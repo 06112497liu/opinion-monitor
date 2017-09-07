@@ -1,0 +1,85 @@
+<beans
+        xmlns:tx="http://www.springframework.org/schema/tx"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.springframework.org/schema/beans"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd"
+>
+
+    <!--<bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">
+        <property name="slowSqlMillis" value="3000"/>
+        <property name="logSlowSql" value="true"/>
+        <property name="mergeSql" value="true"/>
+    </bean>-->
+
+    <!-- 数据库连接池 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="initialSize" value="${jdbc.pool.druid.initialSize}"/>
+        <property name="minIdle" value="${jdbc.pool.druid.maxIdle}"/>
+        <property name="maxActive" value="${jdbc.pool.druid.maxTotal}"/>
+        <property name="filters" value="stat"/>
+        <property name="maxWait" value="${jdbc.pool.druid.maxWaitMillis}"/>
+        <property name="removeAbandonedTimeout" value="${jdbc.pool.druid.removeAbandonedTimeout}"/>
+        <property name="logAbandoned" value="${jdbc.pool.druid.logAbandoned}"/>
+        <property name="timeBetweenEvictionRunsMillis" value="${jdbc.pool.druid.timeBetweenEvictionRunsMillis}"/>
+        <property name="minEvictableIdleTimeMillis" value="${jdbc.pool.druid.minEvictableIdleTimeMillis}"/>
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="testOnReturn" value="true"/>
+    </bean>
+
+    <!-- session工厂-->
+    <bean name="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="plugins">
+            <ref bean="offsetLimitInterceptor"/>
+        </property>
+        <property name="mapperLocations">
+            <list>
+                <value>classpath*:mapper/**/*.xml</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="offsetLimitInterceptor"
+          class="com.mybatis.pagination.OffsetLimitInterceptor">
+        <property name="dialectClass"
+                  value="com.mybatis.dialect.MySQLDialect"/>
+    </bean>
+    <!-- mybatis配置-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.bbd.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactoryBean"/>
+        <!--<property name="annotationClass" value="org.springframework.stereotype.Repository"/>
+        <property name="markerInterface" value="com.base.dao.BaseDao"/>-->
+    </bean>
+    <!-- 事务-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 事物注解 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- DAL层拦截器 -->
+    <bean id="daoAutoProxyCreator" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+        <property name="interceptorNames">
+            <list>
+                <value>daoMonitorInterceptor</value>
+            </list>
+        </property>
+        <property name="beanNames">
+            <value>*Dao</value>
+        </property>
+    </bean>
+
+    <!-- DAO层日志摘要拦截器 -->
+    <bean id="daoMonitorInterceptor" class="com.bbd.common.DaoMonitorInterceptor"/>
+
+</beans>
