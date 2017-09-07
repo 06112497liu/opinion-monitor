@@ -14,12 +14,4 @@
     </modules>
     <packaging>pom</packaging>
 
-    <!--<modules>-->
-    <!--<module>parent</module>-->
-    <!--<module>web</module>-->
-    <!--<module>common</module>-->
-    <!--<module>common-web</module>-->
-    <!--<module>common-dao</module>-->
-    <!--</modules>-->
-
 </project>

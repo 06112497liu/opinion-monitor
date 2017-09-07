@@ -45,13 +45,13 @@
 
             <dependency>
                 <groupId>com.bbd</groupId>
-                <artifactId>common-mysql-dao</artifactId>
+                <artifactId>common-dao</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.bbd</groupId>
-                <artifactId>user</artifactId>
+                <artifactId>web</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
