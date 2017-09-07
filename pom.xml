@@ -1,0 +1,25 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.bbd</groupId>
+    <artifactId>abnormal</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>parent</module>
+        <module>common-dao</module>
+        <module>common</module>
+        <module>web</module>
+        <module>common-web</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <!--<modules>-->
+    <!--<module>parent</module>-->
+    <!--<module>web</module>-->
+    <!--<module>common</module>-->
+    <!--<module>common-web</module>-->
+    <!--<module>common-dao</module>-->
+    <!--</modules>-->
+
+</project>
