@@ -2,12 +2,10 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="http://www.springframework.org/schema/beans"
         xsi:schemaLocation="http://www.springframework.org/schema/beans
-	http://www.springframework.org/schema/beans/spring-beans.xsd"
->
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
     <!-- 业务层配置文件 -->
     <import resource="classpath*:biz.xml"/>
     <import resource="redis.xml"/>
     <import resource="dao.xml"/>
-    <!--<import resource="scheduler.xml"/>-->
 
 </beans>

@@ -10,25 +10,26 @@
 	http://www.springframework.org/schema/mvc
 	http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <bean id="propertiesConfig"
-          class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-        <property name="locations">
-            <list>
-                <value>classpath:config.properties</value>
-                <value>file:/var/reddata/web/company/config.properties</value>
-            </list>
-        </property>
-        <!-- 设置编码格式 -->
-        <property name="fileEncoding" value="UTF-8"></property>
-    </bean>
+    <!--<bean id="propertiesConfig"-->
+    <!--class="org.springframework.beans.factory.config.PropertiesFactoryBean">-->
+    <!--<property name="locations">-->
+    <!--<list>-->
+    <!--<value>classpath:config.properties</value>-->
+    <!--<value>file:/var/reddata/web/abnormal/config.properties</value>-->
+    <!--</list>-->
+    <!--</property>-->
+    <!--&lt;!&ndash; 设置编码格式 &ndash;&gt;-->
+    <!--<property name="fileEncoding" value="UTF-8"></property>-->
+    <!--</bean>-->
 
-    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="properties" ref="propertiesConfig"/>
-        <property name="fileEncoding" value="utf-8"/>
-    </bean>
+    <!--<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+    <!--<property name="properties" ref="propertiesConfig"/>-->
+    <!--<property name="fileEncoding" value="utf-8"/>-->
+    <!--</bean>-->
 
     <!-- controller组件扫描 -->
-    <context:component-scan base-package="com.bbd.controller.*"/>
+    <!-- com.bbd.controller.* 是错的，不要*，定位包到包即可 -->
+    <context:component-scan base-package="com.bbd.controller"/>
 
     <bean id="validator"
           class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
@@ -65,6 +66,14 @@
     <!-- 静态资源处理 -->
     <mvc:default-servlet-handler/>
 
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/yc/**"/>
+            <mvc:exclude-mapping path="/yc/login/login"/>
+            <bean class="com.bbd.filter.LoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
     <!-- 配置SpringMVC的视图解析器 为结果地址加上前缀和后缀 -->
     <bean id="internalResourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/views/"/>
@@ -72,6 +81,6 @@
     </bean>
 
     <!-- 接口注释类加载 -->
-    <bean class="com.bbd.controller.reddata.swagger.config.SwaggerConfig"></bean>
+    <bean class="com.bbd.swagger.SwaggerConfig"></bean>
 
 </beans>

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpSession;
 /**
  * Web请求相关的工具类
  *
- * @author jintao
+ * @author tjwang
  */
 public class RequestUtil {
 

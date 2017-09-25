@@ -80,6 +80,6 @@
     </bean>
 
     <!-- DAO层日志摘要拦截器 -->
-    <bean id="daoMonitorInterceptor" class="com.bbd.common.DaoMonitorInterceptor"/>
+    <bean id="daoMonitorInterceptor" class="com.bbd.filter.DaoMonitorInterceptor"/>
 
 </beans>

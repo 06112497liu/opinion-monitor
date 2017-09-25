@@ -1,7 +1,9 @@
 package com.bbd.aspect;
 
+import com.bbd.RestResult;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindException;
@@ -30,7 +32,8 @@ public class DefaultControllerExceptionHandler {
     public RestResult businessException(ApplicationException e) {
         int errorCode = e.getErrorCode().getStatus();
         logger.info("BusinessException，errorCode=" + errorCode, e);
-        return RestResult.fail(errorCode, e.getMessage());
+        String msg = StringUtils.isNotBlank(e.getMessage()) ? e.getMessage().trim() : e.getErrorCode().getMessage();
+        return RestResult.fail(errorCode, msg);
     }
 
     /**

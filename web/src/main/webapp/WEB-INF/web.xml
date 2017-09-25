@@ -68,9 +68,8 @@
 
     <servlet-mapping>
         <servlet-name>DispatcherServlet</servlet-name>
-        <!-- "*.do"拦截后台请求 -->
+        <url-pattern>*.html</url-pattern>
         <url-pattern>*.do</url-pattern>
-        <!-- 不做任何拦截处理 -->
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 

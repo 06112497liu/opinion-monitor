@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <!-- 数据库驱动包位置 -->
+    <classPathEntry
+            location="lib/mysql-connector-java-5.1.21.jar"/>
+    <context id="context1">
+
+        <plugin type="com.mybatis.plugin.PageBoundsPlugin"></plugin>
+        <!--
+        <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"></plugin>
+        -->
+        <commentGenerator>
+            <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/reddata_yichang" userId="root"
+                        password="root"/>
+
+        <!--
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+            connectionURL="jdbc:mysql://192.168.81.143:3306/reddata_new" userId="root"
+            password="2017@bbd" />
+        -->
+        <!-- 生成模型的包名和位置 -->
+        <javaModelGenerator targetPackage="com.bbd.domain" targetProject="biz">
+        </javaModelGenerator>
+        <!-- 生成的映射文件报名和位置 -->
+        <sqlMapGenerator targetPackage="sqlmap" targetProject="biz">
+        </sqlMapGenerator>
+        <!-- 生成DAO的包名和位置 -->
+        <javaClientGenerator targetPackage="com.bbd.dao" targetProject="biz" type="XMLMAPPER">
+        </javaClientGenerator>
+        <!-- 要生成的那些表(更改tableName 和domainObjectName 就可以了) -->
+
+        <table schema="reddata_yichang" tableName="bbd_user" domainObjectName="User" mapperName="UserDao"
+               enableCountByExample="false" enableUpdateByExample="true"
+               enableDeleteByExample="false" enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+
+        <table schema="reddata_yichang" tableName="bbd_account" domainObjectName="Account" mapperName="AccountDao"
+               enableCountByExample="false" enableUpdateByExample="true"
+               enableDeleteByExample="false" enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+
+    </context>
+</generatorConfiguration>
