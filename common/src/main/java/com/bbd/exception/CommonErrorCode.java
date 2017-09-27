@@ -33,6 +33,8 @@ public enum CommonErrorCode implements ErrorCode {
 
     INNER_ERROR(102, "内部异常"),
 
+    PERMISSION_ERROR(301, "权限不足"),
+
     ;
 
     private int    status;

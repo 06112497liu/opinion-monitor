@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS bbd_account;
 CREATE TABLE `bbd_account` (
   `id` BIGINT(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `user_id` BIGINT(20) NOT NULL,
+  `admin` TINYINT(1) NOT NULL DEFAULT 0,
   `name` VARCHAR(64) DEFAULT NULL,
   `phone` VARCHAR(16) DEFAULT NULL,
   `email` VARCHAR(64) DEFAULT NULL,
@@ -32,3 +33,12 @@ CREATE TABLE `bbd_permission` (
   UNIQUE(`code`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='权限表';
 
+DROP TABLE IF EXISTS bbd_user_permission;
+CREATE TABLE bbd_user_permission(
+  id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  permission_id BIGINT NOT NULL,
+  gmt_create DATETIME DEFAULT NULL COMMENT '创建时间',
+  gmt_modified DATETIME DEFAULT NULL COMMENT '修改时间',
+  INDEX idx_user_id(user_id)
+) COMMENT='用户权限';

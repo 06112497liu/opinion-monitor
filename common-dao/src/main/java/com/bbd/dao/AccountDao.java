@@ -7,6 +7,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 public interface AccountDao {
+    int deleteByExample(AccountExample example);
+
     int deleteByPrimaryKey(Long id);
 
     int insert(Account record);

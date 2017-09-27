@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.bbd.dao.UserDao">
-  <resultMap id="BaseResultMap" type="com.bbd.domain.User">
+<mapper namespace="com.bbd.dao.PermissionDao">
+  <resultMap id="BaseResultMap" type="com.bbd.domain.Permission">
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="username" jdbcType="VARCHAR" property="username" />
-    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
     <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
   </resultMap>
@@ -67,16 +67,16 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, username, password, gmt_create, gmt_modified
+    id, code, name, gmt_create, gmt_modified
   </sql>
-  <select id="selectByExample" parameterType="com.bbd.domain.UserExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.bbd.domain.PermissionExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     'true' as QUERYID,
     <include refid="Base_Column_List" />
-    from bbd_user
+    from bbd_permission
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -87,39 +87,39 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from bbd_user
+    from bbd_permission
     where id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from bbd_user
+    delete from bbd_permission
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <delete id="deleteByExample" parameterType="com.bbd.domain.UserExample">
-    delete from bbd_user
+  <delete id="deleteByExample" parameterType="com.bbd.domain.PermissionExample">
+    delete from bbd_permission
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.bbd.domain.User">
+  <insert id="insert" parameterType="com.bbd.domain.Permission">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_user (username, password, gmt_create, 
+    insert into bbd_permission (code, name, gmt_create, 
       gmt_modified)
-    values (#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP}, 
+    values (#{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP}, 
       #{gmtModified,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.bbd.domain.User">
+  <insert id="insertSelective" parameterType="com.bbd.domain.Permission">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_user
+    insert into bbd_permission
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="username != null">
-        username,
+      <if test="code != null">
+        code,
       </if>
-      <if test="password != null">
-        password,
+      <if test="name != null">
+        name,
       </if>
       <if test="gmtCreate != null">
         gmt_create,
@@ -129,11 +129,11 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="username != null">
-        #{username,jdbcType=VARCHAR},
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
       </if>
-      <if test="password != null">
-        #{password,jdbcType=VARCHAR},
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
       </if>
       <if test="gmtCreate != null">
         #{gmtCreate,jdbcType=TIMESTAMP},
@@ -144,16 +144,16 @@
     </trim>
   </insert>
   <update id="updateByExampleSelective" parameterType="map">
-    update bbd_user
+    update bbd_permission
     <set>
       <if test="record.id != null">
         id = #{record.id,jdbcType=BIGINT},
       </if>
-      <if test="record.username != null">
-        username = #{record.username,jdbcType=VARCHAR},
+      <if test="record.code != null">
+        code = #{record.code,jdbcType=VARCHAR},
       </if>
-      <if test="record.password != null">
-        password = #{record.password,jdbcType=VARCHAR},
+      <if test="record.name != null">
+        name = #{record.name,jdbcType=VARCHAR},
       </if>
       <if test="record.gmtCreate != null">
         gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
@@ -167,24 +167,24 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update bbd_user
+    update bbd_permission
     set id = #{record.id,jdbcType=BIGINT},
-      username = #{record.username,jdbcType=VARCHAR},
-      password = #{record.password,jdbcType=VARCHAR},
+      code = #{record.code,jdbcType=VARCHAR},
+      name = #{record.name,jdbcType=VARCHAR},
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.bbd.domain.User">
-    update bbd_user
+  <update id="updateByPrimaryKeySelective" parameterType="com.bbd.domain.Permission">
+    update bbd_permission
     <set>
-      <if test="username != null">
-        username = #{username,jdbcType=VARCHAR},
+      <if test="code != null">
+        code = #{code,jdbcType=VARCHAR},
       </if>
-      <if test="password != null">
-        password = #{password,jdbcType=VARCHAR},
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
       </if>
       <if test="gmtCreate != null">
         gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
@@ -195,22 +195,22 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.bbd.domain.User">
-    update bbd_user
-    set username = #{username,jdbcType=VARCHAR},
-      password = #{password,jdbcType=VARCHAR},
+  <update id="updateByPrimaryKey" parameterType="com.bbd.domain.Permission">
+    update bbd_permission
+    set code = #{code,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.UserExample" resultMap="BaseResultMap">
+  <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.PermissionExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     'true' as QUERYID,
     <include refid="Base_Column_List" />
-    from bbd_user
+    from bbd_permission
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>

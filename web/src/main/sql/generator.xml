@@ -38,14 +38,30 @@
 
         <table schema="reddata_yichang" tableName="bbd_user" domainObjectName="User" mapperName="UserDao"
                enableCountByExample="false" enableUpdateByExample="true"
-               enableDeleteByExample="false" enableSelectByExample="true"
+               enableDeleteByExample="true" enableSelectByExample="true"
                selectByExampleQueryId="true">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
 
         <table schema="reddata_yichang" tableName="bbd_account" domainObjectName="Account" mapperName="AccountDao"
                enableCountByExample="false" enableUpdateByExample="true"
-               enableDeleteByExample="false" enableSelectByExample="true"
+               enableDeleteByExample="true" enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+
+        <table schema="reddata_yichang" tableName="bbd_permission" domainObjectName="Permission"
+               mapperName="PermissionDao"
+               enableCountByExample="false" enableUpdateByExample="true"
+               enableDeleteByExample="true" enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+
+        <table schema="reddata_yichang" tableName="bbd_user_permission" domainObjectName="UserPermission"
+               mapperName="UserPermissionDao"
+               enableCountByExample="false" enableUpdateByExample="true"
+               enableDeleteByExample="true" enableSelectByExample="true"
                selectByExampleQueryId="true">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>

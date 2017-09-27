@@ -1,27 +1,50 @@
-package com.bbd.domain;
+/**
+ * BBD Service Inc
+ * All Rights Reserved @2016
+ */
+package com.bbd.service.param;
 
-import java.util.Date;
+/**
+ * 账户更新参数
+ * @author tjwang
+ * @version $Id: AccountUpdateVo.java, v 0.1 2017/9/27 0027 16:22 tjwang Exp $
+ */
+public class AccountUpdateVo {
 
-public class Account {
-    private Long id;
+    /**
+     * 账户ID
+     */
+    private Long    id;
 
-    private Long userId;
-
+    /**
+     * 是否是管理员
+     */
     private Boolean admin;
 
-    private String name;
+    /**
+     * 账户名
+     */
+    private String  name;
 
-    private String phone;
+    /**
+     * 电话
+     */
+    private String  phone;
 
-    private String email;
+    /**
+     * 邮件
+     */
+    private String  email;
 
-    private String region;
+    /**
+     * 区域
+     */
+    private String  region;
 
-    private String depNote;
-
-    private Date gmtCreate;
-
-    private Date gmtModified;
+    /**
+     * 部门
+     */
+    private String  depNote;
 
     public Long getId() {
         return id;
@@ -29,14 +52,6 @@ public class Account {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public Boolean getAdmin() {
@@ -85,21 +100,5 @@ public class Account {
 
     public void setDepNote(String depNote) {
         this.depNote = depNote;
-    }
-
-    public Date getGmtCreate() {
-        return gmtCreate;
-    }
-
-    public void setGmtCreate(Date gmtCreate) {
-        this.gmtCreate = gmtCreate;
-    }
-
-    public Date getGmtModified() {
-        return gmtModified;
-    }
-
-    public void setGmtModified(Date gmtModified) {
-        this.gmtModified = gmtModified;
     }
 }

@@ -4,6 +4,8 @@
  */
 package com.bbd.vo;
 
+import java.util.List;
+
 /**
  *
  * @author tjwang
@@ -12,14 +14,31 @@ package com.bbd.vo;
 public class UserInfo {
 
     /**
+     * 是否是管理员
+     */
+    private Boolean      admin;
+
+    /**
      * 登录名
      */
-    private String username;
+    private String       username;
 
     /**
      * 账户名
      */
-    private String accountName;
+    private String       accountName;
+
+    private List<String> roles;
+
+    private List<String> permissions;
+
+    public Boolean getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
+    }
 
     public String getUsername() {
         return username;
@@ -35,5 +54,21 @@ public class UserInfo {
 
     public void setAccountName(String accountName) {
         this.accountName = accountName;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
+
+    public List<String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<String> permissions) {
+        this.permissions = permissions;
     }
 }

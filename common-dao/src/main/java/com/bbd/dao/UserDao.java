@@ -7,6 +7,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 public interface UserDao {
+    int deleteByExample(UserExample example);
+
     int deleteByPrimaryKey(Long id);
 
     int insert(User record);

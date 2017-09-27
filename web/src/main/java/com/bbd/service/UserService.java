@@ -9,6 +9,7 @@ import com.bbd.domain.User;
 import com.bbd.domain.UserExample;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.mybatis.domain.PageBounds;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,21 @@ public class UserService {
     @Autowired
     private UserDao userDao;
 
+    /**
+     * 查询用户列表
+     * @param pb
+     * @return
+     */
+    public List<User> queryUsers(PageBounds pb) {
+        UserExample exam = new UserExample();
+        return userDao.selectByExampleWithPageBounds(exam, pb);
+    }
+
+    /**
+     * 通过用户名查询用户
+     * @param username
+     * @return
+     */
     public Optional<User> queryUserByUserame(String username) {
         Preconditions.checkArgument(StringUtils.isNotBlank(username), "用户名不能为空");
 

@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.bbd.domain.Account">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="admin" jdbcType="BIT" property="admin" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="phone" jdbcType="VARCHAR" property="phone" />
     <result column="email" jdbcType="VARCHAR" property="email" />
@@ -71,7 +72,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, user_id, name, phone, email, region, dep_note, gmt_create, gmt_modified
+    id, user_id, admin, name, phone, email, region, dep_note, gmt_create, gmt_modified
   </sql>
   <select id="selectByExample" parameterType="com.bbd.domain.AccountExample" resultMap="BaseResultMap">
     select
@@ -98,16 +99,24 @@
     delete from bbd_account
     where id = #{id,jdbcType=BIGINT}
   </delete>
+  <delete id="deleteByExample" parameterType="com.bbd.domain.AccountExample">
+    delete from bbd_account
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
   <insert id="insert" parameterType="com.bbd.domain.Account">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_account (user_id, name, phone, 
-      email, region, dep_note, 
-      gmt_create, gmt_modified)
-    values (#{userId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
-      #{email,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR}, #{depNote,jdbcType=VARCHAR}, 
-      #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP})
+    insert into bbd_account (user_id, admin, name, 
+      phone, email, region, 
+      dep_note, gmt_create, gmt_modified
+      )
+    values (#{userId,jdbcType=BIGINT}, #{admin,jdbcType=BIT}, #{name,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR}, 
+      #{depNote,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.bbd.domain.Account">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -117,6 +126,9 @@
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="userId != null">
         user_id,
+      </if>
+      <if test="admin != null">
+        admin,
       </if>
       <if test="name != null">
         name,
@@ -143,6 +155,9 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="userId != null">
         #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="admin != null">
+        #{admin,jdbcType=BIT},
       </if>
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
@@ -176,6 +191,9 @@
       <if test="record.userId != null">
         user_id = #{record.userId,jdbcType=BIGINT},
       </if>
+      <if test="record.admin != null">
+        admin = #{record.admin,jdbcType=BIT},
+      </if>
       <if test="record.name != null">
         name = #{record.name,jdbcType=VARCHAR},
       </if>
@@ -206,6 +224,7 @@
     update bbd_account
     set id = #{record.id,jdbcType=BIGINT},
       user_id = #{record.userId,jdbcType=BIGINT},
+      admin = #{record.admin,jdbcType=BIT},
       name = #{record.name,jdbcType=VARCHAR},
       phone = #{record.phone,jdbcType=VARCHAR},
       email = #{record.email,jdbcType=VARCHAR},
@@ -222,6 +241,9 @@
     <set>
       <if test="userId != null">
         user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="admin != null">
+        admin = #{admin,jdbcType=BIT},
       </if>
       <if test="name != null">
         name = #{name,jdbcType=VARCHAR},
@@ -250,6 +272,7 @@
   <update id="updateByPrimaryKey" parameterType="com.bbd.domain.Account">
     update bbd_account
     set user_id = #{userId,jdbcType=BIGINT},
+      admin = #{admin,jdbcType=BIT},
       name = #{name,jdbcType=VARCHAR},
       phone = #{phone,jdbcType=VARCHAR},
       email = #{email,jdbcType=VARCHAR},

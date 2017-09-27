@@ -7,11 +7,14 @@ package com.bbd.service;
 import com.bbd.dao.AccountDao;
 import com.bbd.domain.Account;
 import com.bbd.domain.AccountExample;
+import com.bbd.service.param.AccountUpdateVo;
+import com.bbd.util.BeanMapperUtil;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,7 +28,7 @@ public class AccountService {
     @Autowired
     private AccountDao accountDao;
 
-    public Optional<Account> queryByUserId(Long userId) {
+    public Optional<Account> loadByUserId(Long userId) {
         Preconditions.checkNotNull(userId);
 
         AccountExample exam = new AccountExample();
@@ -36,5 +39,18 @@ public class AccountService {
             return Optional.absent();
         }
         return Optional.of(ds.get(0));
+    }
+
+    /**
+     * 更新账户
+     * @param vo
+     */
+    public void updateAccount(AccountUpdateVo vo) {
+        Date now = new Date();
+
+        Account account = BeanMapperUtil.map(vo, Account.class);
+        account.setGmtModified(now);
+
+        accountDao.updateByPrimaryKeySelective(account);
     }
 }
