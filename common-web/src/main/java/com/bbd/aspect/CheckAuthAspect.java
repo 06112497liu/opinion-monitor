@@ -9,6 +9,7 @@ import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
@@ -29,12 +30,15 @@ public class CheckAuthAspect {
 
     @Before(value = "com.bbd.aspect.CheckAuthAspect.checkAuthPointcut(checkAuth)")
     public void before(CheckAuth checkAuth) {
-        String permission = checkAuth.permission();
-
         UserInfo user = UserContext.getUser();
 
         if (user.getAdmin()) {
             return;
+        }
+
+        String permission = checkAuth.permission();
+        if (StringUtils.isBlank(permission)) {
+            throw new ApplicationException(CommonErrorCode.PERMISSION_ERROR);
         }
 
         if (!user.getPermissions().contains(permission)) {

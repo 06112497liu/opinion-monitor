@@ -4,9 +4,11 @@
  */
 package com.bbd.service;
 
-import com.bbd.domain.Permission;
+import com.bbd.service.param.PermissionView;
+import com.google.common.collect.Lists;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
 
@@ -23,8 +25,20 @@ public class PermissionServiceTest extends BaseServiceTest {
     @Test
     public void testQueryUserPermissions() {
         Long userId = 1L;
-        List<Permission> ps = permissionService.queryUserPermissions(userId);
+        List<PermissionView> ps = permissionService.queryUserPermissions(userId);
         assertTrue(ps.size() >= 0);
+    }
+
+    @Test
+    @Rollback
+    public void testUpdateUserPermission() {
+        Long userId = 2L;
+        List<Long> pIds = Lists.newArrayList(1L, 2L, 3L, 4L, 5L, 6L);
+
+        permissionService.setUserPermission(userId, pIds);
+
+        List<PermissionView> ps = permissionService.queryUserPermissions(userId);
+        assertTrue(ps.size() > 0);
     }
 
 }

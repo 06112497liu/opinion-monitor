@@ -7,7 +7,6 @@ package com.bbd.controller;
 import com.bbd.RestResult;
 import com.bbd.controller.param.LoginUser;
 import com.bbd.domain.Account;
-import com.bbd.domain.Permission;
 import com.bbd.domain.User;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
@@ -15,6 +14,7 @@ import com.bbd.exception.UserErrorCode;
 import com.bbd.service.AccountService;
 import com.bbd.service.PermissionService;
 import com.bbd.service.UserService;
+import com.bbd.service.param.PermissionView;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Optional;
@@ -96,9 +96,9 @@ public class LoginController extends AbstractController {
      * @param user
      */
     private void setUserPermissions(Long userId, UserInfo user) {
-        List<Permission> ps = permissionService.queryUserPermissions(userId);
+        List<PermissionView> ps = permissionService.queryUserPermissions(userId);
         List<String> codes = Lists.newArrayList();
-        for (Permission p : ps) {
+        for (PermissionView p : ps) {
             codes.add(p.getCode());
         }
         user.setPermissions(codes);
