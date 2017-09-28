@@ -5,6 +5,7 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
+import com.bbd.annotation.TimeUsed;
 import com.bbd.controller.param.LoginUser;
 import com.bbd.domain.Account;
 import com.bbd.domain.User;
@@ -48,6 +49,7 @@ public class LoginController extends AbstractController {
     @Autowired
     private PermissionService permissionService;
 
+    @TimeUsed(threshold = 10)
     @ApiOperation(value = "登录", httpMethod = "POST")
     @ApiImplicitParams({ @ApiImplicitParam(value = "用户名", name = "username", dataType = "String", paramType = "query", required = false),
             @ApiImplicitParam(value = "密码", name = "password", dataType = "String", paramType = "query", required = false) })
