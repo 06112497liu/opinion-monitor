@@ -18,6 +18,10 @@ import java.lang.annotation.Target;
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface TimeUsed {
 
+    /**
+     * 监控阈值，单位毫秒。
+     * @return
+     */
     long threshold() default 0L;
 
 }

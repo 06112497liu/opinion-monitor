@@ -34,6 +34,10 @@ public class CheckAuthAspect {
     public void before(CheckAuth checkAuth) {
         UserInfo user = UserContext.getUser();
 
+        if (user == null) {
+            throw new ApplicationException(CommonErrorCode.PERMISSION_ERROR);
+        }
+
         if (user.getAdmin()) {
             return;
         }
