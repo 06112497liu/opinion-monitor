@@ -74,3 +74,25 @@ create table bbd_warn_notifier
    gmt_modified         datetime comment '修改时间',
    primary key (id)
 );
+
+drop table if exists bbd_opinion;
+create table bbd_opinion
+(
+   id                   bigint not null,
+   uuid                 varchar(32),
+   title                varchar(255),
+   summary             varchar(255),
+   content              text,
+   source               varchar(32),
+   link                 text,
+   source_type          tinyint comment '1. 新闻；2.微博；3.微信；4.政务；5.网站；6.论坛；7.其他',
+   start_time           datetime,
+   hot                  int,
+   emotion              tinyint,
+   similiar             int,
+   words                varchar(128),
+   comment_count        int,
+   gmt_create           datetime comment '创建时间',
+   gmt_modified         datetime comment '修改时间',
+   primary key (id)
+);
