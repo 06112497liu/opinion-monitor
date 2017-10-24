@@ -42,3 +42,57 @@ CREATE TABLE bbd_user_permission(
   gmt_modified DATETIME DEFAULT NULL COMMENT '修改时间',
   INDEX idx_user_id(user_id)
 ) COMMENT='用户权限';
+
+drop table if exists bbd_warn_setting;
+create table bbd_warn_setting
+(
+   id                   bigint not null,
+   name                 varchar(32),
+   type                 tinyint comment '1. 事件新增观点预警；2.事件总体热度预警。',
+   min                  int,
+   max                  int,
+   create_by            bigint,
+   gmt_create           datetime comment '创建时间',
+   modified_by          bigint,
+   gmt_modified         datetime comment '修改时间',
+   primary key (id)
+);
+
+drop table if exists bbd_warn_notifier;
+create table bbd_warn_notifier
+(
+   id                   bigint not null,
+   setting_id           bigint,
+   notifier             varchar(32),
+   email_notify         tinyint(1),
+   email                varchar(64),
+   sms_notify           tinyint(1),
+   phone                varchar(32),
+   create_by            bigint,
+   gmt_create           datetime comment '创建时间',
+   modified_by          bigint,
+   gmt_modified         datetime comment '修改时间',
+   primary key (id)
+);
+
+drop table if exists bbd_opinion;
+create table bbd_opinion
+(
+   id                   bigint not null,
+   uuid                 varchar(32),
+   title                varchar(255),
+   summary             varchar(255),
+   content              text,
+   source               varchar(32),
+   link                 text,
+   source_type          tinyint comment '1. 新闻；2.微博；3.微信；4.政务；5.网站；6.论坛；7.其他',
+   start_time           datetime,
+   hot                  int,
+   emotion              tinyint,
+   similiar             int,
+   words                varchar(128),
+   comment_count        int,
+   gmt_create           datetime comment '创建时间',
+   gmt_modified         datetime comment '修改时间',
+   primary key (id)
+);

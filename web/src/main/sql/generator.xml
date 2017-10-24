@@ -66,5 +66,24 @@
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
 
+        <!-- 预警设置表 -->
+        <table schema="reddata_opinion" tableName="bbd_warn_setting" domainObjectName="WarnSetting" mapperName="WarnSettingDao"
+               enableCountByExample="false" enableUpdateByExample="true"
+               enableDeleteByExample="false" enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <columnOverride column="type" property="type" javaType="java.lang.Integer"/>
+        </table>
+
+        <!-- 预警通知消息表 -->
+        <table schema="reddata_opinion" tableName="bbd_warn_notifier" domainObjectName="WarnNotifier" mapperName="WarnNotifierDao"
+               enableCountByExample="false" enableUpdateByExample="true"
+               enableDeleteByExample="false" enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <columnOverride column="email_notify" property="emailNotify" javaType="java.lang.Integer"/>
+            <columnOverride column="sms_notify" property="smsNotify" javaType="java.lang.Integer"/>
+        </table>
+
     </context>
 </generatorConfiguration>
