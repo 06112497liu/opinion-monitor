@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @version $Id: HelloController.java, v 0.1 2017/9/25 0025 13:47 tjwang Exp $
  */
 @RestController
-@RequestMapping("/yc/hello")
+@RequestMapping("/api/hello")
 public class HelloController extends AbstractController {
 
     @CheckAuth(permission = "world")

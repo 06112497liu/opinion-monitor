@@ -37,7 +37,7 @@ import java.util.List;
  * @version $Id: LoginController.java, v 0.1 2017/9/25 0025 14:48 tjwang Exp $
  */
 @RestController
-@RequestMapping("/yc/login")
+@RequestMapping("/api/login")
 public class LoginController extends AbstractController {
 
     @Autowired

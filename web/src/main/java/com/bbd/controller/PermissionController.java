@@ -29,7 +29,7 @@ import java.util.List;
  * @version $Id: PermissionController.java, v 0.1 2017/9/27 0027 17:02 tjwang Exp $
  */
 @RestController
-@RequestMapping("/yc/permission")
+@RequestMapping("/api/permission")
 public class PermissionController {
 
     @Autowired

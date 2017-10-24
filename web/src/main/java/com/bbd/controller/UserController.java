@@ -21,7 +21,7 @@ import java.util.List;
  * @version $Id: UserController.java, v 0.1 2017/9/27 0027 16:20 tjwang Exp $
  */
 @RestController
-@RequestMapping("/yc/user")
+@RequestMapping("/api/user")
 public class UserController extends AbstractController {
 
     @Autowired
