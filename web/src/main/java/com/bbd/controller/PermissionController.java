@@ -5,7 +5,6 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
-import com.bbd.annotation.CheckAuth;
 import com.bbd.controller.param.UserPermmisionVo;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.PermissionService;
@@ -44,7 +43,6 @@ public class PermissionController {
         return RestResult.ok(permissionService.queryUserPermissions(userId));
     }
 
-    @CheckAuth
     @ApiOperation(value = "设置用户权限", httpMethod = "POST")
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     public RestResult setUserPermissions(@RequestBody @Valid UserPermmisionVo vo) {
