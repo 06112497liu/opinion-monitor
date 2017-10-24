@@ -3,13 +3,14 @@
 <mapper namespace="com.bbd.dao.WarnSettingDao">
   <resultMap id="BaseResultMap" type="com.bbd.domain.WarnSetting">
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="popup" jdbcType="TINYINT" property="popup" />
     <result column="min" jdbcType="INTEGER" property="min" />
     <result column="max" jdbcType="INTEGER" property="max" />
     <result column="create_by" jdbcType="BIGINT" property="createBy" />
-    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
     <result column="modified_by" jdbcType="BIGINT" property="modifiedBy" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
     <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -71,7 +72,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, name, type, min, max, create_by, gmt_create, modified_by, gmt_modified
+    id, type, name, popup, min, max, create_by, modified_by, gmt_create, gmt_modified
   </sql>
   <select id="selectByExample" parameterType="com.bbd.domain.WarnSettingExample" resultMap="BaseResultMap">
     select
@@ -102,12 +103,14 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_warn_setting (name, type, min, 
-      max, create_by, gmt_create, 
-      modified_by, gmt_modified)
-    values (#{name,jdbcType=VARCHAR}, #{type,jdbcType=TINYINT}, #{min,jdbcType=INTEGER}, 
-      #{max,jdbcType=INTEGER}, #{createBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, 
-      #{modifiedBy,jdbcType=BIGINT}, #{gmtModified,jdbcType=TIMESTAMP})
+    insert into bbd_warn_setting (type, name, popup, 
+      min, max, create_by, 
+      modified_by, gmt_create, gmt_modified
+      )
+    values (#{type,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, #{popup,jdbcType=TINYINT}, 
+      #{min,jdbcType=INTEGER}, #{max,jdbcType=INTEGER}, #{createBy,jdbcType=BIGINT}, 
+      #{modifiedBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.bbd.domain.WarnSetting">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -115,11 +118,14 @@
     </selectKey>
     insert into bbd_warn_setting
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="type != null">
+        type,
+      </if>
       <if test="name != null">
         name,
       </if>
-      <if test="type != null">
-        type,
+      <if test="popup != null">
+        popup,
       </if>
       <if test="min != null">
         min,
@@ -130,22 +136,25 @@
       <if test="createBy != null">
         create_by,
       </if>
-      <if test="gmtCreate != null">
-        gmt_create,
-      </if>
       <if test="modifiedBy != null">
         modified_by,
+      </if>
+      <if test="gmtCreate != null">
+        gmt_create,
       </if>
       <if test="gmtModified != null">
         gmt_modified,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="type != null">
+        #{type,jdbcType=TINYINT},
+      </if>
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
       </if>
-      <if test="type != null">
-        #{type,jdbcType=TINYINT},
+      <if test="popup != null">
+        #{popup,jdbcType=TINYINT},
       </if>
       <if test="min != null">
         #{min,jdbcType=INTEGER},
@@ -156,11 +165,11 @@
       <if test="createBy != null">
         #{createBy,jdbcType=BIGINT},
       </if>
-      <if test="gmtCreate != null">
-        #{gmtCreate,jdbcType=TIMESTAMP},
-      </if>
       <if test="modifiedBy != null">
         #{modifiedBy,jdbcType=BIGINT},
+      </if>
+      <if test="gmtCreate != null">
+        #{gmtCreate,jdbcType=TIMESTAMP},
       </if>
       <if test="gmtModified != null">
         #{gmtModified,jdbcType=TIMESTAMP},
@@ -173,11 +182,14 @@
       <if test="record.id != null">
         id = #{record.id,jdbcType=BIGINT},
       </if>
+      <if test="record.type != null">
+        type = #{record.type,jdbcType=TINYINT},
+      </if>
       <if test="record.name != null">
         name = #{record.name,jdbcType=VARCHAR},
       </if>
-      <if test="record.type != null">
-        type = #{record.type,jdbcType=TINYINT},
+      <if test="record.popup != null">
+        popup = #{record.popup,jdbcType=TINYINT},
       </if>
       <if test="record.min != null">
         min = #{record.min,jdbcType=INTEGER},
@@ -188,11 +200,11 @@
       <if test="record.createBy != null">
         create_by = #{record.createBy,jdbcType=BIGINT},
       </if>
-      <if test="record.gmtCreate != null">
-        gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
-      </if>
       <if test="record.modifiedBy != null">
         modified_by = #{record.modifiedBy,jdbcType=BIGINT},
+      </if>
+      <if test="record.gmtCreate != null">
+        gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       </if>
       <if test="record.gmtModified != null">
         gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
@@ -205,13 +217,14 @@
   <update id="updateByExample" parameterType="map">
     update bbd_warn_setting
     set id = #{record.id,jdbcType=BIGINT},
-      name = #{record.name,jdbcType=VARCHAR},
       type = #{record.type,jdbcType=TINYINT},
+      name = #{record.name,jdbcType=VARCHAR},
+      popup = #{record.popup,jdbcType=TINYINT},
       min = #{record.min,jdbcType=INTEGER},
       max = #{record.max,jdbcType=INTEGER},
       create_by = #{record.createBy,jdbcType=BIGINT},
-      gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       modified_by = #{record.modifiedBy,jdbcType=BIGINT},
+      gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -220,11 +233,14 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.bbd.domain.WarnSetting">
     update bbd_warn_setting
     <set>
+      <if test="type != null">
+        type = #{type,jdbcType=TINYINT},
+      </if>
       <if test="name != null">
         name = #{name,jdbcType=VARCHAR},
       </if>
-      <if test="type != null">
-        type = #{type,jdbcType=TINYINT},
+      <if test="popup != null">
+        popup = #{popup,jdbcType=TINYINT},
       </if>
       <if test="min != null">
         min = #{min,jdbcType=INTEGER},
@@ -235,11 +251,11 @@
       <if test="createBy != null">
         create_by = #{createBy,jdbcType=BIGINT},
       </if>
-      <if test="gmtCreate != null">
-        gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
-      </if>
       <if test="modifiedBy != null">
         modified_by = #{modifiedBy,jdbcType=BIGINT},
+      </if>
+      <if test="gmtCreate != null">
+        gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       </if>
       <if test="gmtModified != null">
         gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
@@ -249,13 +265,14 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.bbd.domain.WarnSetting">
     update bbd_warn_setting
-    set name = #{name,jdbcType=VARCHAR},
-      type = #{type,jdbcType=TINYINT},
+    set type = #{type,jdbcType=TINYINT},
+      name = #{name,jdbcType=VARCHAR},
+      popup = #{popup,jdbcType=TINYINT},
       min = #{min,jdbcType=INTEGER},
       max = #{max,jdbcType=INTEGER},
       create_by = #{createBy,jdbcType=BIGINT},
-      gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       modified_by = #{modifiedBy,jdbcType=BIGINT},
+      gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
