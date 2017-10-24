@@ -5,9 +5,9 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="setting_id" jdbcType="BIGINT" property="settingId" />
     <result column="notifier" jdbcType="VARCHAR" property="notifier" />
-    <result column="email_notify" jdbcType="BIT" property="EmailNotify" />
+    <result column="email_notify" jdbcType="BIT" property="emailNotify" />
     <result column="email" jdbcType="VARCHAR" property="email" />
-    <result column="sms_notify" jdbcType="BIT" property="SmsNotify" />
+    <result column="sms_notify" jdbcType="BIT" property="smsNotify" />
     <result column="phone" jdbcType="VARCHAR" property="phone" />
     <result column="create_by" jdbcType="BIGINT" property="createBy" />
     <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
@@ -109,8 +109,8 @@
       email, sms_notify, phone, 
       create_by, gmt_create, modified_by, 
       gmt_modified)
-    values (#{settingId,jdbcType=BIGINT}, #{notifier,jdbcType=VARCHAR}, #{EmailNotify,jdbcType=BIT}, 
-      #{email,jdbcType=VARCHAR}, #{SmsNotify,jdbcType=BIT}, #{phone,jdbcType=VARCHAR}, 
+    values (#{settingId,jdbcType=BIGINT}, #{notifier,jdbcType=VARCHAR}, #{emailNotify,jdbcType=BIT}, 
+      #{email,jdbcType=VARCHAR}, #{smsNotify,jdbcType=BIT}, #{phone,jdbcType=VARCHAR}, 
       #{createBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{modifiedBy,jdbcType=BIGINT}, 
       #{gmtModified,jdbcType=TIMESTAMP})
   </insert>
@@ -126,13 +126,13 @@
       <if test="notifier != null">
         notifier,
       </if>
-      <if test="EmailNotify != null">
+      <if test="emailNotify != null">
         email_notify,
       </if>
       <if test="email != null">
         email,
       </if>
-      <if test="SmsNotify != null">
+      <if test="smsNotify != null">
         sms_notify,
       </if>
       <if test="phone != null">
@@ -158,14 +158,14 @@
       <if test="notifier != null">
         #{notifier,jdbcType=VARCHAR},
       </if>
-      <if test="EmailNotify != null">
-        #{EmailNotify,jdbcType=BIT},
+      <if test="emailNotify != null">
+        #{emailNotify,jdbcType=BIT},
       </if>
       <if test="email != null">
         #{email,jdbcType=VARCHAR},
       </if>
-      <if test="SmsNotify != null">
-        #{SmsNotify,jdbcType=BIT},
+      <if test="smsNotify != null">
+        #{smsNotify,jdbcType=BIT},
       </if>
       <if test="phone != null">
         #{phone,jdbcType=VARCHAR},
@@ -196,14 +196,14 @@
       <if test="record.notifier != null">
         notifier = #{record.notifier,jdbcType=VARCHAR},
       </if>
-      <if test="record.EmailNotify != null">
-        email_notify = #{record.EmailNotify,jdbcType=BIT},
+      <if test="record.emailNotify != null">
+        email_notify = #{record.emailNotify,jdbcType=BIT},
       </if>
       <if test="record.email != null">
         email = #{record.email,jdbcType=VARCHAR},
       </if>
-      <if test="record.SmsNotify != null">
-        sms_notify = #{record.SmsNotify,jdbcType=BIT},
+      <if test="record.smsNotify != null">
+        sms_notify = #{record.smsNotify,jdbcType=BIT},
       </if>
       <if test="record.phone != null">
         phone = #{record.phone,jdbcType=VARCHAR},
@@ -230,9 +230,9 @@
     set id = #{record.id,jdbcType=BIGINT},
       setting_id = #{record.settingId,jdbcType=BIGINT},
       notifier = #{record.notifier,jdbcType=VARCHAR},
-      email_notify = #{record.EmailNotify,jdbcType=BIT},
+      email_notify = #{record.emailNotify,jdbcType=BIT},
       email = #{record.email,jdbcType=VARCHAR},
-      sms_notify = #{record.SmsNotify,jdbcType=BIT},
+      sms_notify = #{record.smsNotify,jdbcType=BIT},
       phone = #{record.phone,jdbcType=VARCHAR},
       create_by = #{record.createBy,jdbcType=BIGINT},
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
@@ -251,14 +251,14 @@
       <if test="notifier != null">
         notifier = #{notifier,jdbcType=VARCHAR},
       </if>
-      <if test="EmailNotify != null">
-        email_notify = #{EmailNotify,jdbcType=BIT},
+      <if test="emailNotify != null">
+        email_notify = #{emailNotify,jdbcType=BIT},
       </if>
       <if test="email != null">
         email = #{email,jdbcType=VARCHAR},
       </if>
-      <if test="SmsNotify != null">
-        sms_notify = #{SmsNotify,jdbcType=BIT},
+      <if test="smsNotify != null">
+        sms_notify = #{smsNotify,jdbcType=BIT},
       </if>
       <if test="phone != null">
         phone = #{phone,jdbcType=VARCHAR},
@@ -282,9 +282,9 @@
     update bbd_warn_notifier
     set setting_id = #{settingId,jdbcType=BIGINT},
       notifier = #{notifier,jdbcType=VARCHAR},
-      email_notify = #{EmailNotify,jdbcType=BIT},
+      email_notify = #{emailNotify,jdbcType=BIT},
       email = #{email,jdbcType=VARCHAR},
-      sms_notify = #{SmsNotify,jdbcType=BIT},
+      sms_notify = #{smsNotify,jdbcType=BIT},
       phone = #{phone,jdbcType=VARCHAR},
       create_by = #{createBy,jdbcType=BIGINT},
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},

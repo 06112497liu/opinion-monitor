@@ -306,52 +306,52 @@ public class WarnNotifierExample {
         }
 
         public Criteria andEmailNotifyEqualTo(Integer value) {
-            addCriterion("email_notify =", value, "EmailNotify");
+            addCriterion("email_notify =", value, "emailNotify");
             return (Criteria) this;
         }
 
         public Criteria andEmailNotifyNotEqualTo(Integer value) {
-            addCriterion("email_notify <>", value, "EmailNotify");
+            addCriterion("email_notify <>", value, "emailNotify");
             return (Criteria) this;
         }
 
         public Criteria andEmailNotifyGreaterThan(Integer value) {
-            addCriterion("email_notify >", value, "EmailNotify");
+            addCriterion("email_notify >", value, "emailNotify");
             return (Criteria) this;
         }
 
         public Criteria andEmailNotifyGreaterThanOrEqualTo(Integer value) {
-            addCriterion("email_notify >=", value, "EmailNotify");
+            addCriterion("email_notify >=", value, "emailNotify");
             return (Criteria) this;
         }
 
         public Criteria andEmailNotifyLessThan(Integer value) {
-            addCriterion("email_notify <", value, "EmailNotify");
+            addCriterion("email_notify <", value, "emailNotify");
             return (Criteria) this;
         }
 
         public Criteria andEmailNotifyLessThanOrEqualTo(Integer value) {
-            addCriterion("email_notify <=", value, "EmailNotify");
+            addCriterion("email_notify <=", value, "emailNotify");
             return (Criteria) this;
         }
 
         public Criteria andEmailNotifyIn(List<Integer> values) {
-            addCriterion("email_notify in", values, "EmailNotify");
+            addCriterion("email_notify in", values, "emailNotify");
             return (Criteria) this;
         }
 
         public Criteria andEmailNotifyNotIn(List<Integer> values) {
-            addCriterion("email_notify not in", values, "EmailNotify");
+            addCriterion("email_notify not in", values, "emailNotify");
             return (Criteria) this;
         }
 
         public Criteria andEmailNotifyBetween(Integer value1, Integer value2) {
-            addCriterion("email_notify between", value1, value2, "EmailNotify");
+            addCriterion("email_notify between", value1, value2, "emailNotify");
             return (Criteria) this;
         }
 
         public Criteria andEmailNotifyNotBetween(Integer value1, Integer value2) {
-            addCriterion("email_notify not between", value1, value2, "EmailNotify");
+            addCriterion("email_notify not between", value1, value2, "emailNotify");
             return (Criteria) this;
         }
 
@@ -436,52 +436,52 @@ public class WarnNotifierExample {
         }
 
         public Criteria andSmsNotifyEqualTo(Integer value) {
-            addCriterion("sms_notify =", value, "SmsNotify");
+            addCriterion("sms_notify =", value, "smsNotify");
             return (Criteria) this;
         }
 
         public Criteria andSmsNotifyNotEqualTo(Integer value) {
-            addCriterion("sms_notify <>", value, "SmsNotify");
+            addCriterion("sms_notify <>", value, "smsNotify");
             return (Criteria) this;
         }
 
         public Criteria andSmsNotifyGreaterThan(Integer value) {
-            addCriterion("sms_notify >", value, "SmsNotify");
+            addCriterion("sms_notify >", value, "smsNotify");
             return (Criteria) this;
         }
 
         public Criteria andSmsNotifyGreaterThanOrEqualTo(Integer value) {
-            addCriterion("sms_notify >=", value, "SmsNotify");
+            addCriterion("sms_notify >=", value, "smsNotify");
             return (Criteria) this;
         }
 
         public Criteria andSmsNotifyLessThan(Integer value) {
-            addCriterion("sms_notify <", value, "SmsNotify");
+            addCriterion("sms_notify <", value, "smsNotify");
             return (Criteria) this;
         }
 
         public Criteria andSmsNotifyLessThanOrEqualTo(Integer value) {
-            addCriterion("sms_notify <=", value, "SmsNotify");
+            addCriterion("sms_notify <=", value, "smsNotify");
             return (Criteria) this;
         }
 
         public Criteria andSmsNotifyIn(List<Integer> values) {
-            addCriterion("sms_notify in", values, "SmsNotify");
+            addCriterion("sms_notify in", values, "smsNotify");
             return (Criteria) this;
         }
 
         public Criteria andSmsNotifyNotIn(List<Integer> values) {
-            addCriterion("sms_notify not in", values, "SmsNotify");
+            addCriterion("sms_notify not in", values, "smsNotify");
             return (Criteria) this;
         }
 
         public Criteria andSmsNotifyBetween(Integer value1, Integer value2) {
-            addCriterion("sms_notify between", value1, value2, "SmsNotify");
+            addCriterion("sms_notify between", value1, value2, "smsNotify");
             return (Criteria) this;
         }
 
         public Criteria andSmsNotifyNotBetween(Integer value1, Integer value2) {
-            addCriterion("sms_notify not between", value1, value2, "SmsNotify");
+            addCriterion("sms_notify not between", value1, value2, "smsNotify");
             return (Criteria) this;
         }
 

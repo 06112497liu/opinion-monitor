@@ -9,11 +9,11 @@ public class WarnNotifier {
 
     private String notifier;
 
-    private Integer EmailNotify;
+    private Integer emailNotify;
 
     private String email;
 
-    private Integer SmsNotify;
+    private Integer smsNotify;
 
     private String phone;
 
@@ -50,11 +50,11 @@ public class WarnNotifier {
     }
 
     public Integer getEmailNotify() {
-        return EmailNotify;
+        return emailNotify;
     }
 
-    public void setEmailNotify(Integer EmailNotify) {
-        this.EmailNotify = EmailNotify;
+    public void setEmailNotify(Integer emailNotify) {
+        this.emailNotify = emailNotify;
     }
 
     public String getEmail() {
@@ -66,11 +66,11 @@ public class WarnNotifier {
     }
 
     public Integer getSmsNotify() {
-        return SmsNotify;
+        return smsNotify;
     }
 
-    public void setSmsNotify(Integer SmsNotify) {
-        this.SmsNotify = SmsNotify;
+    public void setSmsNotify(Integer smsNotify) {
+        this.smsNotify = smsNotify;
     }
 
     public String getPhone() {
