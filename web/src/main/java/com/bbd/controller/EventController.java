@@ -29,20 +29,17 @@ public class EventController extends AbstractController {
     @ApiImplicitParams({ 
     	@ApiImplicitParam(value = "事件名称", name = "eventName", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "事件分组", name = "eventGroup", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "监管主体", name = "monitor", dataType = "Integer", paramType = "query", required = true),
+    	@ApiImplicitParam(value = "监管主体", name = "monitor", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "事发区域", name = "region", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "事件级别", name = "eventLevel", dataType = "Integer", paramType = "query", required = true),
+    	@ApiImplicitParam(value = "事件级别", name = "eventLevel", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "事件描述", name = "description", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "商家主体", name = "merchant", dataType = "String", paramType = "query", required = true),
-    	
     	@ApiImplicitParam(value = "品牌", name = "brand", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "商家地址", name = "address", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "商家联系方式", name = "merchantTel", dataType = "String", paramType = "query", required = true),
-    	
     	@ApiImplicitParam(value = "消费者", name = "consumer", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "消费者联系方式", name = "consumerTel", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "包含关键词", name = "includeWords", dataType = "String", paramType = "query", required = true),
-    	
     	@ApiImplicitParam(value = "主体关键词", name = "keywords", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "排除关键词", name = "excludeWords", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "包含关键词", name = "includeWords", dataType = "String", paramType = "query", required = true),
@@ -58,20 +55,17 @@ public class EventController extends AbstractController {
     	@ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
     	@ApiImplicitParam(value = "事件名称", name = "eventName", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "事件分组", name = "eventGroup", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "监管主体", name = "monitor", dataType = "Integer", paramType = "query", required = true),
+    	@ApiImplicitParam(value = "监管主体", name = "monitor", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "事发区域", name = "region", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "事件级别", name = "eventLevel", dataType = "Integer", paramType = "query", required = true),
+    	@ApiImplicitParam(value = "事件级别", name = "eventLevel", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "事件描述", name = "description", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "商家主体", name = "merchant", dataType = "String", paramType = "query", required = true),
-    	
     	@ApiImplicitParam(value = "品牌", name = "brand", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "商家地址", name = "address", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "商家联系方式", name = "merchantTel", dataType = "String", paramType = "query", required = true),
-    	
     	@ApiImplicitParam(value = "消费者", name = "consumer", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "消费者联系方式", name = "consumerTel", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "包含关键词", name = "includeWords", dataType = "String", paramType = "query", required = true),
-    	
     	@ApiImplicitParam(value = "主体关键词", name = "keywords", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "排除关键词", name = "excludeWords", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "包含关键词", name = "includeWords", dataType = "String", paramType = "query", required = true),

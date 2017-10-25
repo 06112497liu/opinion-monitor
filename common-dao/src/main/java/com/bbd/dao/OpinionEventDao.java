@@ -13,6 +13,8 @@ public interface OpinionEventDao {
 
     int insertSelective(OpinionEvent record);
 
+    List<OpinionEvent> selectByExampleWithBLOBs(OpinionEventExample example);
+
     List<OpinionEvent> selectByExampleWithPageBounds(OpinionEventExample example, PageBounds pageBounds);
 
     List<OpinionEvent> selectByExample(OpinionEventExample example);
@@ -21,9 +23,13 @@ public interface OpinionEventDao {
 
     int updateByExampleSelective(@Param("record") OpinionEvent record, @Param("example") OpinionEventExample example);
 
+    int updateByExampleWithBLOBs(@Param("record") OpinionEvent record, @Param("example") OpinionEventExample example);
+
     int updateByExample(@Param("record") OpinionEvent record, @Param("example") OpinionEventExample example);
 
     int updateByPrimaryKeySelective(OpinionEvent record);
+
+    int updateByPrimaryKeyWithBLOBs(OpinionEvent record);
 
     int updateByPrimaryKey(OpinionEvent record);
 }
