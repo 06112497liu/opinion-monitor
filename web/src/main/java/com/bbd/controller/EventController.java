@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bbd.RestResult;
+import com.bbd.domain.OpinionDictionary;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.service.EventService;
 
@@ -83,6 +84,15 @@ public class EventController extends AbstractController {
     @RequestMapping(value = "getEvent", method = RequestMethod.GET)
     public RestResult getEvent(OpinionEvent opinionEvent) {
         return RestResult.ok(eventService.getEvent(opinionEvent.getId()));
+    }
+    
+    @ApiOperation(value = "事件分组、监管主体、事发区域、事件级别下拉列表", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件分组(A)、监管主体(B)、事发区域(C)、事件级别(D)", name = "parent", dataType = "String", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "getDictionary", method = RequestMethod.GET)
+    public RestResult getDictionary(OpinionDictionary opinionDictionary) {
+        return RestResult.ok(eventService.getDictionary(opinionDictionary.getParent()));
     }
     
 }
