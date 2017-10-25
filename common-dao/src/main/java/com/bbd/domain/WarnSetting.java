@@ -5,9 +5,11 @@ import java.util.Date;
 public class WarnSetting {
     private Long id;
 
+    private Integer type;
+
     private String name;
 
-    private Integer type;
+    private Integer popup;
 
     private Integer min;
 
@@ -15,9 +17,9 @@ public class WarnSetting {
 
     private Long createBy;
 
-    private Date gmtCreate;
-
     private Long modifiedBy;
+
+    private Date gmtCreate;
 
     private Date gmtModified;
 
@@ -29,6 +31,14 @@ public class WarnSetting {
         this.id = id;
     }
 
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
     public String getName() {
         return name;
     }
@@ -37,12 +47,12 @@ public class WarnSetting {
         this.name = name;
     }
 
-    public Integer getType() {
-        return type;
+    public Integer getPopup() {
+        return popup;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
+    public void setPopup(Integer popup) {
+        this.popup = popup;
     }
 
     public Integer getMin() {
@@ -69,20 +79,20 @@ public class WarnSetting {
         this.createBy = createBy;
     }
 
-    public Date getGmtCreate() {
-        return gmtCreate;
-    }
-
-    public void setGmtCreate(Date gmtCreate) {
-        this.gmtCreate = gmtCreate;
-    }
-
     public Long getModifiedBy() {
         return modifiedBy;
     }
 
     public void setModifiedBy(Long modifiedBy) {
         this.modifiedBy = modifiedBy;
+    }
+
+    public Date getGmtCreate() {
+        return gmtCreate;
+    }
+
+    public void setGmtCreate(Date gmtCreate) {
+        this.gmtCreate = gmtCreate;
     }
 
     public Date getGmtModified() {

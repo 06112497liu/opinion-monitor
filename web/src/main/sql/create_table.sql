@@ -44,11 +44,14 @@ CREATE TABLE bbd_user_permission(
 ) COMMENT='用户权限';
 
 drop table if exists bbd_warn_setting;
+/*==============================================================*/
+/* Table: bbd_warn_setting                                      */
+/*==============================================================*/
 create table bbd_warn_setting
 (
-   id                   bigint not null,
+   id                   bigint not null auto_increment,
+   type                 tinyint comment '1. 事件新增观点预警；2.事件总体热度预警；3.舆情预警。',
    name                 varchar(32),
-   type                 tinyint comment '1. 事件新增观点预警；2.事件总体热度预警。',
    min                  int,
    max                  int,
    create_by            bigint,
@@ -59,9 +62,12 @@ create table bbd_warn_setting
 );
 
 drop table if exists bbd_warn_notifier;
+/*==============================================================*/
+/* Table: bbd_warn_notifier                                     */
+/*==============================================================*/
 create table bbd_warn_notifier
 (
-   id                   bigint not null,
+   id                   bigint not null auto_increment,
    setting_id           bigint,
    notifier             varchar(32),
    email_notify         tinyint(1),
@@ -76,9 +82,12 @@ create table bbd_warn_notifier
 );
 
 drop table if exists bbd_opinion;
+/*==============================================================*/
+/* Table: bbd_opinion                                           */
+/*==============================================================*/
 create table bbd_opinion
 (
-   id                   bigint not null,
+   id                   bigint not null auto_increment,
    uuid                 varchar(32),
    title                varchar(255),
    summary             varchar(255),
@@ -96,3 +105,5 @@ create table bbd_opinion
    gmt_modified         datetime comment '修改时间',
    primary key (id)
 );
+
+
