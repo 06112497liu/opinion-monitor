@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbd.dao.MonitorKeywordsExtDao">
+  <resultMap id="BaseResultMap" type="com.bbd.domain.MonitorKeywords">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="value" jdbcType="VARCHAR" property="value" />
+  </resultMap>
+  <insert id="batchInsertKeywords" parameterType="java.util.List">
+    INSERT INTO 
+      bbd_monitor_keywords
+      (value)
+    VALUES
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item})
+    </foreach>
+
+  </insert>
+
+</mapper>

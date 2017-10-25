@@ -1,8 +1,15 @@
-package com.bbd.domain;
+package com.bbd.service.param;
 
-import java.util.Date;
+import com.bbd.domain.WarnNotifier;
 
-public class WarnSetting {
+import java.util.List;
+
+/**
+ * @author Liuweibo
+ * @version Id: WarnSettingVo.java, v0.1 2017/10/25 Liuweibo Exp $$
+ */
+public class WarnSettingVo {
+
     private Long id;
 
     private Integer type;
@@ -17,13 +24,7 @@ public class WarnSetting {
 
     private Integer max;
 
-    private Long createBy;
-
-    private Long modifiedBy;
-
-    private Date gmtCreate;
-
-    private Date gmtModified;
+    private List<WarnNotifier> notifierList;
 
     public Long getId() {
         return id;
@@ -81,35 +82,27 @@ public class WarnSetting {
         this.max = max;
     }
 
-    public Long getCreateBy() {
-        return createBy;
+    public List<WarnNotifier> getNotifierList() {
+        return notifierList;
     }
 
-    public void setCreateBy(Long createBy) {
-        this.createBy = createBy;
+    public void setNotifierList(List<WarnNotifier> notifierList) {
+        this.notifierList = notifierList;
     }
 
-    public Long getModifiedBy() {
-        return modifiedBy;
-    }
-
-    public void setModifiedBy(Long modifiedBy) {
-        this.modifiedBy = modifiedBy;
-    }
-
-    public Date getGmtCreate() {
-        return gmtCreate;
-    }
-
-    public void setGmtCreate(Date gmtCreate) {
-        this.gmtCreate = gmtCreate;
-    }
-
-    public Date getGmtModified() {
-        return gmtModified;
-    }
-
-    public void setGmtModified(Date gmtModified) {
-        this.gmtModified = gmtModified;
+    @Override
+    public String toString() {
+        return "WarnSettingVo{" +
+                "id=" + id +
+                ", type=" + type +
+                ", name='" + name + '\'' +
+                ", level=" + level +
+                ", popup=" + popup +
+                ", min=" + min +
+                ", max=" + max +
+                ", notifierList=" + notifierList +
+                '}';
     }
 }
+    
+    

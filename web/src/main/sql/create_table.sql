@@ -70,9 +70,9 @@ create table bbd_warn_notifier
    id                   bigint not null auto_increment,
    setting_id           bigint,
    notifier             varchar(32),
-   email_notify         tinyint(1),
+   email_notify         tinyint(1) DEFAULT '0',
    email                varchar(64),
-   sms_notify           tinyint(1),
+   sms_notify           tinyint(1) DEFAULT '0',
    phone                varchar(32),
    create_by            bigint,
    gmt_create           datetime comment '创建时间',
@@ -188,4 +188,15 @@ create table bbd_opinion_dictionary
 
 alter table bbd_opinion_dictionary comment '事件分组、事发区域、监管主体、事件级别';
 
+drop table if exists bbd_monitor_keywords;
+
+/*==============================================================*/
+/* Table: bbd_monitor_keywords                                  */
+/*==============================================================*/
+create table bbd_monitor_keywords
+(
+   id                   bigint not null auto_increment,
+   value                varchar(32),
+   primary key (id)
+);
 

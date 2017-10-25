@@ -5,6 +5,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="type" jdbcType="TINYINT" property="type" />
     <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="level" jdbcType="TINYINT" property="level" />
     <result column="popup" jdbcType="TINYINT" property="popup" />
     <result column="min" jdbcType="INTEGER" property="min" />
     <result column="max" jdbcType="INTEGER" property="max" />
@@ -72,7 +73,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, type, name, popup, min, max, create_by, modified_by, gmt_create, gmt_modified
+    id, type, name, level, popup, min, max, create_by, modified_by, gmt_create, gmt_modified
   </sql>
   <select id="selectByExample" parameterType="com.bbd.domain.WarnSettingExample" resultMap="BaseResultMap">
     select
@@ -103,12 +104,12 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_warn_setting (type, name, popup, 
-      min, max, create_by, 
+    insert into bbd_warn_setting (type, name, level, 
+      popup, min, max, create_by, 
       modified_by, gmt_create, gmt_modified
       )
-    values (#{type,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, #{popup,jdbcType=TINYINT}, 
-      #{min,jdbcType=INTEGER}, #{max,jdbcType=INTEGER}, #{createBy,jdbcType=BIGINT}, 
+    values (#{type,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, #{level,jdbcType=TINYINT}, 
+      #{popup,jdbcType=TINYINT}, #{min,jdbcType=INTEGER}, #{max,jdbcType=INTEGER}, #{createBy,jdbcType=BIGINT}, 
       #{modifiedBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -123,6 +124,9 @@
       </if>
       <if test="name != null">
         name,
+      </if>
+      <if test="level != null">
+        level,
       </if>
       <if test="popup != null">
         popup,
@@ -152,6 +156,9 @@
       </if>
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null">
+        #{level,jdbcType=TINYINT},
       </if>
       <if test="popup != null">
         #{popup,jdbcType=TINYINT},
@@ -188,6 +195,9 @@
       <if test="record.name != null">
         name = #{record.name,jdbcType=VARCHAR},
       </if>
+      <if test="record.level != null">
+        level = #{record.level,jdbcType=TINYINT},
+      </if>
       <if test="record.popup != null">
         popup = #{record.popup,jdbcType=TINYINT},
       </if>
@@ -219,6 +229,7 @@
     set id = #{record.id,jdbcType=BIGINT},
       type = #{record.type,jdbcType=TINYINT},
       name = #{record.name,jdbcType=VARCHAR},
+      level = #{record.level,jdbcType=TINYINT},
       popup = #{record.popup,jdbcType=TINYINT},
       min = #{record.min,jdbcType=INTEGER},
       max = #{record.max,jdbcType=INTEGER},
@@ -238,6 +249,9 @@
       </if>
       <if test="name != null">
         name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null">
+        level = #{level,jdbcType=TINYINT},
       </if>
       <if test="popup != null">
         popup = #{popup,jdbcType=TINYINT},
@@ -267,6 +281,7 @@
     update bbd_warn_setting
     set type = #{type,jdbcType=TINYINT},
       name = #{name,jdbcType=VARCHAR},
+      level = #{level,jdbcType=TINYINT},
       popup = #{popup,jdbcType=TINYINT},
       min = #{min,jdbcType=INTEGER},
       max = #{max,jdbcType=INTEGER},

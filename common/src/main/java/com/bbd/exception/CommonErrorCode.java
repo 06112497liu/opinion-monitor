@@ -35,6 +35,7 @@ public enum CommonErrorCode implements ErrorCode {
 
     PERMISSION_ERROR(301, "权限不足"),
 
+
     ;
 
     private int    status;
