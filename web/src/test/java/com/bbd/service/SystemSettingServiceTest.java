@@ -54,7 +54,7 @@ public class SystemSettingServiceTest extends BaseServiceTest{
 
     @Test
     public void testGetWarnSettingList() {
-        settingService.getWarnSettingList(1);
+        settingService.getWarnSettingList(3);
     }
 }
     
