@@ -90,7 +90,7 @@ public class SystemSettingService {
 
         // step-3：添加预警通知人
         notifier.setGmtCreate(new Date());
-        return notifierDao.insert(notifier);
+        return notifierDao.insertSelective(notifier);
     }
 
     /**

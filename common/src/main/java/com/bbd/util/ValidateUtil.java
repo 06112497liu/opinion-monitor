@@ -70,6 +70,32 @@ public class ValidateUtil {
     }
 
     /**
+     * 检查传入的参数列表是否全为空
+     *
+     * @param source
+     */
+    public static void checkAllNull(ErrorCode status, Object... source) {
+        for (Object object : source) {
+            if (Objects.isNull(object)) {
+                throw new ApplicationException(status);
+            }
+        }
+    }
+    /**
+     * 检查传入的参数列表是否不全是空
+     *
+     * @param source
+     */
+    public static void checkNotAllNull(ErrorCode status, Object... source) {
+        for (Object object : source) {
+            if (!Objects.isNull(object)) {
+               return;
+            }
+        }
+        throw new ApplicationException(status);
+    }
+
+    /**
      * 校验字符串是否为空
      *
      * @param source 源字符串
