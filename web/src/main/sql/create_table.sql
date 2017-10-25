@@ -106,4 +106,86 @@ create table bbd_opinion
    primary key (id)
 );
 
+drop table if exists bbd_opinion_event;
+
+/*==============================================================*/
+/* Table: bbd_opinion_event                                     */
+/*==============================================================*/
+create table bbd_opinion_event
+(
+   id                   bigint not null auto_increment,
+   event_name           varchar(64),
+   event_group          varchar(16),
+   monitor              varchar(16),
+   region               varchar(16),
+   event_level          varchar(16),
+   description          text,
+   merchant             varchar(64),
+   brand                varchar(32),
+   address              varchar(128),
+   merchant_tel         varchar(32),
+   consumer             varchar(32),
+   consumer_tel         varchar(32),
+   include_words        text,
+   keywords             text,
+   exclude_words        text,
+   words                text,
+   opinion_count        int,
+   warn_count           int,
+   create_by            bigint,
+   gmt_create           datetime comment '创建时间',
+   modified_by          bigint,
+   gmt_modified         datetime comment '修改时间',
+   primary key (id)
+);
+
+drop table if exists bbd_opinion_event_history;
+
+/*==============================================================*/
+/* Table: bbd_opinion_event_history                             */
+/*==============================================================*/
+create table bbd_opinion_event_history
+(
+   id                   bigint not null auto_increment,
+   event_name           varchar(64),
+   event_group          varchar(16),
+   monitor              varchar(16),
+   region               varchar(16),
+   event_level          varchar(16),
+   description          text,
+   merchant             varchar(64),
+   brand                varchar(32),
+   address              varchar(128),
+   merchant_tel         varchar(32),
+   consumer             varchar(32),
+   consumer_tel         varchar(32),
+   include_words        text,
+   keywords             text,
+   exclude_words        text,
+   begin_time           datetime,
+   end_time             datetime,
+   create_by            bigint,
+   gmt_create           datetime comment '创建时间',
+   modified_by          bigint,
+   gmt_modified         datetime comment '修改时间'
+);
+
+drop table if exists bbd_opinion_dictionary;
+
+/*==============================================================*/
+/* Table: bbd_opinion_dictionary                                */
+/*==============================================================*/
+create table bbd_opinion_dictionary
+(
+   id                   bigint not null auto_increment,
+   parent               varchar(16) comment '父代码',
+   code                 varchar(16) comment '子代码',
+   name                 varchar(64) comment '中文名称',
+   gmt_create           datetime comment '创建时间',
+   gmt_modified         datetime comment '修改时间',
+   primary key (id)
+);
+
+alter table bbd_opinion_dictionary comment '事件分组、事发区域、监管主体、事件级别';
+
 

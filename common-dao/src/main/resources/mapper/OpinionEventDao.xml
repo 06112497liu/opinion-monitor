@@ -154,7 +154,7 @@
       #{region,jdbcType=VARCHAR}, #{eventLevel,jdbcType=VARCHAR}, #{merchant,jdbcType=VARCHAR}, 
       #{brand,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{merchantTel,jdbcType=VARCHAR}, 
       #{consumer,jdbcType=VARCHAR}, #{consumerTel,jdbcType=VARCHAR}, #{opinionCount,jdbcType=INTEGER}, 
-      #{warnCount,jdbcType=INTEGER}, #{createBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, 
+      #{warnCount,jdbcType=INTEGER}, #{createBy,jdbcType=BIGINT}, NOW(), 
       #{modifiedBy,jdbcType=BIGINT}, #{gmtModified,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}, 
       #{includeWords,jdbcType=LONGVARCHAR}, #{keywords,jdbcType=LONGVARCHAR}, #{excludeWords,jdbcType=LONGVARCHAR}, 
       #{words,jdbcType=LONGVARCHAR})
@@ -544,10 +544,10 @@
       consumer_tel = #{consumerTel,jdbcType=VARCHAR},
       opinion_count = #{opinionCount,jdbcType=INTEGER},
       warn_count = #{warnCount,jdbcType=INTEGER},
-      create_by = #{createBy,jdbcType=BIGINT},
-      gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+     <!--  create_by = #{createBy,jdbcType=BIGINT},
+      gmt_create = #{gmtCreate,jdbcType=TIMESTAMP}, -->
       modified_by = #{modifiedBy,jdbcType=BIGINT},
-      gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
+      gmt_modified = NOW()
     where id = #{id,jdbcType=BIGINT}
   </update>
   <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.OpinionEventExample" resultMap="BaseResultMap">
