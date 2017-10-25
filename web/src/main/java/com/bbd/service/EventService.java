@@ -1,12 +1,46 @@
 package com.bbd.service;
 
-import com.bbd.domain.OpinionEvent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public interface EventService {
+import com.bbd.dao.OpinionEventDao;
+import com.bbd.domain.OpinionEvent;
+import com.bbd.service.EventService;
+
+
+/** 
+ * @author daijinlong 
+ * @version $Id: EventService.java, v 0.1 2017年10月25日 下午2:06:26 daijinlong Exp $ 
+ */
+@Service
+public class EventService{
+
+	@Autowired
+	OpinionEventDao opinionEventDao;
 	
-	void createEvent(OpinionEvent opinionEvent);
 	
-	void modifyEvent(OpinionEvent opinionEvent);
+	/**  
+	 * @param opinionEvent 
+	 */
+	public void createEvent(OpinionEvent opinionEvent) {
+		opinionEventDao.insert(opinionEvent);
+	}
 	
-	OpinionEvent getEvent(long id);
+	
+	/**  
+	 * @param id
+	 * @return 
+	 */
+	public OpinionEvent getEvent(long id) {
+		return opinionEventDao.selectByPrimaryKey(id);
+	}
+
+	
+	/**  
+	 * @param opinionEvent 
+	 */
+	public void modifyEvent(OpinionEvent opinionEvent) {
+		opinionEventDao.updateByPrimaryKey(opinionEvent);
+	}
+
 }

@@ -2,7 +2,7 @@ package com.bbd.domain;
 
 import java.util.Date;
 
-public class OpinionEvent {
+public class OpinionEventHistory {
     private Long id;
 
     private String eventName;
@@ -27,9 +27,9 @@ public class OpinionEvent {
 
     private String consumerTel;
 
-    private Integer opinionCount;
+    private Date beginTime;
 
-    private Integer warnCount;
+    private Date endTime;
 
     private Long createBy;
 
@@ -46,8 +46,6 @@ public class OpinionEvent {
     private String keywords;
 
     private String excludeWords;
-
-    private String words;
 
     public Long getId() {
         return id;
@@ -145,20 +143,20 @@ public class OpinionEvent {
         this.consumerTel = consumerTel;
     }
 
-    public Integer getOpinionCount() {
-        return opinionCount;
+    public Date getBeginTime() {
+        return beginTime;
     }
 
-    public void setOpinionCount(Integer opinionCount) {
-        this.opinionCount = opinionCount;
+    public void setBeginTime(Date beginTime) {
+        this.beginTime = beginTime;
     }
 
-    public Integer getWarnCount() {
-        return warnCount;
+    public Date getEndTime() {
+        return endTime;
     }
 
-    public void setWarnCount(Integer warnCount) {
-        this.warnCount = warnCount;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public Long getCreateBy() {
@@ -223,13 +221,5 @@ public class OpinionEvent {
 
     public void setExcludeWords(String excludeWords) {
         this.excludeWords = excludeWords;
-    }
-
-    public String getWords() {
-        return words;
-    }
-
-    public void setWords(String words) {
-        this.words = words;
     }
 }

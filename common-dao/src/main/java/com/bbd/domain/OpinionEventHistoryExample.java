@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OpinionEventExample {
+public class OpinionEventHistoryExample {
     protected String orderByClause;
 
     protected boolean distinct;
 
     protected List<Criteria> oredCriteria;
 
-    public OpinionEventExample() {
+    public OpinionEventHistoryExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 
@@ -935,123 +935,123 @@ public class OpinionEventExample {
             return (Criteria) this;
         }
 
-        public Criteria andOpinionCountIsNull() {
-            addCriterion("opinion_count is null");
+        public Criteria andBeginTimeIsNull() {
+            addCriterion("begin_time is null");
             return (Criteria) this;
         }
 
-        public Criteria andOpinionCountIsNotNull() {
-            addCriterion("opinion_count is not null");
+        public Criteria andBeginTimeIsNotNull() {
+            addCriterion("begin_time is not null");
             return (Criteria) this;
         }
 
-        public Criteria andOpinionCountEqualTo(Integer value) {
-            addCriterion("opinion_count =", value, "opinionCount");
+        public Criteria andBeginTimeEqualTo(Date value) {
+            addCriterion("begin_time =", value, "beginTime");
             return (Criteria) this;
         }
 
-        public Criteria andOpinionCountNotEqualTo(Integer value) {
-            addCriterion("opinion_count <>", value, "opinionCount");
+        public Criteria andBeginTimeNotEqualTo(Date value) {
+            addCriterion("begin_time <>", value, "beginTime");
             return (Criteria) this;
         }
 
-        public Criteria andOpinionCountGreaterThan(Integer value) {
-            addCriterion("opinion_count >", value, "opinionCount");
+        public Criteria andBeginTimeGreaterThan(Date value) {
+            addCriterion("begin_time >", value, "beginTime");
             return (Criteria) this;
         }
 
-        public Criteria andOpinionCountGreaterThanOrEqualTo(Integer value) {
-            addCriterion("opinion_count >=", value, "opinionCount");
+        public Criteria andBeginTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("begin_time >=", value, "beginTime");
             return (Criteria) this;
         }
 
-        public Criteria andOpinionCountLessThan(Integer value) {
-            addCriterion("opinion_count <", value, "opinionCount");
+        public Criteria andBeginTimeLessThan(Date value) {
+            addCriterion("begin_time <", value, "beginTime");
             return (Criteria) this;
         }
 
-        public Criteria andOpinionCountLessThanOrEqualTo(Integer value) {
-            addCriterion("opinion_count <=", value, "opinionCount");
+        public Criteria andBeginTimeLessThanOrEqualTo(Date value) {
+            addCriterion("begin_time <=", value, "beginTime");
             return (Criteria) this;
         }
 
-        public Criteria andOpinionCountIn(List<Integer> values) {
-            addCriterion("opinion_count in", values, "opinionCount");
+        public Criteria andBeginTimeIn(List<Date> values) {
+            addCriterion("begin_time in", values, "beginTime");
             return (Criteria) this;
         }
 
-        public Criteria andOpinionCountNotIn(List<Integer> values) {
-            addCriterion("opinion_count not in", values, "opinionCount");
+        public Criteria andBeginTimeNotIn(List<Date> values) {
+            addCriterion("begin_time not in", values, "beginTime");
             return (Criteria) this;
         }
 
-        public Criteria andOpinionCountBetween(Integer value1, Integer value2) {
-            addCriterion("opinion_count between", value1, value2, "opinionCount");
+        public Criteria andBeginTimeBetween(Date value1, Date value2) {
+            addCriterion("begin_time between", value1, value2, "beginTime");
             return (Criteria) this;
         }
 
-        public Criteria andOpinionCountNotBetween(Integer value1, Integer value2) {
-            addCriterion("opinion_count not between", value1, value2, "opinionCount");
+        public Criteria andBeginTimeNotBetween(Date value1, Date value2) {
+            addCriterion("begin_time not between", value1, value2, "beginTime");
             return (Criteria) this;
         }
 
-        public Criteria andWarnCountIsNull() {
-            addCriterion("warn_count is null");
+        public Criteria andEndTimeIsNull() {
+            addCriterion("end_time is null");
             return (Criteria) this;
         }
 
-        public Criteria andWarnCountIsNotNull() {
-            addCriterion("warn_count is not null");
+        public Criteria andEndTimeIsNotNull() {
+            addCriterion("end_time is not null");
             return (Criteria) this;
         }
 
-        public Criteria andWarnCountEqualTo(Integer value) {
-            addCriterion("warn_count =", value, "warnCount");
+        public Criteria andEndTimeEqualTo(Date value) {
+            addCriterion("end_time =", value, "endTime");
             return (Criteria) this;
         }
 
-        public Criteria andWarnCountNotEqualTo(Integer value) {
-            addCriterion("warn_count <>", value, "warnCount");
+        public Criteria andEndTimeNotEqualTo(Date value) {
+            addCriterion("end_time <>", value, "endTime");
             return (Criteria) this;
         }
 
-        public Criteria andWarnCountGreaterThan(Integer value) {
-            addCriterion("warn_count >", value, "warnCount");
+        public Criteria andEndTimeGreaterThan(Date value) {
+            addCriterion("end_time >", value, "endTime");
             return (Criteria) this;
         }
 
-        public Criteria andWarnCountGreaterThanOrEqualTo(Integer value) {
-            addCriterion("warn_count >=", value, "warnCount");
+        public Criteria andEndTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("end_time >=", value, "endTime");
             return (Criteria) this;
         }
 
-        public Criteria andWarnCountLessThan(Integer value) {
-            addCriterion("warn_count <", value, "warnCount");
+        public Criteria andEndTimeLessThan(Date value) {
+            addCriterion("end_time <", value, "endTime");
             return (Criteria) this;
         }
 
-        public Criteria andWarnCountLessThanOrEqualTo(Integer value) {
-            addCriterion("warn_count <=", value, "warnCount");
+        public Criteria andEndTimeLessThanOrEqualTo(Date value) {
+            addCriterion("end_time <=", value, "endTime");
             return (Criteria) this;
         }
 
-        public Criteria andWarnCountIn(List<Integer> values) {
-            addCriterion("warn_count in", values, "warnCount");
+        public Criteria andEndTimeIn(List<Date> values) {
+            addCriterion("end_time in", values, "endTime");
             return (Criteria) this;
         }
 
-        public Criteria andWarnCountNotIn(List<Integer> values) {
-            addCriterion("warn_count not in", values, "warnCount");
+        public Criteria andEndTimeNotIn(List<Date> values) {
+            addCriterion("end_time not in", values, "endTime");
             return (Criteria) this;
         }
 
-        public Criteria andWarnCountBetween(Integer value1, Integer value2) {
-            addCriterion("warn_count between", value1, value2, "warnCount");
+        public Criteria andEndTimeBetween(Date value1, Date value2) {
+            addCriterion("end_time between", value1, value2, "endTime");
             return (Criteria) this;
         }
 
-        public Criteria andWarnCountNotBetween(Integer value1, Integer value2) {
-            addCriterion("warn_count not between", value1, value2, "warnCount");
+        public Criteria andEndTimeNotBetween(Date value1, Date value2) {
+            addCriterion("end_time not between", value1, value2, "endTime");
             return (Criteria) this;
         }
 
