@@ -18,7 +18,7 @@
     <!--<property name="locations">-->
     <!--<list>-->
     <!--<value>classpath:config.properties</value>-->
-    <!--<value>file:/var/reddata/web/abnormal/config.properties</value>-->
+    <!--<value>file:/var/reddata/web/opinion/config.properties</value>-->
     <!--</list>-->
     <!--</property>-->
     <!--&lt;!&ndash; 设置编码格式 &ndash;&gt;-->

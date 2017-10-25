@@ -22,7 +22,7 @@ public class HelloController extends AbstractController {
     @CheckAuth(permission = "world")
     @RequestMapping(value = "/say", method = RequestMethod.GET)
     public RestResult sayHello() {
-        return RestResult.ok("Hello Abnormal");
+        return RestResult.ok("Hello Opinion");
     }
 
 }
