@@ -49,6 +49,12 @@
 
             <dependency>
                 <groupId>com.bbd</groupId>
+                <artifactId>common-biz</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.bbd</groupId>
                 <artifactId>web</artifactId>
                 <version>${project.version}</version>
             </dependency>
