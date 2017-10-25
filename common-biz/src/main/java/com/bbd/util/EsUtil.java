@@ -53,7 +53,7 @@ public class EsUtil {
     /**
      * 索引
      */
-    public static final String     INDEX               = "bbd";
+    public static final String     INDEX               = "bbd_opinion";
     /**
      * 失联企业
      */
@@ -75,13 +75,22 @@ public class EsUtil {
 
     static {
         try {
-            Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
+            Settings settings = Settings.builder().put("cluster.name", "bbd_opinion_cluster").build();
+            client = new PreBuiltTransportClient(settings).addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.28.100.70"), 9300));
 
-            TransportClient client = new PreBuiltTransportClient(settings).addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9200));
         } catch (UnknownHostException e) {
             logger.error(e.getMessage(), e);
         }
     }
+
+    public static TransportClient getClient() {
+        return client;
+    }
+
+    //    @Value("${es.host}")
+    //    private String                 es_host;
+    //    @Value("${es.port}")
+    //    private Integer                port;
 
     /**
      * es查询
