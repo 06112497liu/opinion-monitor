@@ -11,6 +11,7 @@
         <module>common</module>
         <module>web</module>
         <module>common-web</module>
+        <module>job</module>
     </modules>
     <packaging>pom</packaging>
 
