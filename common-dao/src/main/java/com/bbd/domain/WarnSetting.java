@@ -9,6 +9,8 @@ public class WarnSetting {
 
     private String name;
 
+    private Integer level;
+
     private Integer popup;
 
     private Integer min;
@@ -45,6 +47,14 @@ public class WarnSetting {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
     }
 
     public Integer getPopup() {
