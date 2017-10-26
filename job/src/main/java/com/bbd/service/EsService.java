@@ -6,16 +6,13 @@ package com.bbd.service;
 
 import com.bbd.service.vo.OpinionEsVO;
 import com.bbd.util.EsUtil;
-import com.bbd.util.JsonUtil;
-import com.google.common.collect.Lists;
+import com.mybatis.domain.PageBounds;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,14 +93,9 @@ public class EsService {
     }
 
     public List<OpinionEsVO> searchOpinions() {
-        List<OpinionEsVO> rs = Lists.newArrayList();
+        PageBounds pb = new PageBounds(1, 20);
+        List<OpinionEsVO> rs = EsUtil.search(INDEX_ALIAS, OPINION_TYPE, QueryBuilders.matchAllQuery(), pb, OpinionEsVO.class);
 
-        SearchResponse resp = EsUtil.getClient().prepareSearch(INDEX_ALIAS).setQuery(QueryBuilders.matchAllQuery()).execute().actionGet();
-        SearchHit[] hits = resp.getHits().getHits();
-        for (SearchHit hit : hits) {
-            OpinionEsVO vo = JsonUtil.parseObject(hit.getSourceAsString(), OpinionEsVO.class);
-            rs.add(vo);
-        }
         return rs;
     }
 }
