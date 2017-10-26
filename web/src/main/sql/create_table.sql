@@ -173,3 +173,17 @@ create table bbd_monitor_keywords
    primary key (id)
 );
 
+DROP TABLE IF EXISTS bbd_task;
+CREATE TABLE bbd_task
+(
+   id                   BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+   task_type            INT NOT NULL,
+   current_item         VARCHAR(64),
+   begin_time           DATETIME,
+   end_time             DATETIME,
+   create_by            BIGINT,
+   gmt_create           DATETIME COMMENT '创建时间',
+   modified_by          BIGINT,
+   gmt_modified         DATETIME COMMENT '修改时间'
+) COMMENT '任务表';
+
