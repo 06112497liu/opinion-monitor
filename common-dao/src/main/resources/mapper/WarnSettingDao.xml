@@ -4,6 +4,8 @@
   <resultMap id="BaseResultMap" type="com.bbd.domain.WarnSetting">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="target_type" jdbcType="TINYINT" property="targetType" />
+    <result column="event_id" jdbcType="BIGINT" property="eventId" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="level" jdbcType="TINYINT" property="level" />
     <result column="popup" jdbcType="TINYINT" property="popup" />
@@ -73,7 +75,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, type, name, level, popup, min, max, create_by, modified_by, gmt_create, gmt_modified
+    id, type, target_type, event_id, name, level, popup, min, max, create_by, modified_by, 
+    gmt_create, gmt_modified
   </sql>
   <select id="selectByExample" parameterType="com.bbd.domain.WarnSettingExample" resultMap="BaseResultMap">
     select
@@ -104,12 +107,14 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_warn_setting (type, name, level, 
-      popup, min, max, create_by, 
+    insert into bbd_warn_setting (type, target_type, event_id, 
+      name, level, popup, 
+      min, max, create_by, 
       modified_by, gmt_create, gmt_modified
       )
-    values (#{type,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, #{level,jdbcType=TINYINT}, 
-      #{popup,jdbcType=TINYINT}, #{min,jdbcType=INTEGER}, #{max,jdbcType=INTEGER}, #{createBy,jdbcType=BIGINT}, 
+    values (#{type,jdbcType=TINYINT}, #{targetType,jdbcType=TINYINT}, #{eventId,jdbcType=BIGINT}, 
+      #{name,jdbcType=VARCHAR}, #{level,jdbcType=TINYINT}, #{popup,jdbcType=TINYINT}, 
+      #{min,jdbcType=INTEGER}, #{max,jdbcType=INTEGER}, #{createBy,jdbcType=BIGINT}, 
       #{modifiedBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -121,6 +126,12 @@
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="type != null">
         type,
+      </if>
+      <if test="targetType != null">
+        target_type,
+      </if>
+      <if test="eventId != null">
+        event_id,
       </if>
       <if test="name != null">
         name,
@@ -153,6 +164,12 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="type != null">
         #{type,jdbcType=TINYINT},
+      </if>
+      <if test="targetType != null">
+        #{targetType,jdbcType=TINYINT},
+      </if>
+      <if test="eventId != null">
+        #{eventId,jdbcType=BIGINT},
       </if>
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
@@ -192,6 +209,12 @@
       <if test="record.type != null">
         type = #{record.type,jdbcType=TINYINT},
       </if>
+      <if test="record.targetType != null">
+        target_type = #{record.targetType,jdbcType=TINYINT},
+      </if>
+      <if test="record.eventId != null">
+        event_id = #{record.eventId,jdbcType=BIGINT},
+      </if>
       <if test="record.name != null">
         name = #{record.name,jdbcType=VARCHAR},
       </if>
@@ -228,6 +251,8 @@
     update bbd_warn_setting
     set id = #{record.id,jdbcType=BIGINT},
       type = #{record.type,jdbcType=TINYINT},
+      target_type = #{record.targetType,jdbcType=TINYINT},
+      event_id = #{record.eventId,jdbcType=BIGINT},
       name = #{record.name,jdbcType=VARCHAR},
       level = #{record.level,jdbcType=TINYINT},
       popup = #{record.popup,jdbcType=TINYINT},
@@ -246,6 +271,12 @@
     <set>
       <if test="type != null">
         type = #{type,jdbcType=TINYINT},
+      </if>
+      <if test="targetType != null">
+        target_type = #{targetType,jdbcType=TINYINT},
+      </if>
+      <if test="eventId != null">
+        event_id = #{eventId,jdbcType=BIGINT},
       </if>
       <if test="name != null">
         name = #{name,jdbcType=VARCHAR},
@@ -280,6 +311,8 @@
   <update id="updateByPrimaryKey" parameterType="com.bbd.domain.WarnSetting">
     update bbd_warn_setting
     set type = #{type,jdbcType=TINYINT},
+      target_type = #{targetType,jdbcType=TINYINT},
+      event_id = #{eventId,jdbcType=BIGINT},
       name = #{name,jdbcType=VARCHAR},
       level = #{level,jdbcType=TINYINT},
       popup = #{popup,jdbcType=TINYINT},

@@ -225,6 +225,126 @@ public class WarnSettingExample {
             return (Criteria) this;
         }
 
+        public Criteria andTargetTypeIsNull() {
+            addCriterion("target_type is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTargetTypeIsNotNull() {
+            addCriterion("target_type is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTargetTypeEqualTo(Integer value) {
+            addCriterion("target_type =", value, "targetType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTargetTypeNotEqualTo(Integer value) {
+            addCriterion("target_type <>", value, "targetType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTargetTypeGreaterThan(Integer value) {
+            addCriterion("target_type >", value, "targetType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTargetTypeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("target_type >=", value, "targetType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTargetTypeLessThan(Integer value) {
+            addCriterion("target_type <", value, "targetType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTargetTypeLessThanOrEqualTo(Integer value) {
+            addCriterion("target_type <=", value, "targetType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTargetTypeIn(List<Integer> values) {
+            addCriterion("target_type in", values, "targetType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTargetTypeNotIn(List<Integer> values) {
+            addCriterion("target_type not in", values, "targetType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTargetTypeBetween(Integer value1, Integer value2) {
+            addCriterion("target_type between", value1, value2, "targetType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTargetTypeNotBetween(Integer value1, Integer value2) {
+            addCriterion("target_type not between", value1, value2, "targetType");
+            return (Criteria) this;
+        }
+
+        public Criteria andEventIdIsNull() {
+            addCriterion("event_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andEventIdIsNotNull() {
+            addCriterion("event_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andEventIdEqualTo(Long value) {
+            addCriterion("event_id =", value, "eventId");
+            return (Criteria) this;
+        }
+
+        public Criteria andEventIdNotEqualTo(Long value) {
+            addCriterion("event_id <>", value, "eventId");
+            return (Criteria) this;
+        }
+
+        public Criteria andEventIdGreaterThan(Long value) {
+            addCriterion("event_id >", value, "eventId");
+            return (Criteria) this;
+        }
+
+        public Criteria andEventIdGreaterThanOrEqualTo(Long value) {
+            addCriterion("event_id >=", value, "eventId");
+            return (Criteria) this;
+        }
+
+        public Criteria andEventIdLessThan(Long value) {
+            addCriterion("event_id <", value, "eventId");
+            return (Criteria) this;
+        }
+
+        public Criteria andEventIdLessThanOrEqualTo(Long value) {
+            addCriterion("event_id <=", value, "eventId");
+            return (Criteria) this;
+        }
+
+        public Criteria andEventIdIn(List<Long> values) {
+            addCriterion("event_id in", values, "eventId");
+            return (Criteria) this;
+        }
+
+        public Criteria andEventIdNotIn(List<Long> values) {
+            addCriterion("event_id not in", values, "eventId");
+            return (Criteria) this;
+        }
+
+        public Criteria andEventIdBetween(Long value1, Long value2) {
+            addCriterion("event_id between", value1, value2, "eventId");
+            return (Criteria) this;
+        }
+
+        public Criteria andEventIdNotBetween(Long value1, Long value2) {
+            addCriterion("event_id not between", value1, value2, "eventId");
+            return (Criteria) this;
+        }
+
         public Criteria andNameIsNull() {
             addCriterion("name is null");
             return (Criteria) this;

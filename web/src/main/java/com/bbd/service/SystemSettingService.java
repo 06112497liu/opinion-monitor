@@ -16,8 +16,10 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
+import org.apache.commons.collections.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 
 /**
@@ -40,6 +42,8 @@ public class SystemSettingService {
     @Autowired
     private MonitorKeywordsExtDao keywordsExtDao;
 
+    @Autowired
+    private UserService userService;
 
 
     /**
@@ -50,20 +54,32 @@ public class SystemSettingService {
      * @param third  3级舆情预警热度阈值下限
      * @return
      */
-    public Integer modifyHeat(int type, int first, int second, int third) {
+    public Integer modifyHeat(Long eventId, Integer type, Integer first, Integer second, Integer third) {
 
         // step-1：校验热度值是否符合规范
         boolean flag = checkThresholdValue(type, first, second, third);
         if(flag == false) throw new ApplicationException(CommonErrorCode.PARAM_ERROR);
 
+        // step-2：如果是针对事件，校验操作时间配置是否存在
+        if(type != 3) {
+            WarnSettingExample ex = new WarnSettingExample();
+            ex.createCriteria().andEventIdEqualTo(eventId);
+            List<WarnSetting> list = settingDao.selectByExample(ex);
+            if(list.isEmpty()) throw new ApplicationException(BizErrorCode.OBJECT_NOT_EXIST, "本事件没有预警配置");
+        }
+
         // step-2：热度值配置
         int result;
         if(1 == type) {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(type, 1));
+            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(2, eventId, type, 1));
+        } else if(2 == type) {
+            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(2, eventId, type, 1))
+            + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second), buildWarnSettingExample(2, eventId, type, 2))
+            + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third), buildWarnSettingExample(2, eventId, type, 3));
         } else {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(type, 1))
-            + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second), buildWarnSettingExample(type, 2))
-            + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third), buildWarnSettingExample(type, 3));
+            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(1, eventId, type, 1))
+                    + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second), buildWarnSettingExample(1, eventId, type, 2))
+                    + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third), buildWarnSettingExample(1, eventId, type, 3));
         }
         return result;
     }
@@ -89,6 +105,7 @@ public class SystemSettingService {
         if(!flag) throw new ApplicationException(BizErrorCode.NOTIFIER_SETTINGID_NOT_EXIST);
 
         // step-3：添加预警通知人
+        notifier.setCreateBy(userService.getUserId());
         notifier.setGmtCreate(new Date());
         return notifierDao.insertSelective(notifier);
     }
@@ -109,6 +126,7 @@ public class SystemSettingService {
         if(flag == false) throw new ApplicationException(BizErrorCode.OBJECT_NOT_EXIST);
 
         // step-3：执行修改操作
+        notifier.setModifiedBy(userService.getUserId());
         notifier.setGmtModified(new Date());
         return notifierDao.updateByPrimaryKeySelective(notifier);
     }
@@ -181,7 +199,7 @@ public class SystemSettingService {
      * @param third
      * @return
      */
-    public Map<String, Object> getOpinionNumGroupHeat(int type, int first, int second, int third) {
+    public Map<String, Object> getOpinionNumGroupHeat(Integer type, Integer first, Integer second, Integer third) {
         return null;
     }
 
@@ -190,10 +208,12 @@ public class SystemSettingService {
      * @param type 预警类型（1. 事件新增观点预警；2.事件总体热度预警；3.舆情预警。）
      * @return
      */
-    public List<WarnSettingVo> getWarnSettingList(int type) {
+    public List<WarnSettingVo> getWarnSettingList(Integer type, Long eventId) {
         // step-1：查询warn_setting配置
         WarnSettingExample example = new WarnSettingExample();
-        example.createCriteria().andTypeEqualTo(type);
+        WarnSettingExample.Criteria criteria = example.createCriteria();
+        criteria.andTypeEqualTo(type);
+        if(type != 3) criteria.andEventIdEqualTo(eventId);
         List<WarnSetting> dbList = settingDao.selectByExample(example);
         List<WarnSettingVo> list = BeanMapperUtil.mapList(dbList, WarnSettingVo.class);
 
@@ -208,7 +228,7 @@ public class SystemSettingService {
     }
 
     // 校验阈值是否符合规则
-    private boolean checkThresholdValue(int type, int first, int second, int third) {
+    private boolean checkThresholdValue(Integer type, Integer first, Integer second, Integer third) {
         boolean flag;
         flag = Range.closed(0, 100).containsAll(Ints.asList(first, second, third));
         if(flag == false) return flag;
@@ -220,18 +240,21 @@ public class SystemSettingService {
     }
 
     // 构建WarnSetting类
-    private WarnSetting buildWarnSetting(int max, int min) {
+    private WarnSetting buildWarnSetting(Integer max, Integer min) {
         WarnSetting set = new WarnSetting();
         set.setMax(max);
         set.setMin(min);
         set.setGmtModified(new Date());
+        set.setModifiedBy(userService.getUserId());
         return set;
     }
 
     // 构建WarnSettingExample类
-    private WarnSettingExample buildWarnSettingExample(int type, int level) {
+    private WarnSettingExample buildWarnSettingExample(Integer targetType, Long eventId, Integer type, Integer level) {
         WarnSettingExample example = new WarnSettingExample();
-        example.createCriteria().andTypeEqualTo(type).andLevelEqualTo(level);
+        WarnSettingExample.Criteria criteria = example.createCriteria();
+        criteria.andTypeEqualTo(type).andLevelEqualTo(level);
+        if(targetType == 2) criteria.andEventIdEqualTo(eventId);
         return example;
     }
 

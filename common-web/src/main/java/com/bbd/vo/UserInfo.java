@@ -14,6 +14,11 @@ import java.util.List;
 public class UserInfo {
 
     /**
+     * 登陆用户id
+     */
+    private Long id;
+
+    /**
      * 是否是管理员
      */
     private Boolean      admin;
@@ -31,6 +36,14 @@ public class UserInfo {
     private List<String> roles;
 
     private List<String> permissions;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Boolean getAdmin() {
         return admin;

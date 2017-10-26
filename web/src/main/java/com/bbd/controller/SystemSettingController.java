@@ -5,6 +5,7 @@ import com.bbd.domain.WarnNotifier;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.SystemSettingService;
 import com.bbd.util.ValidateUtil;
+import io.netty.handler.codec.compression.FastLzFrameEncoder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -28,23 +29,26 @@ public class SystemSettingController {
 
     @ApiOperation(value = "获取预警配置列表信息", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "预警类型（1. 事件新增观点预警；2.事件总体热度预警；3.舆情预警。）", name = "type", dataType = "Integer", paramType = "query", required = true)
+            @ApiImplicitParam(value = "预警类型（1. 事件新增观点预警；2.事件总体热度预警；3.舆情预警。）", name = "type", dataType = "Integer", paramType = "query", required = true),
+            @ApiImplicitParam(value = "配置所属事件id（预警类型为1或2，才设置这个参数）", name = "eventId", dataType = "Long", paramType = "query", required = false)
     })
     @RequestMapping(value = "setting/list", method = RequestMethod.GET)
-    public RestResult getWarnSettingList(Integer type) {
+    public RestResult getWarnSettingList(Integer type, Long eventId) {
         ValidateUtil.checkNull(type, CommonErrorCode.PARAM_ERROR, "预警类型不能为空");
-        return RestResult.ok(settingService.getWarnSettingList(type));
+        if(type != 3) ValidateUtil.checkNull(eventId, CommonErrorCode.PARAM_ERROR, "配置所属事件id不能为空");
+        return RestResult.ok(settingService.getWarnSettingList(type, eventId));
     }
 
     @ApiOperation(value = "修改预警配置信息", httpMethod = "GET")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "预警类型（1. 事件新增观点预警；2.事件总体热度预警；3.舆情预警。）", name = "type", dataType = "Integer", paramType = "query", required = true),
+            @ApiImplicitParam(value = "配置所属事件id（预警类型为1或2，才设置这个参数）", name = "eventId", dataType = "Long", paramType = "query", required = false),
             @ApiImplicitParam(value = "1级预警下限", name = "first", dataType = "Integer", paramType = "query", required = true),
             @ApiImplicitParam(value = "2级预警下限", name = "second", dataType = "Integer", paramType = "query", required = false),
-            @ApiImplicitParam(value = "3级预警下限", name = "third", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "3级预警下限", name = "third", dataType = "Integer", paramType = "query", required = false)
     })
-    @RequestMapping(value = "heat/modify", method = RequestMethod.GET)
-    public RestResult modifyHeatValue(Integer type, Integer first, Integer second, Integer third) {
+    @RequestMapping(value = "hot/modify", method = RequestMethod.GET)
+    public RestResult modifyHeatValue(Long eventId, Integer type, Integer first, Integer second, Integer third) {
         ValidateUtil.checkNull(type, CommonErrorCode.PARAM_ERROR, "预警类型不能为空");
         if(type != 1) {
             ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, first, second, third);
@@ -52,7 +56,8 @@ public class SystemSettingController {
             ValidateUtil.checkNull(first, CommonErrorCode.PARAM_ERROR);
             second = 0; third = 0;
         }
-        return RestResult.ok(settingService.modifyHeat(type, first, second, third));
+        if(type != 3) ValidateUtil.checkNull(eventId, CommonErrorCode.BIZ_ERROR, "配置所属事件id不能为空");
+        return RestResult.ok(settingService.modifyHeat(eventId, type, first, second, third));
     }
 
     @ApiOperation(value = "添加预警通知人", httpMethod = "GET")

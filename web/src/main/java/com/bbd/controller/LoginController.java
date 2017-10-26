@@ -81,6 +81,7 @@ public class LoginController extends AbstractController {
         Account account = accountOpt.get();
 
         UserInfo info = new UserInfo();
+        info.setId(userId);
         info.setAdmin(account.getAdmin());
         info.setUsername(username);
         info.setAccountName(account.getName());

@@ -7,6 +7,10 @@ package com.bbd.service;
 import com.bbd.dao.UserDao;
 import com.bbd.domain.User;
 import com.bbd.domain.UserExample;
+import com.bbd.exception.ApplicationException;
+import com.bbd.exception.CommonErrorCode;
+import com.bbd.util.UserContext;
+import com.bbd.vo.UserInfo;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.mybatis.domain.PageBounds;
@@ -15,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -53,6 +58,16 @@ public class UserService {
             return Optional.absent();
         }
         return Optional.of(ds.get(0));
+    }
+
+    /**
+     * 获取登陆用户id
+     * @return
+     */
+    public Long getUserId() {
+        UserInfo u = UserContext.getUser();
+        if(Objects.isNull(u)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登陆");
+        return u.getId();
     }
 
 }
