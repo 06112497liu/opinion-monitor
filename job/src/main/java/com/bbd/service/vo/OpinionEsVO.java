@@ -4,6 +4,8 @@
  */
 package com.bbd.service.vo;
 
+import com.bbd.bean.EsBase;
+
 import java.util.Date;
 
 /**
@@ -11,9 +13,7 @@ import java.util.Date;
  * @author tjwang
  * @version $Id: OpinionEsVO.java, v 0.1 2017/10/26 0026 10:17 tjwang Exp $
  */
-public class OpinionEsVO {
-
-    private Long    id;
+public class OpinionEsVO extends EsBase {
 
     private String  uuid;
 

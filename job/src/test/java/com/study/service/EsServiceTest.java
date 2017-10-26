@@ -5,8 +5,11 @@
 package com.study.service;
 
 import com.bbd.service.EsService;
+import com.bbd.service.vo.OpinionEsVO;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 /**
  *
@@ -20,7 +23,26 @@ public class EsServiceTest extends BaseServiceTest {
 
     @Test
     public void testCreateIndex() {
-        esService.createIndex();
+        esService.createIndex("bbd_opinion_a");
+    }
+
+    @Test
+    public void testSyncOpinions() {
+        esService.syncOpinions("bbd_opinion_a");
+    }
+
+    @Test
+    public void testSyncOpinionToNewIndex() {
+        String newIndex = "bbd_opinion_b";
+        String oldIndex = "bbd_opinion_a";
+        esService.syncOpinionToNewIndex(newIndex, oldIndex);
+    }
+
+    @Test
+    public void testSearchOpinions() {
+        List<OpinionEsVO> ds = esService.searchOpinions();
+        logger.info("size : " + ds.size());
+
     }
 
 }

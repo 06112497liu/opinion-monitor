@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 public class EsBase implements Serializable {
 
-    private Long id;
+    protected Long id;
 
     public Long getId() {
         return id;

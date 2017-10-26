@@ -20,6 +20,7 @@ import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -28,6 +29,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryAction;
@@ -294,14 +296,16 @@ public class EsUtil {
         return result;
     }
 
-    public static <T extends EsBase> void create(String type, List<T> bases) {
+    public static <T extends EsBase> void create(String index, String type, List<T> bases) {
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         for (EsBase base : bases) {
-            bulkRequest.add(client.prepareIndex(INDEX, type, base.getId().toString()).setSource(JsonUtil.fromJson(base)));
+            IndexRequest req = new IndexRequest(index, type, String.valueOf(base.getId())).source(JsonUtil.fromJson(base), XContentType.JSON);
+            bulkRequest.add(req);
+            //bulkRequest.add(client.prepareIndex(INDEX, type, base.getId().toString()).setSource(JsonUtil.fromJson(base)));
         }
 
-        BulkResponse bulkResponse = bulkRequest.get();
-        logger.info("create time used : " + bulkResponse.getTookInMillis());
+        BulkResponse resp = bulkRequest.get();
+        logger.info("create time used : " + resp.getTookInMillis());
     }
 
     public static void delete(String type) {
