@@ -14,6 +14,10 @@ public class WarnSettingVo {
 
     private Integer type;
 
+    private Integer targetType;
+
+    private Long eventId;
+
     private String name;
 
     private Integer level;
@@ -40,6 +44,22 @@ public class WarnSettingVo {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public Integer getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(Integer targetType) {
+        this.targetType = targetType;
+    }
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 
     public String getName() {

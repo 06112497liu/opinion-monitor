@@ -29,12 +29,14 @@ public class SystemSettingController {
 
     @ApiOperation(value = "获取预警配置列表信息", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "预警类型（1. 事件新增观点预警；2.事件总体热度预警；3.舆情预警。）", name = "type", dataType = "Integer", paramType = "query", required = true)
+            @ApiImplicitParam(value = "预警类型（1. 事件新增观点预警；2.事件总体热度预警；3.舆情预警。）", name = "type", dataType = "Integer", paramType = "query", required = true),
+            @ApiImplicitParam(value = "配置所属事件id（预警类型为1或2，才设置这个参数）", name = "eventId", dataType = "Long", paramType = "query", required = false)
     })
     @RequestMapping(value = "setting/list", method = RequestMethod.GET)
-    public RestResult getWarnSettingList(Integer type) {
+    public RestResult getWarnSettingList(Integer type, Long eventId) {
         ValidateUtil.checkNull(type, CommonErrorCode.PARAM_ERROR, "预警类型不能为空");
-        return RestResult.ok(settingService.getWarnSettingList(type));
+        if(type != 3) ValidateUtil.checkNull(eventId, CommonErrorCode.PARAM_ERROR, "配置所属事件id不能为空");
+        return RestResult.ok(settingService.getWarnSettingList(type, eventId));
     }
 
     @ApiOperation(value = "修改预警配置信息", httpMethod = "GET")

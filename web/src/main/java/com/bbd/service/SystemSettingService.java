@@ -54,7 +54,7 @@ public class SystemSettingService {
      * @param third  3级舆情预警热度阈值下限
      * @return
      */
-    public Integer modifyHeat(long eventId, int type, int first, int second, int third) {
+    public Integer modifyHeat(Long eventId, Integer type, Integer first, Integer second, Integer third) {
 
         // step-1：校验热度值是否符合规范
         boolean flag = checkThresholdValue(type, first, second, third);
@@ -199,7 +199,7 @@ public class SystemSettingService {
      * @param third
      * @return
      */
-    public Map<String, Object> getOpinionNumGroupHeat(int type, int first, int second, int third) {
+    public Map<String, Object> getOpinionNumGroupHeat(Integer type, Integer first, Integer second, Integer third) {
         return null;
     }
 
@@ -208,10 +208,12 @@ public class SystemSettingService {
      * @param type 预警类型（1. 事件新增观点预警；2.事件总体热度预警；3.舆情预警。）
      * @return
      */
-    public List<WarnSettingVo> getWarnSettingList(int type) {
+    public List<WarnSettingVo> getWarnSettingList(Integer type, Long eventId) {
         // step-1：查询warn_setting配置
         WarnSettingExample example = new WarnSettingExample();
-        example.createCriteria().andTypeEqualTo(type);
+        WarnSettingExample.Criteria criteria = example.createCriteria();
+        criteria.andTypeEqualTo(type);
+        if(type != 3) criteria.andEventIdEqualTo(eventId);
         List<WarnSetting> dbList = settingDao.selectByExample(example);
         List<WarnSettingVo> list = BeanMapperUtil.mapList(dbList, WarnSettingVo.class);
 
@@ -226,7 +228,7 @@ public class SystemSettingService {
     }
 
     // 校验阈值是否符合规则
-    private boolean checkThresholdValue(int type, int first, int second, int third) {
+    private boolean checkThresholdValue(Integer type, Integer first, Integer second, Integer third) {
         boolean flag;
         flag = Range.closed(0, 100).containsAll(Ints.asList(first, second, third));
         if(flag == false) return flag;
@@ -238,7 +240,7 @@ public class SystemSettingService {
     }
 
     // 构建WarnSetting类
-    private WarnSetting buildWarnSetting(int max, int min) {
+    private WarnSetting buildWarnSetting(Integer max, Integer min) {
         WarnSetting set = new WarnSetting();
         set.setMax(max);
         set.setMin(min);
@@ -248,7 +250,7 @@ public class SystemSettingService {
     }
 
     // 构建WarnSettingExample类
-    private WarnSettingExample buildWarnSettingExample(int targetType, long eventId, int type, int level) {
+    private WarnSettingExample buildWarnSettingExample(Integer targetType, Long eventId, Integer type, Integer level) {
         WarnSettingExample example = new WarnSettingExample();
         WarnSettingExample.Criteria criteria = example.createCriteria();
         criteria.andTypeEqualTo(type).andLevelEqualTo(level);
