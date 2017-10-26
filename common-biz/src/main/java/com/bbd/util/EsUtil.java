@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
+import com.mybatis.domain.SortBy;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
@@ -55,21 +56,21 @@ public class EsUtil {
     /**
      * 索引
      */
-    public static final String     INDEX               = "bbd_opinion";
+    public static final String INDEX = "bbd_opinion";
     /**
      * 失联企业
      */
-    public static final String     TYPE                = "opinion";
-    public static final String     ID_PROP             = "id";
+    public static final String TYPE = "opinion";
+    public static final String ID_PROP = "id";
     /**
      * 滚动分片最大的值   单个片的数量 *　分片数量
      */
-    private static final int       SRCOLL_FITCH_SIZE   = 10000 * 1;
+    private static final int SRCOLL_FITCH_SIZE = 10000 * 1;
     /**
      * 默认的滚动时间
      */
-    private static final long      DEFALUT_SCROLL_TIME = 60000;
-    private static Logger          logger              = LoggerFactory.getLogger(EsUtil.class);
+    private static final long DEFALUT_SCROLL_TIME = 60000;
+    private static Logger logger = LoggerFactory.getLogger(EsUtil.class);
     /**
      * es链接
      */
@@ -139,11 +140,30 @@ public class EsUtil {
     /**
      * form-size 查询实现
      */
+    //    public static <T> PageList<T> search(String index, String type, QueryBuilder queryBuilder, PageBounds pb, Class<T> clazz) {
+    //        int pageSize = pb.getLimit();
+    //        int start = pb.getOffset();
+    //        logger.info("search by form size currentPage:{}, pageSize:{}", pb.getOffset(), pb.getLimit());
+    //
+    //        SearchResponse resp = client.prepareSearch(index).setTypes(type).setQuery(queryBuilder).setFrom(start).setSize(pageSize).execute().actionGet();
+    //        return getPageList(resp, pb, clazz);
+    //    }
     public static <T> PageList<T> search(String index, String type, QueryBuilder queryBuilder, PageBounds pb, Class<T> clazz) {
         int pageSize = pb.getLimit();
         int start = pb.getOffset();
         logger.info("search by form size currentPage:{}, pageSize:{}", pb.getOffset(), pb.getLimit());
-        SearchResponse resp = client.prepareSearch(index).setTypes(type).setQuery(queryBuilder).setFrom(start).setSize(pageSize).execute().actionGet();
+
+        SearchRequestBuilder buider = client.prepareSearch(index).setTypes(type).setQuery(queryBuilder).setFrom(start).setSize(pageSize);
+
+        List<SortBy> orders = pb.getOrders();
+        if (orders != null && orders.size() > 0) {
+            for (SortBy order : orders) {
+                SortOrder direction = order.getDirection() == null ? SortOrder.ASC : SortOrder.fromString(order.getDirection().toString());
+                buider.addSort(order.getProperty(), direction);
+            }
+        }
+
+        SearchResponse resp = buider.execute().actionGet();
         return getPageList(resp, pb, clazz);
     }
 
@@ -218,11 +238,11 @@ public class EsUtil {
      */
     public static <T> PageList<T> search(String type, Map<String, Object> matchMap, Map<String, Object> keyMap, List<RangeQueryBean> list, PageBounds pb, Class clazz) {
         String[] orderFields;
-        SortOrder[] orderTypes = new SortOrder[] { SortOrder.DESC };
+        SortOrder[] orderTypes = new SortOrder[]{SortOrder.DESC};
         if (matchMap == null || matchMap.size() == 0) {
-            orderFields = new String[] { "id" };
+            orderFields = new String[]{"id"};
         } else {
-            orderFields = new String[] { "_score" };
+            orderFields = new String[]{"_score"};
         }
 
         return search(type, matchMap, keyMap, list, pb, clazz, orderFields, orderTypes);
@@ -309,7 +329,7 @@ public class EsUtil {
     public static <T extends EsBase> void create(String index, String type, List<T> bases) {
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         for (EsBase base : bases) {
-            IndexRequest req = new IndexRequest(index, type, String.valueOf(base.getId())).source(JsonUtil.fromJson(base), XContentType.JSON);
+            IndexRequest req = new IndexRequest(index, type, base.getEsId()).source(JsonUtil.fromJson(base), XContentType.JSON);
             bulkRequest.add(req);
             //bulkRequest.add(client.prepareIndex(INDEX, type, base.getId().toString()).setSource(JsonUtil.fromJson(base)));
         }
@@ -360,8 +380,8 @@ public class EsUtil {
     }
 
     public static SearchRequestBuilder buildSearchRequestBuilder(String type, Map<String, Object> matchMap, Map<String, Object> keyMap, List<RangeQueryBean> list) {
-        String[] orderFields = new String[] { "id" };
-        SortOrder[] orderTypes = new SortOrder[] { SortOrder.ASC };
+        String[] orderFields = new String[]{"id"};
+        SortOrder[] orderTypes = new SortOrder[]{SortOrder.ASC};
 
         SearchRequestBuilder searchBuilder = prepareScrollSearchBuilder(type, orderFields, orderTypes);
         searchBuilder.setQuery(prepareQuery(matchMap, keyMap, list));

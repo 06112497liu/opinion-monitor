@@ -7,9 +7,8 @@ package com.bbd.service;
 import com.bbd.service.vo.OpinionEsVO;
 import com.bbd.util.EsUtil;
 import com.mybatis.domain.PageBounds;
-import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
+import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.search.SearchResponse;
@@ -48,13 +47,16 @@ public class EsService {
     public void syncOpinionToNewIndex(String newIndex, String oldIndex) {
         createIndex(newIndex);
         syncOpinions(newIndex);
-        changeOpinionAlias(newIndex, oldIndex);
+        changeOpinionAlias(newIndex, oldIndex, INDEX_ALIAS);
         deleteIndex(oldIndex);
     }
 
-    public void changeOpinionAlias(String newIndex, String oldIndex) {
-        IndicesAliasesResponse resp = EsUtil.getClient().admin().indices().prepareAliases().addAlias(newIndex, INDEX_ALIAS).removeAlias(oldIndex, INDEX_ALIAS).execute().actionGet();
-        logger.info(String.valueOf(resp.isAcknowledged()));
+    public void changeOpinionAlias(String newIndex, String oldIndex, String indexAlias) {
+        IndicesAliasesRequestBuilder builder = EsUtil.getClient().admin().indices().prepareAliases().addAlias(newIndex, indexAlias);
+        if (checkIndexExists(oldIndex)) {
+            builder.removeAlias(oldIndex, indexAlias);
+        }
+        builder.execute().actionGet();
     }
 
     /**
@@ -84,9 +86,11 @@ public class EsService {
      *
      * @param index
      */
-    private void deleteIndex(String index) {
-        DeleteIndexRequest req = new DeleteIndexRequest(index);
-        DeleteIndexResponse resp = EsUtil.getClient().admin().indices().delete(req).actionGet();
+    public void deleteIndex(String index) {
+        if (checkIndexExists(index)) {
+            DeleteIndexRequest req = new DeleteIndexRequest(index);
+            EsUtil.getClient().admin().indices().delete(req).actionGet();
+        }
     }
 
     /**

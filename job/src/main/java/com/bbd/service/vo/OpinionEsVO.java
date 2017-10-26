@@ -13,7 +13,9 @@ import java.util.Date;
  * @author tjwang
  * @version $Id: OpinionEsVO.java, v 0.1 2017/10/26 0026 10:17 tjwang Exp $
  */
-public class OpinionEsVO extends EsBase {
+public class OpinionEsVO implements EsBase {
+
+    private Long    id;
 
     private String  uuid;
 
@@ -44,6 +46,11 @@ public class OpinionEsVO extends EsBase {
     private String  content;
 
     private String  link;
+
+    @Override
+    public String getEsId() {
+        return getUuid();
+    }
 
     public Long getId() {
         return id;
