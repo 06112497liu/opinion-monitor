@@ -4,6 +4,10 @@
  */
 package com.bbd.controller;
 
+import java.util.HashMap;
+import java.util.List;
+
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -21,6 +25,7 @@ import com.bbd.service.EventService;
 
 @RestController
 @RequestMapping("/api/event")
+@Api(description = "监测事件")
 public class EventController extends AbstractController {
 
 	@Autowired
@@ -47,6 +52,7 @@ public class EventController extends AbstractController {
         })
     @RequestMapping(value = "createEvent", method = RequestMethod.POST)
     public RestResult createEvent(OpinionEvent opinionEvent) {
+        //opinionEvent.setCreateBy(createBy);
     	eventService.createEvent(opinionEvent);
         return RestResult.ok();
     }
@@ -73,6 +79,7 @@ public class EventController extends AbstractController {
         })
     @RequestMapping(value = "modifyEvent", method = RequestMethod.POST)
     public RestResult modifyEvent(OpinionEvent opinionEvent) {
+        //opinionEvent.setModifiedBy(modifiedBy);
     	eventService.modifyEvent(opinionEvent);
         return RestResult.ok();
     }
@@ -83,8 +90,49 @@ public class EventController extends AbstractController {
     })
     @RequestMapping(value = "getEvent", method = RequestMethod.GET)
     public RestResult getEvent(OpinionEvent opinionEvent) {
-        return RestResult.ok(eventService.getEvent(opinionEvent.getId()));
+        HashMap map= new HashMap();
+        OpinionEvent event = eventService.getEvent(opinionEvent.getId()); 
+        map.put("event", event);
+        map.put("username", /*获取对应ID的用户名SSO*/event.getCreateBy());
+        return RestResult.ok(map);
     }
+    
+    @ApiOperation(value = "删除事件", httpMethod = "POST")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "deleteEvent", method = RequestMethod.POST)
+    public RestResult deleteEvent(OpinionEvent opinionEvent) {
+       //opinionEvent.setModifiedBy(modifiedBy);
+        eventService.deleteEvent(opinionEvent);
+        return RestResult.ok();
+    }
+    
+    @ApiOperation(value = "归档事件", httpMethod = "POST")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "归档事由", name = "fileReason", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "备注", name = "remark", dataType = "String", paramType = "query", required = false)
+    })
+    @RequestMapping(value = "fileEvent", method = RequestMethod.POST)
+    public RestResult fileEvent(OpinionEvent opinionEvent) {
+        eventService.modifyEvent(opinionEvent);
+        return RestResult.ok();
+    }
+    
+    @ApiOperation(value = "事件列表", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "区域代码", name = "region", dataType = "String", paramType = "query", required = false),
+        @ApiImplicitParam(value = "事件分组", name = "eventGroup", dataType = "String", paramType = "query", required = false),
+        @ApiImplicitParam(value = "第几页", name = "pageNo", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "每页大小", name = "pageSize", dataType = "Integer", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "eventList", method = RequestMethod.GET)
+    public RestResult eventList(OpinionEvent opinionEvent, Integer pageNo, Integer pageSize) {
+        return RestResult.ok(eventService.eventList(opinionEvent, pageNo, pageSize));
+    }
+    
+    
     
     @ApiOperation(value = "事件分组、监管主体、事发区域、事件级别下拉列表", httpMethod = "GET")
     @ApiImplicitParams({ 
@@ -94,5 +142,5 @@ public class EventController extends AbstractController {
     public RestResult getDictionary(OpinionDictionary opinionDictionary) {
         return RestResult.ok(eventService.getDictionary(opinionDictionary.getParent()));
     }
-    
+   
 }

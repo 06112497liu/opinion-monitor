@@ -31,6 +31,10 @@ public class OpinionEvent {
 
     private Integer warnCount;
 
+    private String fileReason;
+
+    private Byte isDelete;
+
     private Long createBy;
 
     private Date gmtCreate;
@@ -48,6 +52,8 @@ public class OpinionEvent {
     private String excludeWords;
 
     private String words;
+
+    private String remark;
 
     public Long getId() {
         return id;
@@ -161,6 +167,22 @@ public class OpinionEvent {
         this.warnCount = warnCount;
     }
 
+    public String getFileReason() {
+        return fileReason;
+    }
+
+    public void setFileReason(String fileReason) {
+        this.fileReason = fileReason;
+    }
+
+    public Byte getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(Byte isDelete) {
+        this.isDelete = isDelete;
+    }
+
     public Long getCreateBy() {
         return createBy;
     }
@@ -231,5 +253,13 @@ public class OpinionEvent {
 
     public void setWords(String words) {
         this.words = words;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

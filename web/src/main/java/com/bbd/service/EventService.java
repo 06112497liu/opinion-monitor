@@ -10,7 +10,10 @@ import com.bbd.dao.OpinionEventDao;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.domain.OpinionDictionaryExample;
 import com.bbd.domain.OpinionEvent;
+import com.bbd.domain.OpinionEventExample;
+import com.bbd.domain.OpinionEventExample.Criteria;
 import com.bbd.service.EventService;
+import com.mybatis.domain.PageBounds;
 
 
 /** 
@@ -29,6 +32,7 @@ public class EventService{
 	 * @param opinionEvent 
 	 */
 	public void createEvent(OpinionEvent opinionEvent) {
+	    opinionEvent.setIsDelete((byte)0);
 		opinionEventDao.insert(opinionEvent);
 	}
 	
@@ -46,8 +50,33 @@ public class EventService{
 	 * @param opinionEvent 
 	 */
 	public void modifyEvent(OpinionEvent opinionEvent) {
-		opinionEventDao.updateByPrimaryKey(opinionEvent);
+		opinionEventDao.updateByPrimaryKeySelective(opinionEvent);
 	}
+	
+	/**  
+     * @param opinionEvent 
+     */
+    public void deleteEvent(OpinionEvent opinionEvent) {
+        opinionEvent.setIsDelete((byte)1);
+        opinionEventDao.updateByPrimaryKeySelective(opinionEvent);
+    }
+    
+    /**  
+     * @param opinionEvent 
+     */
+    public List<OpinionEvent> eventList(OpinionEvent opinionEvent, Integer pageNo, Integer pageSize) {
+        PageBounds pageBounds = new PageBounds(pageNo, pageSize);
+        OpinionEventExample  example = new OpinionEventExample();
+        example.setOrderByClause("gmt_create DESC");
+        Criteria criteria = example.createCriteria();
+        if (opinionEvent.getRegion() != null) {
+            criteria.andRegionEqualTo(opinionEvent.getRegion());
+        }
+        if (opinionEvent.getEventGroup() != null) {
+            criteria.andEventGroupEqualTo(opinionEvent.getEventGroup());
+        }
+        return opinionEventDao.selectByExampleWithPageBounds(example, pageBounds);
+    }
 	
 	
 	/**  
