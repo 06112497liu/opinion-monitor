@@ -134,7 +134,7 @@ create table bbd_opinion_event
    warn_count           int,
    file_reason          varchar(16) comment '归档事由',
    remark               text comment '备注',
-   delete               tinyint comment '是否删除，1是，0否',
+   is_delete            tinyint comment '是否删除，1是，0否',
    create_by            bigint,
    gmt_create           datetime comment '创建时间',
    modified_by          bigint,
