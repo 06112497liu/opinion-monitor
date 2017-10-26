@@ -49,4 +49,9 @@ public class EsServiceTest extends BaseServiceTest {
         esService.searchOpinionAggs();
     }
 
+    @Test
+    public void testGetAlias() {
+        esService.getAlias();
+    }
+
 }

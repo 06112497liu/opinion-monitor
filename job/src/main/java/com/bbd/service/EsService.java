@@ -6,8 +6,10 @@ package com.bbd.service;
 
 import com.bbd.service.vo.OpinionEsVO;
 import com.bbd.util.EsUtil;
+import com.google.common.collect.Lists;
 import com.mybatis.domain.PageBounds;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
+import org.elasticsearch.action.admin.indices.alias.get.GetAliasesResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -135,5 +138,18 @@ public class EsService {
             logger.info("key: {}, value: {}", b.getKey(), b.getDocCount());
         }
 
+    }
+
+    /**
+     * 获取当前索引
+     * @return
+     */
+    public String getCurrentAlias() {
+        GetAliasesResponse resp = EsUtil.getClient().admin().indices().prepareGetAliases("bbd_opinion").execute().actionGet();
+        if (resp.getAliases().isEmpty()) {
+            return null;
+        }
+        ArrayList<String> list = Lists.newArrayList(resp.getAliases().keysIt());
+        return list.get(0);
     }
 }
