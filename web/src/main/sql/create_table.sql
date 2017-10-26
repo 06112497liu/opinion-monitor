@@ -132,6 +132,9 @@ create table bbd_opinion_event
    words                text,
    opinion_count        int,
    warn_count           int,
+   file_reason          varchar(16) comment '归档事由',
+   remark               text comment '备注',
+   is_delete            tinyint comment '是否删除，1是，0否',
    create_by            bigint,
    gmt_create           datetime comment '创建时间',
    modified_by          bigint,
@@ -139,36 +142,6 @@ create table bbd_opinion_event
    primary key (id)
 );
 
-drop table if exists bbd_opinion_event_history;
-
-/*==============================================================*/
-/* Table: bbd_opinion_event_history                             */
-/*==============================================================*/
-create table bbd_opinion_event_history
-(
-   id                   bigint not null auto_increment,
-   event_name           varchar(64),
-   event_group          varchar(16),
-   monitor              varchar(16),
-   region               varchar(16),
-   event_level          varchar(16),
-   description          text,
-   merchant             varchar(64),
-   brand                varchar(32),
-   address              varchar(128),
-   merchant_tel         varchar(32),
-   consumer             varchar(32),
-   consumer_tel         varchar(32),
-   include_words        text,
-   keywords             text,
-   exclude_words        text,
-   begin_time           datetime,
-   end_time             datetime,
-   create_by            bigint,
-   gmt_create           datetime comment '创建时间',
-   modified_by          bigint,
-   gmt_modified         datetime comment '修改时间'
-);
 
 drop table if exists bbd_opinion_dictionary;
 
