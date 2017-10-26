@@ -16,6 +16,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
+import org.apache.commons.collections.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,20 +54,32 @@ public class SystemSettingService {
      * @param third  3级舆情预警热度阈值下限
      * @return
      */
-    public Integer modifyHeat(int type, int first, int second, int third) {
+    public Integer modifyHeat(long eventId, int type, int first, int second, int third) {
 
         // step-1：校验热度值是否符合规范
         boolean flag = checkThresholdValue(type, first, second, third);
         if(flag == false) throw new ApplicationException(CommonErrorCode.PARAM_ERROR);
 
+        // step-2：如果是针对事件，校验操作时间配置是否存在
+        if(type != 3) {
+            WarnSettingExample ex = new WarnSettingExample();
+            ex.createCriteria().andEventIdEqualTo(eventId);
+            List<WarnSetting> list = settingDao.selectByExample(ex);
+            if(list.isEmpty()) throw new ApplicationException(BizErrorCode.OBJECT_NOT_EXIST, "本事件没有预警配置");
+        }
+
         // step-2：热度值配置
         int result;
         if(1 == type) {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(type, 1));
+            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(2, eventId, type, 1));
+        } else if(2 == type) {
+            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(2, eventId, type, 1))
+            + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second), buildWarnSettingExample(2, eventId, type, 2))
+            + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third), buildWarnSettingExample(2, eventId, type, 3));
         } else {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(type, 1))
-            + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second), buildWarnSettingExample(type, 2))
-            + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third), buildWarnSettingExample(type, 3));
+            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(1, eventId, type, 1))
+                    + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second), buildWarnSettingExample(1, eventId, type, 2))
+                    + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third), buildWarnSettingExample(1, eventId, type, 3));
         }
         return result;
     }
@@ -235,9 +248,11 @@ public class SystemSettingService {
     }
 
     // 构建WarnSettingExample类
-    private WarnSettingExample buildWarnSettingExample(int type, int level) {
+    private WarnSettingExample buildWarnSettingExample(int targetType, long eventId, int type, int level) {
         WarnSettingExample example = new WarnSettingExample();
-        example.createCriteria().andTypeEqualTo(type).andLevelEqualTo(level);
+        WarnSettingExample.Criteria criteria = example.createCriteria();
+        criteria.andTypeEqualTo(type).andLevelEqualTo(level);
+        if(targetType == 2) criteria.andEventIdEqualTo(eventId);
         return example;
     }
 
