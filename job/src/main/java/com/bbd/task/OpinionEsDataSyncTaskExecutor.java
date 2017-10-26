@@ -97,7 +97,7 @@ public class OpinionEsDataSyncTaskExecutor extends AbstractTaskExecutor<String, 
         TaskEntity task = taskService.getById(taskId);
         String curItem = task.getCurrentItem();
         if (StringUtils.isBlank(curItem)) {
-            esService.createIndex(newIndex);
+            esService.createOpinionIndex(newIndex, type);
             if (task.getBeginTime() == null) {
                 task.setBeginTime(new Date());
                 taskService.updateTask(task);

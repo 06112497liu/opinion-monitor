@@ -12,6 +12,8 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
@@ -66,7 +68,20 @@ public class EsService {
         if (checkIndexExists(index)) {
             deleteIndex(index);
         }
-        EsUtil.getClient().admin().indices().prepareCreate(index).get();
+        EsUtil.getClient().admin().indices().prepareCreate(index).setSettings(Settings.builder().put("number_of_shards", 1).put("number_of_replicas", 1)).get();
+    }
+
+    /**
+     * 创建舆情索引
+     * @param index
+     */
+    public void createOpinionIndex(String index, String type) {
+        if (checkIndexExists(index)) {
+            deleteIndex(index);
+        }
+        String mapping = "{\"opinion\": {  \"properties\": {\"esId\": {  \"type\": \"keyword\"},\"source\": {  \"type\": \"keyword\"},\"uuid\": {  \"type\": \"keyword\"},\"startTime\": {  \"type\": \"date\",  \"format\": \"yyyy-MM-dd HH:mm:ss\"},\"gmtCreate\": {  \"type\": \"date\",  \"format\": \"yyyy-MM-dd HH:mm:ss\"},\"gmtModified\": {  \"type\": \"date\",  \"format\": \"yyyy-MM-dd HH:mm:ss\"}  }}  }";
+        EsUtil.getClient().admin().indices().prepareCreate(index).setSettings(Settings.builder().put("number_of_shards", 1).put("number_of_replicas", 1)).addMapping(type, mapping, XContentType.JSON)
+            .get();
     }
 
     /**
