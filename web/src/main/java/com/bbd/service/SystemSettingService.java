@@ -18,6 +18,7 @@ import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 
 /**
@@ -40,6 +41,8 @@ public class SystemSettingService {
     @Autowired
     private MonitorKeywordsExtDao keywordsExtDao;
 
+    @Autowired
+    private UserService userService;
 
 
     /**
@@ -89,6 +92,7 @@ public class SystemSettingService {
         if(!flag) throw new ApplicationException(BizErrorCode.NOTIFIER_SETTINGID_NOT_EXIST);
 
         // step-3：添加预警通知人
+        notifier.setCreateBy(userService.getUserId());
         notifier.setGmtCreate(new Date());
         return notifierDao.insertSelective(notifier);
     }
@@ -109,6 +113,7 @@ public class SystemSettingService {
         if(flag == false) throw new ApplicationException(BizErrorCode.OBJECT_NOT_EXIST);
 
         // step-3：执行修改操作
+        notifier.setModifiedBy(userService.getUserId());
         notifier.setGmtModified(new Date());
         return notifierDao.updateByPrimaryKeySelective(notifier);
     }
@@ -225,6 +230,7 @@ public class SystemSettingService {
         set.setMax(max);
         set.setMin(min);
         set.setGmtModified(new Date());
+        set.setModifiedBy(userService.getUserId());
         return set;
     }
 

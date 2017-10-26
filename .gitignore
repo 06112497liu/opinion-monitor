@@ -7,3 +7,5 @@
 *.jar
 *.class
 *.log
+*.gz
+*/log/*
