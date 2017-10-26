@@ -42,7 +42,11 @@ public class EsServiceTest extends BaseServiceTest {
     public void testSearchOpinions() {
         List<OpinionEsVO> ds = esService.searchOpinions();
         logger.info("size : " + ds.size());
+    }
 
+    @Test
+    public void testSearchOpinionAggs() {
+        esService.searchOpinionAggs();
     }
 
 }

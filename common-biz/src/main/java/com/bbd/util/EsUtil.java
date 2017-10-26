@@ -55,21 +55,21 @@ public class EsUtil {
     /**
      * 索引
      */
-    public static final String INDEX = "bbd_opinion";
+    public static final String     INDEX               = "bbd_opinion";
     /**
      * 失联企业
      */
-    public static final String TYPE = "opinion";
-    public static final String ID_PROP = "id";
+    public static final String     TYPE                = "opinion";
+    public static final String     ID_PROP             = "id";
     /**
      * 滚动分片最大的值   单个片的数量 *　分片数量
      */
-    private static final int SRCOLL_FITCH_SIZE = 10000 * 1;
+    private static final int       SRCOLL_FITCH_SIZE   = 10000 * 1;
     /**
      * 默认的滚动时间
      */
-    private static final long DEFALUT_SCROLL_TIME = 60000;
-    private static Logger logger = LoggerFactory.getLogger(EsUtil.class);
+    private static final long      DEFALUT_SCROLL_TIME = 60000;
+    private static Logger          logger              = LoggerFactory.getLogger(EsUtil.class);
     /**
      * es链接
      */
@@ -218,11 +218,11 @@ public class EsUtil {
      */
     public static <T> PageList<T> search(String type, Map<String, Object> matchMap, Map<String, Object> keyMap, List<RangeQueryBean> list, PageBounds pb, Class clazz) {
         String[] orderFields;
-        SortOrder[] orderTypes = new SortOrder[]{SortOrder.DESC};
+        SortOrder[] orderTypes = new SortOrder[] { SortOrder.DESC };
         if (matchMap == null || matchMap.size() == 0) {
-            orderFields = new String[]{"id"};
+            orderFields = new String[] { "id" };
         } else {
-            orderFields = new String[]{"_score"};
+            orderFields = new String[] { "_score" };
         }
 
         return search(type, matchMap, keyMap, list, pb, clazz, orderFields, orderTypes);
@@ -360,8 +360,8 @@ public class EsUtil {
     }
 
     public static SearchRequestBuilder buildSearchRequestBuilder(String type, Map<String, Object> matchMap, Map<String, Object> keyMap, List<RangeQueryBean> list) {
-        String[] orderFields = new String[]{"id"};
-        SortOrder[] orderTypes = new SortOrder[]{SortOrder.ASC};
+        String[] orderFields = new String[] { "id" };
+        SortOrder[] orderTypes = new SortOrder[] { SortOrder.ASC };
 
         SearchRequestBuilder searchBuilder = prepareScrollSearchBuilder(type, orderFields, orderTypes);
         searchBuilder.setQuery(prepareQuery(matchMap, keyMap, list));

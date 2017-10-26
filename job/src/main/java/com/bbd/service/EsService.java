@@ -12,7 +12,11 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,7 @@ import java.util.List;
 
 /**
  * Elasticsearch相关服务
+ *
  * @author tjwang
  * @version $Id: EsService.java, v 0.1 2017/10/25 0025 17:43 tjwang Exp $
  */
@@ -36,6 +41,7 @@ public class EsService {
 
     /**
      * 同步数到新的索引。创建新索引，将新索引与别名关联，删除就索引。
+     *
      * @param newIndex
      * @param oldIndex
      */
@@ -63,6 +69,7 @@ public class EsService {
 
     /**
      * 检查索引是否存在
+     *
      * @param index
      * @return
      */
@@ -74,6 +81,7 @@ public class EsService {
 
     /**
      * 删除索引
+     *
      * @param index
      */
     private void deleteIndex(String index) {
@@ -97,5 +105,16 @@ public class EsService {
         List<OpinionEsVO> rs = EsUtil.search(INDEX_ALIAS, OPINION_TYPE, QueryBuilders.matchAllQuery(), pb, OpinionEsVO.class);
 
         return rs;
+    }
+
+    public void searchOpinionAggs() {
+        SearchResponse resp = EsUtil.getClient().prepareSearch(INDEX_ALIAS).addAggregation(AggregationBuilders.terms("agg").field("emotion")).setSize(0).execute().actionGet();
+        Aggregations aggs = resp.getAggregations();
+        Terms agg = aggs.get("agg");
+        List<? extends Terms.Bucket> buckets = agg.getBuckets();
+        for (Terms.Bucket b : buckets) {
+            logger.info("key: {}, value: {}", b.getKey(), b.getDocCount());
+        }
+
     }
 }
