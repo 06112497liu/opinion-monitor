@@ -24,4 +24,80 @@
     ORDER BY a.hot DESC
     LIMIT 2;
   </select>
+
+  <!--查询不同时间段舆情增量-->
+  <select id="selectAddOpinionGroupByTime" resultType="java.util.Map">
+      SELECT
+        (
+        SELECT
+            count(1)
+            FROM
+                bbd_opinion
+            WHERE
+                start_time > DATE_SUB(NOW(), INTERVAL 1 DAY)
+        ) as day,
+        (
+            SELECT
+                count(1)
+            FROM
+                bbd_opinion
+            WHERE
+                start_time > DATE_SUB(NOW(), INTERVAL 1 WEEK)
+        ) as week,
+        (
+            SELECT
+                count(1)
+            FROM
+                bbd_opinion
+            WHERE
+                start_time > DATE_SUB(NOW(), INTERVAL 1 MONTH)
+        ) as month;
+  </select>
+
+    <!--查询舆情传播渠道分布-->
+  <select id="selectOpinionChannelTrend" resultType="com.bbd.param.ChannelTrend">
+        SET @count:=(SELECT count(1) FROM bbd_opinion);
+        SELECT
+          a.source_type sourceType,
+          b.`name` as sourceTypeDesc,
+          count(1) num,
+          FORMAT(count(1) /@count * 100, 2) AS percent
+        FROM
+          bbd_opinion a
+        LEFT JOIN bbd_opinion_dictionary b ON a.source_type = b. CODE
+        WHERE
+          b.parent = 'F'
+        GROUP BY source_type
+        ORDER BY num DESC
+  </select>
+
+    <!--查询舆情事件类型分布-->
+    <select id="selectEventTypeTrend" resultType="com.bbd.param.NameValueInfo">
+        SELECT
+            a.region AS name,
+            b.name AS nameDesc,
+            count(1) AS value
+        FROM
+            bbd_opinion_event a
+        LEFT JOIN bbd_opinion_dictionary b ON a.region = b.code
+        WHERE
+            b.parent = 'C'
+        GROUP BY
+            a.region
+    </select>
+
+    <!--查询舆情事件地域分布-->
+    <select id="selectEventMapTrend" resultType="com.bbd.param.NameValueInfo">
+        SELECT
+            a.event_group AS name,
+            b.name AS nameDesc,
+            count(1) AS value
+        FROM
+            bbd_opinion_event a
+        LEFT JOIN bbd_opinion_dictionary b ON a.event_group = b.code
+        WHERE
+            b.parent = 'A'
+        GROUP BY
+            a.event_group
+    </select>
 </mapper>

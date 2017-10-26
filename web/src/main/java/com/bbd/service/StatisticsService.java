@@ -2,11 +2,14 @@ package com.bbd.service;
 
 import com.bbd.dao.OpinionExtDao;
 import com.bbd.domain.Opinion;
+import com.bbd.param.ChannelTrend;
+import com.bbd.param.NameValueInfo;
 import com.bbd.param.OpinionVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 统计服务接口
@@ -25,6 +28,42 @@ public class StatisticsService {
      */
     public List<OpinionVo> getWarnOpinionTopTen() {
         List<OpinionVo> list = opinionExtDao.selectWarnOpinionTopTen();
+        return list;
+    }
+
+    /**
+     * 查询不同时间段舆情增量
+     * @return
+     */
+    public Map<String, Long> getAddOpinionGroupByTime() {
+        Map<String, Long> map = opinionExtDao.selectAddOpinionGroupByTime();
+        return map;
+    }
+
+    /**
+     * 查询舆情传播渠道分布
+     * @return
+     */
+    public List<ChannelTrend> getOpinionChannelTrend() {
+        List<ChannelTrend> list = opinionExtDao.selectOpinionChannelTrend();
+        return list;
+    }
+
+    /**
+     * 查询舆情事件类型分布
+     * @return
+     */
+    public List<NameValueInfo> getEventTypeTrend() {
+        List<NameValueInfo> list = opinionExtDao.selectEventTypeTrend();
+        return list;
+    }
+
+    /**
+     * 查询舆情事件地域分布
+     * @return
+     */
+    public List<NameValueInfo> getEventMapTrend() {
+        List<NameValueInfo> list = opinionExtDao.selectEventMapTrend();
         return list;
     }
 
