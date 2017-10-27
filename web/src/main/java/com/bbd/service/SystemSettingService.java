@@ -16,7 +16,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
-import org.apache.commons.collections.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -225,6 +224,23 @@ public class SystemSettingService {
             w.setNotifierList(notifierDao.selectByExample(exam));
         });
         return list;
+    }
+
+    /**
+     * 返回-1表示该舆情没有达到预警级别
+     * @param hot
+     * @return
+     */
+    public Integer judgeOpinionSettingClass(Integer hot) {
+        WarnSettingExample example = new WarnSettingExample();
+        example.createCriteria().andTypeEqualTo(3);
+        List<WarnSetting> setting = settingDao.selectByExample(example);
+        for(WarnSetting s : setting) {
+            int min = s.getMin(); int max = s.getMax();
+            boolean isContain = Range.closed(min, max).contains(hot);
+            if(isContain) return s.getLevel();
+        }
+        return -1;
     }
 
     // 校验阈值是否符合规则

@@ -1,25 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.bbd.dao.OpinionDao">
-  <resultMap id="BaseResultMap" type="com.bbd.domain.Opinion">
+<mapper namespace="com.bbd.dao.SimiliarNewsDao">
+  <resultMap id="BaseResultMap" type="com.bbd.domain.SimiliarNews">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="seq" jdbcType="INTEGER" property="seq" />
     <result column="uuid" jdbcType="VARCHAR" property="uuid" />
     <result column="title" jdbcType="VARCHAR" property="title" />
-    <result column="summary" jdbcType="VARCHAR" property="summary" />
-    <result column="source" jdbcType="VARCHAR" property="source" />
-    <result column="source_type" jdbcType="TINYINT" property="sourceType" />
-    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
     <result column="hot" jdbcType="INTEGER" property="hot" />
-    <result column="emotion" jdbcType="TINYINT" property="emotion" />
-    <result column="similiar" jdbcType="INTEGER" property="similiar" />
-    <result column="words" jdbcType="VARCHAR" property="words" />
-    <result column="comment_count" jdbcType="INTEGER" property="commentCount" />
+    <result column="source" jdbcType="VARCHAR" property="source" />
     <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
     <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
   </resultMap>
-  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.bbd.domain.Opinion">
-    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.bbd.domain.SimiliarNews">
     <result column="link" jdbcType="LONGVARCHAR" property="link" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -81,13 +73,12 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, seq, uuid, title, summary, source, source_type, start_time, hot, emotion, similiar, 
-    words, comment_count, gmt_create, gmt_modified
+    id, seq, uuid, title, hot, source, gmt_create, gmt_modified
   </sql>
   <sql id="Blob_Column_List">
-    content, link
+    link
   </sql>
-  <select id="selectByExampleWithBLOBs" parameterType="com.bbd.domain.OpinionExample" resultMap="ResultMapWithBLOBs">
+  <select id="selectByExampleWithBLOBs" parameterType="com.bbd.domain.SimiliarNewsExample" resultMap="ResultMapWithBLOBs">
     select
     <if test="distinct">
       distinct
@@ -96,7 +87,7 @@
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
-    from bbd_opinion
+    from bbd_similiar_news
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -104,14 +95,14 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByExample" parameterType="com.bbd.domain.OpinionExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.bbd.domain.SimiliarNewsExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     'true' as QUERYID,
     <include refid="Base_Column_List" />
-    from bbd_opinion
+    from bbd_similiar_news
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -124,35 +115,29 @@
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
-    from bbd_opinion
+    from bbd_similiar_news
     where id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from bbd_opinion
+    delete from bbd_similiar_news
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.bbd.domain.Opinion">
+  <insert id="insert" parameterType="com.bbd.domain.SimiliarNews">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_opinion (seq, uuid, title, 
-      summary, source, source_type, 
-      start_time, hot, emotion, 
-      similiar, words, comment_count, 
-      gmt_create, gmt_modified, content, 
-      link)
+    insert into bbd_similiar_news (seq, uuid, title, 
+      hot, source, gmt_create, 
+      gmt_modified, link)
     values (#{seq,jdbcType=INTEGER}, #{uuid,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
-      #{summary,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR}, #{sourceType,jdbcType=TINYINT}, 
-      #{startTime,jdbcType=TIMESTAMP}, #{hot,jdbcType=INTEGER}, #{emotion,jdbcType=TINYINT}, 
-      #{similiar,jdbcType=INTEGER}, #{words,jdbcType=VARCHAR}, #{commentCount,jdbcType=INTEGER}, 
-      #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR}, 
-      #{link,jdbcType=LONGVARCHAR})
+      #{hot,jdbcType=INTEGER}, #{source,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP}, 
+      #{gmtModified,jdbcType=TIMESTAMP}, #{link,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.bbd.domain.Opinion">
+  <insert id="insertSelective" parameterType="com.bbd.domain.SimiliarNews">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_opinion
+    insert into bbd_similiar_news
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="seq != null">
         seq,
@@ -163,41 +148,17 @@
       <if test="title != null">
         title,
       </if>
-      <if test="summary != null">
-        summary,
-      </if>
-      <if test="source != null">
-        source,
-      </if>
-      <if test="sourceType != null">
-        source_type,
-      </if>
-      <if test="startTime != null">
-        start_time,
-      </if>
       <if test="hot != null">
         hot,
       </if>
-      <if test="emotion != null">
-        emotion,
-      </if>
-      <if test="similiar != null">
-        similiar,
-      </if>
-      <if test="words != null">
-        words,
-      </if>
-      <if test="commentCount != null">
-        comment_count,
+      <if test="source != null">
+        source,
       </if>
       <if test="gmtCreate != null">
         gmt_create,
       </if>
       <if test="gmtModified != null">
         gmt_modified,
-      </if>
-      <if test="content != null">
-        content,
       </if>
       <if test="link != null">
         link,
@@ -213,32 +174,11 @@
       <if test="title != null">
         #{title,jdbcType=VARCHAR},
       </if>
-      <if test="summary != null">
-        #{summary,jdbcType=VARCHAR},
-      </if>
-      <if test="source != null">
-        #{source,jdbcType=VARCHAR},
-      </if>
-      <if test="sourceType != null">
-        #{sourceType,jdbcType=TINYINT},
-      </if>
-      <if test="startTime != null">
-        #{startTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="hot != null">
         #{hot,jdbcType=INTEGER},
       </if>
-      <if test="emotion != null">
-        #{emotion,jdbcType=TINYINT},
-      </if>
-      <if test="similiar != null">
-        #{similiar,jdbcType=INTEGER},
-      </if>
-      <if test="words != null">
-        #{words,jdbcType=VARCHAR},
-      </if>
-      <if test="commentCount != null">
-        #{commentCount,jdbcType=INTEGER},
+      <if test="source != null">
+        #{source,jdbcType=VARCHAR},
       </if>
       <if test="gmtCreate != null">
         #{gmtCreate,jdbcType=TIMESTAMP},
@@ -246,16 +186,13 @@
       <if test="gmtModified != null">
         #{gmtModified,jdbcType=TIMESTAMP},
       </if>
-      <if test="content != null">
-        #{content,jdbcType=LONGVARCHAR},
-      </if>
       <if test="link != null">
         #{link,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
   <update id="updateByExampleSelective" parameterType="map">
-    update bbd_opinion
+    update bbd_similiar_news
     <set>
       <if test="record.id != null">
         id = #{record.id,jdbcType=BIGINT},
@@ -269,41 +206,17 @@
       <if test="record.title != null">
         title = #{record.title,jdbcType=VARCHAR},
       </if>
-      <if test="record.summary != null">
-        summary = #{record.summary,jdbcType=VARCHAR},
-      </if>
-      <if test="record.source != null">
-        source = #{record.source,jdbcType=VARCHAR},
-      </if>
-      <if test="record.sourceType != null">
-        source_type = #{record.sourceType,jdbcType=TINYINT},
-      </if>
-      <if test="record.startTime != null">
-        start_time = #{record.startTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="record.hot != null">
         hot = #{record.hot,jdbcType=INTEGER},
       </if>
-      <if test="record.emotion != null">
-        emotion = #{record.emotion,jdbcType=TINYINT},
-      </if>
-      <if test="record.similiar != null">
-        similiar = #{record.similiar,jdbcType=INTEGER},
-      </if>
-      <if test="record.words != null">
-        words = #{record.words,jdbcType=VARCHAR},
-      </if>
-      <if test="record.commentCount != null">
-        comment_count = #{record.commentCount,jdbcType=INTEGER},
+      <if test="record.source != null">
+        source = #{record.source,jdbcType=VARCHAR},
       </if>
       <if test="record.gmtCreate != null">
         gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       </if>
       <if test="record.gmtModified != null">
         gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.content != null">
-        content = #{record.content,jdbcType=LONGVARCHAR},
       </if>
       <if test="record.link != null">
         link = #{record.link,jdbcType=LONGVARCHAR},
@@ -314,51 +227,36 @@
     </if>
   </update>
   <update id="updateByExampleWithBLOBs" parameterType="map">
-    update bbd_opinion
+    update bbd_similiar_news
     set id = #{record.id,jdbcType=BIGINT},
       seq = #{record.seq,jdbcType=INTEGER},
       uuid = #{record.uuid,jdbcType=VARCHAR},
       title = #{record.title,jdbcType=VARCHAR},
-      summary = #{record.summary,jdbcType=VARCHAR},
-      source = #{record.source,jdbcType=VARCHAR},
-      source_type = #{record.sourceType,jdbcType=TINYINT},
-      start_time = #{record.startTime,jdbcType=TIMESTAMP},
       hot = #{record.hot,jdbcType=INTEGER},
-      emotion = #{record.emotion,jdbcType=TINYINT},
-      similiar = #{record.similiar,jdbcType=INTEGER},
-      words = #{record.words,jdbcType=VARCHAR},
-      comment_count = #{record.commentCount,jdbcType=INTEGER},
+      source = #{record.source,jdbcType=VARCHAR},
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
-      content = #{record.content,jdbcType=LONGVARCHAR},
       link = #{record.link,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update bbd_opinion
+    update bbd_similiar_news
     set id = #{record.id,jdbcType=BIGINT},
       seq = #{record.seq,jdbcType=INTEGER},
       uuid = #{record.uuid,jdbcType=VARCHAR},
       title = #{record.title,jdbcType=VARCHAR},
-      summary = #{record.summary,jdbcType=VARCHAR},
-      source = #{record.source,jdbcType=VARCHAR},
-      source_type = #{record.sourceType,jdbcType=TINYINT},
-      start_time = #{record.startTime,jdbcType=TIMESTAMP},
       hot = #{record.hot,jdbcType=INTEGER},
-      emotion = #{record.emotion,jdbcType=TINYINT},
-      similiar = #{record.similiar,jdbcType=INTEGER},
-      words = #{record.words,jdbcType=VARCHAR},
-      comment_count = #{record.commentCount,jdbcType=INTEGER},
+      source = #{record.source,jdbcType=VARCHAR},
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.bbd.domain.Opinion">
-    update bbd_opinion
+  <update id="updateByPrimaryKeySelective" parameterType="com.bbd.domain.SimiliarNews">
+    update bbd_similiar_news
     <set>
       <if test="seq != null">
         seq = #{seq,jdbcType=INTEGER},
@@ -369,32 +267,11 @@
       <if test="title != null">
         title = #{title,jdbcType=VARCHAR},
       </if>
-      <if test="summary != null">
-        summary = #{summary,jdbcType=VARCHAR},
-      </if>
-      <if test="source != null">
-        source = #{source,jdbcType=VARCHAR},
-      </if>
-      <if test="sourceType != null">
-        source_type = #{sourceType,jdbcType=TINYINT},
-      </if>
-      <if test="startTime != null">
-        start_time = #{startTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="hot != null">
         hot = #{hot,jdbcType=INTEGER},
       </if>
-      <if test="emotion != null">
-        emotion = #{emotion,jdbcType=TINYINT},
-      </if>
-      <if test="similiar != null">
-        similiar = #{similiar,jdbcType=INTEGER},
-      </if>
-      <if test="words != null">
-        words = #{words,jdbcType=VARCHAR},
-      </if>
-      <if test="commentCount != null">
-        comment_count = #{commentCount,jdbcType=INTEGER},
+      <if test="source != null">
+        source = #{source,jdbcType=VARCHAR},
       </if>
       <if test="gmtCreate != null">
         gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
@@ -402,61 +279,43 @@
       <if test="gmtModified != null">
         gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
       </if>
-      <if test="content != null">
-        content = #{content,jdbcType=LONGVARCHAR},
-      </if>
       <if test="link != null">
         link = #{link,jdbcType=LONGVARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.bbd.domain.Opinion">
-    update bbd_opinion
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.bbd.domain.SimiliarNews">
+    update bbd_similiar_news
     set seq = #{seq,jdbcType=INTEGER},
       uuid = #{uuid,jdbcType=VARCHAR},
       title = #{title,jdbcType=VARCHAR},
-      summary = #{summary,jdbcType=VARCHAR},
-      source = #{source,jdbcType=VARCHAR},
-      source_type = #{sourceType,jdbcType=TINYINT},
-      start_time = #{startTime,jdbcType=TIMESTAMP},
       hot = #{hot,jdbcType=INTEGER},
-      emotion = #{emotion,jdbcType=TINYINT},
-      similiar = #{similiar,jdbcType=INTEGER},
-      words = #{words,jdbcType=VARCHAR},
-      comment_count = #{commentCount,jdbcType=INTEGER},
+      source = #{source,jdbcType=VARCHAR},
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
-      content = #{content,jdbcType=LONGVARCHAR},
       link = #{link,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.bbd.domain.Opinion">
-    update bbd_opinion
+  <update id="updateByPrimaryKey" parameterType="com.bbd.domain.SimiliarNews">
+    update bbd_similiar_news
     set seq = #{seq,jdbcType=INTEGER},
       uuid = #{uuid,jdbcType=VARCHAR},
       title = #{title,jdbcType=VARCHAR},
-      summary = #{summary,jdbcType=VARCHAR},
-      source = #{source,jdbcType=VARCHAR},
-      source_type = #{sourceType,jdbcType=TINYINT},
-      start_time = #{startTime,jdbcType=TIMESTAMP},
       hot = #{hot,jdbcType=INTEGER},
-      emotion = #{emotion,jdbcType=TINYINT},
-      similiar = #{similiar,jdbcType=INTEGER},
-      words = #{words,jdbcType=VARCHAR},
-      comment_count = #{commentCount,jdbcType=INTEGER},
+      source = #{source,jdbcType=VARCHAR},
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.OpinionExample" resultMap="BaseResultMap">
+  <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.SimiliarNewsExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     'true' as QUERYID,
     <include refid="Base_Column_List" />
-    from bbd_opinion
+    from bbd_similiar_news
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>

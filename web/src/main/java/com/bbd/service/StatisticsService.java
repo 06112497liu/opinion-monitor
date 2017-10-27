@@ -1,7 +1,6 @@
 package com.bbd.service;
 
 import com.bbd.dao.OpinionExtDao;
-import com.bbd.domain.Opinion;
 import com.bbd.param.ChannelTrend;
 import com.bbd.param.NameValueInfo;
 import com.bbd.param.OpinionVo;

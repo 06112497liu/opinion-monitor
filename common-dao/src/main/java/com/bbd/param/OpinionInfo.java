@@ -1,11 +1,17 @@
-package com.bbd.domain;
+package com.bbd.param;
+
+import com.bbd.domain.SimiliarNews;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
+import java.util.List;
 
-public class Opinion {
+/**
+ * @author Liuweibo
+ * @version Id: OpinionInfo.java, v0.1 2017/10/27 Liuweibo Exp $$
+ */
+public class OpinionInfo {
     private Long id;
-
-    private Integer seq;
 
     private String uuid;
 
@@ -17,9 +23,12 @@ public class Opinion {
 
     private Integer sourceType;
 
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
     private Date startTime;
 
     private Integer hot;
+
+    private Integer warnClass;
 
     private Integer emotion;
 
@@ -29,13 +38,11 @@ public class Opinion {
 
     private Integer commentCount;
 
-    private Date gmtCreate;
-
-    private Date gmtModified;
-
     private String content;
 
     private String link;
+
+    private List<SimiliarNews> similiarNewsList;
 
     public Long getId() {
         return id;
@@ -43,14 +50,6 @@ public class Opinion {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Integer getSeq() {
-        return seq;
-    }
-
-    public void setSeq(Integer seq) {
-        this.seq = seq;
     }
 
     public String getUuid() {
@@ -109,6 +108,14 @@ public class Opinion {
         this.hot = hot;
     }
 
+    public Integer getWarnClass() {
+        return warnClass;
+    }
+
+    public void setWarnClass(Integer warnClass) {
+        this.warnClass = warnClass;
+    }
+
     public Integer getEmotion() {
         return emotion;
     }
@@ -141,22 +148,6 @@ public class Opinion {
         this.commentCount = commentCount;
     }
 
-    public Date getGmtCreate() {
-        return gmtCreate;
-    }
-
-    public void setGmtCreate(Date gmtCreate) {
-        this.gmtCreate = gmtCreate;
-    }
-
-    public Date getGmtModified() {
-        return gmtModified;
-    }
-
-    public void setGmtModified(Date gmtModified) {
-        this.gmtModified = gmtModified;
-    }
-
     public String getContent() {
         return content;
     }
@@ -172,4 +163,36 @@ public class Opinion {
     public void setLink(String link) {
         this.link = link;
     }
+
+    public List<SimiliarNews> getSimiliarNewsList() {
+        return similiarNewsList;
+    }
+
+    public void setSimiliarNewsList(List<SimiliarNews> similiarNewsList) {
+        this.similiarNewsList = similiarNewsList;
+    }
+
+    @Override
+    public String toString() {
+        return "OpinionInfo{" +
+                "id=" + id +
+                ", uuid='" + uuid + '\'' +
+                ", title='" + title + '\'' +
+                ", summary='" + summary + '\'' +
+                ", source='" + source + '\'' +
+                ", sourceType=" + sourceType +
+                ", startTime=" + startTime +
+                ", hot=" + hot +
+                ", warnClass=" + warnClass +
+                ", emotion=" + emotion +
+                ", similiar=" + similiar +
+                ", words='" + words + '\'' +
+                ", commentCount=" + commentCount +
+                ", content='" + content + '\'' +
+                ", link='" + link + '\'' +
+                ", similiarNewsList=" + similiarNewsList +
+                '}';
+    }
 }
+    
+    
