@@ -132,15 +132,13 @@ public class EventController extends AbstractController {
         return RestResult.ok(eventService.eventList(opinionEvent, pageNo, pageSize));
     }
     
-    
-    
     @ApiOperation(value = "事件分组、监管主体、事发区域、事件级别下拉列表", httpMethod = "GET")
     @ApiImplicitParams({ 
-        @ApiImplicitParam(value = "事件分组(A)、监管主体(B)、事发区域(C)、事件级别(D)", name = "parent", dataType = "String", paramType = "query", required = true)
+        @ApiImplicitParam(value = "事件分组(A)、监管主体(B)、事发区域(C)、事件级别(D)、归档事由(E)", name = "parent", dataType = "String", paramType = "query", required = true)
     })
     @RequestMapping(value = "getDictionary", method = RequestMethod.GET)
     public RestResult getDictionary(OpinionDictionary opinionDictionary) {
         return RestResult.ok(eventService.getDictionary(opinionDictionary.getParent()));
     }
-   
+    
 }

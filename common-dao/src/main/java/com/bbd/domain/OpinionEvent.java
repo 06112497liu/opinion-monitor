@@ -2,6 +2,8 @@ package com.bbd.domain;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class OpinionEvent {
     private Long id;
 
@@ -37,6 +39,7 @@ public class OpinionEvent {
 
     private Long createBy;
 
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Date gmtCreate;
 
     private Long modifiedBy;
