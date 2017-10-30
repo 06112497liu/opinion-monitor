@@ -52,6 +52,8 @@ create table bbd_warn_setting
    id                   bigint not null auto_increment,
    type                 tinyint comment '1. 事件新增观点预警；2.事件总体热度预警；3.舆情预警。',
    name                 varchar(32),
+   target_type          tinyint comment '1.舆情；2.事件',
+   event_id             bigint comment '配置所属事件id',
    min                  int,
    max                  int,
    create_by            bigint,

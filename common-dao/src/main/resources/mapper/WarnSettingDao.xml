@@ -115,7 +115,7 @@
     values (#{type,jdbcType=TINYINT}, #{targetType,jdbcType=TINYINT}, #{eventId,jdbcType=BIGINT}, 
       #{name,jdbcType=VARCHAR}, #{level,jdbcType=TINYINT}, #{popup,jdbcType=TINYINT}, 
       #{min,jdbcType=INTEGER}, #{max,jdbcType=INTEGER}, #{createBy,jdbcType=BIGINT}, 
-      #{modifiedBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}
+      #{modifiedBy,jdbcType=BIGINT}, NOW(), #{gmtModified,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.bbd.domain.WarnSetting">
