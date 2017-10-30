@@ -51,7 +51,7 @@ public class EsServiceTest extends BaseServiceTest {
 
     @Test
     public void testGetAlias() {
-        esService.getAlias();
+        esService.getCurrentAlias();
     }
 
 }
