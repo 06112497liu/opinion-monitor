@@ -13,17 +13,7 @@ public class OpinionServiceTest extends BaseServiceTest {
     @Autowired
     private OpinionService opinionService;
 
-    @Test
-    public void testOpinionDetail() {
-        OpinionInfo o = opinionService.getOpinionDetail("6");
-        System.out.println(o);
-    }
 
-    @Test
-    public void testRemoveWarnOpinion() {
-        Integer i = opinionService.removeWarnOpinion("99");
-        System.out.println(i);
-    }
 
 }
     

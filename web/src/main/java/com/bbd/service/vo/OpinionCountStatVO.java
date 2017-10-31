@@ -31,6 +31,16 @@ public class OpinionCountStatVO {
      */
     private Integer levelThree;
 
+    public OpinionCountStatVO() {
+    }
+
+    public OpinionCountStatVO(Integer total, Integer levelOne, Integer levelTwo, Integer levelThree) {
+        this.total = total;
+        this.levelOne = levelOne;
+        this.levelTwo = levelTwo;
+        this.levelThree = levelThree;
+    }
+
     public Integer getTotal() {
         return total;
     }
