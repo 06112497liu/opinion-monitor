@@ -2,15 +2,17 @@ package com.bbd.service;
 
 import com.bbd.annotation.TimeUsed;
 import com.bbd.dao.OpinionDao;
+import com.bbd.dao.OpinionStatusDao;
 import com.bbd.dao.SimiliarNewsDao;
-import com.bbd.domain.Opinion;
-import com.bbd.domain.OpinionExample;
-import com.bbd.domain.SimiliarNews;
-import com.bbd.domain.SimiliarNewsExample;
+import com.bbd.domain.*;
+import com.bbd.exception.ApplicationException;
+import com.bbd.exception.BizErrorCode;
+import com.bbd.exception.CommonErrorCode;
 import com.bbd.param.OpinionInfo;
 import com.bbd.util.BeanMapperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -31,6 +33,9 @@ public class OpinionService {
 
     @Autowired
     private SystemSettingService settingService;
+
+    @Autowired
+    private OpinionStatusDao opinionStatusDao;
 
     /**
      * 根据uuid查询舆情详情
@@ -65,8 +70,20 @@ public class OpinionService {
         return rs;
     }
 
-
-
+    /**
+     * 解除舆情预警
+     * @param uuid
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Integer removeWarnOpinion(String uuid) {
+        OpinionStatus os = new OpinionStatus();
+        os.setStatus(2);
+        OpinionStatusExample example = new OpinionStatusExample();
+        example.createCriteria().andUuidEqualTo(uuid);
+        int updateInt = opinionStatusDao.updateByExampleSelective(os, example);
+        if(updateInt == 0) throw new ApplicationException(BizErrorCode.OBJECT_NOT_EXIST);
+        return updateInt;
+    }
 }
     
     
