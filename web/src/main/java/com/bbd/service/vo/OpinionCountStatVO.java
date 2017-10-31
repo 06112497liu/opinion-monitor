@@ -14,22 +14,22 @@ public class OpinionCountStatVO {
     /**
      * 预警总量
      */
-    private Integer total;
+    private Integer total      = 0;
 
     /**
      * 一级预警量
      */
-    private Integer levelOne;
+    private Integer levelOne   = 0;
 
     /**
      * 二级预警量
      */
-    private Integer levelTwo;
+    private Integer levelTwo   = 0;
 
     /**
      * 三级预警量
      */
-    private Integer levelThree;
+    private Integer levelThree = 0;
 
     public OpinionCountStatVO() {
     }
