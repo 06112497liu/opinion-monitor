@@ -6,7 +6,7 @@ package com.bbd.service.impl;
 
 import com.bbd.service.IndexStatisticService;
 import com.bbd.service.param.OpinionCountStatQueryParam;
-import com.bbd.service.vo.KeyValueVo;
+import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionCountStatVO;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -34,24 +34,24 @@ public class IndexStatisticMockServiceImpl implements IndexStatisticService {
     }
 
     @Override
-    public Map<String, List<OpinionCountStatVO>> getOpinionCountStatisticGroupTime(OpinionCountStatQueryParam param) {
-        Map<String, List<OpinionCountStatVO>> map = Maps.newHashMap();
-        for(int i=0; i<10; i++) {
-            List<OpinionCountStatVO> list = Lists.newArrayList();
-            for(int j=0; j<4; j++) {
-                OpinionCountStatVO o = new OpinionCountStatVO((int)(Math.random()*100), (int)(Math.random()*20), (int)(Math.random()*30), (int)(Math.random()*50));
+    public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(OpinionCountStatQueryParam param) {
+        Map<String, List<KeyValueVO>> map = Maps.newHashMap();
+        for(int i=0; i<4; i++) {
+            List<KeyValueVO> list = Lists.newArrayList();
+            for(int j=0; j<10; j++) {
+                KeyValueVO o = new KeyValueVO("10月" + (j+1) + "日", "111",(int)(Math.random()*99));
                 list.add(o);
             }
-            map.put("10月"+i+"日", list);
+            map.put(i + "", list);
         }
         return map;
     }
 
     @Override
-    public List<KeyValueVo> getOpinionDBCoordinate() {
-        List<KeyValueVo> list = Lists.newArrayList();
+    public List<KeyValueVO> getOpinionDBCoordinate() {
+        List<KeyValueVO> list = Lists.newArrayList();
         for(int i=0; i<12; i++) {
-            KeyValueVo v = new KeyValueVo(i+1, (int)(Math.random()*1000));
+            KeyValueVO v = new KeyValueVO(i+1, "iii", (int)(Math.random()*1000));
             list.add(v);
         }
         return list;
@@ -78,40 +78,40 @@ public class IndexStatisticMockServiceImpl implements IndexStatisticService {
     }
 
     @Override
-    public List<KeyValueVo> getKeywordsTopTen() {
-        List<KeyValueVo> list = Lists.newArrayList();
+    public List<KeyValueVO> getKeywordsTopTen() {
+        List<KeyValueVO> list = Lists.newArrayList();
         for(int i=0; i<10; i++) {
-            KeyValueVo v = new KeyValueVo("假货", (int)(Math.random()*1000));
+            KeyValueVO v = new KeyValueVO("假货", "111", (int)(Math.random()*1000));
             list.add(v);
         }
         return list;
     }
 
     @Override
-    public List<KeyValueVo> getEventChannelTrend() {
-        List<KeyValueVo> list = Lists.newArrayList();
+    public List<KeyValueVO> getEventChannelTrend() {
+        List<KeyValueVO> list = Lists.newArrayList();
         for(int i=0; i<7; i++) {
-            KeyValueVo v = new KeyValueVo("微博", "64.15");
+            KeyValueVO v = new KeyValueVO("微博", "111", "64.15");
             list.add(v);
         }
         return list;
     }
 
     @Override
-    public List<KeyValueVo> getEventClassTrend() {
-        List<KeyValueVo> list = Lists.newArrayList();
+    public List<KeyValueVO> getEventClassTrend() {
+        List<KeyValueVO> list = Lists.newArrayList();
         for(int i=0; i<11; i++) {
-            KeyValueVo v = new KeyValueVo("奶粉", (int)(Math.random()*100));
+            KeyValueVO v = new KeyValueVO("奶粉", "111", (int)(Math.random()*100));
             list.add(v);
         }
         return list;
     }
 
     @Override
-    public List<KeyValueVo> getEventAreaTrend() {
-        List<KeyValueVo> list = Lists.newArrayList();
+    public List<KeyValueVO> getEventAreaTrend() {
+        List<KeyValueVO> list = Lists.newArrayList();
         for(int i=0; i<11; i++) {
-            KeyValueVo v = new KeyValueVo("清镇市", (int)(Math.random()*100));
+            KeyValueVO v = new KeyValueVO("清镇市", "111", (int)(Math.random()*100));
             list.add(v);
         }
         return list;
