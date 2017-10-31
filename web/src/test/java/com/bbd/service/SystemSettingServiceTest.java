@@ -1,7 +1,6 @@
 package com.bbd.service;
 
 import com.bbd.domain.WarnNotifier;
-import com.bbd.service.impl.SystemSettingService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
