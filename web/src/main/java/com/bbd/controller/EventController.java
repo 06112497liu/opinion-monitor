@@ -141,4 +141,29 @@ public class EventController extends AbstractController {
         return RestResult.ok(eventService.getDictionary(opinionDictionary.getParent()));
     }
     
+    @ApiOperation(value = "事件信息列表", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "舆情类型,空表示全部舆情，0表示中性舆情，1表示正面舆情，2表示负面舆情", name = "emotion", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "媒体类型,空表示全部，001表示新闻，002表示网站，003表示微信，004表示论坛，005表示微博，006表示政务，007表示其他", name = "source", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "起始页号", name = "pageNo", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "每页大小", name = "pageSize", dataType = "Integer", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "eventInfoList", method = RequestMethod.GET)
+    public RestResult eventInfoList(Integer id, Integer cycle, Integer emotion, String source, Integer pageNo, Integer pageSize) {
+        return RestResult.ok(eventService.getEventInfoList(id, cycle, emotion, source, pageNo, pageSize));
+    }
+    
+   /* @ApiOperation(value = "图表跟踪分析/事件总体走势", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        })
+    @RequestMapping(value = "eventInfoList", method = RequestMethod.GET)
+    public RestResult eventWholeTrend(Integer id, Integer cycle) {
+        return null;
+       // return RestResult.ok(eventService.eventWholeTrend(id, cycle));
+    }*/
+    
 }
