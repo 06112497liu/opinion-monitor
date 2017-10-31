@@ -4,15 +4,15 @@ package com.bbd.service.vo;
  * @author Liuweibo
  * @version Id: KeyValueVo.java, v0.1 2017/10/31 Liuweibo Exp $$
  */
-public class KeyValueVo {
+public class KeyValueVO {
 
     private Object key;
     private Object value;
 
-    public KeyValueVo() {
+    public KeyValueVO() {
     }
 
-    public KeyValueVo(Object key, Object value) {
+    public KeyValueVO(Object key, Object value) {
         this.key = key;
         this.value = value;
     }

@@ -8,7 +8,7 @@ import java.util.Date;
  * @author Liuweibo
  * @version Id: WarnOpinionTopTenVo.java, v0.1 2017/10/31 Liuweibo Exp $$
  */
-public class WarnOpinionTopTenVo {
+public class WarnOpinionTopTenVO {
 
     /**
      * 舆情标题
@@ -26,10 +26,10 @@ public class WarnOpinionTopTenVo {
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
     private Date    time;
 
-    public WarnOpinionTopTenVo() {
+    public WarnOpinionTopTenVO() {
     }
 
-    public WarnOpinionTopTenVo(String title, Integer level, Date time) {
+    public WarnOpinionTopTenVO(String title, Integer level, Date time) {
         this.title = title;
         this.level = level;
         this.time = time;

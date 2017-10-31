@@ -2,7 +2,7 @@ package com.bbd.service.impl;
 
 import com.bbd.domain.WarnSetting;
 import com.bbd.service.OpinionService;
-import com.bbd.service.vo.WarnOpinionTopTenVo;
+import com.bbd.service.vo.WarnOpinionTopTenVO;
 import com.google.common.collect.Lists;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +17,10 @@ import java.util.List;
 public class OpinionMockServiceImpl implements OpinionService {
 
     @Override
-    public List<WarnOpinionTopTenVo> getWarnOpinionTopTen() {
-        List<WarnOpinionTopTenVo> list = Lists.newArrayList();
+    public List<WarnOpinionTopTenVO> getWarnOpinionTopTen() {
+        List<WarnOpinionTopTenVO> list = Lists.newArrayList();
         for(int i=0; i<10; i++) {
-            WarnOpinionTopTenVo v = new WarnOpinionTopTenVo("标题" + (i+1), (int)(Math.random()*3+1), new Date());
+            WarnOpinionTopTenVO v = new WarnOpinionTopTenVO("标题" + (i+1), (int)(Math.random()*3+1), new Date());
             list.add(v);
         }
         return list;

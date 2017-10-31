@@ -1,6 +1,6 @@
 package com.bbd.service;
 
-import com.bbd.service.vo.WarnOpinionTopTenVo;
+import com.bbd.service.vo.WarnOpinionTopTenVO;
 
 import java.util.List;
 
@@ -15,5 +15,5 @@ public interface OpinionService {
      * 预警舆情top10
      * @return
      */
-    List<WarnOpinionTopTenVo> getWarnOpinionTopTen();
+    List<WarnOpinionTopTenVO> getWarnOpinionTopTen();
 }

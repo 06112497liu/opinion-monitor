@@ -5,7 +5,7 @@
 package com.bbd.service;
 
 import com.bbd.service.param.OpinionCountStatQueryParam;
-import com.bbd.service.vo.KeyValueVo;
+import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionCountStatVO;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public interface IndexStatisticService {
      * 舆情数据库统计坐标轴
      * @return
      */
-    List<KeyValueVo> getOpinionDBCoordinate();
+    List<KeyValueVO> getOpinionDBCoordinate();
 
     /**
      * 系统运行情况统计
@@ -54,24 +54,24 @@ public interface IndexStatisticService {
      * 本月舆情关键词top10
      * @return
      */
-    List<KeyValueVo> getKeywordsTopTen();
+    List<KeyValueVO> getKeywordsTopTen();
 
     /**
      * 舆情传播渠道分布
      * @return
      */
-    List<KeyValueVo> getEventChannelTrend();
+    List<KeyValueVO> getEventChannelTrend();
 
     /**
      * 舆情事件类别分布
      * @return
      */
-    List<KeyValueVo> getEventClassTrend();
+    List<KeyValueVO> getEventClassTrend();
 
     /**
      * 舆情事件地域分布
      * @return
      */
-    List<KeyValueVo> getEventAreaTrend();
+    List<KeyValueVO> getEventAreaTrend();
 
 }
