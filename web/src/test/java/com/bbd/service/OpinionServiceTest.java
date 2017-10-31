@@ -19,6 +19,12 @@ public class OpinionServiceTest extends BaseServiceTest {
         System.out.println(o);
     }
 
+    @Test
+    public void testRemoveWarnOpinion() {
+        Integer i = opinionService.removeWarnOpinion("99");
+        System.out.println(i);
+    }
+
 }
     
     

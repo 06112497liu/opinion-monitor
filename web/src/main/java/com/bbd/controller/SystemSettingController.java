@@ -5,15 +5,18 @@ import com.bbd.domain.WarnNotifier;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.SystemSettingService;
 import com.bbd.util.ValidateUtil;
-import io.netty.handler.codec.compression.FastLzFrameEncoder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 /**
  * @author Liuweibo
@@ -48,14 +51,14 @@ public class SystemSettingController {
             @ApiImplicitParam(value = "3级预警下限", name = "third", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "hot/modify", method = RequestMethod.GET)
-    public RestResult modifyHeatValue(Long eventId, Integer type, Integer first, Integer second, Integer third) {
+    public RestResult modifyHeatValue(Long eventId,
+                                      Integer type,
+                                      Integer first,
+                                      @RequestParam(value = "second", defaultValue = "0") Integer second,
+                                      @RequestParam(value = "third", defaultValue = "0") Integer third) {
         ValidateUtil.checkNull(type, CommonErrorCode.PARAM_ERROR, "预警类型不能为空");
-        if(type != 1) {
-            ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, first, second, third);
-        } else {
-            ValidateUtil.checkNull(first, CommonErrorCode.PARAM_ERROR);
-            second = 0; third = 0;
-        }
+        if(type != 1) ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, first, second, third);
+        else ValidateUtil.checkNull(first, CommonErrorCode.PARAM_ERROR);
         if(type != 3) ValidateUtil.checkNull(eventId, CommonErrorCode.BIZ_ERROR, "配置所属事件id不能为空");
         return RestResult.ok(settingService.modifyHeat(eventId, type, first, second, third));
     }
@@ -63,14 +66,15 @@ public class SystemSettingController {
     @ApiOperation(value = "添加预警通知人", httpMethod = "GET")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "所属预警配置id", name = "settingId", dataType = "Long", paramType = "query", required = true),
-            @ApiImplicitParam(value = "通知人", name = "notifier", dataType = "String", paramType = "query", required = true),
+            @ApiImplicitParam(value = "通知人", name = "notifier", dataType = "String", paramType = "query", required = false),
             @ApiImplicitParam(value = "邮件通知（0-否，1-是）", name = "emailNotify", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "邮件", name = "email", dataType = "String", paramType = "query", required = false),
             @ApiImplicitParam(value = "短信通知（0-否，1-是）", name = "smsNotify", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "电话", name = "phone", dataType = "String", paramType = "query", required = false)
     })
     @RequestMapping(value = "notifier/add", method = RequestMethod.GET)
-    public RestResult addNotifier(WarnNotifier w) {
+    public RestResult addNotifier(@Valid WarnNotifier w, Errors errorss) {
+        errorss.hasErrors();
         ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, w.getSettingId(), w.getNotifier());
         ValidateUtil.checkNotAllNull(CommonErrorCode.PARAM_ERROR, w.getEmail(), w.getPhone());
         return RestResult.ok(settingService.addNotifier(w));
@@ -114,7 +118,7 @@ public class SystemSettingController {
 
     @ApiOperation(value = "删除舆情关键词", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "关键词id", name = "id", dataType = "Long", paramType = "query", required = true)
+            @ApiImplicitParam(value = "关键词id", name = "id", dataType = "Long", paramType = "query", required = false)
     })
     @RequestMapping(value = "keywords/del", method = RequestMethod.GET)
     public RestResult delKeywords(Long id) {

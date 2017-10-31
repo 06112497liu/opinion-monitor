@@ -18,6 +18,7 @@ import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -27,6 +28,7 @@ import java.util.*;
  * @version Id: SystemSettingService.java, v0.1 2017/10/25 Liuweibo Exp $$
  */
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class SystemSettingService {
 
     @Autowired
