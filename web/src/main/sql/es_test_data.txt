@@ -1,5 +1,5 @@
 // 舆情索引
-PUT bbd_opinion_mock
+PUT bbd_opinion_mock_a
 {
   "settings": {
     "number_of_replicas": 0,
@@ -103,15 +103,15 @@ PUT /bbd_opinion_mock_a/opinion/2
 	"abstract": "商丘六旬老人帮邻居救火负伤 谢绝万元医药费",	"content":"段哥真是个大好人！”10月30日上午，家住商丘市工贸路市委家属院的王坤对记者说，月初他家失火，危急时刻65岁的邻居段绪锋奋不顾身帮其救火，救援中，段绪锋左胳膊被炸伤。住院10多天出院后，段绪锋将王坤偷偷在医院垫付的一万元押金退了回来。",
 	"source": "新浪网",
 	"link": "http://news.ifeng.com/a/20171031/52869864_0.shtml?_zbs_baidu_news",
-	"media_type": 1,
+	"mediaType": 1,
 	"website": "新浪网",
 	"publicTime": "2017-09-10",
 	"hot": 60,
 	"emotion": 0,
 	"keyword": ["大火", "习大大"],
 	"keys": ["政治", "医院"],
-	"similiar_count": 8500,
-	"comment_count": 120,
+	"similiarCount": 8500,
+	"commentCount": 120,
 	"calcTime": "2017-9-11 13:00:00",
 	"events": [5,6,7,8,9]
 }
@@ -123,15 +123,15 @@ PUT /bbd_opinion_mock_a/opinion/3
 	"abstract": "习近平同中央政治局常委集体瞻仰中共一大会址",	"content":"党的十九大闭幕仅一周，31日上午，习近平和李克强、栗战书、汪洋、王沪宁、赵乐际、韩正，从北京乘专机来到上海，到兴业路76号集体瞻仰中共一大会址。",
 	"source": "新浪网",
 	"link": "http://news.sina.com.cn/gov/2017-10-31/doc-ifynhhay9783967.shtml",
-	"media_type": 5,
+	"mediaType": 5,
 	"website": "新浪网",
 	"publicTime": "2017-10-31",
 	"hot": 30,
 	"emotion": 1,
 	"keyword": ["常委", "共产党"],
 	"keys": ["政治", "医院"],
-	"similiar_count": 10000,
-	"comment_count": 3000,
+	"similiarCount": 10000,
+	"commentCount": 3000,
 	"calcTime": "2017-10-31 08:00:00",
 	"events": [6,8]
 }
