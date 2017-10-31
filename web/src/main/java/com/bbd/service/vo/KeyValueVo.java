@@ -7,13 +7,15 @@ package com.bbd.service.vo;
 public class KeyValueVO {
 
     private Object key;
+    private String name;
     private Object value;
 
     public KeyValueVO() {
     }
 
-    public KeyValueVO(Object key, Object value) {
+    public KeyValueVO(Object key, String name,Object value) {
         this.key = key;
+        this.name = name;
         this.value = value;
     }
 
@@ -23,6 +25,14 @@ public class KeyValueVO {
 
     public void setKey(Object key) {
         this.key = key;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Object getValue() {

@@ -30,7 +30,7 @@ public interface IndexStatisticService {
      * @param param
      * @return
      */
-    Map<String, List<OpinionCountStatVO>> getOpinionCountStatisticGroupTime(OpinionCountStatQueryParam param);
+    Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(OpinionCountStatQueryParam param);
 
     /**
      * 舆情数据库统计坐标轴
