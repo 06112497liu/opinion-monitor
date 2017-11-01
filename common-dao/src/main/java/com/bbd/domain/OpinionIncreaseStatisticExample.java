@@ -2,6 +2,7 @@ package com.bbd.domain;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 public class OpinionIncreaseStatisticExample {
@@ -105,6 +106,32 @@ public class OpinionIncreaseStatisticExample {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
+        protected void addCriterionForJDBCDate(String condition, Date value, String property) {
+            if (value == null) {
+                throw new RuntimeException("Value for " + property + " cannot be null");
+            }
+            addCriterion(condition, new java.sql.Date(value.getTime()), property);
+        }
+
+        protected void addCriterionForJDBCDate(String condition, List<Date> values, String property) {
+            if (values == null || values.size() == 0) {
+                throw new RuntimeException("Value list for " + property + " cannot be null or empty");
+            }
+            List<java.sql.Date> dateList = new ArrayList<java.sql.Date>();
+            Iterator<Date> iter = values.iterator();
+            while (iter.hasNext()) {
+                dateList.add(new java.sql.Date(iter.next().getTime()));
+            }
+            addCriterion(condition, dateList, property);
+        }
+
+        protected void addCriterionForJDBCDate(String condition, Date value1, Date value2, String property) {
+            if (value1 == null || value2 == null) {
+                throw new RuntimeException("Between values for " + property + " cannot be null");
+            }
+            addCriterion(condition, new java.sql.Date(value1.getTime()), new java.sql.Date(value2.getTime()), property);
+        }
+
         public Criteria andIdIsNull() {
             addCriterion("id is null");
             return (Criteria) this;
@@ -165,243 +192,123 @@ public class OpinionIncreaseStatisticExample {
             return (Criteria) this;
         }
 
-        public Criteria andTotalIsNull() {
-            addCriterion("total is null");
+        public Criteria andCountIsNull() {
+            addCriterion("count is null");
             return (Criteria) this;
         }
 
-        public Criteria andTotalIsNotNull() {
-            addCriterion("total is not null");
+        public Criteria andCountIsNotNull() {
+            addCriterion("count is not null");
             return (Criteria) this;
         }
 
-        public Criteria andTotalEqualTo(Integer value) {
-            addCriterion("total =", value, "total");
+        public Criteria andCountEqualTo(Integer value) {
+            addCriterion("count =", value, "count");
             return (Criteria) this;
         }
 
-        public Criteria andTotalNotEqualTo(Integer value) {
-            addCriterion("total <>", value, "total");
+        public Criteria andCountNotEqualTo(Integer value) {
+            addCriterion("count <>", value, "count");
             return (Criteria) this;
         }
 
-        public Criteria andTotalGreaterThan(Integer value) {
-            addCriterion("total >", value, "total");
+        public Criteria andCountGreaterThan(Integer value) {
+            addCriterion("count >", value, "count");
             return (Criteria) this;
         }
 
-        public Criteria andTotalGreaterThanOrEqualTo(Integer value) {
-            addCriterion("total >=", value, "total");
+        public Criteria andCountGreaterThanOrEqualTo(Integer value) {
+            addCriterion("count >=", value, "count");
             return (Criteria) this;
         }
 
-        public Criteria andTotalLessThan(Integer value) {
-            addCriterion("total <", value, "total");
+        public Criteria andCountLessThan(Integer value) {
+            addCriterion("count <", value, "count");
             return (Criteria) this;
         }
 
-        public Criteria andTotalLessThanOrEqualTo(Integer value) {
-            addCriterion("total <=", value, "total");
+        public Criteria andCountLessThanOrEqualTo(Integer value) {
+            addCriterion("count <=", value, "count");
             return (Criteria) this;
         }
 
-        public Criteria andTotalIn(List<Integer> values) {
-            addCriterion("total in", values, "total");
+        public Criteria andCountIn(List<Integer> values) {
+            addCriterion("count in", values, "count");
             return (Criteria) this;
         }
 
-        public Criteria andTotalNotIn(List<Integer> values) {
-            addCriterion("total not in", values, "total");
+        public Criteria andCountNotIn(List<Integer> values) {
+            addCriterion("count not in", values, "count");
             return (Criteria) this;
         }
 
-        public Criteria andTotalBetween(Integer value1, Integer value2) {
-            addCriterion("total between", value1, value2, "total");
+        public Criteria andCountBetween(Integer value1, Integer value2) {
+            addCriterion("count between", value1, value2, "count");
             return (Criteria) this;
         }
 
-        public Criteria andTotalNotBetween(Integer value1, Integer value2) {
-            addCriterion("total not between", value1, value2, "total");
+        public Criteria andCountNotBetween(Integer value1, Integer value2) {
+            addCriterion("count not between", value1, value2, "count");
             return (Criteria) this;
         }
 
-        public Criteria andDayIncreaseIsNull() {
-            addCriterion("day_increase is null");
+        public Criteria andRecordTimeIsNull() {
+            addCriterion("record_time is null");
             return (Criteria) this;
         }
 
-        public Criteria andDayIncreaseIsNotNull() {
-            addCriterion("day_increase is not null");
+        public Criteria andRecordTimeIsNotNull() {
+            addCriterion("record_time is not null");
             return (Criteria) this;
         }
 
-        public Criteria andDayIncreaseEqualTo(Integer value) {
-            addCriterion("day_increase =", value, "dayIncrease");
+        public Criteria andRecordTimeEqualTo(Date value) {
+            addCriterionForJDBCDate("record_time =", value, "recordTime");
             return (Criteria) this;
         }
 
-        public Criteria andDayIncreaseNotEqualTo(Integer value) {
-            addCriterion("day_increase <>", value, "dayIncrease");
+        public Criteria andRecordTimeNotEqualTo(Date value) {
+            addCriterionForJDBCDate("record_time <>", value, "recordTime");
             return (Criteria) this;
         }
 
-        public Criteria andDayIncreaseGreaterThan(Integer value) {
-            addCriterion("day_increase >", value, "dayIncrease");
+        public Criteria andRecordTimeGreaterThan(Date value) {
+            addCriterionForJDBCDate("record_time >", value, "recordTime");
             return (Criteria) this;
         }
 
-        public Criteria andDayIncreaseGreaterThanOrEqualTo(Integer value) {
-            addCriterion("day_increase >=", value, "dayIncrease");
+        public Criteria andRecordTimeGreaterThanOrEqualTo(Date value) {
+            addCriterionForJDBCDate("record_time >=", value, "recordTime");
             return (Criteria) this;
         }
 
-        public Criteria andDayIncreaseLessThan(Integer value) {
-            addCriterion("day_increase <", value, "dayIncrease");
+        public Criteria andRecordTimeLessThan(Date value) {
+            addCriterionForJDBCDate("record_time <", value, "recordTime");
             return (Criteria) this;
         }
 
-        public Criteria andDayIncreaseLessThanOrEqualTo(Integer value) {
-            addCriterion("day_increase <=", value, "dayIncrease");
+        public Criteria andRecordTimeLessThanOrEqualTo(Date value) {
+            addCriterionForJDBCDate("record_time <=", value, "recordTime");
             return (Criteria) this;
         }
 
-        public Criteria andDayIncreaseIn(List<Integer> values) {
-            addCriterion("day_increase in", values, "dayIncrease");
+        public Criteria andRecordTimeIn(List<Date> values) {
+            addCriterionForJDBCDate("record_time in", values, "recordTime");
             return (Criteria) this;
         }
 
-        public Criteria andDayIncreaseNotIn(List<Integer> values) {
-            addCriterion("day_increase not in", values, "dayIncrease");
+        public Criteria andRecordTimeNotIn(List<Date> values) {
+            addCriterionForJDBCDate("record_time not in", values, "recordTime");
             return (Criteria) this;
         }
 
-        public Criteria andDayIncreaseBetween(Integer value1, Integer value2) {
-            addCriterion("day_increase between", value1, value2, "dayIncrease");
+        public Criteria andRecordTimeBetween(Date value1, Date value2) {
+            addCriterionForJDBCDate("record_time between", value1, value2, "recordTime");
             return (Criteria) this;
         }
 
-        public Criteria andDayIncreaseNotBetween(Integer value1, Integer value2) {
-            addCriterion("day_increase not between", value1, value2, "dayIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andWeekIncreaseIsNull() {
-            addCriterion("week_increase is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andWeekIncreaseIsNotNull() {
-            addCriterion("week_increase is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andWeekIncreaseEqualTo(Integer value) {
-            addCriterion("week_increase =", value, "weekIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andWeekIncreaseNotEqualTo(Integer value) {
-            addCriterion("week_increase <>", value, "weekIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andWeekIncreaseGreaterThan(Integer value) {
-            addCriterion("week_increase >", value, "weekIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andWeekIncreaseGreaterThanOrEqualTo(Integer value) {
-            addCriterion("week_increase >=", value, "weekIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andWeekIncreaseLessThan(Integer value) {
-            addCriterion("week_increase <", value, "weekIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andWeekIncreaseLessThanOrEqualTo(Integer value) {
-            addCriterion("week_increase <=", value, "weekIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andWeekIncreaseIn(List<Integer> values) {
-            addCriterion("week_increase in", values, "weekIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andWeekIncreaseNotIn(List<Integer> values) {
-            addCriterion("week_increase not in", values, "weekIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andWeekIncreaseBetween(Integer value1, Integer value2) {
-            addCriterion("week_increase between", value1, value2, "weekIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andWeekIncreaseNotBetween(Integer value1, Integer value2) {
-            addCriterion("week_increase not between", value1, value2, "weekIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andMonthIncreaseIsNull() {
-            addCriterion("month_increase is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andMonthIncreaseIsNotNull() {
-            addCriterion("month_increase is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andMonthIncreaseEqualTo(Integer value) {
-            addCriterion("month_increase =", value, "monthIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andMonthIncreaseNotEqualTo(Integer value) {
-            addCriterion("month_increase <>", value, "monthIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andMonthIncreaseGreaterThan(Integer value) {
-            addCriterion("month_increase >", value, "monthIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andMonthIncreaseGreaterThanOrEqualTo(Integer value) {
-            addCriterion("month_increase >=", value, "monthIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andMonthIncreaseLessThan(Integer value) {
-            addCriterion("month_increase <", value, "monthIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andMonthIncreaseLessThanOrEqualTo(Integer value) {
-            addCriterion("month_increase <=", value, "monthIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andMonthIncreaseIn(List<Integer> values) {
-            addCriterion("month_increase in", values, "monthIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andMonthIncreaseNotIn(List<Integer> values) {
-            addCriterion("month_increase not in", values, "monthIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andMonthIncreaseBetween(Integer value1, Integer value2) {
-            addCriterion("month_increase between", value1, value2, "monthIncrease");
-            return (Criteria) this;
-        }
-
-        public Criteria andMonthIncreaseNotBetween(Integer value1, Integer value2) {
-            addCriterion("month_increase not between", value1, value2, "monthIncrease");
+        public Criteria andRecordTimeNotBetween(Date value1, Date value2) {
+            addCriterionForJDBCDate("record_time not between", value1, value2, "recordTime");
             return (Criteria) this;
         }
 

@@ -3,10 +3,8 @@
 <mapper namespace="com.bbd.dao.OpinionIncreaseStatisticDao">
   <resultMap id="BaseResultMap" type="com.bbd.domain.OpinionIncreaseStatistic">
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="total" jdbcType="INTEGER" property="total" />
-    <result column="day_increase" jdbcType="INTEGER" property="dayIncrease" />
-    <result column="week_increase" jdbcType="INTEGER" property="weekIncrease" />
-    <result column="month_increase" jdbcType="INTEGER" property="monthIncrease" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="record_time" jdbcType="DATE" property="recordTime" />
     <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
     <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
   </resultMap>
@@ -69,7 +67,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, total, day_increase, week_increase, month_increase, gmt_create, gmt_modified
+    id, count, record_time, gmt_create, gmt_modified
   </sql>
   <select id="selectByExample" parameterType="com.bbd.domain.OpinionIncreaseStatisticExample" resultMap="BaseResultMap">
     select
@@ -100,12 +98,10 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_opinion_increase_statistic (total, day_increase, week_increase, 
-      month_increase, gmt_create, gmt_modified
-      )
-    values (#{total,jdbcType=INTEGER}, #{dayIncrease,jdbcType=INTEGER}, #{weekIncrease,jdbcType=INTEGER}, 
-      #{monthIncrease,jdbcType=INTEGER}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}
-      )
+    insert into bbd_opinion_increase_statistic (count, record_time, gmt_create, 
+      gmt_modified)
+    values (#{count,jdbcType=INTEGER}, #{recordTime,jdbcType=DATE}, #{gmtCreate,jdbcType=TIMESTAMP}, 
+      #{gmtModified,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.bbd.domain.OpinionIncreaseStatistic">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -113,17 +109,11 @@
     </selectKey>
     insert into bbd_opinion_increase_statistic
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="total != null">
-        total,
+      <if test="count != null">
+        count,
       </if>
-      <if test="dayIncrease != null">
-        day_increase,
-      </if>
-      <if test="weekIncrease != null">
-        week_increase,
-      </if>
-      <if test="monthIncrease != null">
-        month_increase,
+      <if test="recordTime != null">
+        record_time,
       </if>
       <if test="gmtCreate != null">
         gmt_create,
@@ -133,17 +123,11 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="total != null">
-        #{total,jdbcType=INTEGER},
+      <if test="count != null">
+        #{count,jdbcType=INTEGER},
       </if>
-      <if test="dayIncrease != null">
-        #{dayIncrease,jdbcType=INTEGER},
-      </if>
-      <if test="weekIncrease != null">
-        #{weekIncrease,jdbcType=INTEGER},
-      </if>
-      <if test="monthIncrease != null">
-        #{monthIncrease,jdbcType=INTEGER},
+      <if test="recordTime != null">
+        #{recordTime,jdbcType=DATE},
       </if>
       <if test="gmtCreate != null">
         #{gmtCreate,jdbcType=TIMESTAMP},
@@ -159,17 +143,11 @@
       <if test="record.id != null">
         id = #{record.id,jdbcType=BIGINT},
       </if>
-      <if test="record.total != null">
-        total = #{record.total,jdbcType=INTEGER},
+      <if test="record.count != null">
+        count = #{record.count,jdbcType=INTEGER},
       </if>
-      <if test="record.dayIncrease != null">
-        day_increase = #{record.dayIncrease,jdbcType=INTEGER},
-      </if>
-      <if test="record.weekIncrease != null">
-        week_increase = #{record.weekIncrease,jdbcType=INTEGER},
-      </if>
-      <if test="record.monthIncrease != null">
-        month_increase = #{record.monthIncrease,jdbcType=INTEGER},
+      <if test="record.recordTime != null">
+        record_time = #{record.recordTime,jdbcType=DATE},
       </if>
       <if test="record.gmtCreate != null">
         gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
@@ -185,10 +163,8 @@
   <update id="updateByExample" parameterType="map">
     update bbd_opinion_increase_statistic
     set id = #{record.id,jdbcType=BIGINT},
-      total = #{record.total,jdbcType=INTEGER},
-      day_increase = #{record.dayIncrease,jdbcType=INTEGER},
-      week_increase = #{record.weekIncrease,jdbcType=INTEGER},
-      month_increase = #{record.monthIncrease,jdbcType=INTEGER},
+      count = #{record.count,jdbcType=INTEGER},
+      record_time = #{record.recordTime,jdbcType=DATE},
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -198,17 +174,11 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.bbd.domain.OpinionIncreaseStatistic">
     update bbd_opinion_increase_statistic
     <set>
-      <if test="total != null">
-        total = #{total,jdbcType=INTEGER},
+      <if test="count != null">
+        count = #{count,jdbcType=INTEGER},
       </if>
-      <if test="dayIncrease != null">
-        day_increase = #{dayIncrease,jdbcType=INTEGER},
-      </if>
-      <if test="weekIncrease != null">
-        week_increase = #{weekIncrease,jdbcType=INTEGER},
-      </if>
-      <if test="monthIncrease != null">
-        month_increase = #{monthIncrease,jdbcType=INTEGER},
+      <if test="recordTime != null">
+        record_time = #{recordTime,jdbcType=DATE},
       </if>
       <if test="gmtCreate != null">
         gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
@@ -221,10 +191,8 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.bbd.domain.OpinionIncreaseStatistic">
     update bbd_opinion_increase_statistic
-    set total = #{total,jdbcType=INTEGER},
-      day_increase = #{dayIncrease,jdbcType=INTEGER},
-      week_increase = #{weekIncrease,jdbcType=INTEGER},
-      month_increase = #{monthIncrease,jdbcType=INTEGER},
+    set count = #{count,jdbcType=INTEGER},
+      record_time = #{recordTime,jdbcType=DATE},
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}

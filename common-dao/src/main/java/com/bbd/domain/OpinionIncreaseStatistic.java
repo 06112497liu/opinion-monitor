@@ -5,13 +5,9 @@ import java.util.Date;
 public class OpinionIncreaseStatistic {
     private Long id;
 
-    private Integer total;
+    private Integer count;
 
-    private Integer dayIncrease;
-
-    private Integer weekIncrease;
-
-    private Integer monthIncrease;
+    private Date recordTime;
 
     private Date gmtCreate;
 
@@ -25,36 +21,20 @@ public class OpinionIncreaseStatistic {
         this.id = id;
     }
 
-    public Integer getTotal() {
-        return total;
+    public Integer getCount() {
+        return count;
     }
 
-    public void setTotal(Integer total) {
-        this.total = total;
+    public void setCount(Integer count) {
+        this.count = count;
     }
 
-    public Integer getDayIncrease() {
-        return dayIncrease;
+    public Date getRecordTime() {
+        return recordTime;
     }
 
-    public void setDayIncrease(Integer dayIncrease) {
-        this.dayIncrease = dayIncrease;
-    }
-
-    public Integer getWeekIncrease() {
-        return weekIncrease;
-    }
-
-    public void setWeekIncrease(Integer weekIncrease) {
-        this.weekIncrease = weekIncrease;
-    }
-
-    public Integer getMonthIncrease() {
-        return monthIncrease;
-    }
-
-    public void setMonthIncrease(Integer monthIncrease) {
-        this.monthIncrease = monthIncrease;
+    public void setRecordTime(Date recordTime) {
+        this.recordTime = recordTime;
     }
 
     public Date getGmtCreate() {
