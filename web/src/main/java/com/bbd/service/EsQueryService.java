@@ -5,8 +5,10 @@
 package com.bbd.service;
 
 import com.bbd.constant.EsConstant;
+import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionCountStatVO;
 import com.bbd.util.EsUtil;
+import com.google.common.collect.Lists;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -67,5 +69,16 @@ public class EsQueryService {
         }
         vo.setTotal(total);
         return vo;
+    }
+
+    List<KeyValueVO> getKeywordsTopTen() {
+        List<KeyValueVO> result = Lists.newArrayList();
+
+        String aggName = "top_kws";
+        String termField = "keys";
+
+        TransportClient client = EsUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).addAggregation(AggregationBuilders.terms(aggName).field(termField)).execute().actionGet();
+        return result;
     }
 }

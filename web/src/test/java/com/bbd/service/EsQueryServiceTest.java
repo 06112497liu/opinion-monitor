@@ -26,4 +26,9 @@ public class EsQueryServiceTest extends BaseServiceTest {
         esQueryService.getOpinionCountStatistic(now);
     }
 
+    @Test
+    public void testGetKeywordsTopTen() {
+        esQueryService.getKeywordsTopTen();
+    }
+
 }
