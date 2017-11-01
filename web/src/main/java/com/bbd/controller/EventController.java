@@ -4,13 +4,12 @@
  */
 package com.bbd.controller;
 
-import java.util.HashMap;
-import java.util.List;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -155,15 +154,106 @@ public class EventController extends AbstractController {
         return RestResult.ok(eventService.getEventInfoList(id, cycle, emotion, source, pageNo, pageSize));
     }
     
-   /* @ApiOperation(value = "图表跟踪分析/事件总体走势", httpMethod = "GET")
+    @ApiOperation(value = "事件信息列表/媒体类型标签", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "舆情类型,空表示全部舆情，0表示中性舆情，1表示正面舆情，2表示负面舆情", name = "emotion", dataType = "Integer", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "eventLabelList", method = RequestMethod.GET)
+    public RestResult eventLabelList(Integer id, Integer cycle, Integer emotion) {
+        return RestResult.ok(eventService.eventLabelList(id, cycle, emotion));
+    }
+    
+    @ApiOperation(value = "事件信息列表/信息总量", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "eventInfoTotal", method = RequestMethod.GET)
+    public RestResult eventInfoTotal(Integer id, Integer cycle) {
+        return RestResult.ok(eventService.eventInfoTotal(id, cycle));
+    }
+    
+    @ApiOperation(value = "事件信息列表/预警事件总热度", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "eventHotValue", method = RequestMethod.GET)
+    public RestResult eventHotValue(Integer id) {
+        return RestResult.ok(eventService.eventHotValue(id));
+    }
+    
+    @ApiOperation(value = "图表跟踪分析/事件总体走势", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
         @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
         })
-    @RequestMapping(value = "eventInfoList", method = RequestMethod.GET)
+    @RequestMapping(value = "eventWholeTrend", method = RequestMethod.GET)
     public RestResult eventWholeTrend(Integer id, Integer cycle) {
-        return null;
-       // return RestResult.ok(eventService.eventWholeTrend(id, cycle));
-    }*/
+       return RestResult.ok(eventService.eventWholeTrend(id, cycle));
+    }
+    
+    @ApiOperation(value = "图表跟踪分析/舆情事件信息传播渠道分布", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        })
+    @RequestMapping(value = "eventSrcDis", method = RequestMethod.GET)
+    public RestResult eventSrcDis(Integer id, Integer cycle) {
+       return RestResult.ok(eventService.eventSrcDis(id, cycle));
+    }
+    
+    @ApiOperation(value = "图表跟踪分析/信息走势图", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        })
+    @RequestMapping(value = "eventInfoTrend", method = RequestMethod.GET)
+    public RestResult eventInfoTrend(Integer id, Integer cycle) {
+       return RestResult.ok(eventService.eventInfoTrend(id, cycle));
+    }
+    
+    @ApiOperation(value = "图表跟踪分析/媒体活跃度和媒体来源占比", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        })
+    @RequestMapping(value = "eventSrcActive", method = RequestMethod.GET)
+    public RestResult eventSrcActive(Integer id, Integer cycle) {
+       return RestResult.ok(eventService.eventSrcActive(id, cycle));
+    }
+    
+    @ApiOperation(value = "图表跟踪分析/事件走势", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "起始页号", name = "pageNo", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "每页大小", name = "pageSize", dataType = "Integer", paramType = "query", required = true)
+        })
+    @RequestMapping(value = "eventTrend", method = RequestMethod.GET)
+    public RestResult eventTrend(Integer id, Integer cycle, Integer pageNo, Integer pageSize) {
+       return RestResult.ok(eventService.eventTrend(id, cycle, pageNo, pageSize));
+    }
+    
+    @ApiOperation(value = "图表跟踪分析/事件关键词云", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        })
+    @RequestMapping(value = "eventKeywords", method = RequestMethod.GET)
+    public RestResult eventKeywords(Integer id, Integer cycle) {
+       return RestResult.ok(eventService.eventKeywords(id, cycle));
+    }
+    
+    @ApiOperation(value = "图表跟踪分析/数据类型", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        })
+    @RequestMapping(value = "eventDataType", method = RequestMethod.GET)
+    public RestResult eventDataType(Integer id, Integer cycle) {
+       return RestResult.ok(eventService.eventDataType(id, cycle));
+    }
     
 }

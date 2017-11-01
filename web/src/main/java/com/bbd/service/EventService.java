@@ -16,6 +16,7 @@ import com.bbd.domain.OpinionEvent;
 import com.bbd.domain.OpinionEventExample;
 import com.bbd.domain.OpinionEventExample.Criteria;
 import com.bbd.domain.WarnSetting;
+import com.bbd.service.vo.GraphVO;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionVO;
 import com.mybatis.domain.PageBounds;
@@ -178,17 +179,29 @@ public class EventService{
 	    opinionList.add(opinionVO);
 	    map.put("items", opinionList);
 	    
-	    List<KeyValueVO> websiteList = new ArrayList<KeyValueVO>();
-	    KeyValueVO websiteNew = new KeyValueVO();
-	    websiteNew.setKey("all");
-	    websiteNew.setValue(20);
-	    websiteNew.setName("全部");
-	    websiteList.add(websiteNew);
-	    
-	    KeyValueVO websiteWeb = new KeyValueVO();
-	    websiteWeb.setKey("002");
-	    websiteWeb.setValue(2);
-	    websiteWeb.setName("网站");
+        return map;
+	}
+	
+	
+	/**  
+	 * @param id
+	 * @param cycle
+	 * @param emotion
+	 * @return 
+	 */
+	public  List<KeyValueVO> eventLabelList(Integer id, Integer cycle, Integer emotion){
+
+        List<KeyValueVO> websiteList = new ArrayList<KeyValueVO>();
+        KeyValueVO websiteNew = new KeyValueVO();
+        websiteNew.setKey("all");
+        websiteNew.setValue(20);
+        websiteNew.setName("全部");
+        websiteList.add(websiteNew);
+        
+        KeyValueVO websiteWeb = new KeyValueVO();
+        websiteWeb.setKey("002");
+        websiteWeb.setValue(2);
+        websiteWeb.setName("网站");
         websiteList.add(websiteWeb);
         
         KeyValueVO websiteWeChat = new KeyValueVO();
@@ -221,20 +234,229 @@ public class EventService{
         websiteOther.setName("其他");
         websiteList.add(websiteOther);
         
-        map.put("labels", websiteList);
+        return websiteList;
+	}
+	
+	
+	/**  
+	 * @param id
+	 * @param cycle
+	 * @return 
+	 */
+	public  int eventInfoTotal(Integer id, Integer cycle){
+	    return 83732;
+	}
+	
+	
+	/**  
+	 * @param id
+	 * @return 
+	 */
+	public  int eventHotValue(Integer id){
+        return 85;
+    }
+	
+	
+	/**  
+	 * @param id
+	 * @param cycle
+	 * @return 
+	 */
+	public HashMap<String, Object> eventWholeTrend(Integer id, Integer cycle) {
+	    HashMap<String, Object> map = new HashMap<String, Object>();
+	    List<GraphVO> infoList = new ArrayList<GraphVO>();
+	    GraphVO o1 = new GraphVO("2017-09-09 14:00", "信息总量", "12");
+	    GraphVO o2 = new GraphVO("2017-09-09 16:00", "信息总量", "18");
+	    GraphVO o3 = new GraphVO("2017-09-09 18:00", "信息总量", "12");
+        infoList.add(o1);
+        infoList.add(o2);
+        infoList.add(o3);
+	    
+        map.put("infoList", infoList);
+        
+        List<GraphVO> warnList = new ArrayList<GraphVO>();
+        GraphVO o4 = new GraphVO("2017-09-09 14:00", "预警总量", "12");
+        GraphVO o5 = new GraphVO("2017-09-09 16:00", "预警总量", "18");
+        GraphVO o6 = new GraphVO("2017-09-09 18:00", "预警总量", "12");
+        warnList.add(o4);
+        warnList.add(o5);
+        warnList.add(o6);
+        
+        map.put("warnList", warnList);
+       
+        return map;
+	    
+	}
+	
+	
+	/**  
+	 * @param id
+	 * @param cycle
+	 * @return 
+	 */
+	public HashMap<String, Object> eventSrcDis(Integer id, Integer cycle) {
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        List<GraphVO> srcDisList = new ArrayList<GraphVO>();
+        GraphVO o1 = new GraphVO(null, "微博", "12");
+        GraphVO o2 = new GraphVO(null, "网站", "18");
+        GraphVO o3 = new GraphVO(null, "论坛", "12");
+        
+        srcDisList.add(o1);
+        srcDisList.add(o2);
+        srcDisList.add(o3);
+        map.put("srcDisList", srcDisList);
         return map;
 	}
 	
-	HashMap<String, Object> eventWholeTrend(Integer id, Integer cycle) {
-	    HashMap<String, Object> map = new HashMap<String, Object>();
-	   /* List<Object>
-        map.put("infoTotalNum", 86754);
-        map.put("eventHotVal", 86);
-        map.put("pageNo", 1);
-        map.put("pageSize", 10);
-        map.put("total", 20);*/
-        return null;
-	    
-	}
+	
+	/**  
+	 * @param id
+	 * @param cycle
+	 * @return 
+	 */
+	public HashMap<String, Object> eventInfoTrend(Integer id, Integer cycle) {
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        List<GraphVO> allList = new ArrayList<GraphVO>();
+        GraphVO o1 = new GraphVO("2017-09-09 14:00", "全部", "12");
+        GraphVO o2 = new GraphVO("2017-09-09 16:00", "全部", "18");
+        GraphVO o3 = new GraphVO("2017-09-09 18:00", "全部", "12");
+        allList.add(o1);
+        allList.add(o2);
+        allList.add(o3);
+        
+        map.put("allList", allList);
+        
+        List<GraphVO> webList = new ArrayList<GraphVO>();
+        GraphVO o4 = new GraphVO("2017-09-09 14:00", "网站", "4");
+        GraphVO o5 = new GraphVO("2017-09-09 16:00", "网站", "6");
+        GraphVO o6 = new GraphVO("2017-09-09 18:00", "网站", "4");
+        webList.add(o4);
+        webList.add(o5);
+        webList.add(o6);
+        
+        map.put("webList", webList);
+        
+        List<GraphVO> luntanList = new ArrayList<GraphVO>();
+        GraphVO o7 = new GraphVO("2017-09-09 14:00", "论坛", "5");
+        GraphVO o8 = new GraphVO("2017-09-09 16:00", "论坛", "7");
+        GraphVO o9 = new GraphVO("2017-09-09 18:00", "论坛", "5");
+        luntanList.add(o7);
+        luntanList.add(o8);
+        luntanList.add(o9);
+        
+        map.put("luntanList", luntanList);
+        
+        List<GraphVO> weiboList = new ArrayList<GraphVO>();
+        GraphVO o10 = new GraphVO("2017-09-09 14:00", "微博", "3");
+        GraphVO o11 = new GraphVO("2017-09-09 16:00", "微博", "5");
+        GraphVO o12 = new GraphVO("2017-09-09 18:00", "微博", "3");
+        weiboList.add(o10);
+        weiboList.add(o11);
+        weiboList.add(o12);
+        
+        map.put("weiboList", weiboList);
+        
+        return map;
+    }
+	
+	
+	/**  
+	 * @param id
+	 * @param cycle
+	 * @return 
+	 */
+	public HashMap<String, Object> eventSrcActive(Integer id, Integer cycle) {
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        List<GraphVO> srcActiveList = new ArrayList<GraphVO>();
+        GraphVO o1 = new GraphVO(null, "新浪微博", "12");
+        GraphVO o2 = new GraphVO(null, "百度贴吧", "18");
+        GraphVO o3 = new GraphVO(null, "贵阳网", "12");
+        
+        srcActiveList.add(o1);
+        srcActiveList.add(o2);
+        srcActiveList.add(o3);
+        map.put("srcActiveList", srcActiveList);
+        return map;
+    }
+	
+	public HashMap<String, Object> eventTrend(Integer id, Integer cycle, Integer pageNo, Integer pageSize) {
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        
+        List<OpinionVO> trendList = new ArrayList<OpinionVO>();
+        OpinionVO o1 = new OpinionVO();
+        o1.setStartTime("2017-01-02 11");
+        o1.setTitle("京昆高速多车相撞，4死5伤");
+        o1.setUuid("001");
+        o1.setWebsite("新华网");
+        o1.setSimiliar(45);
+        trendList.add(o1);
+        
+        OpinionVO o2 = new OpinionVO();
+        o2.setStartTime("2017-01-03 08");
+        o2.setTitle("京昆高速多车相撞，5死4伤");
+        o2.setUuid("002");
+        o2.setWebsite("贵阳网");
+        o2.setSimiliar(49);
+        trendList.add(o2);
+        
+        OpinionVO o3 = new OpinionVO();
+        o3.setStartTime("2017-01-04 08");
+        o3.setTitle("京昆高速多车相撞，6死3伤");
+        o3.setUuid("003");
+        o3.setWebsite("新浪网");
+        o3.setSimiliar(58);
+        trendList.add(o3);
+        
+        trendList.add(o3);
+        map.put("trendList", trendList);
+        map.put("eventTime", "2017-01-02");
+        return map;
+    }
+	
+	public HashMap<String, Object> eventKeywords(Integer id, Integer cycle) {
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        List<GraphVO> eventKeywords = new ArrayList<GraphVO>();
+        GraphVO o1 = new GraphVO(null, "天价", "999");
+        GraphVO o2 = new GraphVO(null, "诈骗", "700");
+        GraphVO o3 = new GraphVO(null, "宰客", "600");
+        
+        GraphVO o4 = new GraphVO(null, "强制消费", "500");
+        GraphVO o5 = new GraphVO(null, "欺诈", "400");
+        GraphVO o6 = new GraphVO(null, "虚假", "300");
+        
+        GraphVO o7 = new GraphVO(null, "不合格", "250");
+        GraphVO o8 = new GraphVO(null, "投诉", "200");
+        GraphVO o9 = new GraphVO(null, "超标", "100");
+        
+        GraphVO o10 = new GraphVO(null, "瓜娃子", "20");
+        
+        eventKeywords.add(o1);
+        eventKeywords.add(o2);
+        eventKeywords.add(o3);
+        
+        eventKeywords.add(o4);
+        eventKeywords.add(o5);
+        eventKeywords.add(o6);
+        
+        eventKeywords.add(o7);
+        eventKeywords.add(o8);
+        eventKeywords.add(o9);
+        
+        eventKeywords.add(o10);
+        
+        map.put("eventKeywords", eventKeywords);
+        return map;
+    }
+    
+	public HashMap<String, Object> eventDataType(Integer id, Integer cycle) {
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        List<GraphVO> eventDataTypeList = new ArrayList<GraphVO>();
+        GraphVO o1 = new GraphVO(null, "敏感", "80");
+        GraphVO o2 = new GraphVO(null, "非敏感", "20");
+        eventDataTypeList.add(o1);
+        eventDataTypeList.add(o2);
+        map.put("eventKeywords", eventDataTypeList);
+        return map;
+    }  
 	
 }
