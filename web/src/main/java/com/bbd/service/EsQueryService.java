@@ -14,6 +14,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.range.InternalRange;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
@@ -78,7 +79,17 @@ public class EsQueryService {
         String termField = "keys";
 
         TransportClient client = EsUtil.getClient();
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).addAggregation(AggregationBuilders.terms(aggName).field(termField)).execute().actionGet();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(10)).setSize(0).execute().actionGet();
+        List<StringTerms.Bucket> bs = ((StringTerms) resp.getAggregations().get(aggName)).getBuckets();
+        for (StringTerms.Bucket b : bs) {
+            String key = String.valueOf(b.getKey());
+            Integer count = Long.valueOf(b.getDocCount()).intValue();
+            KeyValueVO vo = new KeyValueVO();
+            vo.setKey(key);
+            vo.setName(key);
+            vo.setValue(count);
+            result.add(vo);
+        }
         return result;
     }
 }

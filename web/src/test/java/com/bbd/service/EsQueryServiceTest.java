@@ -4,10 +4,12 @@
  */
 package com.bbd.service;
 
+import com.bbd.service.vo.KeyValueVO;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  *
@@ -28,7 +30,8 @@ public class EsQueryServiceTest extends BaseServiceTest {
 
     @Test
     public void testGetKeywordsTopTen() {
-        esQueryService.getKeywordsTopTen();
+        List<KeyValueVO> r = esQueryService.getKeywordsTopTen();
+        assertTrue(r.size() >= 0);
     }
 
 }
