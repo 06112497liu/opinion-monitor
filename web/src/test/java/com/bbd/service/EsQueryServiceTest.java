@@ -38,7 +38,7 @@ public class EsQueryServiceTest extends BaseServiceTest {
 
     @Test
     public void testGetEventSpreadChannelInfo() {
-        List<KeyValueVO> r = esQueryService.getEventSpreadChannelInfo();
+        List<KeyValueVO> r = esQueryService.getOpinionMediaSpread();
         assertTrue(r.size() >= 0);
     }
 
@@ -64,8 +64,14 @@ public class EsQueryServiceTest extends BaseServiceTest {
 
     @Test
     public void testQueryEventOpinionCounts() {
-        List<KeyValueVO> r = esQueryService.queryEventOpinionCounts();
+        List<KeyValueVO> r = esQueryService.getEventOpinionCounts();
         assertNotNull(r);
     }
 
+    @Test
+    public void testGetEventOpinionMediaSpread() {
+        long eventId = 6L;
+        List<KeyValueVO> r = esQueryService.getEventOpinionMediaSpread(eventId);
+        assertNotNull(r);
+    }
 }

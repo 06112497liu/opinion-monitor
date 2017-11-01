@@ -38,7 +38,7 @@ public interface EsQueryService {
      * 舆情传播渠道分布 - 首页
      * @return
      */
-    List<KeyValueVO> getEventSpreadChannelInfo();
+    List<KeyValueVO> getOpinionMediaSpread();
 
     /**
      * 查询预警舆情
@@ -62,6 +62,12 @@ public interface EsQueryService {
      * 查询事件对应舆情数量
      * @return
      */
-    List<KeyValueVO> queryEventOpinionCounts();
+    List<KeyValueVO> getEventOpinionCounts();
+
+    /**
+     * 舆情传播渠道分布 - 事件详情
+     * @return
+     */
+    List<KeyValueVO> getEventOpinionMediaSpread(Long eventId);
 
 }

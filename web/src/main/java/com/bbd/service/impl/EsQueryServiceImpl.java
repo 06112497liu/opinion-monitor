@@ -19,6 +19,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -112,7 +113,7 @@ public class EsQueryServiceImpl implements EsQueryService {
      * 舆情传播渠道分布 - 首页
      * @return
      */
-    public List<KeyValueVO> getEventSpreadChannelInfo() {
+    public List<KeyValueVO> getOpinionMediaSpread() {
         String aggName = "media_aggs";
         String termField = "mediaType";
 
@@ -252,7 +253,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     @Override
-    public List<KeyValueVO> queryEventOpinionCounts() {
+    public List<KeyValueVO> getEventOpinionCounts() {
         String eventsAgg = "events_agg";
         String eventsField = "events";
 
@@ -260,5 +261,19 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setSize(0).addAggregation(AggregationBuilders.terms(eventsAgg).field(eventsField).size(100)).execute().actionGet();
 
         return buildLongTermLists(resp, eventsAgg);
+    }
+
+    @Override
+    public List<KeyValueVO> getEventOpinionMediaSpread(Long eventId) {
+        String eventsField = "events";
+        String aggName = "media_aggs";
+        String termField = "mediaType";
+
+        TransportClient client = EsUtil.getClient();
+        TermQueryBuilder query = QueryBuilders.termQuery(eventsField, eventId);
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(10)).setSize(0).execute()
+            .actionGet();
+
+        return buildLongTermLists(resp, aggName);
     }
 }
