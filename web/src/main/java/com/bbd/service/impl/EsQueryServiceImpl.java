@@ -92,21 +92,13 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     public List<KeyValueVO> getKeywordsTopTen() {
-        List<KeyValueVO> result = Lists.newArrayList();
 
         String aggName = "top_kws";
         String termField = "keys";
 
         TransportClient client = EsUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(10)).setSize(0).execute().actionGet();
-        List<StringTerms.Bucket> bs = ((StringTerms) resp.getAggregations().get(aggName)).getBuckets();
-        for (StringTerms.Bucket b : bs) {
-            KeyValueVO vo = new KeyValueVO();
-            vo.setKey(b.getKey());
-            vo.setValue(b.getDocCount());
-            result.add(vo);
-        }
-        return result;
+        return buildStringTermLists(resp, aggName);
     }
 
     /**
@@ -252,6 +244,20 @@ public class EsQueryServiceImpl implements EsQueryService {
         return result;
     }
 
+    private List<KeyValueVO> buildStringTermLists(SearchResponse resp, String aggName) {
+        List<KeyValueVO> result = Lists.newArrayList();
+
+        List<StringTerms.Bucket> bs = ((StringTerms) resp.getAggregations().get(aggName)).getBuckets();
+        for (StringTerms.Bucket b : bs) {
+            KeyValueVO vo = new KeyValueVO();
+            vo.setKey(b.getKey());
+            vo.setValue(b.getDocCount());
+            result.add(vo);
+        }
+
+        return result;
+    }
+
     @Override
     public List<KeyValueVO> getEventOpinionCounts() {
         String eventsAgg = "events_agg";
@@ -275,5 +281,18 @@ public class EsQueryServiceImpl implements EsQueryService {
             .actionGet();
 
         return buildLongTermLists(resp, aggName);
+    }
+
+    @Override
+    public List<KeyValueVO> getEventWebsiteSpread(Long eventId) {
+        String eventsField = "events";
+        String aggName = "website_aggs";
+        String termField = "website";
+
+        TransportClient client = EsUtil.getClient();
+        TermQueryBuilder query = QueryBuilders.termQuery(eventsField, eventId);
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(8)).setSize(0).execute().actionGet();
+
+        return buildStringTermLists(resp, aggName);
     }
 }

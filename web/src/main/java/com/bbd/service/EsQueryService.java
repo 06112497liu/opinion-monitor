@@ -70,4 +70,11 @@ public interface EsQueryService {
      */
     List<KeyValueVO> getEventOpinionMediaSpread(Long eventId);
 
+    /**
+     * 获取网站来源占比 - 事件详情（媒体活跃度，媒体来源）
+     * @param eventId
+     * @return
+     */
+    List<KeyValueVO> getEventWebsiteSpread(Long eventId);
+
 }
