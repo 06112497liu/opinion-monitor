@@ -67,7 +67,27 @@ public class OpinionMockServiceImpl implements OpinionService {
             OpinionVO v = new OpinionVO();
             v.setUuid("111");
             v.setTitle("AAA");
-            v.setSummary("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            v.setSummary("啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊");
+            v.setWebsite("贵阳网");
+            v.setLevel(1);
+            v.setStartTime("2017-05-09 11:45");
+            v.setEmotion(1);
+            v.setHot(95);
+            list.add(v);
+        }
+        Paginator p = new Paginator(1, 10, 200);
+        PageList<OpinionVO> pageList = PageListHelper.create(list, p);
+        return pageList;
+    }
+
+    @Override
+    public PageList<OpinionVO> getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType) {
+        List<OpinionVO> list = Lists.newArrayList();
+        for(int i=0; i<200; i++) {
+            OpinionVO v = new OpinionVO();
+            v.setUuid("111");
+            v.setTitle("AAA");
+            v.setSummary("包边报表不不不不不不不不不不不不不不不不不不不不不不不不不不不不不不不不不不不");
             v.setWebsite("贵阳网");
             v.setLevel(1);
             v.setStartTime("2017-05-09 11:45");

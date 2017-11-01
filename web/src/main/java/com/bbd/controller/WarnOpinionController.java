@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * 预警舆情控制器
@@ -51,6 +52,20 @@ public class WarnOpinionController extends AbstractController {
     public RestResult getWarnOpinionMediaTrend(@RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan, Integer emotion, Integer rank) {
         ValidateUtil.checkNull(rank, CommonErrorCode.PARAM_ERROR, "rank不能为空");
         return RestResult.ok(opinionService.getWarnOpinionMediaTrend(timeSpan, emotion, rank));
+    }
+
+    @ApiOperation(value = "历史预警舆情列表", httpMethod = "GET")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "预警时间起", name = "startTime", dataType = "Date", paramType = "query", required = false),
+            @ApiImplicitParam(value = "预警时间止", name = "endTime", dataType = "Date", paramType = "query", required = false),
+            @ApiImplicitParam(value = "舆情类型(0-中性舆情，1-正面舆情，2-负面舆情)", name = "emotion", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "媒体类型(1-新闻，2-网站，3-微信，4-论坛，5-微博，6-政务，7-其他)", name = "sourceType", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "起始页号", name = "page", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
+    })
+    @RequestMapping(value = "history/list", method = RequestMethod.GET)
+    public RestResult getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType) {
+        return RestResult.ok(opinionService.getHistoryWarnOpinionList(startTime, endTime, emotion, sourceType));
     }
 
 

@@ -5,6 +5,7 @@ import com.bbd.service.vo.OpinionVO;
 import com.bbd.service.vo.WarnOpinionTopTenVO;
 import com.mybatis.domain.PageList;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,4 +44,14 @@ public interface OpinionService {
      * @return
      */
     PageList<OpinionVO> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, Integer sourceType);
+
+    /**
+     * 历史预警舆情
+     * @param startTime
+     * @param endTime
+     * @param emotion
+     * @param sourceType
+     * @return
+     */
+    PageList<OpinionVO> getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType);
 }
