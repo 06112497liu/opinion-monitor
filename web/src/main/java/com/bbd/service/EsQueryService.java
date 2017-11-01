@@ -11,6 +11,7 @@ import com.bbd.service.vo.OpinionEsSearchVO;
 import com.bbd.service.vo.OpinionEsVO;
 import com.bbd.util.EsUtil;
 import com.bbd.util.JsonUtil;
+import com.bbd.util.StringUtils;
 import com.google.common.collect.Lists;
 import com.mybatis.domain.PageBounds;
 import org.elasticsearch.action.search.SearchResponse;
@@ -25,6 +26,8 @@ import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilde
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
@@ -142,6 +145,7 @@ public class EsQueryService {
 
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(calcTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(hotField).gte(60));
         if (emotion != null) {
             query.must(QueryBuilders.termQuery(emotionField, emotion));
         }
@@ -167,6 +171,52 @@ public class EsQueryService {
         List<KeyValueVO> mediaList = buildMediaLists(resp, mediaAggName);
         result.setHotLevelStats(hotLevelList);
         result.setMediaTypeStats(mediaList);
+
+        return result;
+    }
+
+    /**
+     * 查询热点舆情（非预警）TOP100
+     * @param param: 查询字符创
+     * @param startTime
+     * @param emotion
+     * @return
+     */
+    public OpinionEsSearchVO queryTop100HotOpinion(String param, DateTime startTime, Integer emotion) {
+        OpinionEsSearchVO result = new OpinionEsSearchVO();
+
+        List<OpinionEsVO> opList = Lists.newArrayList();
+
+        String hotField = "hot";
+        String calcTimeField = "calcTime";
+        String emotionField = "emotion";
+        String titleField = "title";
+        String contentField = "content";
+
+        TransportClient client = EsUtil.getClient();
+
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        if (StringUtils.isNotBlank(param)) {
+            query.must(QueryBuilders.multiMatchQuery(param, titleField, contentField));
+        }
+        query.must(QueryBuilders.rangeQuery(calcTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(hotField).lt(60));
+        if (emotion != null) {
+            query.must(QueryBuilders.termQuery(emotionField, emotion));
+        }
+
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setSize(100).setQuery(query).addSort(SortBuilders.fieldSort(hotField).order(SortOrder.DESC)).execute().actionGet();
+
+        SearchHits hits = resp.getHits();
+        result.setTotal(hits.getTotalHits());
+
+        SearchHit[] items = hits.getHits();
+        for (SearchHit item : items) {
+            String source = item.getSourceAsString();
+            OpinionEsVO vo = JsonUtil.parseObject(source, OpinionEsVO.class);
+            opList.add(vo);
+        }
+        result.setOpinions(opList);
 
         return result;
     }
