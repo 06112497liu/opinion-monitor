@@ -6,7 +6,7 @@ package com.bbd.service.impl;
 
 import com.bbd.service.IndexStatisticService;
 import com.bbd.service.param.OpinionCountStatQueryParam;
-import com.bbd.service.vo.KeyValueVo;
+import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionCountStatVO;
 import org.springframework.stereotype.Service;
 
@@ -27,12 +27,12 @@ public class IndexStatisticEsServiceImpl implements IndexStatisticService {
     }
 
     @Override
-    public Map<String, List<OpinionCountStatVO>> getOpinionCountStatisticGroupTime(OpinionCountStatQueryParam param) {
+    public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(OpinionCountStatQueryParam param) {
         return null;
     }
 
     @Override
-    public List<KeyValueVo> getOpinionDBCoordinate() {
+    public List<KeyValueVO> getOpinionDBCoordinate() {
         return null;
     }
 
@@ -47,22 +47,22 @@ public class IndexStatisticEsServiceImpl implements IndexStatisticService {
     }
 
     @Override
-    public List<KeyValueVo> getKeywordsTopTen() {
+    public List<KeyValueVO> getKeywordsTopTen() {
         return null;
     }
 
     @Override
-    public List<KeyValueVo> getEventChannelTrend() {
+    public List<KeyValueVO> getEventChannelTrend() {
         return null;
     }
 
     @Override
-    public List<KeyValueVo> getEventClassTrend() {
+    public List<KeyValueVO> getEventClassTrend() {
         return null;
     }
 
     @Override
-    public List<KeyValueVo> getEventAreaTrend() {
+    public List<KeyValueVO> getEventAreaTrend() {
         return null;
     }
 }
