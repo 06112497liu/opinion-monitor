@@ -5,6 +5,8 @@
 package com.bbd.service;
 
 import com.bbd.service.vo.KeyValueVO;
+import com.bbd.service.vo.OpinionEsSearchVO;
+import com.mybatis.domain.PageBounds;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -38,6 +40,17 @@ public class EsQueryServiceTest extends BaseServiceTest {
     public void testGetEventSpreadChannelInfo() {
         List<KeyValueVO> r = esQueryService.getEventSpreadChannelInfo();
         assertTrue(r.size() >= 0);
+    }
+
+    @Test
+    public void testQueryWarningOpinion() {
+        DateTime dateTime = new DateTime();
+        dateTime = dateTime.plusMonths(-3);
+
+        Integer emotion = null;
+        PageBounds pb = new PageBounds(1, 10);
+        OpinionEsSearchVO r = esQueryService.queryWarningOpinion(dateTime, emotion, pb);
+        assertNotNull(r);
     }
 
 }
