@@ -119,7 +119,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         TransportClient client = EsUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(10)).setSize(0).execute().actionGet();
 
-        return buildMediaLists(resp, aggName);
+        return buildLongTermLists(resp, aggName);
     }
 
     /**
@@ -169,7 +169,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         result.setOpinions(opList);
 
         List<KeyValueVO> hotLevelList = buildHotLevelLists(resp, hotLevelAggName);
-        List<KeyValueVO> mediaList = buildMediaLists(resp, mediaAggName);
+        List<KeyValueVO> mediaList = buildLongTermLists(resp, mediaAggName);
         result.setHotLevelStats(hotLevelList);
         result.setMediaTypeStats(mediaList);
 
@@ -237,7 +237,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         return result;
     }
 
-    private List<KeyValueVO> buildMediaLists(SearchResponse resp, String aggName) {
+    private List<KeyValueVO> buildLongTermLists(SearchResponse resp, String aggName) {
         List<KeyValueVO> result = Lists.newArrayList();
 
         List<LongTerms.Bucket> bs = ((LongTerms) resp.getAggregations().get(aggName)).getBuckets();
@@ -251,4 +251,14 @@ public class EsQueryServiceImpl implements EsQueryService {
         return result;
     }
 
+    @Override
+    public List<KeyValueVO> queryEventOpinionCounts() {
+        String eventsAgg = "events_agg";
+        String eventsField = "events";
+
+        TransportClient client = EsUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setSize(0).addAggregation(AggregationBuilders.terms(eventsAgg).field(eventsField).size(100)).execute().actionGet();
+
+        return buildLongTermLists(resp, eventsAgg);
+    }
 }

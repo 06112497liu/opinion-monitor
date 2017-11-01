@@ -58,4 +58,10 @@ public interface EsQueryService {
      */
     OpinionEsSearchVO queryTop100HotOpinion(String param, DateTime startTime, Integer emotion);
 
+    /**
+     * 查询事件对应舆情数量
+     * @return
+     */
+    List<KeyValueVO> queryEventOpinionCounts();
+
 }

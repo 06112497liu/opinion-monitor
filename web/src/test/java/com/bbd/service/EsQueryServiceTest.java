@@ -62,4 +62,10 @@ public class EsQueryServiceTest extends BaseServiceTest {
         assertNotNull(r);
     }
 
+    @Test
+    public void testQueryEventOpinionCounts() {
+        List<KeyValueVO> r = esQueryService.queryEventOpinionCounts();
+        assertNotNull(r);
+    }
+
 }
