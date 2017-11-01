@@ -295,4 +295,18 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         return buildStringTermLists(resp, aggName);
     }
+
+    @Override
+    public List<KeyValueVO> getEventEmotionSpread(Long eventId) {
+        String eventsField = "events";
+        String aggName = "emotion_aggs";
+        String termField = "emotion";
+
+        TransportClient client = EsUtil.getClient();
+        TermQueryBuilder query = QueryBuilders.termQuery(eventsField, eventId);
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(10)).setSize(0).execute()
+            .actionGet();
+
+        return buildLongTermLists(resp, aggName);
+    }
 }

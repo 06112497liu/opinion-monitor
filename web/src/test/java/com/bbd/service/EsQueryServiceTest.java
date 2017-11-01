@@ -81,4 +81,11 @@ public class EsQueryServiceTest extends BaseServiceTest {
         List<KeyValueVO> r = esQueryService.getEventWebsiteSpread(eventId);
         assertNotNull(r);
     }
+
+    @Test
+    public void testGetEventEmotionSpread() {
+        long eventId = 6L;
+        List<KeyValueVO> r = esQueryService.getEventEmotionSpread(eventId);
+        assertNotNull(r);
+    }
 }
