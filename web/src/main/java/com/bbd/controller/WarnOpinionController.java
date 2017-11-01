@@ -8,10 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -39,7 +36,7 @@ public class WarnOpinionController extends AbstractController {
     })
     @RequestMapping(value = "list", method = RequestMethod.GET)
     public RestResult getWarnOpinionList(@RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan, Integer emotion, Integer sourceType) {
-        return RestResult.ok(opinionService.getWarnOpinionList(timeSpan, emotion, sourceType));
+        return RestResult.ok(opinionService.getWarnOpinionList(timeSpan, emotion, sourceType, getPageBounds()));
     }
 
     @ApiOperation(value = "舆情列表媒体类型分布", httpMethod = "GET")
@@ -65,9 +62,30 @@ public class WarnOpinionController extends AbstractController {
     })
     @RequestMapping(value = "history/list", method = RequestMethod.GET)
     public RestResult getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType) {
-        return RestResult.ok(opinionService.getHistoryWarnOpinionList(startTime, endTime, emotion, sourceType));
+        return RestResult.ok(opinionService.getHistoryWarnOpinionList(startTime, endTime, emotion, sourceType, getPageBounds()));
     }
 
+    @ApiOperation(value = "预警舆情详情", httpMethod = "GET")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String uuid", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "{uuid}", method = RequestMethod.GET)
+    public RestResult getWarnOpinionDetail(@PathVariable(value = "uuid") String uuid) {
+        ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
+        return RestResult.ok(opinionService.getOpinionDetail(uuid));
+    }
+
+    @ApiOperation(value = "预警舆情相同文章信息", httpMethod = "GET")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String uuid", paramType = "query", required = true),
+            @ApiImplicitParam(value = "起始页号", name = "page", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
+    })
+    @RequestMapping(value = "news/list", method = RequestMethod.GET)
+    public RestResult getWarnOpinionSimiliarNewsList(@PathVariable(value = "uuid") String uuid) {
+        ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
+        return RestResult.ok(opinionService.getOpinionSimiliarNewsList(uuid, getPageBounds()));
+    }
 
 
 }
