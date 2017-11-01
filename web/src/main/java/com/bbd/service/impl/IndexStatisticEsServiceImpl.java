@@ -6,8 +6,10 @@ package com.bbd.service.impl;
 
 import com.bbd.service.IndexStatisticService;
 import com.bbd.service.param.OpinionCountStatQueryParam;
+import com.bbd.service.vo.DBStaVO;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionCountStatVO;
+import com.bbd.service.vo.SystemStaVO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,12 +39,12 @@ public class IndexStatisticEsServiceImpl implements IndexStatisticService {
     }
 
     @Override
-    public Map<String, Object> getSystemSta() {
+    public SystemStaVO getSystemSta() {
         return null;
     }
 
     @Override
-    public Map<String, Object> getDBsta() {
+    public DBStaVO getDBsta() {
         return null;
     }
 
