@@ -14,6 +14,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.range.InternalRange;
+import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -72,7 +73,11 @@ public class EsQueryService {
         return vo;
     }
 
-    List<KeyValueVO> getKeywordsTopTen() {
+    /**
+     * 关键词排行TOP10
+     * @return
+     */
+    public List<KeyValueVO> getKeywordsTopTen() {
         List<KeyValueVO> result = Lists.newArrayList();
 
         String aggName = "top_kws";
@@ -82,14 +87,34 @@ public class EsQueryService {
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(10)).setSize(0).execute().actionGet();
         List<StringTerms.Bucket> bs = ((StringTerms) resp.getAggregations().get(aggName)).getBuckets();
         for (StringTerms.Bucket b : bs) {
-            String key = String.valueOf(b.getKey());
-            Integer count = Long.valueOf(b.getDocCount()).intValue();
             KeyValueVO vo = new KeyValueVO();
-            vo.setKey(key);
-            vo.setName(key);
-            vo.setValue(count);
+            vo.setKey(b.getKey());
+            vo.setValue(b.getDocCount());
             result.add(vo);
         }
         return result;
     }
+
+    /**
+     * 舆情传播渠道分布
+     * @return
+     */
+    List<KeyValueVO> getEventSpreadChannelInfo() {
+        List<KeyValueVO> result = Lists.newArrayList();
+
+        String aggName = "media_aggs";
+        String termField = "mediaType";
+
+        TransportClient client = EsUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(10)).setSize(0).execute().actionGet();
+        List<LongTerms.Bucket> bs = ((LongTerms) resp.getAggregations().get(aggName)).getBuckets();
+        for (LongTerms.Bucket b : bs) {
+            KeyValueVO vo = new KeyValueVO();
+            vo.setKey(b.getKey());
+            vo.setValue(b.getDocCount());
+            result.add(vo);
+        }
+        return result;
+    }
+
 }

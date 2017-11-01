@@ -34,4 +34,10 @@ public class EsQueryServiceTest extends BaseServiceTest {
         assertTrue(r.size() >= 0);
     }
 
+    @Test
+    public void testGetEventSpreadChannelInfo() {
+        List<KeyValueVO> r = esQueryService.getEventSpreadChannelInfo();
+        assertTrue(r.size() >= 0);
+    }
+
 }
