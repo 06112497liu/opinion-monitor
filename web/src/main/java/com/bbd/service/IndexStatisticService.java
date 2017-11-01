@@ -5,8 +5,10 @@
 package com.bbd.service;
 
 import com.bbd.service.param.OpinionCountStatQueryParam;
+import com.bbd.service.vo.DBStaVO;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionCountStatVO;
+import com.bbd.service.vo.SystemStaVO;
 
 import java.util.List;
 import java.util.Map;
@@ -42,13 +44,13 @@ public interface IndexStatisticService {
      * 系统运行情况统计
      * @return
      */
-    Map<String, Object> getSystemSta();
+    SystemStaVO getSystemSta();
 
     /**
      * 舆情数据库统计
      * @return
      */
-    Map<String, Object> getDBsta();
+    DBStaVO getDBsta();
 
     /**
      * 本月舆情关键词top10

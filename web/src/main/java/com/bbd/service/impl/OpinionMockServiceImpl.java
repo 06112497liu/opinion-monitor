@@ -1,10 +1,9 @@
 package com.bbd.service.impl;
 
 import com.bbd.service.OpinionService;
-import com.bbd.service.vo.KeyValueVO;
-import com.bbd.service.vo.OpinionVO;
-import com.bbd.service.vo.WarnOpinionTopTenVO;
+import com.bbd.service.vo.*;
 import com.google.common.collect.Lists;
+import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
@@ -31,7 +30,7 @@ public class OpinionMockServiceImpl implements OpinionService {
     }
 
     @Override
-    public PageList<OpinionVO> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType) {
+    public PageList<OpinionVO> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb) {
         List<OpinionVO> list = Lists.newArrayList();
         for(int i=0; i<200; i++) {
             OpinionVO v = new OpinionVO();
@@ -61,7 +60,7 @@ public class OpinionMockServiceImpl implements OpinionService {
     }
 
     @Override
-    public PageList<OpinionVO> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, Integer sourceType) {
+    public PageList<OpinionVO> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb) {
         List<OpinionVO> list = Lists.newArrayList();
         for(int i=0; i<200; i++) {
             OpinionVO v = new OpinionVO();
@@ -81,7 +80,7 @@ public class OpinionMockServiceImpl implements OpinionService {
     }
 
     @Override
-    public PageList<OpinionVO> getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType) {
+    public PageList<OpinionVO> getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType, PageBounds pb) {
         List<OpinionVO> list = Lists.newArrayList();
         for(int i=0; i<200; i++) {
             OpinionVO v = new OpinionVO();
@@ -97,6 +96,40 @@ public class OpinionMockServiceImpl implements OpinionService {
         }
         Paginator p = new Paginator(1, 10, 200);
         PageList<OpinionVO> pageList = PageListHelper.create(list, p);
+        return pageList;
+    }
+
+    @Override
+    public OpinionExtVO getOpinionDetail(String uuid) {
+        OpinionExtVO v = new OpinionExtVO();
+        v.setUuid("654654+4fdas8");
+        v.setEmotion(0);
+        v.setHot(56);
+        v.setLevel(3);
+        v.setStartTime("2017-05-11 12:33");
+        v.setSummary("今天凌晨，欧冠小组赛进行了第4轮的比赛，B组中，巴黎和拜仁双双赢球，两队携手提前两轮出线。D组的巴萨客场与奥林匹亚科斯打成0-0，但依然在小组中领跑。");
+        v.setTitle("欧冠-内马尔破门铁卫戴帽巴黎5-0 拜仁2-1 两队携手出线 巴萨战平");
+        v.setContent("北京时间11月1日凌晨3点45分，2017-18赛季欧冠联赛B组小组赛第4轮打响，法甲豪门大巴黎坐镇王子公园球场迎战比利时球队安德莱赫特。\n" +
+                "第29分钟，巴黎取得领先，内马尔左路得球后回敲，姆巴佩斜塞禁区左侧，维拉蒂顺势一拉晃过防守球员，右脚兜射远角破门得分，大巴黎1-0领先！\n" +
+                "上半场补时阶段，内马尔左路带球内切，在禁区弧顶附近右脚大力轰门，皮球直窜网窝，2-0！");
+        v.setWebsite("微博");
+        v.setSimiliar(666);
+        v.setKeyword("欧冠，成都，北京");
+        return v;
+    }
+
+    @Override
+    public PageList<SimiliarNewsVO> getOpinionSimiliarNewsList(String uuid, PageBounds pageBounds) {
+        List<SimiliarNewsVO> list = Lists.newArrayList();
+        for(int i=0; i<200; i++) {
+            SimiliarNewsVO v = new SimiliarNewsVO();
+            v.setTitle("欧冠-内马尔破门铁卫戴帽巴黎5-0 拜仁2-1 两队携手出线 巴萨战平");
+            v.setHot((int)(Math.random()*66));
+            v.setSource("论坛");
+            list.add(v);
+        }
+        Paginator p = new Paginator(1, 10, 200);
+        PageList<SimiliarNewsVO> pageList = PageListHelper.create(list, p);
         return pageList;
     }
 }

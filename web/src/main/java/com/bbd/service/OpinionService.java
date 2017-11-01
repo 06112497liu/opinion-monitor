@@ -1,9 +1,9 @@
 package com.bbd.service;
 
-import com.bbd.service.vo.KeyValueVO;
-import com.bbd.service.vo.OpinionVO;
-import com.bbd.service.vo.WarnOpinionTopTenVO;
+import com.bbd.service.vo.*;
+import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
+import org.springframework.data.domain.Page;
 
 import java.util.Date;
 import java.util.List;
@@ -28,7 +28,7 @@ public interface OpinionService {
      * @param sourceType
      * @return
      */
-    PageList<OpinionVO> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType);
+    PageList<OpinionVO> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb);
 
     /**
      * 舆情列表媒体类型分布
@@ -43,7 +43,7 @@ public interface OpinionService {
      * @param keyword
      * @return
      */
-    PageList<OpinionVO> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, Integer sourceType);
+    PageList<OpinionVO> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb);
 
     /**
      * 历史预警舆情
@@ -53,5 +53,20 @@ public interface OpinionService {
      * @param sourceType
      * @return
      */
-    PageList<OpinionVO> getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType);
+    PageList<OpinionVO> getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType, PageBounds pb);
+
+    /**
+     * 舆情详情
+     * @param uuid
+     * @return
+     */
+    OpinionExtVO getOpinionDetail(String uuid);
+
+    /**
+     * 舆情相同文章数信息
+     * @param uuid
+     * @param pageBounds
+     * @return
+     */
+    PageList<SimiliarNewsVO> getOpinionSimiliarNewsList(String uuid, PageBounds pageBounds);
 }

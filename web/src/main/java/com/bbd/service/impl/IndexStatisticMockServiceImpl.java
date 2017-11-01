@@ -6,8 +6,10 @@ package com.bbd.service.impl;
 
 import com.bbd.service.IndexStatisticService;
 import com.bbd.service.param.OpinionCountStatQueryParam;
+import com.bbd.service.vo.DBStaVO;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionCountStatVO;
+import com.bbd.service.vo.SystemStaVO;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.springframework.stereotype.Service;
@@ -58,23 +60,15 @@ public class IndexStatisticMockServiceImpl implements IndexStatisticService {
     }
 
     @Override
-    public Map<String, Object> getSystemSta() {
-        Map<String, Object> map = Maps.newHashMap();
-        map.put("runDays", 350);
-        map.put("opinionCount", 5436543);
-        map.put("warnOpinion", 514);
-        map.put("event", 20);
-        return map;
+    public SystemStaVO getSystemSta() {
+        SystemStaVO v = new SystemStaVO(350, 2584236, 55548, 12212);
+        return v;
     }
 
     @Override
-    public Map<String, Object> getDBsta() {
-        Map<String, Object> map = Maps.newHashMap();
-        map.put("historyTotal", 545435434);
-        map.put("dayAdd", 1244);
-        map.put("weekAdd", 454654);
-        map.put("monthAdd", 6546544);
-        return map;
+    public DBStaVO getDBsta() {
+        DBStaVO v = new DBStaVO(350, 2584236, 55548, 12212);
+        return v;
     }
 
     @Override
