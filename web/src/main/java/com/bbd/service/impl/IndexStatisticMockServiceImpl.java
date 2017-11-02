@@ -26,7 +26,7 @@ import java.util.Map;
 public class IndexStatisticMockServiceImpl implements IndexStatisticService {
 
     @Override
-    public OpinionCountStatVO getOpinionCountStatistic(OpinionCountStatQueryParam param) {
+    public OpinionCountStatVO getOpinionCountStatistic(Integer state, Integer timeSpan) {
         OpinionCountStatVO r = new OpinionCountStatVO();
         r.setTotal(1000);
         r.setLevelOne(20);

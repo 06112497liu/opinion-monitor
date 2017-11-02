@@ -39,7 +39,8 @@ public class OpinionMockServiceImpl implements OpinionService {
             v.setSummary("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
             v.setWebsite("贵阳网");
             v.setLevel(1);
-            v.setStartTime("2017-05-09 11:45");
+            v.setCalcTime(new Date());
+            v.setPublicTime(new Date());
             v.setEmotion(1);
             v.setHot(95);
             list.add(v);
@@ -69,7 +70,8 @@ public class OpinionMockServiceImpl implements OpinionService {
             v.setSummary("啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊");
             v.setWebsite("贵阳网");
             v.setLevel(1);
-            v.setStartTime("2017-05-09 11:45");
+            v.setCalcTime(new Date());
+            v.setPublicTime(new Date());
             v.setEmotion(1);
             v.setHot(95);
             list.add(v);
@@ -89,7 +91,8 @@ public class OpinionMockServiceImpl implements OpinionService {
             v.setSummary("包边报表不不不不不不不不不不不不不不不不不不不不不不不不不不不不不不不不不不不");
             v.setWebsite("贵阳网");
             v.setLevel(1);
-            v.setStartTime("2017-05-09 11:45");
+            v.setCalcTime(new Date());
+            v.setPublicTime(new Date());
             v.setEmotion(1);
             v.setHot(95);
             list.add(v);
@@ -106,7 +109,8 @@ public class OpinionMockServiceImpl implements OpinionService {
         v.setEmotion(0);
         v.setHot(56);
         v.setLevel(3);
-        v.setStartTime("2017-05-11 12:33");
+        v.setCalcTime(new Date());
+        v.setPublicTime(new Date());
         v.setSummary("今天凌晨，欧冠小组赛进行了第4轮的比赛，B组中，巴黎和拜仁双双赢球，两队携手提前两轮出线。D组的巴萨客场与奥林匹亚科斯打成0-0，但依然在小组中领跑。");
         v.setTitle("欧冠-内马尔破门铁卫戴帽巴黎5-0 拜仁2-1 两队携手出线 巴萨战平");
         v.setContent("北京时间11月1日凌晨3点45分，2017-18赛季欧冠联赛B组小组赛第4轮打响，法甲豪门大巴黎坐镇王子公园球场迎战比利时球队安德莱赫特。\n" +

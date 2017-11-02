@@ -4,8 +4,13 @@
  * BBD Service Inc
  * All Rights Reserved @2017
  */
- package com.bbd.service.vo; 
-/** 
+ package com.bbd.service.vo;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
+
+/**
  * @author daijinlong 
  * @version $Id: OpinionVO.java, v 0.1 2017年10月31日 下午3:07:22 daijinlong Exp $ 
  */
@@ -17,17 +22,21 @@ public class OpinionVO {
     
     private String summary;
     
-    private int hot;
+    private Integer hot;
     
-    private int similiar;
+    private Integer similiar;
     
-    private int emotion;
+    private Integer emotion;
     
     private String website;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date calcTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date publicTime;
     
-    private String startTime;
-    
-    private int level;
+    private Integer level;
 
     public String getUuid() {
         return uuid;
@@ -53,27 +62,27 @@ public class OpinionVO {
         this.summary = summary;
     }
 
-    public int getHot() {
+    public Integer getHot() {
         return hot;
     }
 
-    public void setHot(int hot) {
+    public void setHot(Integer hot) {
         this.hot = hot;
     }
 
-    public int getSimiliar() {
+    public Integer getSimiliar() {
         return similiar;
     }
 
-    public void setSimiliar(int similiar) {
+    public void setSimiliar(Integer similiar) {
         this.similiar = similiar;
     }
 
-    public int getEmotion() {
+    public Integer getEmotion() {
         return emotion;
     }
 
-    public void setEmotion(int emotion) {
+    public void setEmotion(Integer emotion) {
         this.emotion = emotion;
     }
 
@@ -85,21 +94,28 @@ public class OpinionVO {
         this.website = website;
     }
 
-    public String getStartTime() {
-        return startTime;
+    public Date getCalcTime() {
+        return calcTime;
     }
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
+    public void setCalcTime(Date calcTime) {
+        this.calcTime = calcTime;
     }
 
-    public int getLevel() {
+    public Date getPublicTime() {
+        return publicTime;
+    }
+
+    public void setPublicTime(Date publicTime) {
+        this.publicTime = publicTime;
+    }
+
+    public Integer getLevel() {
         return level;
     }
 
-    public void setLevel(int level) {
+    public void setLevel(Integer level) {
         this.level = level;
     }
-    
 }
 

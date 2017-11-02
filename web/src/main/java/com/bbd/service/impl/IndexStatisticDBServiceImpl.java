@@ -1,7 +1,3 @@
-/**
- * BBD Service Inc
- * All Rights Reserved @2016
- */
 package com.bbd.service.impl;
 
 import com.bbd.service.IndexStatisticService;
@@ -16,15 +12,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
- * @author tjwang
- * @version $Id: IndexStatisticEsServiceImpl.java, v 0.1 2017/10/31 0031 17:02 tjwang Exp $
+ * @author Liuweibo
+ * @version Id: IndexStatisticServiceImpl.java, v0.1 2017/11/2 Liuweibo Exp $$
  */
-@Service("indexStatisticEsServiceImpl")
-public class IndexStatisticEsServiceImpl implements IndexStatisticService {
+@Service("indexStatisticDBServiceImpl")
+public class IndexStatisticDBServiceImpl implements IndexStatisticService {
 
     @Override
     public OpinionCountStatVO getOpinionCountStatistic(Integer state, Integer timeSpan) {
+
         return null;
     }
 
@@ -68,3 +64,5 @@ public class IndexStatisticEsServiceImpl implements IndexStatisticService {
         return null;
     }
 }
+    
+    

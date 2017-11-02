@@ -22,10 +22,11 @@ public interface IndexStatisticService {
 
     /**
      * 首页预警舆情数量统计
-     * @param param
+     * @param state
+     * @param timeSpan
      * @return
      */
-    OpinionCountStatVO getOpinionCountStatistic(OpinionCountStatQueryParam param);
+    OpinionCountStatVO getOpinionCountStatistic(Integer state, Integer timeSpan);
 
     /**
      * 预警舆情数量统计坐标轴
