@@ -9,12 +9,17 @@ import org.springframework.stereotype.Service;
 
 import com.bbd.dao.OpinionDictionaryDao;
 import com.bbd.dao.OpinionEventDao;
+import com.bbd.dao.OpinionEventSourceTrendDao;
+import com.bbd.dao.OpinionEventTrendDao;
 import com.bbd.dao.WarnSettingDao;
+import com.bbd.domain.Graph;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.domain.OpinionDictionaryExample;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.domain.OpinionEventExample;
 import com.bbd.domain.OpinionEventExample.Criteria;
+import com.bbd.domain.OpinionEventTrend;
+import com.bbd.domain.OpinionEventTrendExample;
 import com.bbd.domain.WarnSetting;
 import com.bbd.service.vo.GraphVO;
 import com.bbd.service.vo.KeyValueVO;
@@ -35,6 +40,10 @@ public class EventService{
 	OpinionDictionaryDao opinionDictionaryDao;
 	@Autowired
 	WarnSettingDao warnSettingDao;
+	@Autowired
+	OpinionEventSourceTrendDao opinionEventSourceTrendDao;
+	@Autowired
+	OpinionEventTrendDao opinionEventTrendDao;
 	/**  
 	 * @param opinionEvent 
 	 */
@@ -159,7 +168,7 @@ public class EventService{
 	 * @param pageSize
 	 * @return 
 	 */
-	public  HashMap<String, Object> getEventInfoList(Integer id, Integer cycle, Integer emotion, String source, Integer pageNo, Integer pageSize) {
+	public  HashMap<String, Object> getEventInfoList(Long id, Integer cycle, Integer emotion, String source, Integer pageNo, Integer pageSize) {
 	    HashMap<String, Object> map = new HashMap<String, Object>();
 	    map.put("infoTotalNum", 86754);
 	    map.put("eventHotVal", 86);
@@ -188,7 +197,7 @@ public class EventService{
 	 * @param emotion
 	 * @return 
 	 */
-	public  List<KeyValueVO> eventLabelList(Integer id, Integer cycle, Integer emotion){
+	public  List<KeyValueVO> eventLabelList(Long id, Integer cycle, Integer emotion){
 
         List<KeyValueVO> websiteList = new ArrayList<KeyValueVO>();
         KeyValueVO websiteNew = new KeyValueVO();
@@ -242,7 +251,7 @@ public class EventService{
 	 * @param cycle
 	 * @return 
 	 */
-	public  int eventInfoTotal(Integer id, Integer cycle){
+	public  int eventInfoTotal(Long id, Integer cycle){
 	    return 83732;
 	}
 	
@@ -251,7 +260,7 @@ public class EventService{
 	 * @param id
 	 * @return 
 	 */
-	public  int eventHotValue(Integer id){
+	public  int eventHotValue(Long id){
         return 85;
     }
 	
@@ -261,30 +270,21 @@ public class EventService{
 	 * @param cycle
 	 * @return 
 	 */
-	public HashMap<String, Object> eventWholeTrend(Integer id, Integer cycle) {
+	public HashMap<String, Object> eventWholeTrend(Long id, Integer cycle) {
 	    HashMap<String, Object> map = new HashMap<String, Object>();
-	    List<GraphVO> infoList = new ArrayList<GraphVO>();
-	    GraphVO o1 = new GraphVO("2017-09-09 14:00", "信息总量", "12");
-	    GraphVO o2 = new GraphVO("2017-09-09 16:00", "信息总量", "18");
-	    GraphVO o3 = new GraphVO("2017-09-09 18:00", "信息总量", "12");
-        infoList.add(o1);
-        infoList.add(o2);
-        infoList.add(o3);
-	    
+	    Integer days;
+	    if (cycle == 1) {
+	        days = 1;
+	    } else if (cycle == 2) {
+	        days = 7;
+	    } else {
+	        days = 30;
+	    }
+	    List<Graph> infoList = opinionEventSourceTrendDao.selectBySourceAndCycle(id, null, "notNull", days);
         map.put("infoList", infoList);
-        
-        List<GraphVO> warnList = new ArrayList<GraphVO>();
-        GraphVO o4 = new GraphVO("2017-09-09 14:00", "预警总量", "12");
-        GraphVO o5 = new GraphVO("2017-09-09 16:00", "预警总量", "18");
-        GraphVO o6 = new GraphVO("2017-09-09 18:00", "预警总量", "12");
-        warnList.add(o4);
-        warnList.add(o5);
-        warnList.add(o6);
-        
+        List<Graph> warnList = opinionEventSourceTrendDao.selectBySourceAndCycle(id, null, null, days);
         map.put("warnList", warnList);
-       
         return map;
-	    
 	}
 	
 	
@@ -293,7 +293,7 @@ public class EventService{
 	 * @param cycle
 	 * @return 
 	 */
-	public HashMap<String, Object> eventSrcDis(Integer id, Integer cycle) {
+	public HashMap<String, Object> eventSrcDis(Long id, Integer cycle) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         List<GraphVO> srcDisList = new ArrayList<GraphVO>();
         GraphVO o1 = new GraphVO(null, "微博", "12");
@@ -313,49 +313,27 @@ public class EventService{
 	 * @param cycle
 	 * @return 
 	 */
-	public HashMap<String, Object> eventInfoTrend(Integer id, Integer cycle) {
+	public List<List<Graph>> eventInfoTrend(Long id, Integer cycle) {
         HashMap<String, Object> map = new HashMap<String, Object>();
-        List<GraphVO> allList = new ArrayList<GraphVO>();
-        GraphVO o1 = new GraphVO("2017-09-09 14:00", "全部", "12");
-        GraphVO o2 = new GraphVO("2017-09-09 16:00", "全部", "18");
-        GraphVO o3 = new GraphVO("2017-09-09 18:00", "全部", "12");
-        allList.add(o1);
-        allList.add(o2);
-        allList.add(o3);
-        
-        map.put("allList", allList);
-        
-        List<GraphVO> webList = new ArrayList<GraphVO>();
-        GraphVO o4 = new GraphVO("2017-09-09 14:00", "网站", "4");
-        GraphVO o5 = new GraphVO("2017-09-09 16:00", "网站", "6");
-        GraphVO o6 = new GraphVO("2017-09-09 18:00", "网站", "4");
-        webList.add(o4);
-        webList.add(o5);
-        webList.add(o6);
-        
-        map.put("webList", webList);
-        
-        List<GraphVO> luntanList = new ArrayList<GraphVO>();
-        GraphVO o7 = new GraphVO("2017-09-09 14:00", "论坛", "5");
-        GraphVO o8 = new GraphVO("2017-09-09 16:00", "论坛", "7");
-        GraphVO o9 = new GraphVO("2017-09-09 18:00", "论坛", "5");
-        luntanList.add(o7);
-        luntanList.add(o8);
-        luntanList.add(o9);
-        
-        map.put("luntanList", luntanList);
-        
-        List<GraphVO> weiboList = new ArrayList<GraphVO>();
-        GraphVO o10 = new GraphVO("2017-09-09 14:00", "微博", "3");
-        GraphVO o11 = new GraphVO("2017-09-09 16:00", "微博", "5");
-        GraphVO o12 = new GraphVO("2017-09-09 18:00", "微博", "3");
-        weiboList.add(o10);
-        weiboList.add(o11);
-        weiboList.add(o12);
-        
-        map.put("weiboList", weiboList);
-        
-        return map;
+        List<OpinionDictionary> opinionDictionaryList = getDictionary("F");
+        Integer days;
+        if (cycle == 1) {
+            days = 1;
+        } else if (cycle == 2) {
+            days = 7;
+        } else {
+            days = 30;
+        }
+        List<List<Graph>> list = new ArrayList<List<Graph>>();
+        List<Graph> allList = opinionEventSourceTrendDao.selectBySourceAndCycle(id, null, "notNull", days);
+        list.add(allList);
+        for (OpinionDictionary e : opinionDictionaryList) {
+            List<Graph> gs = opinionEventSourceTrendDao.selectBySourceAndCycle(id, e.getCode(), "notNull", days);
+            if (gs!=null && gs.size()>0) {
+                list.add(gs);
+            }
+        }
+        return list;
     }
 	
 	
@@ -364,7 +342,7 @@ public class EventService{
 	 * @param cycle
 	 * @return 
 	 */
-	public HashMap<String, Object> eventSrcActive(Integer id, Integer cycle) {
+	public HashMap<String, Object> eventSrcActive(Long id, Integer cycle) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         List<GraphVO> srcActiveList = new ArrayList<GraphVO>();
         GraphVO o1 = new GraphVO(null, "新浪微博", "12");
@@ -378,7 +356,7 @@ public class EventService{
         return map;
     }
 	
-	public HashMap<String, Object> eventTrend(Integer id, Integer cycle, Integer pageNo, Integer pageSize) {
+	public HashMap<String, Object> eventTrend(Long id, Integer cycle, Integer pageNo, Integer pageSize) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         
         List<OpinionVO> trendList = new ArrayList<OpinionVO>();
@@ -404,12 +382,20 @@ public class EventService{
         trendList.add(o3);
         
         trendList.add(o3);
+        
+       /* OpinionEventTrendExample example = new OpinionEventTrendExample();
+        example.createCriteria().andEventIdEqualTo(id);
+        List<OpinionEventTrend> opinionEventTrendList = opinionEventTrendDao.selectByExample(example);
+        List<String> uuids = new ArrayList<String>();
+        for (OpinionEventTrend e : opinionEventTrendList) {
+            uuids.add(e.getOpinionUuid());
+        }*/
         map.put("trendList", trendList);
         map.put("eventTime", "2017-01-02");
         return map;
     }
 	
-	public HashMap<String, Object> eventKeywords(Integer id, Integer cycle) {
+	public HashMap<String, Object> eventKeywords(Long id, Integer cycle) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         List<GraphVO> eventKeywords = new ArrayList<GraphVO>();
         GraphVO o1 = new GraphVO(null, "天价", "999");
@@ -444,7 +430,7 @@ public class EventService{
         return map;
     }
     
-	public HashMap<String, Object> eventDataType(Integer id, Integer cycle) {
+	public HashMap<String, Object> eventDataType(Long id, Integer cycle) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         List<GraphVO> eventDataTypeList = new ArrayList<GraphVO>();
         GraphVO o1 = new GraphVO(null, "敏感", "80");
