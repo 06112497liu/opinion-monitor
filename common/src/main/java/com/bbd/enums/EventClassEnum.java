@@ -6,15 +6,18 @@ import com.google.common.base.Objects;
  * @author liuweibo
  * @version $Id: DistrictEnum.java, v0.1 ${DATA} 17:42 liuweibo Exp $$
  */
-public enum WebsiteEnum {
+public enum EventClassEnum {
 
-    XINWEN(1, "新闻"),
-    WANGZHAN(2, "网站"),
-    WEIXIN(3, "微信"),
-    LUNTAN(4, "论坛"),
-    WEIBO(5, "微博"),
-    JIAOWU(6, "政务"),
-    QITA(7, "其他"),;
+    NAIFEN(1, "奶粉"),
+    YINPING(2, "饮品"),
+    JIADIAN(3, "家电"),
+    DIANSHANG(3, "电商"),
+    QICHE(4, "汽车"),
+    YIYAO(5, "医药"),
+    KUAIDI(6, "快递"),
+    CHAOSHI(7, "超市"),
+    RIHUA(8, "日化"),
+    QITA(9, "其他"),;
 
     private Integer code;
 
@@ -29,7 +32,7 @@ public enum WebsiteEnum {
     }
 
     public static String getDescByCode(Integer code) {
-        WebsiteEnum[] vals = WebsiteEnum.values();
+        EventClassEnum[] vals = EventClassEnum.values();
         for (int i = 0; i < vals.length; i++) {
             if(Objects.equal(vals[i].getCode(), code)) {
                 return vals[i].getDesc();
@@ -39,7 +42,7 @@ public enum WebsiteEnum {
     }
 
     public static Integer getCodeByDesc(String desc) {
-        WebsiteEnum[] vals = WebsiteEnum.values();
+        EventClassEnum[] vals = EventClassEnum.values();
         for (int i = 0; i < vals.length; i++) {
             if(Objects.equal(vals[i].getDesc(), desc)) {
                 return vals[i].getCode();
@@ -52,7 +55,7 @@ public enum WebsiteEnum {
      * @param code
      * @param desc
      */
-    private WebsiteEnum(Integer code, String desc) {
+    private EventClassEnum(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }
