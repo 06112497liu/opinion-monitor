@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.bbd.domain.OpinionWarnCountStatistic">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="total" jdbcType="INTEGER" property="total" />
+    <result column="state" jdbcType="TINYINT" property="state" />
     <result column="level_one" jdbcType="INTEGER" property="levelOne" />
     <result column="level_two" jdbcType="INTEGER" property="levelTwo" />
     <result column="level_three" jdbcType="INTEGER" property="levelThree" />
@@ -70,7 +71,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, total, level_one, level_two, level_three, record_time, gmt_create, gmt_modified
+    id, total, state, level_one, level_two, level_three, record_time, gmt_create, gmt_modified
   </sql>
   <select id="selectByExample" parameterType="com.bbd.domain.OpinionWarnCountStatisticExample" resultMap="BaseResultMap">
     select
@@ -101,12 +102,12 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_opinion_warn_count_statistic (total, level_one, level_two, 
-      level_three, record_time, gmt_create, 
-      gmt_modified)
-    values (#{total,jdbcType=INTEGER}, #{levelOne,jdbcType=INTEGER}, #{levelTwo,jdbcType=INTEGER}, 
-      #{levelThree,jdbcType=INTEGER}, #{recordTime,jdbcType=DATE}, #{gmtCreate,jdbcType=TIMESTAMP}, 
-      #{gmtModified,jdbcType=TIMESTAMP})
+    insert into bbd_opinion_warn_count_statistic (total, state, level_one, 
+      level_two, level_three, record_time, 
+      gmt_create, gmt_modified)
+    values (#{total,jdbcType=INTEGER}, #{state,jdbcType=TINYINT}, #{levelOne,jdbcType=INTEGER}, 
+      #{levelTwo,jdbcType=INTEGER}, #{levelThree,jdbcType=INTEGER}, #{recordTime,jdbcType=DATE}, 
+      #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.bbd.domain.OpinionWarnCountStatistic">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -116,6 +117,9 @@
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="total != null">
         total,
+      </if>
+      <if test="state != null">
+        state,
       </if>
       <if test="levelOne != null">
         level_one,
@@ -139,6 +143,9 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="total != null">
         #{total,jdbcType=INTEGER},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=TINYINT},
       </if>
       <if test="levelOne != null">
         #{levelOne,jdbcType=INTEGER},
@@ -169,6 +176,9 @@
       <if test="record.total != null">
         total = #{record.total,jdbcType=INTEGER},
       </if>
+      <if test="record.state != null">
+        state = #{record.state,jdbcType=TINYINT},
+      </if>
       <if test="record.levelOne != null">
         level_one = #{record.levelOne,jdbcType=INTEGER},
       </if>
@@ -196,6 +206,7 @@
     update bbd_opinion_warn_count_statistic
     set id = #{record.id,jdbcType=BIGINT},
       total = #{record.total,jdbcType=INTEGER},
+      state = #{record.state,jdbcType=TINYINT},
       level_one = #{record.levelOne,jdbcType=INTEGER},
       level_two = #{record.levelTwo,jdbcType=INTEGER},
       level_three = #{record.levelThree,jdbcType=INTEGER},
@@ -211,6 +222,9 @@
     <set>
       <if test="total != null">
         total = #{total,jdbcType=INTEGER},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=TINYINT},
       </if>
       <if test="levelOne != null">
         level_one = #{levelOne,jdbcType=INTEGER},
@@ -236,6 +250,7 @@
   <update id="updateByPrimaryKey" parameterType="com.bbd.domain.OpinionWarnCountStatistic">
     update bbd_opinion_warn_count_statistic
     set total = #{total,jdbcType=INTEGER},
+      state = #{state,jdbcType=TINYINT},
       level_one = #{levelOne,jdbcType=INTEGER},
       level_two = #{levelTwo,jdbcType=INTEGER},
       level_three = #{levelThree,jdbcType=INTEGER},

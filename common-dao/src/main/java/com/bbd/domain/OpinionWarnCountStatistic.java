@@ -7,6 +7,8 @@ public class OpinionWarnCountStatistic {
 
     private Integer total;
 
+    private Integer state;
+
     private Integer levelOne;
 
     private Integer levelTwo;
@@ -33,6 +35,14 @@ public class OpinionWarnCountStatistic {
 
     public void setTotal(Integer total) {
         this.total = total;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
     }
 
     public Integer getLevelOne() {

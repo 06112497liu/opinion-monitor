@@ -4,6 +4,7 @@ import com.bbd.dao.OpinionIncreaseStatisticDao;
 import com.bbd.dao.OpinionWarnCountStatisticDao;
 import com.bbd.domain.OpinionIncreaseStatistic;
 import com.bbd.domain.OpinionWarnCountStatistic;
+import com.google.common.base.Preconditions;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,15 +27,17 @@ public class OpinionCountStaJob {
 
     /**
      * 预警舆情不同时间点数量统计
-     * @param levelOne
-     * @param levelTwo
-     * @param levelThree
+     * @param state 状态，1.全部；2.已处理；3.未处理
+     * @param levelOne 1级预警数量
+     * @param levelTwo 2级预警数量
+     * @param levelThree 3级预警数量
      * @return
      */
-    public Integer warnOpinionCountSta(Integer levelOne, Integer levelTwo, Integer levelThree) {
+    public Integer warnOpinionCountSta(Integer state, Integer levelOne, Integer levelTwo, Integer levelThree) {
+        Preconditions.checkNotNull(state, "state不能为空");
         int one = getIfNull(levelOne, 0); int two = getIfNull(levelTwo, 0); int three = getIfNull(levelThree, 0);
         OpinionWarnCountStatistic o = new OpinionWarnCountStatistic();
-        o.setLevelOne(one);o.setLevelTwo(two);o.setLevelThree(three);
+        o.setState(state);o.setLevelOne(one);o.setLevelTwo(two);o.setLevelThree(three);
         o.setTotal(one + two + three);
         o.setGmtCreate(getHourTime(DateTime.now()));
         Integer result = warnCountStatisticDao.insertSelective(o);
