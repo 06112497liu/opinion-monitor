@@ -11,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+
 /**
  * 热点舆情控制器
  * @author Liuweibo
@@ -21,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(description = "热点舆情控制器")
 public class HotOpinionController extends AbstractController {
 
-    @Autowired
+    @Resource(name = "opinionEsServiceImpl")
     private OpinionService opinionService;
 
     @ApiOperation(value = "热点舆情列表查询", httpMethod = "GET")

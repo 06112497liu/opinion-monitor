@@ -173,7 +173,6 @@ public class EventService{
 	    opinionVO.setSummary("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 	    opinionVO.setWebsite("贵阳网");
 	    opinionVO.setLevel(1);
-	    opinionVO.setStartTime("2017-05-09 11:45");
 	    opinionVO.setEmotion(1);
 	    opinionVO.setHot(95);
 	    opinionList.add(opinionVO);
@@ -384,27 +383,24 @@ public class EventService{
         
         List<OpinionVO> trendList = new ArrayList<OpinionVO>();
         OpinionVO o1 = new OpinionVO();
-        o1.setStartTime("2017-01-02 11");
         o1.setTitle("京昆高速多车相撞，4死5伤");
         o1.setUuid("001");
         o1.setWebsite("新华网");
-        o1.setSimiliar(45);
+        o1.setSimiliarCount(45);
         trendList.add(o1);
         
         OpinionVO o2 = new OpinionVO();
-        o2.setStartTime("2017-01-03 08");
         o2.setTitle("京昆高速多车相撞，5死4伤");
         o2.setUuid("002");
         o2.setWebsite("贵阳网");
-        o2.setSimiliar(49);
+        o2.setSimiliarCount(49);
         trendList.add(o2);
         
         OpinionVO o3 = new OpinionVO();
-        o3.setStartTime("2017-01-04 08");
         o3.setTitle("京昆高速多车相撞，6死3伤");
         o3.setUuid("003");
         o3.setWebsite("新浪网");
-        o3.setSimiliar(58);
+        o3.setSimiliarCount(58);
         trendList.add(o3);
         
         trendList.add(o3);

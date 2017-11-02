@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Liuweibo
@@ -30,7 +31,7 @@ public class OpinionMockServiceImpl implements OpinionService {
     }
 
     @Override
-    public PageList<OpinionVO> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb) {
+    public Map<String, Object> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb) {
         List<OpinionVO> list = Lists.newArrayList();
         for(int i=0; i<200; i++) {
             OpinionVO v = new OpinionVO();
@@ -47,7 +48,7 @@ public class OpinionMockServiceImpl implements OpinionService {
         }
         Paginator p = new Paginator(1, 10, 200);
         PageList<OpinionVO> pageList = PageListHelper.create(list, p);
-        return pageList;
+        return null;
     }
 
     @Override
@@ -117,7 +118,7 @@ public class OpinionMockServiceImpl implements OpinionService {
                 "第29分钟，巴黎取得领先，内马尔左路得球后回敲，姆巴佩斜塞禁区左侧，维拉蒂顺势一拉晃过防守球员，右脚兜射远角破门得分，大巴黎1-0领先！\n" +
                 "上半场补时阶段，内马尔左路带球内切，在禁区弧顶附近右脚大力轰门，皮球直窜网窝，2-0！");
         v.setWebsite("微博");
-        v.setSimiliar(666);
+        v.setSimiliarCount(666);
         v.setKeyword("欧冠，成都，北京");
         return v;
     }

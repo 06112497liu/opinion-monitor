@@ -24,7 +24,7 @@ public class OpinionVO {
     
     private Integer hot;
     
-    private Integer similiar;
+    private Integer similiarCount;
     
     private Integer emotion;
     
@@ -70,12 +70,12 @@ public class OpinionVO {
         this.hot = hot;
     }
 
-    public Integer getSimiliar() {
-        return similiar;
+    public Integer getSimiliarCount() {
+        return similiarCount;
     }
 
-    public void setSimiliar(Integer similiar) {
-        this.similiar = similiar;
+    public void setSimiliarCount(Integer similiarCount) {
+        this.similiarCount = similiarCount;
     }
 
     public Integer getEmotion() {
