@@ -2,10 +2,7 @@ package com.bbd.service.impl;
 
 import com.bbd.service.IndexStatisticService;
 import com.bbd.service.param.OpinionCountStatQueryParam;
-import com.bbd.service.vo.DBStaVO;
-import com.bbd.service.vo.KeyValueVO;
-import com.bbd.service.vo.OpinionCountStatVO;
-import com.bbd.service.vo.SystemStaVO;
+import com.bbd.service.vo.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,7 +47,7 @@ public class IndexStatisticDBServiceImpl implements IndexStatisticService {
     }
 
     @Override
-    public List<KeyValueVO> getEventChannelTrend() {
+    public List<KeyValuePercentVO> getEventChannelTrend() {
         return null;
     }
 

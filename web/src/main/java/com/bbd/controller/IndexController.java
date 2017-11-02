@@ -40,6 +40,9 @@ public class IndexController extends AbstractController {
     @Resource(name = "indexStatisticDBServiceImpl")
     private IndexStatisticService indexStatisticDBService;
 
+    @Resource(name = "indexStatisticEsServiceImpl")
+    private IndexStatisticService indexStatisticEsService;
+
     @Resource(name = "opinionMockServiceImpl")
     private OpinionService opinionService;
 
@@ -99,7 +102,7 @@ public class IndexController extends AbstractController {
     @ApiOperation(value = "舆情传播渠道分布", httpMethod = "GET")
     @RequestMapping(value = "/opinion/channel/trend", method = RequestMethod.GET)
     public RestResult getEventChannelTrend() {
-        return RestResult.ok(indexStatisticService.getEventChannelTrend());
+        return RestResult.ok(indexStatisticEsService.getEventChannelTrend());
     }
 
     @ApiOperation(value = "历史舆情事件类别分布", httpMethod = "GET")

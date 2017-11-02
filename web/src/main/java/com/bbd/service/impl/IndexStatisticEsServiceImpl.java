@@ -4,12 +4,14 @@
  */
 package com.bbd.service.impl;
 
+import com.bbd.enums.WebsiteEnum;
+import com.bbd.service.EsQueryService;
 import com.bbd.service.IndexStatisticService;
 import com.bbd.service.param.OpinionCountStatQueryParam;
-import com.bbd.service.vo.DBStaVO;
-import com.bbd.service.vo.KeyValueVO;
-import com.bbd.service.vo.OpinionCountStatVO;
-import com.bbd.service.vo.SystemStaVO;
+import com.bbd.service.utils.PercentUtil;
+import com.bbd.service.vo.*;
+import com.bbd.util.BeanMapperUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,9 @@ import java.util.Map;
  */
 @Service("indexStatisticEsServiceImpl")
 public class IndexStatisticEsServiceImpl implements IndexStatisticService {
+
+    @Autowired
+    private EsQueryService esQueryService;
 
     @Override
     public OpinionCountStatVO getOpinionCountStatistic(Integer state, Integer timeSpan) {
@@ -54,8 +59,14 @@ public class IndexStatisticEsServiceImpl implements IndexStatisticService {
     }
 
     @Override
-    public List<KeyValueVO> getEventChannelTrend() {
-        return null;
+    public List<KeyValuePercentVO> getEventChannelTrend() {
+        List<KeyValueVO> list = esQueryService.getOpinionMediaSpread();
+        List<KeyValuePercentVO> rs = BeanMapperUtil.mapList(list, KeyValuePercentVO.class);
+        rs.forEach(k -> {
+            k.setName(WebsiteEnum.getDescByCode(Integer.parseInt(k.getKey().toString())));
+        });
+        PercentUtil.calcLongPercents(rs);
+        return rs;
     }
 
     @Override

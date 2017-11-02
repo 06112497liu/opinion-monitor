@@ -6,6 +6,7 @@ import com.bbd.service.SystemSettingService;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
@@ -31,6 +32,14 @@ public class OpinionEsServiceImpl implements OpinionService {
     @Autowired
     private SystemSettingService systemSettingService;
 
+    private final String hotLevelAggName = "hot_level_agg";
+    private final String hotField = "hot";
+    private final String mediaAggName = "media_agg";
+    private final String mediaField = "mediaType";
+
+    private final String calcTimeField = "calcTime";
+    private final String emotionField = "emotion";
+
     @Override
     public List<WarnOpinionTopTenVO> getWarnOpinionTopTen() {
         return null;
@@ -41,9 +50,9 @@ public class OpinionEsServiceImpl implements OpinionService {
         // step-1：组装条件
         DateTime now = DateTime.now();
         DateTime startTime = null;
-        if(2 == timeSpan) startTime = now.plusDays(-7);
-        else if(3 == timeSpan) startTime = now.plusMonths(-1);
-        else startTime = now.plusHours(-24);
+//        if(2 == timeSpan) startTime = now.plusDays(-7);
+//        else if(3 == timeSpan) startTime = now.plusMonths(-1);
+//        else startTime = now.plusHours(-24);
 
         // step-2：查询es，并构建结果
         OpinionEsSearchVO esResult = esQueryService.queryWarningOpinion(startTime, emotion, pb);
@@ -51,8 +60,14 @@ public class OpinionEsServiceImpl implements OpinionService {
         opinions.forEach(o -> {
             o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
         });
+        Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), esResult.getTotal().intValue());
+        PageList p = PageListHelper.create(opinions, paginator);
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("opinions", p);
+        map.put("website", esResult.getMediaTypeStats());
+        map.put("level", esResult.getHotLevelStats());
 
-        return null;
+        return map;
     }
 
     @Override

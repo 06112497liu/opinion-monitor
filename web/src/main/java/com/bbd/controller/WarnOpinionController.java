@@ -36,8 +36,7 @@ public class WarnOpinionController extends AbstractController {
     })
     @RequestMapping(value = "list", method = RequestMethod.GET)
     public RestResult getWarnOpinionList(@RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan,
-                                         @RequestParam(value = "emotion", defaultValue = "0")Integer emotion,
-                                         Integer sourceType) {
+                                         @RequestParam(value = "emotion", defaultValue = "0") Integer emotion, Integer sourceType) {
         return RestResult.ok(opinionService.getWarnOpinionList(timeSpan, emotion, sourceType, getPageBounds()));
     }
 
