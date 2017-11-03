@@ -26,6 +26,8 @@ public class OpinionEsVO {
 
     private Integer  similiarCount;
 
+    private Integer commentCount;
+
     private Integer  emotion;
 
     private String[] keyword;
@@ -84,6 +86,14 @@ public class OpinionEsVO {
 
     public void setSimiliarCount(Integer similiarCount) {
         this.similiarCount = similiarCount;
+    }
+
+    public Integer getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(Integer commentCount) {
+        this.commentCount = commentCount;
     }
 
     public Integer getEmotion() {

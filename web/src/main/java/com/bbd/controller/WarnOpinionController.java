@@ -58,8 +58,8 @@ public class WarnOpinionController extends AbstractController {
     @ApiImplicitParams({
             @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String uuid", paramType = "query", required = true)
     })
-    @RequestMapping(value = "{uuid}", method = RequestMethod.GET)
-    public RestResult getWarnOpinionDetail(@PathVariable(value = "uuid") String uuid) {
+    @RequestMapping(value = "detail", method = RequestMethod.GET)
+    public RestResult getWarnOpinionDetail(String uuid) {
         ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
         return RestResult.ok(opinionService.getOpinionDetail(uuid));
     }

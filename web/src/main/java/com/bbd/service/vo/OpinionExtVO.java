@@ -10,6 +10,8 @@ import java.util.List;
  */
 public class OpinionExtVO extends OpinionVO {
 
+    private Integer commentCount;
+
     /**
      * 舆情内容
      */
@@ -18,7 +20,16 @@ public class OpinionExtVO extends OpinionVO {
     /**
      * 词云
      */
-    private String keyword;
+    private String[] keyword;
+
+
+    public Integer getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(Integer commentCount) {
+        this.commentCount = commentCount;
+    }
 
     public String getContent() {
         return content;
@@ -28,20 +39,12 @@ public class OpinionExtVO extends OpinionVO {
         this.content = content;
     }
 
-    public String getKeyword() {
+    public String[] getKeyword() {
         return keyword;
     }
 
-    public void setKeyword(String keyword) {
+    public void setKeyword(String[] keyword) {
         this.keyword = keyword;
-    }
-
-    @Override
-    public String toString() {
-        return "OpinionExtVO{" +
-                "content='" + content + '\'' +
-                ", keyword='" + keyword + '\'' +
-                '}';
     }
 }
     

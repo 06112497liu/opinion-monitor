@@ -88,4 +88,9 @@ public class EsQueryServiceTest extends BaseServiceTest {
         List<KeyValueVO> r = esQueryService.getEventEmotionSpread(eventId);
         assertNotNull(r);
     }
+
+    @Test
+    public void testGetOpinionByUUID() {
+        esQueryService.getOpinionByUUID("88");
+    }
 }

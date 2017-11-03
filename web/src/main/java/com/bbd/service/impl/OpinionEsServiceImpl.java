@@ -74,7 +74,12 @@ public class OpinionEsServiceImpl implements OpinionService {
 
     @Override
     public OpinionExtVO getOpinionDetail(String uuid) {
-        return null;
+        OpinionEsVO o = esQueryService.getOpinionByUUID(uuid);
+        OpinionExtVO result = BeanMapperUtil.map(o, OpinionExtVO.class);
+        // 判断预警级别
+        Integer level = systemSettingService.judgeOpinionSettingClass(result.getHot());
+        result.setLevel(level);
+        return result;
     }
 
     @Override

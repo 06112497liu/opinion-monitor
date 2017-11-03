@@ -7,6 +7,7 @@ package com.bbd.service;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionCountStatVO;
 import com.bbd.service.vo.OpinionEsSearchVO;
+import com.bbd.service.vo.OpinionEsVO;
 import com.mybatis.domain.PageBounds;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -96,4 +97,10 @@ public interface EsQueryService {
      */
     List<KeyValueVO> getEventEmotionSpread(Long eventId);
 
+    /**
+     * 根据舆情uuid查询舆情详情
+     * @param uuid
+     * @return
+     */
+    OpinionEsVO getOpinionByUUID(String uuid);
 }

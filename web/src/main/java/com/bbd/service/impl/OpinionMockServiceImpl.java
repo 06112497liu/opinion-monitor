@@ -109,7 +109,7 @@ public class OpinionMockServiceImpl implements OpinionService {
                 "上半场补时阶段，内马尔左路带球内切，在禁区弧顶附近右脚大力轰门，皮球直窜网窝，2-0！");
         v.setWebsite("微博");
         v.setSimiliarCount(666);
-        v.setKeyword("欧冠，成都，北京");
+        v.setKeyword(new String[]{"欧冠，成都，北京"});
         return v;
     }
 

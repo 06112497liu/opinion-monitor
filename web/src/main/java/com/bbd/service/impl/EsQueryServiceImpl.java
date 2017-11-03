@@ -133,13 +133,13 @@ public class EsQueryServiceImpl implements EsQueryService {
         String mediaAggName = "media_agg";
         String mediaField = "mediaType";
 
-        String calcTimeField = "calcTime";
+        String publicTimeField = "publicTime";
         String emotionField = "emotion";
 
         TransportClient client = EsUtil.getClient();
 
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.rangeQuery(calcTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(publicTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(hotField).gte(60));
         if (emotion != null)
             query.must(QueryBuilders.termQuery(emotionField, emotion));
@@ -239,7 +239,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         List<OpinionEsVO> opList = Lists.newArrayList();
 
         String hotField = "hot";
-        String calcTimeField = "calcTime";
+        String publicTimeField = "publicTime";
         String emotionField = "emotion";
         String titleField = "title";
         String contentField = "content";
@@ -250,7 +250,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         if (StringUtils.isNotBlank(param)) {
             query.must(QueryBuilders.multiMatchQuery(param, titleField, contentField));
         }
-        query.must(QueryBuilders.rangeQuery(calcTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(publicTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(hotField).lt(60));
         if (emotion != null) {
             query.must(QueryBuilders.termQuery(emotionField, emotion));
@@ -365,5 +365,22 @@ public class EsQueryServiceImpl implements EsQueryService {
             .actionGet();
 
         return buildLongTermLists(resp, aggName);
+    }
+
+    @Override
+    public OpinionEsVO getOpinionByUUID(String uuid) {
+        String uuidField = "uuid";
+        TransportClient client = EsUtil.getClient();
+        TermQueryBuilder query = QueryBuilders.termQuery(uuidField, uuid);
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).setFrom(0).setSize(1).execute().actionGet();
+        SearchHits hits = resp.getHits();
+
+        SearchHit[] items = hits.getHits();
+        OpinionEsVO vo = null;
+        for (SearchHit item : items) {
+            String source = item.getSourceAsString();
+            vo = JsonUtil.parseObject(source, OpinionEsVO.class);
+        }
+        return vo;
     }
 }
