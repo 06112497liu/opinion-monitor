@@ -935,6 +935,66 @@ public class OpinionEventExample {
             return (Criteria) this;
         }
 
+        public Criteria andHotIsNull() {
+            addCriterion("hot is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHotIsNotNull() {
+            addCriterion("hot is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHotEqualTo(Integer value) {
+            addCriterion("hot =", value, "hot");
+            return (Criteria) this;
+        }
+
+        public Criteria andHotNotEqualTo(Integer value) {
+            addCriterion("hot <>", value, "hot");
+            return (Criteria) this;
+        }
+
+        public Criteria andHotGreaterThan(Integer value) {
+            addCriterion("hot >", value, "hot");
+            return (Criteria) this;
+        }
+
+        public Criteria andHotGreaterThanOrEqualTo(Integer value) {
+            addCriterion("hot >=", value, "hot");
+            return (Criteria) this;
+        }
+
+        public Criteria andHotLessThan(Integer value) {
+            addCriterion("hot <", value, "hot");
+            return (Criteria) this;
+        }
+
+        public Criteria andHotLessThanOrEqualTo(Integer value) {
+            addCriterion("hot <=", value, "hot");
+            return (Criteria) this;
+        }
+
+        public Criteria andHotIn(List<Integer> values) {
+            addCriterion("hot in", values, "hot");
+            return (Criteria) this;
+        }
+
+        public Criteria andHotNotIn(List<Integer> values) {
+            addCriterion("hot not in", values, "hot");
+            return (Criteria) this;
+        }
+
+        public Criteria andHotBetween(Integer value1, Integer value2) {
+            addCriterion("hot between", value1, value2, "hot");
+            return (Criteria) this;
+        }
+
+        public Criteria andHotNotBetween(Integer value1, Integer value2) {
+            addCriterion("hot not between", value1, value2, "hot");
+            return (Criteria) this;
+        }
+
         public Criteria andOpinionCountIsNull() {
             addCriterion("opinion_count is null");
             return (Criteria) this;

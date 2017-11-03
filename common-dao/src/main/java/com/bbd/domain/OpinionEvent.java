@@ -29,6 +29,8 @@ public class OpinionEvent {
 
     private String consumerTel;
 
+    private Integer hot;
+
     private Integer opinionCount;
 
     private Integer warnCount;
@@ -53,8 +55,6 @@ public class OpinionEvent {
     private String keywords;
 
     private String excludeWords;
-
-    private String words;
 
     private String remark;
 
@@ -154,6 +154,14 @@ public class OpinionEvent {
         this.consumerTel = consumerTel;
     }
 
+    public Integer getHot() {
+        return hot;
+    }
+
+    public void setHot(Integer hot) {
+        this.hot = hot;
+    }
+
     public Integer getOpinionCount() {
         return opinionCount;
     }
@@ -248,14 +256,6 @@ public class OpinionEvent {
 
     public void setExcludeWords(String excludeWords) {
         this.excludeWords = excludeWords;
-    }
-
-    public String getWords() {
-        return words;
-    }
-
-    public void setWords(String words) {
-        this.words = words;
     }
 
     public String getRemark() {
