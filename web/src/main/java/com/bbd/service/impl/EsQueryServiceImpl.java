@@ -15,6 +15,7 @@ import com.bbd.util.JsonUtil;
 import com.bbd.util.StringUtils;
 import com.google.common.collect.Lists;
 import com.mybatis.domain.PageBounds;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -140,14 +141,19 @@ public class EsQueryServiceImpl implements EsQueryService {
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(calcTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(hotField).gte(60));
-        if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
-        if (sourceType != null) query.must(QueryBuilders.termQuery(mediaAggName, sourceType));
+        if (emotion != null)
+            query.must(QueryBuilders.termQuery(emotionField, emotion));
 
         RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(hotField).keyed(true).addRange("levelOne", 80, 101).addRange("levelTwo", 70, 80)
             .addRange("levelThree", 60, 70);
         TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(mediaField);
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query).addAggregation(hotLevelAgg).addAggregation(mediaAgg)
-            .execute().actionGet();
+        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query).addAggregation(hotLevelAgg).addAggregation(mediaAgg);
+
+        if (sourceType != null) {
+            builder.setPostFilter(QueryBuilders.termQuery(mediaField, sourceType));
+        }
+
+        SearchResponse resp = builder.execute().actionGet();
 
         SearchHits hits = resp.getHits();
         result.setTotal(hits.getTotalHits());
