@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.bbd.dao.OpinionWarnCountStatisticDao">
-  <resultMap id="BaseResultMap" type="com.bbd.domain.OpinionWarnCountStatistic">
+<mapper namespace="com.bbd.dao.OpinionEventSourceTrendDao">
+  <resultMap id="BaseResultMap" type="com.bbd.domain.OpinionEventSourceTrend">
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="total" jdbcType="INTEGER" property="total" />
-    <result column="state" jdbcType="TINYINT" property="state" />
-    <result column="level_one" jdbcType="INTEGER" property="levelOne" />
-    <result column="level_two" jdbcType="INTEGER" property="levelTwo" />
-    <result column="level_three" jdbcType="INTEGER" property="levelThree" />
-    <result column="record_time" jdbcType="DATE" property="recordTime" />
+    <result column="event_id" jdbcType="BIGINT" property="eventId" />
+    <result column="source_type" jdbcType="VARCHAR" property="sourceType" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="warn_count" jdbcType="INTEGER" property="warnCount" />
+    <result column="pick_time" jdbcType="TIMESTAMP" property="pickTime" />
     <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
     <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
   </resultMap>
+  
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -71,16 +71,16 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, total, state, level_one, level_two, level_three, record_time, gmt_create, gmt_modified
+    id, event_id, source_type, count, warn_count, pick_time, gmt_create, gmt_modified
   </sql>
-  <select id="selectByExample" parameterType="com.bbd.domain.OpinionWarnCountStatisticExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.bbd.domain.OpinionEventSourceTrendExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     'true' as QUERYID,
     <include refid="Base_Column_List" />
-    from bbd_opinion_warn_count_statistic
+    from bbd_opinion_event_source_trend
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -91,47 +91,44 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from bbd_opinion_warn_count_statistic
+    from bbd_opinion_event_source_trend
     where id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from bbd_opinion_warn_count_statistic
+    delete from bbd_opinion_event_source_trend
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.bbd.domain.OpinionWarnCountStatistic">
+  <insert id="insert" parameterType="com.bbd.domain.OpinionEventSourceTrend">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_opinion_warn_count_statistic (total, state, level_one, 
-      level_two, level_three, record_time, 
-      gmt_create, gmt_modified)
-    values (#{total,jdbcType=INTEGER}, #{state,jdbcType=TINYINT}, #{levelOne,jdbcType=INTEGER}, 
-      #{levelTwo,jdbcType=INTEGER}, #{levelThree,jdbcType=INTEGER}, #{recordTime,jdbcType=DATE}, 
-      #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP})
+    insert into bbd_opinion_event_source_trend (event_id, source_type, count, 
+      warn_count, pick_time, gmt_create, 
+      gmt_modified)
+    values (#{eventId,jdbcType=BIGINT}, #{sourceType,jdbcType=VARCHAR}, #{count,jdbcType=INTEGER}, 
+      #{warnCount,jdbcType=INTEGER}, #{pickTime,jdbcType=TIMESTAMP}, #{gmtCreate,jdbcType=TIMESTAMP}, 
+      #{gmtModified,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.bbd.domain.OpinionWarnCountStatistic">
+  <insert id="insertSelective" parameterType="com.bbd.domain.OpinionEventSourceTrend">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_opinion_warn_count_statistic
+    insert into bbd_opinion_event_source_trend
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="total != null">
-        total,
+      <if test="eventId != null">
+        event_id,
       </if>
-      <if test="state != null">
-        state,
+      <if test="sourceType != null">
+        source_type,
       </if>
-      <if test="levelOne != null">
-        level_one,
+      <if test="count != null">
+        count,
       </if>
-      <if test="levelTwo != null">
-        level_two,
+      <if test="warnCount != null">
+        warn_count,
       </if>
-      <if test="levelThree != null">
-        level_three,
-      </if>
-      <if test="recordTime != null">
-        record_time,
+      <if test="pickTime != null">
+        pick_time,
       </if>
       <if test="gmtCreate != null">
         gmt_create,
@@ -141,23 +138,20 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="total != null">
-        #{total,jdbcType=INTEGER},
+      <if test="eventId != null">
+        #{eventId,jdbcType=BIGINT},
       </if>
-      <if test="state != null">
-        #{state,jdbcType=TINYINT},
+      <if test="sourceType != null">
+        #{sourceType,jdbcType=VARCHAR},
       </if>
-      <if test="levelOne != null">
-        #{levelOne,jdbcType=INTEGER},
+      <if test="count != null">
+        #{count,jdbcType=INTEGER},
       </if>
-      <if test="levelTwo != null">
-        #{levelTwo,jdbcType=INTEGER},
+      <if test="warnCount != null">
+        #{warnCount,jdbcType=INTEGER},
       </if>
-      <if test="levelThree != null">
-        #{levelThree,jdbcType=INTEGER},
-      </if>
-      <if test="recordTime != null">
-        #{recordTime,jdbcType=DATE},
+      <if test="pickTime != null">
+        #{pickTime,jdbcType=TIMESTAMP},
       </if>
       <if test="gmtCreate != null">
         #{gmtCreate,jdbcType=TIMESTAMP},
@@ -168,28 +162,25 @@
     </trim>
   </insert>
   <update id="updateByExampleSelective" parameterType="map">
-    update bbd_opinion_warn_count_statistic
+    update bbd_opinion_event_source_trend
     <set>
       <if test="record.id != null">
         id = #{record.id,jdbcType=BIGINT},
       </if>
-      <if test="record.total != null">
-        total = #{record.total,jdbcType=INTEGER},
+      <if test="record.eventId != null">
+        event_id = #{record.eventId,jdbcType=BIGINT},
       </if>
-      <if test="record.state != null">
-        state = #{record.state,jdbcType=TINYINT},
+      <if test="record.sourceType != null">
+        source_type = #{record.sourceType,jdbcType=VARCHAR},
       </if>
-      <if test="record.levelOne != null">
-        level_one = #{record.levelOne,jdbcType=INTEGER},
+      <if test="record.count != null">
+        count = #{record.count,jdbcType=INTEGER},
       </if>
-      <if test="record.levelTwo != null">
-        level_two = #{record.levelTwo,jdbcType=INTEGER},
+      <if test="record.warnCount != null">
+        warn_count = #{record.warnCount,jdbcType=INTEGER},
       </if>
-      <if test="record.levelThree != null">
-        level_three = #{record.levelThree,jdbcType=INTEGER},
-      </if>
-      <if test="record.recordTime != null">
-        record_time = #{record.recordTime,jdbcType=DATE},
+      <if test="record.pickTime != null">
+        pick_time = #{record.pickTime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.gmtCreate != null">
         gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
@@ -203,40 +194,36 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update bbd_opinion_warn_count_statistic
+    update bbd_opinion_event_source_trend
     set id = #{record.id,jdbcType=BIGINT},
-      total = #{record.total,jdbcType=INTEGER},
-      state = #{record.state,jdbcType=TINYINT},
-      level_one = #{record.levelOne,jdbcType=INTEGER},
-      level_two = #{record.levelTwo,jdbcType=INTEGER},
-      level_three = #{record.levelThree,jdbcType=INTEGER},
-      record_time = #{record.recordTime,jdbcType=DATE},
+      event_id = #{record.eventId,jdbcType=BIGINT},
+      source_type = #{record.sourceType,jdbcType=VARCHAR},
+      count = #{record.count,jdbcType=INTEGER},
+      warn_count = #{record.warnCount,jdbcType=INTEGER},
+      pick_time = #{record.pickTime,jdbcType=TIMESTAMP},
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.bbd.domain.OpinionWarnCountStatistic">
-    update bbd_opinion_warn_count_statistic
+  <update id="updateByPrimaryKeySelective" parameterType="com.bbd.domain.OpinionEventSourceTrend">
+    update bbd_opinion_event_source_trend
     <set>
-      <if test="total != null">
-        total = #{total,jdbcType=INTEGER},
+      <if test="eventId != null">
+        event_id = #{eventId,jdbcType=BIGINT},
       </if>
-      <if test="state != null">
-        state = #{state,jdbcType=TINYINT},
+      <if test="sourceType != null">
+        source_type = #{sourceType,jdbcType=VARCHAR},
       </if>
-      <if test="levelOne != null">
-        level_one = #{levelOne,jdbcType=INTEGER},
+      <if test="count != null">
+        count = #{count,jdbcType=INTEGER},
       </if>
-      <if test="levelTwo != null">
-        level_two = #{levelTwo,jdbcType=INTEGER},
+      <if test="warnCount != null">
+        warn_count = #{warnCount,jdbcType=INTEGER},
       </if>
-      <if test="levelThree != null">
-        level_three = #{levelThree,jdbcType=INTEGER},
-      </if>
-      <if test="recordTime != null">
-        record_time = #{recordTime,jdbcType=DATE},
+      <if test="pickTime != null">
+        pick_time = #{pickTime,jdbcType=TIMESTAMP},
       </if>
       <if test="gmtCreate != null">
         gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
@@ -247,31 +234,56 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.bbd.domain.OpinionWarnCountStatistic">
-    update bbd_opinion_warn_count_statistic
-    set total = #{total,jdbcType=INTEGER},
-      state = #{state,jdbcType=TINYINT},
-      level_one = #{levelOne,jdbcType=INTEGER},
-      level_two = #{levelTwo,jdbcType=INTEGER},
-      level_three = #{levelThree,jdbcType=INTEGER},
-      record_time = #{recordTime,jdbcType=DATE},
+  <update id="updateByPrimaryKey" parameterType="com.bbd.domain.OpinionEventSourceTrend">
+    update bbd_opinion_event_source_trend
+    set event_id = #{eventId,jdbcType=BIGINT},
+      source_type = #{sourceType,jdbcType=VARCHAR},
+      count = #{count,jdbcType=INTEGER},
+      warn_count = #{warnCount,jdbcType=INTEGER},
+      pick_time = #{pickTime,jdbcType=TIMESTAMP},
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.OpinionWarnCountStatisticExample" resultMap="BaseResultMap">
+  <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.OpinionEventSourceTrendExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     'true' as QUERYID,
     <include refid="Base_Column_List" />
-    from bbd_opinion_warn_count_statistic
+    from bbd_opinion_event_source_trend
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
     <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
+  </select>
+  
+  <resultMap id="GraphMap" type="com.bbd.domain.Graph">
+  </resultMap>
+  <select id="selectBySourceAndCycle" resultMap="GraphMap">
+	SELECT 
+	<if test="sourceType != null">
+     b.`name` AS category,
+    </if>
+    <if test="sourceType == null">
+     '全部' AS category,
+    </if>
+	`pick_time` AS TIME, 
+	<if test="isInfo != null">
+     SUM(`count`) AS VALUE
+    </if>
+	<if test="isInfo == null">
+     SUM(`warn_count`) AS VALUE
+    </if> 
+	FROM `bbd_opinion_event_source_trend` a, `bbd_opinion_dictionary` b 
+	WHERE a.`source_type`=b.`code` AND `parent`='F' 
+	<if test="sourceType != null">
+     AND a.`source_type`=#{sourceType} 
+    </if>
+	AND `event_id`=#{id} AND `pick_time` >=DATE_SUB(NOW(),INTERVAL #{days} DAY) 
+	GROUP BY `pick_time`
   </select>
 </mapper>

@@ -2,17 +2,16 @@ package com.bbd.domain;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
-public class OpinionIncreaseStatisticExample {
+public class OpinionEventTrendExample {
     protected String orderByClause;
 
     protected boolean distinct;
 
     protected List<Criteria> oredCriteria;
 
-    public OpinionIncreaseStatisticExample() {
+    public OpinionEventTrendExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 
@@ -106,32 +105,6 @@ public class OpinionIncreaseStatisticExample {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
-        protected void addCriterionForJDBCDate(String condition, Date value, String property) {
-            if (value == null) {
-                throw new RuntimeException("Value for " + property + " cannot be null");
-            }
-            addCriterion(condition, new java.sql.Date(value.getTime()), property);
-        }
-
-        protected void addCriterionForJDBCDate(String condition, List<Date> values, String property) {
-            if (values == null || values.size() == 0) {
-                throw new RuntimeException("Value list for " + property + " cannot be null or empty");
-            }
-            List<java.sql.Date> dateList = new ArrayList<java.sql.Date>();
-            Iterator<Date> iter = values.iterator();
-            while (iter.hasNext()) {
-                dateList.add(new java.sql.Date(iter.next().getTime()));
-            }
-            addCriterion(condition, dateList, property);
-        }
-
-        protected void addCriterionForJDBCDate(String condition, Date value1, Date value2, String property) {
-            if (value1 == null || value2 == null) {
-                throw new RuntimeException("Between values for " + property + " cannot be null");
-            }
-            addCriterion(condition, new java.sql.Date(value1.getTime()), new java.sql.Date(value2.getTime()), property);
-        }
-
         public Criteria andIdIsNull() {
             addCriterion("id is null");
             return (Criteria) this;
@@ -192,123 +165,193 @@ public class OpinionIncreaseStatisticExample {
             return (Criteria) this;
         }
 
-        public Criteria andCountIsNull() {
-            addCriterion("count is null");
+        public Criteria andEventIdIsNull() {
+            addCriterion("event_id is null");
             return (Criteria) this;
         }
 
-        public Criteria andCountIsNotNull() {
-            addCriterion("count is not null");
+        public Criteria andEventIdIsNotNull() {
+            addCriterion("event_id is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCountEqualTo(Integer value) {
-            addCriterion("count =", value, "count");
+        public Criteria andEventIdEqualTo(Long value) {
+            addCriterion("event_id =", value, "eventId");
             return (Criteria) this;
         }
 
-        public Criteria andCountNotEqualTo(Integer value) {
-            addCriterion("count <>", value, "count");
+        public Criteria andEventIdNotEqualTo(Long value) {
+            addCriterion("event_id <>", value, "eventId");
             return (Criteria) this;
         }
 
-        public Criteria andCountGreaterThan(Integer value) {
-            addCriterion("count >", value, "count");
+        public Criteria andEventIdGreaterThan(Long value) {
+            addCriterion("event_id >", value, "eventId");
             return (Criteria) this;
         }
 
-        public Criteria andCountGreaterThanOrEqualTo(Integer value) {
-            addCriterion("count >=", value, "count");
+        public Criteria andEventIdGreaterThanOrEqualTo(Long value) {
+            addCriterion("event_id >=", value, "eventId");
             return (Criteria) this;
         }
 
-        public Criteria andCountLessThan(Integer value) {
-            addCriterion("count <", value, "count");
+        public Criteria andEventIdLessThan(Long value) {
+            addCriterion("event_id <", value, "eventId");
             return (Criteria) this;
         }
 
-        public Criteria andCountLessThanOrEqualTo(Integer value) {
-            addCriterion("count <=", value, "count");
+        public Criteria andEventIdLessThanOrEqualTo(Long value) {
+            addCriterion("event_id <=", value, "eventId");
             return (Criteria) this;
         }
 
-        public Criteria andCountIn(List<Integer> values) {
-            addCriterion("count in", values, "count");
+        public Criteria andEventIdIn(List<Long> values) {
+            addCriterion("event_id in", values, "eventId");
             return (Criteria) this;
         }
 
-        public Criteria andCountNotIn(List<Integer> values) {
-            addCriterion("count not in", values, "count");
+        public Criteria andEventIdNotIn(List<Long> values) {
+            addCriterion("event_id not in", values, "eventId");
             return (Criteria) this;
         }
 
-        public Criteria andCountBetween(Integer value1, Integer value2) {
-            addCriterion("count between", value1, value2, "count");
+        public Criteria andEventIdBetween(Long value1, Long value2) {
+            addCriterion("event_id between", value1, value2, "eventId");
             return (Criteria) this;
         }
 
-        public Criteria andCountNotBetween(Integer value1, Integer value2) {
-            addCriterion("count not between", value1, value2, "count");
+        public Criteria andEventIdNotBetween(Long value1, Long value2) {
+            addCriterion("event_id not between", value1, value2, "eventId");
             return (Criteria) this;
         }
 
-        public Criteria andRecordTimeIsNull() {
-            addCriterion("record_time is null");
+        public Criteria andOpinionUuidIsNull() {
+            addCriterion("opinion_uuid is null");
             return (Criteria) this;
         }
 
-        public Criteria andRecordTimeIsNotNull() {
-            addCriterion("record_time is not null");
+        public Criteria andOpinionUuidIsNotNull() {
+            addCriterion("opinion_uuid is not null");
             return (Criteria) this;
         }
 
-        public Criteria andRecordTimeEqualTo(Date value) {
-            addCriterionForJDBCDate("record_time =", value, "recordTime");
+        public Criteria andOpinionUuidEqualTo(String value) {
+            addCriterion("opinion_uuid =", value, "opinionUuid");
             return (Criteria) this;
         }
 
-        public Criteria andRecordTimeNotEqualTo(Date value) {
-            addCriterionForJDBCDate("record_time <>", value, "recordTime");
+        public Criteria andOpinionUuidNotEqualTo(String value) {
+            addCriterion("opinion_uuid <>", value, "opinionUuid");
             return (Criteria) this;
         }
 
-        public Criteria andRecordTimeGreaterThan(Date value) {
-            addCriterionForJDBCDate("record_time >", value, "recordTime");
+        public Criteria andOpinionUuidGreaterThan(String value) {
+            addCriterion("opinion_uuid >", value, "opinionUuid");
             return (Criteria) this;
         }
 
-        public Criteria andRecordTimeGreaterThanOrEqualTo(Date value) {
-            addCriterionForJDBCDate("record_time >=", value, "recordTime");
+        public Criteria andOpinionUuidGreaterThanOrEqualTo(String value) {
+            addCriterion("opinion_uuid >=", value, "opinionUuid");
             return (Criteria) this;
         }
 
-        public Criteria andRecordTimeLessThan(Date value) {
-            addCriterionForJDBCDate("record_time <", value, "recordTime");
+        public Criteria andOpinionUuidLessThan(String value) {
+            addCriterion("opinion_uuid <", value, "opinionUuid");
             return (Criteria) this;
         }
 
-        public Criteria andRecordTimeLessThanOrEqualTo(Date value) {
-            addCriterionForJDBCDate("record_time <=", value, "recordTime");
+        public Criteria andOpinionUuidLessThanOrEqualTo(String value) {
+            addCriterion("opinion_uuid <=", value, "opinionUuid");
             return (Criteria) this;
         }
 
-        public Criteria andRecordTimeIn(List<Date> values) {
-            addCriterionForJDBCDate("record_time in", values, "recordTime");
+        public Criteria andOpinionUuidLike(String value) {
+            addCriterion("opinion_uuid like", value, "opinionUuid");
             return (Criteria) this;
         }
 
-        public Criteria andRecordTimeNotIn(List<Date> values) {
-            addCriterionForJDBCDate("record_time not in", values, "recordTime");
+        public Criteria andOpinionUuidNotLike(String value) {
+            addCriterion("opinion_uuid not like", value, "opinionUuid");
             return (Criteria) this;
         }
 
-        public Criteria andRecordTimeBetween(Date value1, Date value2) {
-            addCriterionForJDBCDate("record_time between", value1, value2, "recordTime");
+        public Criteria andOpinionUuidIn(List<String> values) {
+            addCriterion("opinion_uuid in", values, "opinionUuid");
             return (Criteria) this;
         }
 
-        public Criteria andRecordTimeNotBetween(Date value1, Date value2) {
-            addCriterionForJDBCDate("record_time not between", value1, value2, "recordTime");
+        public Criteria andOpinionUuidNotIn(List<String> values) {
+            addCriterion("opinion_uuid not in", values, "opinionUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOpinionUuidBetween(String value1, String value2) {
+            addCriterion("opinion_uuid between", value1, value2, "opinionUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOpinionUuidNotBetween(String value1, String value2) {
+            addCriterion("opinion_uuid not between", value1, value2, "opinionUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andPickTimeIsNull() {
+            addCriterion("pick_time is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPickTimeIsNotNull() {
+            addCriterion("pick_time is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPickTimeEqualTo(Date value) {
+            addCriterion("pick_time =", value, "pickTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andPickTimeNotEqualTo(Date value) {
+            addCriterion("pick_time <>", value, "pickTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andPickTimeGreaterThan(Date value) {
+            addCriterion("pick_time >", value, "pickTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andPickTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("pick_time >=", value, "pickTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andPickTimeLessThan(Date value) {
+            addCriterion("pick_time <", value, "pickTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andPickTimeLessThanOrEqualTo(Date value) {
+            addCriterion("pick_time <=", value, "pickTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andPickTimeIn(List<Date> values) {
+            addCriterion("pick_time in", values, "pickTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andPickTimeNotIn(List<Date> values) {
+            addCriterion("pick_time not in", values, "pickTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andPickTimeBetween(Date value1, Date value2) {
+            addCriterion("pick_time between", value1, value2, "pickTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andPickTimeNotBetween(Date value1, Date value2) {
+            addCriterion("pick_time not between", value1, value2, "pickTime");
             return (Criteria) this;
         }
 

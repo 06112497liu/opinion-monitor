@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbd.dao.OpinionWarnCountStatisticExtDao">
+  <resultMap id="BaseResultMap" type="com.bbd.domain.OpinionWarnCountStatistic">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="total" jdbcType="INTEGER" property="total" />
+    <result column="state" jdbcType="TINYINT" property="state" />
+    <result column="level_one" jdbcType="INTEGER" property="levelOne" />
+    <result column="level_two" jdbcType="INTEGER" property="levelTwo" />
+    <result column="level_three" jdbcType="INTEGER" property="levelThree" />
+    <result column="record_time" jdbcType="DATE" property="recordTime" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+  </resultMap>
+  <select id="countWarnOpinionByTimeSpan" resultType="com.bbd.domain.OpinionWarnCountStatistic">
+
+  </select>
+</mapper>

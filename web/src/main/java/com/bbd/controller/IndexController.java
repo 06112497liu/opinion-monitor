@@ -15,9 +15,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -35,6 +37,12 @@ public class IndexController extends AbstractController {
     @Resource(name = "indexStatisticMockServiceImpl")
     private IndexStatisticService indexStatisticService;
 
+    @Resource(name = "indexStatisticDBServiceImpl")
+    private IndexStatisticService indexStatisticDBService;
+
+    @Resource(name = "indexStatisticEsServiceImpl")
+    private IndexStatisticService indexStatisticEsService;
+
     @Resource(name = "opinionMockServiceImpl")
     private OpinionService opinionService;
 
@@ -46,14 +54,13 @@ public class IndexController extends AbstractController {
 
     @ApiOperation(value = "预警舆情统计", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "状态：0. 全部; 1. 已处理; 2. 未处理", name = "status", dataType = "Integer", paramType = "query", required = true),
-            @ApiImplicitParam(value = "时间跨度：1. 本日；2. 本周； 3. 本月； 4. 本年； 5. 全部。", name = "timeSpan", dataType = "Integer", paramType = "query", required = true)
+            @ApiImplicitParam(value = "状态：0. 全部; 1. 已处理; 2. 未处理", name = "state", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "时间跨度：1. 本日；2. 本周； 3. 本月； 4. 本年； 5. 全部。", name = "timeSpan", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "/stat/opinion/count", method = RequestMethod.GET)
-    public RestResult getOpinionCountStatistic(OpinionCountStatQueryParam param) {
-        ValidateUtil.checkNull(param.getStatus(), CommonErrorCode.PARAM_ERROR, "status不能为空");
-        ValidateUtil.checkNull(param.getTimeSpan(), CommonErrorCode.PARAM_ERROR, "timeSpan不能为空");
-        return RestResult.ok(indexStatisticService.getOpinionCountStatistic(param));
+    public RestResult getOpinionCountStatistic(@RequestParam(value = "state", defaultValue = "0") Integer state,
+                                               @RequestParam(value = "timespan", defaultValue = "3") Integer timeSpan) {
+        return RestResult.ok(indexStatisticDBService.getOpinionCountStatistic(state, timeSpan));
     }
 
     @ApiOperation(value = "预警舆情统计坐标轴", httpMethod = "GET")
@@ -95,7 +102,7 @@ public class IndexController extends AbstractController {
     @ApiOperation(value = "舆情传播渠道分布", httpMethod = "GET")
     @RequestMapping(value = "/opinion/channel/trend", method = RequestMethod.GET)
     public RestResult getEventChannelTrend() {
-        return RestResult.ok(indexStatisticService.getEventChannelTrend());
+        return RestResult.ok(indexStatisticEsService.getEventChannelTrend());
     }
 
     @ApiOperation(value = "历史舆情事件类别分布", httpMethod = "GET")

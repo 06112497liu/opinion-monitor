@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 舆情接口服务
@@ -28,7 +29,7 @@ public interface OpinionService {
      * @param sourceType
      * @return
      */
-    PageList<OpinionVO> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb);
+    Map<String, Object> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb);
 
     /**
      * 舆情列表媒体类型分布

@@ -23,7 +23,7 @@ import java.util.Date;
 @Api(description = "预警舆情控制器")
 public class WarnOpinionController extends AbstractController {
 
-    @Resource(name = "opinionMockServiceImpl")
+    @Resource(name = "opinionEsServiceImpl")
     private OpinionService opinionService;
 
     @ApiOperation(value = "预警舆情信息列表", httpMethod = "GET")
@@ -35,7 +35,8 @@ public class WarnOpinionController extends AbstractController {
             @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "list", method = RequestMethod.GET)
-    public RestResult getWarnOpinionList(@RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan, Integer emotion, Integer sourceType) {
+    public RestResult getWarnOpinionList(@RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan,
+                                         @RequestParam(value = "emotion", defaultValue = "0") Integer emotion, Integer sourceType) {
         return RestResult.ok(opinionService.getWarnOpinionList(timeSpan, emotion, sourceType, getPageBounds()));
     }
 

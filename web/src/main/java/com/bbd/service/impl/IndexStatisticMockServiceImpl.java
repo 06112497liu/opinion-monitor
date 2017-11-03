@@ -6,10 +6,7 @@ package com.bbd.service.impl;
 
 import com.bbd.service.IndexStatisticService;
 import com.bbd.service.param.OpinionCountStatQueryParam;
-import com.bbd.service.vo.DBStaVO;
-import com.bbd.service.vo.KeyValueVO;
-import com.bbd.service.vo.OpinionCountStatVO;
-import com.bbd.service.vo.SystemStaVO;
+import com.bbd.service.vo.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.springframework.stereotype.Service;
@@ -26,7 +23,7 @@ import java.util.Map;
 public class IndexStatisticMockServiceImpl implements IndexStatisticService {
 
     @Override
-    public OpinionCountStatVO getOpinionCountStatistic(OpinionCountStatQueryParam param) {
+    public OpinionCountStatVO getOpinionCountStatistic(Integer state, Integer timeSpan) {
         OpinionCountStatVO r = new OpinionCountStatVO();
         r.setTotal(1000);
         r.setLevelOne(20);
@@ -82,10 +79,10 @@ public class IndexStatisticMockServiceImpl implements IndexStatisticService {
     }
 
     @Override
-    public List<KeyValueVO> getEventChannelTrend() {
-        List<KeyValueVO> list = Lists.newArrayList();
+    public List<KeyValuePercentVO> getEventChannelTrend() {
+        List<KeyValuePercentVO> list = Lists.newArrayList();
         for(int i=0; i<7; i++) {
-            KeyValueVO v = new KeyValueVO("微博", "111", "64.15");
+            KeyValuePercentVO v = new KeyValuePercentVO();
             list.add(v);
         }
         return list;

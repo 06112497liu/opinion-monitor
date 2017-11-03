@@ -2,12 +2,14 @@ package com.bbd.domain;
 
 import java.util.Date;
 
-public class OpinionIncreaseStatistic {
+public class OpinionEventTrend {
     private Long id;
 
-    private Integer count;
+    private Long eventId;
 
-    private Date recordTime;
+    private String opinionUuid;
+
+    private Date pickTime;
 
     private Date gmtCreate;
 
@@ -21,20 +23,28 @@ public class OpinionIncreaseStatistic {
         this.id = id;
     }
 
-    public Integer getCount() {
-        return count;
+    public Long getEventId() {
+        return eventId;
     }
 
-    public void setCount(Integer count) {
-        this.count = count;
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 
-    public Date getRecordTime() {
-        return recordTime;
+    public String getOpinionUuid() {
+        return opinionUuid;
     }
 
-    public void setRecordTime(Date recordTime) {
-        this.recordTime = recordTime;
+    public void setOpinionUuid(String opinionUuid) {
+        this.opinionUuid = opinionUuid;
+    }
+
+    public Date getPickTime() {
+        return pickTime;
+    }
+
+    public void setPickTime(Date pickTime) {
+        this.pickTime = pickTime;
     }
 
     public Date getGmtCreate() {

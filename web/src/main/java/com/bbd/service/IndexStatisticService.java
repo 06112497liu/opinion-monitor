@@ -5,10 +5,7 @@
 package com.bbd.service;
 
 import com.bbd.service.param.OpinionCountStatQueryParam;
-import com.bbd.service.vo.DBStaVO;
-import com.bbd.service.vo.KeyValueVO;
-import com.bbd.service.vo.OpinionCountStatVO;
-import com.bbd.service.vo.SystemStaVO;
+import com.bbd.service.vo.*;
 
 import java.util.List;
 import java.util.Map;
@@ -22,10 +19,11 @@ public interface IndexStatisticService {
 
     /**
      * 首页预警舆情数量统计
-     * @param param
+     * @param state
+     * @param timeSpan
      * @return
      */
-    OpinionCountStatVO getOpinionCountStatistic(OpinionCountStatQueryParam param);
+    OpinionCountStatVO getOpinionCountStatistic(Integer state, Integer timeSpan);
 
     /**
      * 预警舆情数量统计坐标轴
@@ -62,7 +60,7 @@ public interface IndexStatisticService {
      * 舆情传播渠道分布
      * @return
      */
-    List<KeyValueVO> getEventChannelTrend();
+    List<KeyValuePercentVO> getEventChannelTrend();
 
     /**
      * 舆情事件类别分布
