@@ -123,7 +123,7 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @param pb: 分页
      * @return
      */
-    public OpinionEsSearchVO queryWarningOpinion(DateTime startTime, Integer emotion, Integer sourceType, PageBounds pb) {
+    public OpinionEsSearchVO queryWarningOpinion(DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb) {
         OpinionEsSearchVO result = new OpinionEsSearchVO();
 
         List<OpinionEsVO> opList = Lists.newArrayList();
@@ -149,8 +149,8 @@ public class EsQueryServiceImpl implements EsQueryService {
         TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(mediaField);
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query).addAggregation(hotLevelAgg).addAggregation(mediaAgg);
 
-        if (sourceType != null) {
-            builder.setPostFilter(QueryBuilders.termQuery(mediaField, sourceType));
+        if (mediaType != null) {
+            builder.setPostFilter(QueryBuilders.termQuery(mediaField, mediaType));
         }
 
         SearchResponse resp = builder.execute().actionGet();
@@ -169,6 +169,58 @@ public class EsQueryServiceImpl implements EsQueryService {
         List<KeyValueVO> hotLevelList = buildHotLevelLists(resp, hotLevelAggName);
         List<KeyValueVO> mediaList = buildLongTermLists(resp, mediaAggName);
         result.setHotLevelStats(hotLevelList);
+        result.setMediaTypeStats(mediaList);
+
+        return result;
+    }
+
+    @Override
+    public OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb) {
+        OpinionEsSearchVO result = new OpinionEsSearchVO();
+
+        List<OpinionEsVO> opList = Lists.newArrayList();
+
+        String hotLevelAggName = "hot_level_agg";
+        String hotField = "hot";
+        String mediaAggName = "media_agg";
+        String mediaField = "mediaType";
+        String eventsField = "events";
+
+        String calcTimeField = "calcTime";
+        String emotionField = "emotion";
+
+        TransportClient client = EsUtil.getClient();
+
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.rangeQuery(calcTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(hotField).gte(60));
+        query.must(QueryBuilders.termQuery(eventsField, eventId));
+        if (emotion != null)
+            query.must(QueryBuilders.termQuery(emotionField, emotion));
+
+        RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(hotField).keyed(true).addRange("levelOne", 80, 101).addRange("levelTwo", 70, 80)
+            .addRange("levelThree", 60, 70);
+        TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(mediaField);
+        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query).addAggregation(hotLevelAgg).addAggregation(mediaAgg);
+
+        if (mediaType != null) {
+            builder.setPostFilter(QueryBuilders.termQuery(mediaField, mediaType));
+        }
+
+        SearchResponse resp = builder.execute().actionGet();
+
+        SearchHits hits = resp.getHits();
+        result.setTotal(hits.getTotalHits());
+
+        SearchHit[] items = hits.getHits();
+        for (SearchHit item : items) {
+            String source = item.getSourceAsString();
+            OpinionEsVO vo = JsonUtil.parseObject(source, OpinionEsVO.class);
+            opList.add(vo);
+        }
+        result.setOpinions(opList);
+
+        List<KeyValueVO> mediaList = buildLongTermLists(resp, mediaAggName);
         result.setMediaTypeStats(mediaList);
 
         return result;

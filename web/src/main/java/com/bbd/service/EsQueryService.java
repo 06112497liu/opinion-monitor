@@ -44,10 +44,22 @@ public interface EsQueryService {
      * 查询预警舆情
      * @param startTime: 开始时间
      * @param emotion: 情感
+     * @param mediaType: 媒体类型
      * @param pb: 分页
      * @return
      */
-    OpinionEsSearchVO queryWarningOpinion(DateTime startTime, Integer emotion, Integer sourceType, PageBounds pb);
+    OpinionEsSearchVO queryWarningOpinion(DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb);
+
+    /**
+     * 查询预警舆情
+     * @param eventId: 事件ID
+     * @param startTime: 开始时间
+     * @param emotion: 情感
+     * @param mediaType: 媒体类型
+     * @param pb: 分页
+     * @return
+     */
+    OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb);
 
     /**
      * 查询热点舆情（非预警）TOP100
