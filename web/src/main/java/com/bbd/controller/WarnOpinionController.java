@@ -40,18 +40,6 @@ public class WarnOpinionController extends AbstractController {
         return RestResult.ok(opinionService.getWarnOpinionList(timeSpan, emotion, sourceType, getPageBounds()));
     }
 
-    @ApiOperation(value = "舆情列表媒体类型分布", httpMethod = "GET")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "时间周期(1-24小时，2-7天，3-30天)", name = "timeSpan", dataType = "Integer", paramType = "query", required = false),
-            @ApiImplicitParam(value = "舆情类型(0-中性舆情，1-正面舆情，2-负面舆情)", name = "emotion", dataType = "Integer", paramType = "query", required = false),
-            @ApiImplicitParam(value = "舆情级别(1-预警舆情，2-热点舆情)", name = "rank", dataType = "Integer", paramType = "query", required = true)
-    })
-    @RequestMapping(value = "media/trend", method = RequestMethod.GET)
-    public RestResult getWarnOpinionMediaTrend(@RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan, Integer emotion, Integer rank) {
-        ValidateUtil.checkNull(rank, CommonErrorCode.PARAM_ERROR, "rank不能为空");
-        return RestResult.ok(opinionService.getWarnOpinionMediaTrend(timeSpan, emotion, rank));
-    }
-
     @ApiOperation(value = "历史预警舆情列表", httpMethod = "GET")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "预警时间起", name = "startTime", dataType = "Date", paramType = "query", required = false),

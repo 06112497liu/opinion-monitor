@@ -32,14 +32,6 @@ public interface OpinionService {
     Map<String, Object> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb);
 
     /**
-     * 舆情列表媒体类型分布
-     * @param timeSpan
-     * @param emotion
-     * @returnkeywordnde
-     */
-    List<KeyValueVO> getWarnOpinionMediaTrend(Integer timeSpan, Integer emotion, Integer rank);
-
-    /**
      * 热点舆情top100
      * @param keyword
      * @return

@@ -1,4 +1,6 @@
 // 舆情索引
+DELETE bbd_opinion_mock_a
+
 PUT bbd_opinion_mock_a
 {
   "settings": {
@@ -77,7 +79,7 @@ PUT /bbd_opinion_mock_a/opinion/1
 {
 	"uuid": 1,
 	"title": "第十九次全国人民代表大会",
-	"abstract": "中共中央第十九次全国人民代表大会在北京顺利举行",
+	"summary": "中共中央第十九次全国人民代表大会在北京顺利举行",
 	"content": "2017年10月18日上午9:00，中国共产党第十九次全国代表大会在人民大会堂开幕。习近平代表第十八届中央委员会向大会作了题为《决胜全面建成小康社会 夺取新时代中国特色社会主义伟大胜利》的报告。这次大会的主题是：不忘初心，牢记使命，高举中国特色社会主义伟大旗帜，决胜全面建成小康社会，夺取新时代中国特色社会主义伟大胜利，为实现中华民族伟大复兴的中国梦不懈奋斗。党的十九大，是在全面建成小康社会决胜阶段、中国特色社会主义发展关键时期召开的一次十分重要的大会。承担着谋划决胜全面建成小康社会、深入推进社会主义现代化建设的重大任务，事关党和国家事业继往开来，事关中国特色社会主义前途命运，事关最广大人民根本利益。2017年10月24日，中国共产党第十九次全国代表大会在选举产生新一届中央委员会和中央纪律检查委员会，通过关于十八届中央委员会报告的决议、关于十八届中央纪律检查委员会工作报告的决议、关于《中国共产党章程（修正案）》的决议后，在人民大会堂胜利闭幕.",
 	"source": "贵阳网",
 	"link": "https://baike.baidu.com/item/%E4%B8%AD%E5%9B%BD%E5%85%B1%E4%BA%A7%E5%85%9A%E7%AC%AC%E5%8D%81%E4%B9%9D%E6%AC%A1%E5%85%A8%E5%9B%BD%E4%BB%A3%E8%A1%A8%E5%A4%A7%E4%BC%9A/1629417?fr=aladdin&fromid=22165012&fromtitle=%E5%8D%81%E4%B9%9D%E5%A4%A7",
@@ -100,7 +102,7 @@ PUT /bbd_opinion_mock_a/opinion/2
 {
 	"uuid": 2,
 	"title": "六旬老人帮邻居救火负伤 出院后谢绝万元医药费",
-	"abstract": "商丘六旬老人帮邻居救火负伤 谢绝万元医药费",	"content":"段哥真是个大好人！”10月30日上午，家住商丘市工贸路市委家属院的王坤对记者说，月初他家失火，危急时刻65岁的邻居段绪锋奋不顾身帮其救火，救援中，段绪锋左胳膊被炸伤。住院10多天出院后，段绪锋将王坤偷偷在医院垫付的一万元押金退了回来。",
+	"summary": "商丘六旬老人帮邻居救火负伤 谢绝万元医药费",	"content":"段哥真是个大好人！”10月30日上午，家住商丘市工贸路市委家属院的王坤对记者说，月初他家失火，危急时刻65岁的邻居段绪锋奋不顾身帮其救火，救援中，段绪锋左胳膊被炸伤。住院10多天出院后，段绪锋将王坤偷偷在医院垫付的一万元押金退了回来。",
 	"source": "新浪网",
 	"link": "http://news.ifeng.com/a/20171031/52869864_0.shtml?_zbs_baidu_news",
 	"mediaType": 1,
@@ -120,7 +122,7 @@ PUT /bbd_opinion_mock_a/opinion/3
 {
 	"uuid": 3,
 	"title": "习近平同中央政治局常委集体瞻仰中共一大会址",
-	"abstract": "习近平同中央政治局常委集体瞻仰中共一大会址",	"content":"党的十九大闭幕仅一周，31日上午，习近平和李克强、栗战书、汪洋、王沪宁、赵乐际、韩正，从北京乘专机来到上海，到兴业路76号集体瞻仰中共一大会址。",
+	"summary": "习近平同中央政治局常委集体瞻仰中共一大会址",	"content":"党的十九大闭幕仅一周，31日上午，习近平和李克强、栗战书、汪洋、王沪宁、赵乐际、韩正，从北京乘专机来到上海，到兴业路76号集体瞻仰中共一大会址。",
 	"source": "新浪网",
 	"link": "http://news.sina.com.cn/gov/2017-10-31/doc-ifynhhay9783967.shtml",
 	"mediaType": 5,
@@ -134,4 +136,124 @@ PUT /bbd_opinion_mock_a/opinion/3
 	"commentCount": 3000,
 	"calcTime": "2017-10-31 08:00:00",
 	"events": [6,8]
+}
+
+PUT /bbd_opinion_mock_a/opinion/4
+{
+	"uuid": 4,
+	"title": "习近平同中央政治局常委集体瞻仰中共一大会址",
+	"summary": "习近平同中央政治局常委集体瞻仰中共一大会址",	"content":"党的十九大闭幕仅一周，31日上午，习近平和李克强、栗战书、汪洋、王沪宁、赵乐际、韩正，从北京乘专机来到上海，到兴业路76号集体瞻仰中共一大会址。",
+	"source": "新浪网",
+	"link": "http://news.sina.com.cn/gov/2017-10-31/doc-ifynhhay9783967.shtml",
+	"mediaType": 7,
+	"website": "其他",
+	"publicTime": "2017-10-31",
+	"hot": 61,
+	"emotion": 1,
+	"keyword": ["常委", "共产党"],
+	"keys": ["政治", "医院"],
+	"similiarCount": 10000,
+	"commentCount": 3000,
+	"calcTime": "2017-10-31 08:00:00",
+	"events": [6,8]
+}
+
+PUT /bbd_opinion_mock_a/opinion/5
+{
+	"uuid": 5,
+	"title": "习近平同中央政治局常委集体瞻仰中共一大会址",
+	"summary": "习近平同中央政治局常委集体瞻仰中共一大会址",	"content":"党的十九大闭幕仅一周，31日上午，习近平和李克强、栗战书、汪洋、王沪宁、赵乐际、韩正，从北京乘专机来到上海，到兴业路76号集体瞻仰中共一大会址。",
+	"source": "新浪网",
+	"link": "http://news.sina.com.cn/gov/2017-10-31/doc-ifynhhay9783967.shtml",
+	"mediaType": 2,
+	"website": "新浪网",
+	"publicTime": "2017-10-31",
+	"hot": 34,
+	"emotion": 2,
+	"keyword": ["常委", "共产党"],
+	"keys": ["政治", "医院"],
+	"similiarCount": 10000,
+	"commentCount": 3000,
+	"calcTime": "2017-10-31 08:00:00",
+	"events": [6,8]
+}
+
+PUT /bbd_opinion_mock_a/opinion/6
+{
+	"uuid": 6,
+	"title": "习近平同中央政治局常委集体瞻仰中共一大会址",
+	"summary": "习近平同中央政治局常委集体瞻仰中共一大会址",	"content":"党的十九大闭幕仅一周，31日上午，习近平和李克强、栗战书、汪洋、王沪宁、赵乐际、韩正，从北京乘专机来到上海，到兴业路76号集体瞻仰中共一大会址。",
+	"source": "微信",
+	"link": "http://news.sina.com.cn/gov/2017-10-31/doc-ifynhhay9783967.shtml",
+	"mediaType": 3,
+	"website": "微信",
+	"publicTime": "2017-04-31",
+	"hot": 30,
+	"emotion": 1,
+	"keyword": ["常委", "共产党"],
+	"keys": ["政治", "医院"],
+	"similiarCount": 10000,
+	"commentCount": 3000,
+	"calcTime": "2017-04-31 08:00:00",
+	"events": [6,8]
+}
+
+PUT /bbd_opinion_mock_a/opinion/6
+{
+	"uuid": 6,
+	"title": "江苏省食药监管局你，这些饮料、罐头、食用油不合格｜抽检",
+	"summary": "根据《中华人民共和国食品安全法》、《食品安全抽样检验管理办法》等规定，现将江苏省食药监管局近期执行国家食药总局食品安全监督抽检相关信息公告。",
+	"source": "微信",
+	"link": "https://www.toutiao.com/a6483796637192815118/",
+	"mediaType": 3,
+	"website": "微信",
+	"publicTime": "2017-10-31",
+	"hot": 99,
+	"emotion": 1,
+	"keyword": ["常委", "共产党"],
+	"keys": ["政治", "医院"],
+	"similiarCount": 54545,
+	"commentCount": 30154500,
+	"calcTime": "2017-10-11 08:00:00",
+	"events": [3,5]
+}
+
+PUT /bbd_opinion_mock_a/opinion/8
+{
+	"uuid": 8,
+	"title": "中共中央关于认真学习宣传贯彻党的十九大精神的决定",
+	"summary": "为深入学习宣传贯彻党的十九大精神，把全党全国各族人民的思想统一到党的十九大精神上来，把力量凝聚到党的十九大确定的各项任务上来，作出如下决定。",
+	"source": "新华社",
+	"link": "http://news.cnr.cn/native/gd/20171103/t20171103_524010705.shtml",
+	"mediaType": 1,
+	"website": "新华社",
+	"publicTime": "2017-11-01",
+	"hot": 77,
+	"emotion": 0,
+	"keyword": ["常委", "共产党"],
+	"keys": ["政治", "医院"],
+	"similiarCount": 7542754,
+	"commentCount": 24,
+	"calcTime": "2017-11-01 08:00:00",
+	"events": [2,8,9]
+}
+
+PUT /bbd_opinion_mock_a/opinion/9
+{
+	"uuid": 9,
+	"title": "李克强主持召开国务院常务会议",
+	"summary": "央广网北京10月31日消息 据中国之声《新闻和报纸摘要》报道，国务院总理李克强10月30日主持召开国务院常务会议，通过《深化“互联网+先进制造业”发展工业互联网的指导意见》，促进实体经济振兴、加快转型升级；通过《国务院关于废止〈中华人民共和国营业税暂行条例〉和修改〈中华人民共和国增值税暂行条例〉的决定（草案）》，推动营改增改革成果法治化。",
+	"source": "央广网",
+	"link": "http://china.cnr.cn/news/20171031/t20171031_524006165.shtml",
+	"mediaType": 5,
+	"website": "央广网",
+	"publicTime": "2017-08-31",
+	"hot": 59,
+	"emotion": 0,
+	"keyword": ["常委", "共产党"],
+	"keys": ["政治", "医院"],
+	"similiarCount": 2654,
+	"commentCount": 142,
+	"calcTime": "2017-08-31 08:00:00",
+	"events": [4,8]
 }
