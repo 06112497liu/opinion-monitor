@@ -32,14 +32,6 @@ public class OpinionEsServiceImpl implements OpinionService {
     @Autowired
     private SystemSettingService systemSettingService;
 
-    private final String hotLevelAggName = "hot_level_agg";
-    private final String hotField = "hot";
-    private final String mediaAggName = "media_agg";
-    private final String mediaField = "mediaType";
-
-    private final String calcTimeField = "calcTime";
-    private final String emotionField = "emotion";
-
     @Override
     public List<WarnOpinionTopTenVO> getWarnOpinionTopTen() {
         return null;
@@ -68,11 +60,6 @@ public class OpinionEsServiceImpl implements OpinionService {
         map.put("level", esResult.getHotLevelStats());
 
         return map;
-    }
-
-    @Override
-    public List<KeyValueVO> getWarnOpinionMediaTrend(Integer timeSpan, Integer emotion, Integer rank) {
-        return null;
     }
 
     @Override

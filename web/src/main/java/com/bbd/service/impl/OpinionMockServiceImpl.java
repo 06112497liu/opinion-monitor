@@ -52,16 +52,6 @@ public class OpinionMockServiceImpl implements OpinionService {
     }
 
     @Override
-    public List<KeyValueVO> getWarnOpinionMediaTrend(Integer timeSpan, Integer emotion, Integer rank) {
-        List<KeyValueVO> list = Lists.newLinkedList();
-        for(int i=0; i<7; i++) {
-            KeyValueVO v = new KeyValueVO(i+1, "微博", 26);
-            list.add(v);
-        }
-        return list;
-    }
-
-    @Override
     public PageList<OpinionVO> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb) {
         List<OpinionVO> list = Lists.newArrayList();
         for(int i=0; i<200; i++) {
