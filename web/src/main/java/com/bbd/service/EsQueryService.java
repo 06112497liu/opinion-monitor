@@ -47,7 +47,7 @@ public interface EsQueryService {
      * @param pb: 分页
      * @return
      */
-    OpinionEsSearchVO queryWarningOpinion(DateTime startTime, Integer emotion, PageBounds pb);
+    OpinionEsSearchVO queryWarningOpinion(DateTime startTime, Integer emotion, Integer sourceType, PageBounds pb);
 
     /**
      * 查询热点舆情（非预警）TOP100

@@ -60,7 +60,7 @@ public class IndexController extends AbstractController {
     @RequestMapping(value = "/stat/opinion/count", method = RequestMethod.GET)
     public RestResult getOpinionCountStatistic(@RequestParam(value = "state", defaultValue = "0") Integer state,
                                                @RequestParam(value = "timespan", defaultValue = "3") Integer timeSpan) {
-        return RestResult.ok(indexStatisticDBService.getOpinionCountStatistic(state, timeSpan));
+        return RestResult.ok(indexStatisticEsService.getOpinionCountStatistic(state, timeSpan));
     }
 
     @ApiOperation(value = "预警舆情统计坐标轴", httpMethod = "GET")
@@ -96,7 +96,7 @@ public class IndexController extends AbstractController {
     @ApiOperation(value = "本月关键词top10", httpMethod = "GET")
     @RequestMapping(value = "/keywords/top10", method = RequestMethod.GET)
     public RestResult getKeywordsTopTen() {
-        return RestResult.ok(indexStatisticService.getKeywordsTopTen());
+        return RestResult.ok(indexStatisticEsService.getKeywordsTopTen());
     }
 
     @ApiOperation(value = "舆情传播渠道分布", httpMethod = "GET")

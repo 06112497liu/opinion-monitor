@@ -50,12 +50,12 @@ public class OpinionEsServiceImpl implements OpinionService {
         // step-1：组装条件
         DateTime now = DateTime.now();
         DateTime startTime = null;
-//        if(2 == timeSpan) startTime = now.plusDays(-7);
-//        else if(3 == timeSpan) startTime = now.plusMonths(-1);
-//        else startTime = now.plusHours(-24);
+        if(2 == timeSpan) startTime = now.plusDays(-7);
+        else if(3 == timeSpan) startTime = now.plusMonths(-1);
+        else startTime = now.plusHours(-24);
 
         // step-2：查询es，并构建结果
-        OpinionEsSearchVO esResult = esQueryService.queryWarningOpinion(startTime, emotion, pb);
+        OpinionEsSearchVO esResult = esQueryService.queryWarningOpinion(startTime, emotion, sourceType, pb);
         List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
         opinions.forEach(o -> {
             o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));

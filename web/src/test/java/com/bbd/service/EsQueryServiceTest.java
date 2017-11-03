@@ -49,7 +49,7 @@ public class EsQueryServiceTest extends BaseServiceTest {
 
         Integer emotion = null;
         PageBounds pb = new PageBounds(1, 10);
-        OpinionEsSearchVO r = esQueryService.queryWarningOpinion(dateTime, emotion, pb);
+        OpinionEsSearchVO r = esQueryService.queryWarningOpinion(dateTime, emotion, 2, pb);
         assertNotNull(r);
     }
 

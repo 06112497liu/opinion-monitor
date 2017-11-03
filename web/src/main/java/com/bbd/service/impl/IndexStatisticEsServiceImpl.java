@@ -11,9 +11,11 @@ import com.bbd.service.param.OpinionCountStatQueryParam;
 import com.bbd.service.utils.PercentUtil;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +32,15 @@ public class IndexStatisticEsServiceImpl implements IndexStatisticService {
 
     @Override
     public OpinionCountStatVO getOpinionCountStatistic(Integer state, Integer timeSpan) {
-        return null;
+        // step-1：组装条件
+        DateTime now = DateTime.now();
+        DateTime startTime = null;
+        if(timeSpan == 2) startTime = now.plusDays(-7);
+        else if(timeSpan == 3) startTime = now.plusMonths(-1);
+        else startTime = now.plusDays(-1);
+        // step-2：执行查询
+        OpinionCountStatVO result = esQueryService.getOpinionCountStatistic(startTime);
+        return result;
     }
 
     @Override
@@ -55,7 +65,12 @@ public class IndexStatisticEsServiceImpl implements IndexStatisticService {
 
     @Override
     public List<KeyValueVO> getKeywordsTopTen() {
-        return null;
+        List<KeyValueVO> list = esQueryService.getKeywordsTopTen();
+        list.sort((k1, k2) -> {
+            int a = ((Long)(k1.getValue())).intValue(); int b = ((Long)(k2.getValue())).intValue();
+            return Integer.compare(b, a);
+        });
+        return list;
     }
 
     @Override
