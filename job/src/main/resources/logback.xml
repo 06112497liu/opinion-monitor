@@ -5,14 +5,14 @@
     <!-- 控制台日志 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%date{yyyy‐MM‐dd HH:mm:ss}||%thread||%level||%logger:%line||%msg %ex||%n</pattern>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss}||%thread||%level||%logger:%line||%msg %ex||%n</pattern>
         </encoder>
     </appender>
 
     <!-- 文件日志 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder>
-            <pattern>%date{yyyy‐MM‐dd HH:mm:ss}||%thread||%level||%logger:%line||%msg %ex||%n</pattern>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss}||%thread||%level||%logger:%line||%msg %ex||%n</pattern>
         </encoder>
         <file>${LOG_HOME}/opinion-job.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
