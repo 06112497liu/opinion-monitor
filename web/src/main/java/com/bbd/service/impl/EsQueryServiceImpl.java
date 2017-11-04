@@ -16,6 +16,7 @@ import com.bbd.util.JsonUtil;
 import com.bbd.util.StringUtils;
 import com.google.common.collect.Lists;
 import com.mybatis.domain.PageBounds;
+import io.swagger.models.auth.In;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -63,6 +64,11 @@ public class EsQueryServiceImpl implements EsQueryService {
     private final String titleField = "title";
     private final String contentField = "content";
     private final String websiteField = "website";
+
+    private Integer oneClass;
+    private Integer twoClass;
+    private Integer threeClass;
+
     /**
      * 获取预警舆情top10（排除在舆情任务中的预警舆情，以及热点舆情）
      * @return
@@ -71,11 +77,12 @@ public class EsQueryServiceImpl implements EsQueryService {
     public List<OpinionEsVO> getWarnOpinionTopTen() {
         // step-1：获取预警热度分界
         Map<Integer, Integer> map = settingService.getWarnClass();
-        Integer levelThree = map.get(3);
+        Integer threeClass = map.get(3);
+
         // 构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.rangeQuery(hotField).gte(levelThree));
+        query.must(QueryBuilders.rangeQuery(hotField).gte(threeClass));
         query.must(QueryBuilders.rangeQuery(publicTimeField).gte(levelThree));
         return null;
     }
@@ -88,16 +95,23 @@ public class EsQueryServiceImpl implements EsQueryService {
     public OpinionCountStatVO getOpinionCountStatistic(DateTime startTime) {
         String aggName = "level_count";
 
-        OpinionCountStatVO vo = new OpinionCountStatVO();
+        // step-1：获取预警热度分界
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3); Integer twoClss = map.get(2); Integer oneClass = map.get(1);
+
+        // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
                 .setQuery(QueryBuilders.rangeQuery(EsConstant.CALC_TIME_PROP).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)))
-                .addAggregation(AggregationBuilders.range(aggName).field(hotField).keyed(true).addRange(levelThree, 60, 70).addRange(levelTwo, 70, 80).addRange(levelOne, 80, Integer.MAX_VALUE))
+                .addAggregation(AggregationBuilders.range(aggName).field(hotField).keyed(true)
+                        .addRange(levelThree, threeClass, twoClss-1).addRange(levelTwo, twoClss, oneClass-1).addRange(levelOne, oneClass, Integer.MAX_VALUE))
                 .setSize(0).execute().actionGet();
 
+        // step-3：查询并构建结果
         InternalRange agg = resp.getAggregations().get(aggName);
         List<InternalRange.Bucket> bs = agg.getBuckets();
         int total = 0;
+        OpinionCountStatVO vo = new OpinionCountStatVO();
         for (InternalRange.Bucket b : bs) {
             int count = Long.valueOf(b.getDocCount()).intValue();
             switch (b.getKey()) {
@@ -156,18 +170,20 @@ public class EsQueryServiceImpl implements EsQueryService {
         String hotLevelAggName = "hot_level_agg";
         String mediaAggName = "media_agg";
 
-        OpinionEsSearchVO result = new OpinionEsSearchVO();
-        List<OpinionEsVO> opList = Lists.newArrayList();
+        // step-1：获取预警热度分界
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3); Integer twoClss = map.get(2); Integer oneClass = map.get(1);
 
+        // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(publicTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
-        query.must(QueryBuilders.rangeQuery(hotField).gte(60));
+        query.must(QueryBuilders.rangeQuery(hotField).gte(threeClass));
         if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
         if (mediaType != null) query.must(QueryBuilders.termQuery(mediaTypeField, mediaType));
 
         RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(hotField).keyed(true)
-                .addRange("levelOne", 80, 101).addRange("levelTwo", 70, 80).addRange("levelThree", 60, 70);
+                .addRange("levelOne", oneClass, Integer.MAX_VALUE).addRange("levelTwo", twoClss, oneClass-1).addRange("levelThree", threeClass, twoClss-1);
         TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(mediaTypeField);
 
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
@@ -177,6 +193,9 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .addAggregation(mediaAgg);
         if (mediaType != null) builder.setPostFilter(QueryBuilders.termQuery(mediaTypeField, mediaType));
 
+        //step-3：查询并返回结果
+        OpinionEsSearchVO result = new OpinionEsSearchVO();
+        List<OpinionEsVO> opList = Lists.newArrayList();
         SearchResponse resp = builder.execute().actionGet();
         SearchHits hits = resp.getHits();
         result.setTotal(hits.getTotalHits());
@@ -201,19 +220,21 @@ public class EsQueryServiceImpl implements EsQueryService {
         String hotLevelAggName = "hot_level_agg";
         String mediaAggName = "media_agg";
 
-        OpinionEsSearchVO result = new OpinionEsSearchVO();
-        List<OpinionEsVO> opList = Lists.newArrayList();
+        // step-1：获取预警热度分界
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3); Integer twoClss = map.get(2); Integer oneClass = map.get(1);
 
+        // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(calcTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
-        query.must(QueryBuilders.rangeQuery(hotField).gte(60));
+        query.must(QueryBuilders.rangeQuery(hotField).gte(threeClass));
         query.must(QueryBuilders.termQuery(eventsField, eventId));
         if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
         if (mediaType != null) query.must(QueryBuilders.termQuery(mediaTypeField, mediaType));
 
         RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(hotField).keyed(true)
-                .addRange("levelOne", 80, 101).addRange("levelTwo", 70, 80).addRange("levelThree", 60, 70);
+                .addRange("levelOne", oneClass, Integer.MAX_VALUE).addRange("levelTwo", twoClss, oneClass-1).addRange("levelThree", threeClass, twoClss-1);
         TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(mediaTypeField);
 
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
@@ -223,6 +244,9 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .addAggregation(mediaAgg);
         if (mediaType != null) builder.setPostFilter(QueryBuilders.termQuery(mediaTypeField, mediaType));
 
+        // step-3：查询并返回结果
+        OpinionEsSearchVO result = new OpinionEsSearchVO();
+        List<OpinionEsVO> opList = Lists.newArrayList();
         SearchResponse resp = builder.execute().actionGet();
         SearchHits hits = resp.getHits();
         result.setTotal(hits.getTotalHits());
@@ -248,20 +272,26 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     public OpinionEsSearchVO queryTop100HotOpinion(String param, DateTime startTime, Integer emotion) {
-        OpinionEsSearchVO result = new OpinionEsSearchVO();
-        List<OpinionEsVO> opList = Lists.newArrayList();
 
+        // step-1：获取预警热度分界
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3);
+
+        // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         if (StringUtils.isNotBlank(param)) query.must(QueryBuilders.multiMatchQuery(param, titleField, contentField));
         query.must(QueryBuilders.rangeQuery(publicTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
-        query.must(QueryBuilders.rangeQuery(hotField).lt(60));
+        query.must(QueryBuilders.rangeQuery(hotField).lt(threeClass));
         if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
 
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setSize(100)
                 .setQuery(query).addSort(SortBuilders.fieldSort(hotField).order(SortOrder.DESC))
                 .execute().actionGet();
 
+        // step-3：查询并返回结果
+        OpinionEsSearchVO result = new OpinionEsSearchVO();
+        List<OpinionEsVO> opList = Lists.newArrayList();
         SearchHits hits = resp.getHits();
         result.setTotal(hits.getTotalHits());
         SearchHit[] items = hits.getHits();
