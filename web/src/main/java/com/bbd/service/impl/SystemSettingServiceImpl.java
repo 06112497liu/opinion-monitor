@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 预警配置服务接口
@@ -192,6 +193,15 @@ public class SystemSettingServiceImpl implements SystemSettingService {
             if(isContain) return s.getLevel();
         }
         return -1;
+    }
+
+    @Override
+    public Map<Integer, Integer> getWarnClass() {
+        WarnSettingExample example = new WarnSettingExample();
+        example.createCriteria().andTypeEqualTo(3);
+        List<WarnSetting> list = settingDao.selectByExample(example);
+        Map<Integer, Integer> map = list.stream().collect(Collectors.toMap(WarnSetting::getLevel, WarnSetting::getMin));
+        return map;
     }
 
     // 校验阈值是否符合规则

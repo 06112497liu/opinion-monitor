@@ -86,6 +86,12 @@ public interface SystemSettingService {
      * @return
      */
     Integer judgeOpinionSettingClass(Integer hot);
+
+    /**
+     * 获取预警等级
+     * @return
+     */
+    Map<Integer, Integer> getWarnClass();
 }
     
     

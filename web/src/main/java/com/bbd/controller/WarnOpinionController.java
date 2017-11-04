@@ -3,7 +3,9 @@ package com.bbd.controller;
 import com.bbd.RestResult;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionService;
+import com.bbd.service.vo.OpinionVO;
 import com.bbd.util.ValidateUtil;
+import com.mybatis.domain.PageList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 预警舆情控制器
@@ -23,7 +26,7 @@ import java.util.Date;
 @Api(description = "预警舆情控制器")
 public class WarnOpinionController extends AbstractController {
 
-    @Resource(name = "opinionEsServiceImpl")
+    @Resource
     private OpinionService opinionService;
 
     @ApiOperation(value = "预警舆情信息列表", httpMethod = "GET")
@@ -37,7 +40,8 @@ public class WarnOpinionController extends AbstractController {
     @RequestMapping(value = "list", method = RequestMethod.GET)
     public RestResult getWarnOpinionList(@RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan,
                                          @RequestParam(value = "emotion", defaultValue = "0") Integer emotion, Integer sourceType) {
-        return RestResult.ok(opinionService.getWarnOpinionList(timeSpan, emotion, sourceType, getPageBounds()));
+        Map<String, Object> result = opinionService.getWarnOpinionList(timeSpan, emotion, sourceType, getPageBounds());
+        return RestResult.ok(result);
     }
 
     @ApiOperation(value = "历史预警舆情列表", httpMethod = "GET")
@@ -51,7 +55,8 @@ public class WarnOpinionController extends AbstractController {
     })
     @RequestMapping(value = "history/list", method = RequestMethod.GET)
     public RestResult getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType) {
-        return RestResult.ok(opinionService.getHistoryWarnOpinionList(startTime, endTime, emotion, sourceType, getPageBounds()));
+        PageList<OpinionVO> result = opinionService.getHistoryWarnOpinionList(startTime, endTime, emotion, sourceType, getPageBounds());
+        return RestResult.ok(result);
     }
 
     @ApiOperation(value = "预警舆情详情", httpMethod = "GET")

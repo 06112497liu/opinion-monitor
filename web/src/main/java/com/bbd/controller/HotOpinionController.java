@@ -23,7 +23,7 @@ import javax.annotation.Resource;
 @Api(description = "热点舆情控制器")
 public class HotOpinionController extends AbstractController {
 
-    @Resource(name = "opinionEsServiceImpl")
+    @Resource
     private OpinionService opinionService;
 
     @ApiOperation(value = "热点舆情列表查询", httpMethod = "GET")

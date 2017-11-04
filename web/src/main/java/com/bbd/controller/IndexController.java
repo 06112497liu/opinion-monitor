@@ -34,16 +34,10 @@ import javax.annotation.Resource;
 @Api(description = "统计页面")
 public class IndexController extends AbstractController {
 
-    @Resource(name = "indexStatisticMockServiceImpl")
+    @Resource
     private IndexStatisticService indexStatisticService;
 
-    @Resource(name = "indexStatisticDBServiceImpl")
-    private IndexStatisticService indexStatisticDBService;
-
-    @Resource(name = "indexStatisticEsServiceImpl")
-    private IndexStatisticService indexStatisticEsService;
-
-    @Resource(name = "opinionMockServiceImpl")
+    @Resource
     private OpinionService opinionService;
 
     @ApiOperation(value = "系统运行情况统计", httpMethod = "GET")
@@ -60,7 +54,7 @@ public class IndexController extends AbstractController {
     @RequestMapping(value = "/stat/opinion/count", method = RequestMethod.GET)
     public RestResult getOpinionCountStatistic(@RequestParam(value = "state", defaultValue = "0") Integer state,
                                                @RequestParam(value = "timespan", defaultValue = "3") Integer timeSpan) {
-        return RestResult.ok(indexStatisticEsService.getOpinionCountStatistic(state, timeSpan));
+        return RestResult.ok(indexStatisticService.getOpinionCountStatistic(state, timeSpan));
     }
 
     @ApiOperation(value = "预警舆情统计坐标轴", httpMethod = "GET")
@@ -96,13 +90,13 @@ public class IndexController extends AbstractController {
     @ApiOperation(value = "本月关键词top10", httpMethod = "GET")
     @RequestMapping(value = "/keywords/top10", method = RequestMethod.GET)
     public RestResult getKeywordsTopTen() {
-        return RestResult.ok(indexStatisticEsService.getKeywordsTopTen());
+        return RestResult.ok(indexStatisticService.getKeywordsTopTen());
     }
 
     @ApiOperation(value = "舆情传播渠道分布", httpMethod = "GET")
     @RequestMapping(value = "/opinion/channel/trend", method = RequestMethod.GET)
     public RestResult getEventChannelTrend() {
-        return RestResult.ok(indexStatisticEsService.getEventChannelTrend());
+        return RestResult.ok(indexStatisticService.getEventChannelTrend());
     }
 
     @ApiOperation(value = "历史舆情事件类别分布", httpMethod = "GET")

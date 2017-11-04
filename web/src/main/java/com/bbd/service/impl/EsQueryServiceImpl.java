@@ -6,6 +6,7 @@ package com.bbd.service.impl;
 
 import com.bbd.constant.EsConstant;
 import com.bbd.service.EsQueryService;
+import com.bbd.service.SystemSettingService;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionCountStatVO;
 import com.bbd.service.vo.OpinionEsSearchVO;
@@ -32,9 +33,11 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilde
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * ES查询服务
@@ -44,31 +47,59 @@ import java.util.List;
 @Service
 public class EsQueryServiceImpl implements EsQueryService {
 
+    @Autowired
+    private SystemSettingService settingService;
+
+    private final String hotField = "hot";
+    private final String levelThree = "levelThree";
+    private final String levelTwo = "levelTwo";
+    private final String levelOne = "levelOne";
+    private final String mediaTypeField = "mediaType";
+    private final String publicTimeField = "publicTime";
+    private final String emotionField = "emotion";
+    private final String keysField = "keys";
+    private final String eventsField = "events";
+    private final String calcTimeField = "calcTime";
+    private final String titleField = "title";
+    private final String contentField = "content";
+    private final String websiteField = "website";
+    /**
+     * 获取预警舆情top10（排除在舆情任务中的预警舆情，以及热点舆情）
+     * @return
+     */
+    @Override
+    public List<OpinionEsVO> getWarnOpinionTopTen() {
+        // step-1：获取预警热度分界
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer levelThree = map.get(3);
+        // 构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.rangeQuery(hotField).gte(levelThree));
+        query.must(QueryBuilders.rangeQuery(publicTimeField).gte(levelThree));
+        return null;
+    }
+
     /**
      * 获取舆情数量 - 首页
      * @param startTime
      * @return
      */
     public OpinionCountStatVO getOpinionCountStatistic(DateTime startTime) {
-        OpinionCountStatVO vo = new OpinionCountStatVO();
-
         String aggName = "level_count";
-        String field = "hot";
-        final String levelThree = "levelThree";
-        final String levelTwo = "levelTwo";
-        final String levelOne = "levelOne";
 
+        OpinionCountStatVO vo = new OpinionCountStatVO();
         TransportClient client = EsUtil.getClient();
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(QueryBuilders.rangeQuery(EsConstant.CALC_TIME_PROP).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)))
-            .addAggregation(AggregationBuilders.range(aggName).field(field).keyed(true).addRange(levelThree, 60, 70).addRange(levelTwo, 70, 80).addRange(levelOne, 80, Integer.MAX_VALUE)).setSize(0)
-            .execute().actionGet();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setQuery(QueryBuilders.rangeQuery(EsConstant.CALC_TIME_PROP).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)))
+                .addAggregation(AggregationBuilders.range(aggName).field(hotField).keyed(true).addRange(levelThree, 60, 70).addRange(levelTwo, 70, 80).addRange(levelOne, 80, Integer.MAX_VALUE))
+                .setSize(0).execute().actionGet();
 
         InternalRange agg = resp.getAggregations().get(aggName);
         List<InternalRange.Bucket> bs = agg.getBuckets();
         int total = 0;
         for (InternalRange.Bucket b : bs) {
             int count = Long.valueOf(b.getDocCount()).intValue();
-
             switch (b.getKey()) {
                 case levelOne:
                     vo.setLevelOne(count);
@@ -93,12 +124,11 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     public List<KeyValueVO> getKeywordsTopTen() {
-
         String aggName = "top_kws";
-        String termField = "keys";
-
         TransportClient client = EsUtil.getClient();
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(10)).setSize(0).execute().actionGet();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .addAggregation(AggregationBuilders.terms(aggName).field(keysField).size(10))
+                .setSize(0).execute().actionGet();
         return buildStringTermLists(resp, aggName);
     }
 
@@ -108,11 +138,10 @@ public class EsQueryServiceImpl implements EsQueryService {
      */
     public List<KeyValueVO> getOpinionMediaSpread() {
         String aggName = "media_aggs";
-        String termField = "mediaType";
-
         TransportClient client = EsUtil.getClient();
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(10)).setSize(0).execute().actionGet();
-
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .addAggregation(AggregationBuilders.terms(aggName).field(mediaTypeField).size(10))
+                .setSize(0).execute().actionGet();
         return buildLongTermLists(resp, aggName);
     }
 
@@ -124,40 +153,33 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     public OpinionEsSearchVO queryWarningOpinion(DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb) {
-        OpinionEsSearchVO result = new OpinionEsSearchVO();
+        String hotLevelAggName = "hot_level_agg";
+        String mediaAggName = "media_agg";
 
+        OpinionEsSearchVO result = new OpinionEsSearchVO();
         List<OpinionEsVO> opList = Lists.newArrayList();
 
-        String hotLevelAggName = "hot_level_agg";
-        String hotField = "hot";
-        String mediaAggName = "media_agg";
-        String mediaField = "mediaType";
-
-        String publicTimeField = "publicTime";
-        String emotionField = "emotion";
-
         TransportClient client = EsUtil.getClient();
-
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(publicTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(hotField).gte(60));
-        if (emotion != null)
-            query.must(QueryBuilders.termQuery(emotionField, emotion));
+        if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
+        if (mediaType != null) query.must(QueryBuilders.termQuery(mediaTypeField, mediaType));
 
-        RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(hotField).keyed(true).addRange("levelOne", 80, 101).addRange("levelTwo", 70, 80)
-            .addRange("levelThree", 60, 70);
-        TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(mediaField);
-        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query).addAggregation(hotLevelAgg).addAggregation(mediaAgg);
+        RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(hotField).keyed(true)
+                .addRange("levelOne", 80, 101).addRange("levelTwo", 70, 80).addRange("levelThree", 60, 70);
+        TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(mediaTypeField);
 
-        if (mediaType != null) {
-            builder.setPostFilter(QueryBuilders.termQuery(mediaField, mediaType));
-        }
+        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setFrom(pb.getOffset()).setSize(pb.getLimit())
+                .setQuery(query)
+                .addAggregation(hotLevelAgg)
+                .addAggregation(mediaAgg);
+        if (mediaType != null) builder.setPostFilter(QueryBuilders.termQuery(mediaTypeField, mediaType));
 
         SearchResponse resp = builder.execute().actionGet();
-
         SearchHits hits = resp.getHits();
         result.setTotal(hits.getTotalHits());
-
         SearchHit[] items = hits.getHits();
         for (SearchHit item : items) {
             String source = item.getSourceAsString();
@@ -176,42 +198,34 @@ public class EsQueryServiceImpl implements EsQueryService {
 
     @Override
     public OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb) {
-        OpinionEsSearchVO result = new OpinionEsSearchVO();
+        String hotLevelAggName = "hot_level_agg";
+        String mediaAggName = "media_agg";
 
+        OpinionEsSearchVO result = new OpinionEsSearchVO();
         List<OpinionEsVO> opList = Lists.newArrayList();
 
-        String hotLevelAggName = "hot_level_agg";
-        String hotField = "hot";
-        String mediaAggName = "media_agg";
-        String mediaField = "mediaType";
-        String eventsField = "events";
-
-        String calcTimeField = "calcTime";
-        String emotionField = "emotion";
-
         TransportClient client = EsUtil.getClient();
-
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(calcTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(hotField).gte(60));
         query.must(QueryBuilders.termQuery(eventsField, eventId));
-        if (emotion != null)
-            query.must(QueryBuilders.termQuery(emotionField, emotion));
+        if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
+        if (mediaType != null) query.must(QueryBuilders.termQuery(mediaTypeField, mediaType));
 
-        RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(hotField).keyed(true).addRange("levelOne", 80, 101).addRange("levelTwo", 70, 80)
-            .addRange("levelThree", 60, 70);
-        TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(mediaField);
-        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query).addAggregation(hotLevelAgg).addAggregation(mediaAgg);
+        RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(hotField).keyed(true)
+                .addRange("levelOne", 80, 101).addRange("levelTwo", 70, 80).addRange("levelThree", 60, 70);
+        TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(mediaTypeField);
 
-        if (mediaType != null) {
-            builder.setPostFilter(QueryBuilders.termQuery(mediaField, mediaType));
-        }
+        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setFrom(pb.getOffset()).setSize(pb.getLimit())
+                .setQuery(query)
+                .addAggregation(hotLevelAgg)
+                .addAggregation(mediaAgg);
+        if (mediaType != null) builder.setPostFilter(QueryBuilders.termQuery(mediaTypeField, mediaType));
 
         SearchResponse resp = builder.execute().actionGet();
-
         SearchHits hits = resp.getHits();
         result.setTotal(hits.getTotalHits());
-
         SearchHit[] items = hits.getHits();
         for (SearchHit item : items) {
             String source = item.getSourceAsString();
@@ -235,32 +249,21 @@ public class EsQueryServiceImpl implements EsQueryService {
      */
     public OpinionEsSearchVO queryTop100HotOpinion(String param, DateTime startTime, Integer emotion) {
         OpinionEsSearchVO result = new OpinionEsSearchVO();
-
         List<OpinionEsVO> opList = Lists.newArrayList();
 
-        String hotField = "hot";
-        String publicTimeField = "publicTime";
-        String emotionField = "emotion";
-        String titleField = "title";
-        String contentField = "content";
-
         TransportClient client = EsUtil.getClient();
-
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        if (StringUtils.isNotBlank(param)) {
-            query.must(QueryBuilders.multiMatchQuery(param, titleField, contentField));
-        }
+        if (StringUtils.isNotBlank(param)) query.must(QueryBuilders.multiMatchQuery(param, titleField, contentField));
         query.must(QueryBuilders.rangeQuery(publicTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(hotField).lt(60));
-        if (emotion != null) {
-            query.must(QueryBuilders.termQuery(emotionField, emotion));
-        }
+        if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
 
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setSize(100).setQuery(query).addSort(SortBuilders.fieldSort(hotField).order(SortOrder.DESC)).execute().actionGet();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setSize(100)
+                .setQuery(query).addSort(SortBuilders.fieldSort(hotField).order(SortOrder.DESC))
+                .execute().actionGet();
 
         SearchHits hits = resp.getHits();
         result.setTotal(hits.getTotalHits());
-
         SearchHit[] items = hits.getHits();
         for (SearchHit item : items) {
             String source = item.getSourceAsString();
@@ -318,63 +321,69 @@ public class EsQueryServiceImpl implements EsQueryService {
     @Override
     public List<KeyValueVO> getEventOpinionCounts() {
         String eventsAgg = "events_agg";
-        String eventsField = "events";
 
         TransportClient client = EsUtil.getClient();
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setSize(0).addAggregation(AggregationBuilders.terms(eventsAgg).field(eventsField).size(100)).execute().actionGet();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setSize(0)
+                .addAggregation(AggregationBuilders.terms(eventsAgg).field(eventsField).size(100))
+                .execute().actionGet();
 
         return buildLongTermLists(resp, eventsAgg);
     }
 
     @Override
     public List<KeyValueVO> getEventOpinionMediaSpread(Long eventId) {
-        String eventsField = "events";
         String aggName = "media_aggs";
-        String termField = "mediaType";
 
         TransportClient client = EsUtil.getClient();
         TermQueryBuilder query = QueryBuilders.termQuery(eventsField, eventId);
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(10)).setSize(0).execute()
-            .actionGet();
-
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setQuery(query)
+                .addAggregation(AggregationBuilders.terms(aggName).field(mediaTypeField).size(10)).setSize(0)
+                .execute().actionGet();
         return buildLongTermLists(resp, aggName);
     }
 
     @Override
     public List<KeyValueVO> getEventWebsiteSpread(Long eventId) {
-        String eventsField = "events";
         String aggName = "website_aggs";
-        String termField = "website";
 
         TransportClient client = EsUtil.getClient();
         TermQueryBuilder query = QueryBuilders.termQuery(eventsField, eventId);
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(8)).setSize(0).execute().actionGet();
-
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setQuery(query)
+                .addAggregation(AggregationBuilders.terms(aggName).field(websiteField).size(8)).setSize(0)
+                .execute().actionGet();
         return buildStringTermLists(resp, aggName);
     }
 
     @Override
     public List<KeyValueVO> getEventEmotionSpread(Long eventId) {
-        String eventsField = "events";
         String aggName = "emotion_aggs";
-        String termField = "emotion";
 
         TransportClient client = EsUtil.getClient();
         TermQueryBuilder query = QueryBuilders.termQuery(eventsField, eventId);
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).addAggregation(AggregationBuilders.terms(aggName).field(termField).size(10)).setSize(0).execute()
-            .actionGet();
-
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setQuery(query)
+                .addAggregation(AggregationBuilders.terms(aggName).field(emotionField).size(10)).setSize(0)
+                .execute().actionGet();
         return buildLongTermLists(resp, aggName);
     }
 
+    /**
+     * 根据舆情uuid查询舆情详情
+     * @param uuid
+     * @return
+     */
     @Override
     public OpinionEsVO getOpinionByUUID(String uuid) {
         String uuidField = "uuid";
         TransportClient client = EsUtil.getClient();
         TermQueryBuilder query = QueryBuilders.termQuery(uuidField, uuid);
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).setFrom(0).setSize(1).execute().actionGet();
-        SearchHits hits = resp.getHits();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setQuery(query).setFrom(0).setSize(1)
+                .execute().actionGet();
 
+        SearchHits hits = resp.getHits();
         SearchHit[] items = hits.getHits();
         OpinionEsVO vo = null;
         for (SearchHit item : items) {

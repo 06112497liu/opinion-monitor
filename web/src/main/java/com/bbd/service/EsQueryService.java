@@ -23,6 +23,12 @@ import java.util.List;
 public interface EsQueryService {
 
     /**
+     * 获取预警舆情top10（排除在舆情任务中的预警舆情，以及热点舆情）
+     * @return
+     */
+    List<OpinionEsVO> getWarnOpinionTopTen();
+
+    /**
      * 获取舆情数量 - 首页
      * @param startTime
      * @return
