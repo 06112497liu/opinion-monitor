@@ -5,6 +5,7 @@ import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mybatis.domain.PageBounds;
@@ -34,7 +35,18 @@ public class OpinionServiceImpl implements OpinionService {
 
     @Override
     public List<WarnOpinionTopTenVO> getWarnOpinionTopTen() {
-        return null;
+        List<WarnOpinionTopTenVO> result = Lists.newLinkedList();
+        List<OpinionEsVO> esList = esQueryService.getWarnOpinionTopTen();
+        esList.forEach(o -> {
+            WarnOpinionTopTenVO v = new WarnOpinionTopTenVO();
+            v.setTime(o.getPublicTime());
+            v.setHot(o.getHot());
+            v.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+            v.setTitle(o.getTitle());
+            result.add(v);
+        });
+        result.sort((x1, x2) -> ComparisonChain.start().compare(x1.getLevel(), x2.getLevel()).compare(x2.getHot(), x1.getHot()).result());
+        return result;
     }
 
     @Override

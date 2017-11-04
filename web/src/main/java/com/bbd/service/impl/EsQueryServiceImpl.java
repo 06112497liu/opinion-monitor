@@ -5,6 +5,7 @@
 package com.bbd.service.impl;
 
 import com.bbd.constant.EsConstant;
+import com.bbd.domain.Opinion;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.vo.KeyValueVO;
@@ -75,16 +76,32 @@ public class EsQueryServiceImpl implements EsQueryService {
      */
     @Override
     public List<OpinionEsVO> getWarnOpinionTopTen() {
-        // step-1：获取预警热度分界
+        // step-1：获取预警热度分界和时间区间
         Map<Integer, Integer> map = settingService.getWarnClass();
         Integer threeClass = map.get(3);
+        DateTime dateTime = DateTime.now().plusDays(-30);
 
-        // 构建es查询条件
+        // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(hotField).gte(threeClass));
-        query.must(QueryBuilders.rangeQuery(publicTimeField).gte(levelThree));
-        return null;
+        query.must(QueryBuilders.rangeQuery(publicTimeField).gte(dateTime.toString(EsConstant.LONG_TIME_FORMAT)));
+
+        // step-3：执行查询并返回结果
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setSize(10)
+                .setQuery(query)
+                .addSort(SortBuilders.fieldSort(hotField).order(SortOrder.DESC))
+                .execute().actionGet();
+        SearchHits hits = resp.getHits();
+        SearchHit[] items = hits.getHits();
+        List<OpinionEsVO> list = Lists.newLinkedList();
+        for (SearchHit s : items) {
+            String source = s.getSourceAsString();
+            OpinionEsVO v = JsonUtil.parseObject(source, OpinionEsVO.class);
+            list.add(v);
+        }
+        return list;
     }
 
     /**
@@ -246,17 +263,11 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         // step-3：查询并返回结果
         OpinionEsSearchVO result = new OpinionEsSearchVO();
-        List<OpinionEsVO> opList = Lists.newArrayList();
         SearchResponse resp = builder.execute().actionGet();
-        SearchHits hits = resp.getHits();
-        result.setTotal(hits.getTotalHits());
-        SearchHit[] items = hits.getHits();
-        for (SearchHit item : items) {
-            String source = item.getSourceAsString();
-            OpinionEsVO vo = JsonUtil.parseObject(source, OpinionEsVO.class);
-            opList.add(vo);
-        }
+        result.setTotal(resp.getHits().getTotalHits());
+        List<OpinionEsVO> opList = buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
+
 
         List<KeyValueVO> mediaList = buildLongTermLists(resp, mediaAggName);
         result.setMediaTypeStats(mediaList);
@@ -291,18 +302,24 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         // step-3：查询并返回结果
         OpinionEsSearchVO result = new OpinionEsSearchVO();
-        List<OpinionEsVO> opList = Lists.newArrayList();
-        SearchHits hits = resp.getHits();
-        result.setTotal(hits.getTotalHits());
-        SearchHit[] items = hits.getHits();
-        for (SearchHit item : items) {
-            String source = item.getSourceAsString();
-            OpinionEsVO vo = JsonUtil.parseObject(source, OpinionEsVO.class);
-            opList.add(vo);
-        }
+        result.setTotal(resp.getHits().getTotalHits());
+        List<OpinionEsVO> opList = buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
         return result;
+    }
+
+    // 构建返回结果
+    private <T> List<T> buildResult(SearchResponse resp, Class<T> clazz) {
+        List<T> list = Lists.newLinkedList();
+        SearchHits hits = resp.getHits();
+        SearchHit[] items = hits.getHits();
+        for(SearchHit s : items) {
+            String source = s.getSourceAsString();
+            T t = JsonUtil.parseObject(source, clazz);
+            list.add(t);
+        }
+        return list;
     }
 
     private List<KeyValueVO> buildHotLevelLists(SearchResponse resp, String aggName) {
@@ -413,13 +430,8 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .setQuery(query).setFrom(0).setSize(1)
                 .execute().actionGet();
 
-        SearchHits hits = resp.getHits();
-        SearchHit[] items = hits.getHits();
-        OpinionEsVO vo = null;
-        for (SearchHit item : items) {
-            String source = item.getSourceAsString();
-            vo = JsonUtil.parseObject(source, OpinionEsVO.class);
-        }
-        return vo;
+        List<OpinionEsVO> list = buildResult(resp, OpinionEsVO.class);
+        if(list.isEmpty()) return null;
+        return list.get(0);
     }
 }

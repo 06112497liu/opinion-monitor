@@ -16,6 +16,11 @@ public class WarnOpinionTopTenVO {
     private String  title;
 
     /**
+     * 热度值
+     */
+    private Integer hot;
+
+    /**
      * 舆情等级
      */
     private Integer level;
@@ -41,6 +46,14 @@ public class WarnOpinionTopTenVO {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Integer getHot() {
+        return hot;
+    }
+
+    public void setHot(Integer hot) {
+        this.hot = hot;
     }
 
     public Integer getLevel() {

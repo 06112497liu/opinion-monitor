@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  *
  * @author jintao
  */
-@JsonInclude(Include.NON_NULL)
 public class RestResult {
     /**
      * 成功代码
