@@ -75,7 +75,7 @@ public interface EsQueryService {
      * @param emotion
      * @return
      */
-    OpinionEsSearchVO queryTop100HotOpinion(String param, DateTime startTime, Integer emotion);
+    OpinionEsSearchVO queryTop100HotOpinion(String param, DateTime startTime, Integer emotion, Integer mediaType);
 
     /**
      * 查询事件对应舆情数量

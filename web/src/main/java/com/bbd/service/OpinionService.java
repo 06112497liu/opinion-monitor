@@ -36,7 +36,7 @@ public interface OpinionService {
      * @param keyword
      * @return
      */
-    PageList<OpinionVO> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb);
+    Map<String, Object> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb);
 
     /**
      * 历史预警舆情

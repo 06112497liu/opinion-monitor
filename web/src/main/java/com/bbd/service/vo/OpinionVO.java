@@ -30,6 +30,8 @@ public class OpinionVO {
     
     private String website;
 
+    private Integer mediaType;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date calcTime;
 
@@ -92,6 +94,14 @@ public class OpinionVO {
 
     public void setWebsite(String website) {
         this.website = website;
+    }
+
+    public Integer getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(Integer mediaType) {
+        this.mediaType = mediaType;
     }
 
     public Date getCalcTime() {

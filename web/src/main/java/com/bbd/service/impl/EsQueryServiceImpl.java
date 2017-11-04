@@ -191,7 +191,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         Map<Integer, Integer> map = settingService.getWarnClass();
         Integer threeClass = map.get(3); Integer twoClss = map.get(2); Integer oneClass = map.get(1);
 
-        // step-2：构建es查询条件
+        // step-2：构建es查询条件（这里差一个条件：舆情未存在舆情任务流程中）
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(publicTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
@@ -282,19 +282,20 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @param emotion
      * @return
      */
-    public OpinionEsSearchVO queryTop100HotOpinion(String param, DateTime startTime, Integer emotion) {
+    public OpinionEsSearchVO queryTop100HotOpinion(String param, DateTime startTime, Integer emotion, Integer mediaType) {
 
         // step-1：获取预警热度分界
         Map<Integer, Integer> map = settingService.getWarnClass();
         Integer threeClass = map.get(3);
 
-        // step-2：构建es查询条件
+        // step-2：构建es查询条件（这里还差一个条件：添加了监测的热点舆情不显示）
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         if (StringUtils.isNotBlank(param)) query.must(QueryBuilders.multiMatchQuery(param, titleField, contentField));
         query.must(QueryBuilders.rangeQuery(publicTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(hotField).lt(threeClass));
         if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
+        if (mediaType != null) query.must(QueryBuilders.termQuery(mediaTypeField, mediaType));
 
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setSize(100)
                 .setQuery(query).addSort(SortBuilders.fieldSort(hotField).order(SortOrder.DESC))
