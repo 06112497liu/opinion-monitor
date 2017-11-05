@@ -66,7 +66,8 @@ public class OpinionServiceImpl implements OpinionService {
         PageList p = PageListHelper.create(opinions, paginator);
         Map<String, Object> map = Maps.newHashMap();
         map.put("opinions", p);
-        map.put("mediaType", esResult.getMediaTypeStats());
+        List<KeyValueVO> mediaTypeSta = esResult.getMediaTypeStats(); transMediaTypeToChina(mediaTypeSta);
+        map.put("mediaType", mediaTypeSta);
         map.put("level", esResult.getHotLevelStats());
 
         return map;
@@ -123,12 +124,34 @@ public class OpinionServiceImpl implements OpinionService {
     }
 
     private void transMediaTypeToChina(List<KeyValueVO> list) {
-        list.forEach(v -> v.setName(WebsiteEnum.getDescByCode((Integer) v.getKey())));
+        for(KeyValueVO v : list) {
+            v.setName( WebsiteEnum.getDescByCode( v.getKey().toString() ) );
+        }
     }
 
     @Override
-    public PageList<OpinionVO> getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType, PageBounds pb) {
-        return null;
+    public Map<String, Object> getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer mediaType, PageBounds pb) {
+        DateTime start = new DateTime(startTime);
+        DateTime endTemp = new DateTime(endTime);
+        int year = endTemp.getYear(); int month = endTemp.getMonthOfYear(); int day = endTemp.getDayOfMonth();
+        DateTime end = new DateTime(year, month, day, 23, 59, 59);
+
+        // step-1：查询es
+        OpinionEsSearchVO esResult = esQueryService.queryHistoryOpinions(start, end, emotion, mediaType, pb);
+        List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
+        opinions.forEach(o -> {
+            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+        });
+
+        // step-2：分页并返回结果
+        Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), esResult.getTotal().intValue());
+        PageList p = PageListHelper.create(opinions, paginator);
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("opinions", p);
+        map.put("mediaType", esResult.getMediaTypeStats());
+        map.put("level", esResult.getHotLevelStats());
+
+        return map;
     }
 
     @Override

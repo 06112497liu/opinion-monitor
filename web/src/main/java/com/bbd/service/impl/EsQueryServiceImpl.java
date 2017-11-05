@@ -32,12 +32,14 @@ import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilde
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -65,10 +67,8 @@ public class EsQueryServiceImpl implements EsQueryService {
     private final String titleField = "title";
     private final String contentField = "content";
     private final String websiteField = "website";
-
-    private Integer oneClass;
-    private Integer twoClass;
-    private Integer threeClass;
+    private final String warnTimeField = "warnTime";
+    private final String hotLevelField = "hotLevel";
 
     /**
      * 获取预警舆情top10（排除在舆情任务中的预警舆情，以及热点舆情）
@@ -206,22 +206,17 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
                 .setFrom(pb.getOffset()).setSize(pb.getLimit())
                 .setQuery(query)
+                .addSort(SortBuilders.fieldSort(hotField).order(SortOrder.DESC))
                 .addAggregation(hotLevelAgg)
                 .addAggregation(mediaAgg);
         if (mediaType != null) builder.setPostFilter(QueryBuilders.termQuery(mediaTypeField, mediaType));
 
         //step-3：查询并返回结果
         OpinionEsSearchVO result = new OpinionEsSearchVO();
-        List<OpinionEsVO> opList = Lists.newArrayList();
         SearchResponse resp = builder.execute().actionGet();
         SearchHits hits = resp.getHits();
         result.setTotal(hits.getTotalHits());
-        SearchHit[] items = hits.getHits();
-        for (SearchHit item : items) {
-            String source = item.getSourceAsString();
-            OpinionEsVO vo = JsonUtil.parseObject(source, OpinionEsVO.class);
-            opList.add(vo);
-        }
+        List<OpinionEsVO> opList = buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
         List<KeyValueVO> hotLevelList = buildHotLevelLists(resp, hotLevelAggName);
@@ -257,6 +252,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
                 .setFrom(pb.getOffset()).setSize(pb.getLimit())
                 .setQuery(query)
+                .addSort(SortBuilders.fieldSort(hotField).order(SortOrder.DESC))
                 .addAggregation(hotLevelAgg)
                 .addAggregation(mediaAgg);
         if (mediaType != null) builder.setPostFilter(QueryBuilders.termQuery(mediaTypeField, mediaType));
@@ -272,6 +268,42 @@ public class EsQueryServiceImpl implements EsQueryService {
         List<KeyValueVO> mediaList = buildLongTermLists(resp, mediaAggName);
         result.setMediaTypeStats(mediaList);
 
+        return result;
+    }
+
+    @Override
+    public OpinionEsSearchVO queryHistoryOpinions(DateTime startTime, DateTime endTime, Integer emotion, Integer mediaType, PageBounds pb) {
+        String hotLevelAggName = "hot_level_agg";
+        String mediaAggName = "media_agg";
+
+        // step-1：构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.rangeQuery(warnTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(hotLevelField).gte(3)); // 预警等级必须达到3
+        if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
+        if (mediaType != null) query.must(QueryBuilders.termQuery(mediaTypeField, mediaType));
+
+        TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(mediaTypeField);
+        TermsAggregationBuilder hotLevelAgg = AggregationBuilders.terms(hotLevelAggName).field(hotLevelField);
+
+        // step-2：查询es
+        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setFrom(pb.getOffset()).setSize(pb.getLimit())
+                .setQuery(query)
+                .addSort(SortBuilders.fieldSort(hotField).order(SortOrder.DESC))
+                .addAggregation(hotLevelAgg)
+                .addAggregation(mediaAgg);
+        SearchResponse resp = builder.execute().actionGet();
+
+        // step-3：构建返回结果
+        OpinionEsSearchVO result = new OpinionEsSearchVO();
+        result.setTotal(resp.getHits().getTotalHits());
+        List<OpinionEsVO> opList = buildResult(resp, OpinionEsVO.class);
+        result.setOpinions(opList);
+
+        List<KeyValueVO> mediaList = buildLongTermLists(resp, mediaAggName);
+        result.setMediaTypeStats(mediaList);
         return result;
     }
 

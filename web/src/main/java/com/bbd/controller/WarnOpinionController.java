@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -33,14 +34,13 @@ public class WarnOpinionController extends AbstractController {
     @ApiImplicitParams({
             @ApiImplicitParam(value = "时间周期(1-24小时，2-7天，3-30天)", name = "timeSpan", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "舆情类型(0-中性舆情，1-正面舆情，2-负面舆情)", name = "emotion", dataType = "Integer", paramType = "query", required = false),
-            @ApiImplicitParam(value = "媒体类型(1-新闻，2-网站，3-微信，4-论坛，5-微博，6-政务，7-其他)", name = "sourceType", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "媒体类型(1-新闻，2-网站，3-微信，4-论坛，5-微博，6-政务，7-其他)", name = "mediaType", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "起始页号", name = "page", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "list", method = RequestMethod.GET)
-    public RestResult getWarnOpinionList(@RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan,
-                                         @RequestParam(value = "emotion", defaultValue = "0") Integer emotion, Integer sourceType) {
-        Map<String, Object> result = opinionService.getWarnOpinionList(timeSpan, emotion, sourceType, getPageBounds());
+    public RestResult getWarnOpinionList(@RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan, Integer emotion, Integer mediaType) {
+        Map<String, Object> result = opinionService.getWarnOpinionList(timeSpan, emotion, mediaType, getPageBounds());
         return RestResult.ok(result);
     }
 
@@ -49,13 +49,15 @@ public class WarnOpinionController extends AbstractController {
             @ApiImplicitParam(value = "预警时间起", name = "startTime", dataType = "Date", paramType = "query", required = false),
             @ApiImplicitParam(value = "预警时间止", name = "endTime", dataType = "Date", paramType = "query", required = false),
             @ApiImplicitParam(value = "舆情类型(0-中性舆情，1-正面舆情，2-负面舆情)", name = "emotion", dataType = "Integer", paramType = "query", required = false),
-            @ApiImplicitParam(value = "媒体类型(1-新闻，2-网站，3-微信，4-论坛，5-微博，6-政务，7-其他)", name = "sourceType", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "媒体类型(1-新闻，2-网站，3-微信，4-论坛，5-微博，6-政务，7-其他)", name = "mediaType", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "起始页号", name = "page", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "history/list", method = RequestMethod.GET)
-    public RestResult getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType) {
-        PageList<OpinionVO> result = opinionService.getHistoryWarnOpinionList(startTime, endTime, emotion, sourceType, getPageBounds());
+    public RestResult getHistoryWarnOpinionList(@DateTimeFormat(pattern="yyyy-MM-dd") Date startTime,
+                                                @DateTimeFormat(pattern="yyyy-MM-dd") Date endTime,
+                                                Integer emotion, Integer mediaType) {
+        Map<String, Object> result = opinionService.getHistoryWarnOpinionList(startTime, endTime, emotion, mediaType, getPageBounds());
         return RestResult.ok(result);
     }
 

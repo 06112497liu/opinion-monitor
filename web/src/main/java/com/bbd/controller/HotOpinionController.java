@@ -31,13 +31,13 @@ public class HotOpinionController extends AbstractController {
             @ApiImplicitParam(value = "查询关键词", name = "keyword", dataType = "String", paramType = "query", required = false),
             @ApiImplicitParam(value = "时间周期(1-24小时，2-7天，3-30天)", name = "timeSpan", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "舆情类型(0-中性舆情，1-正面舆情，2-负面舆情)", name = "emotion", dataType = "Integer", paramType = "query", required = false),
-            @ApiImplicitParam(value = "媒体类型(1-新闻，2-网站，3-微信，4-论坛，5-微博，6-政务，7-其他)", name = "sourceType", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "媒体类型(1-新闻，2-网站，3-微信，4-论坛，5-微博，6-政务，7-其他)", name = "mediaType", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "起始页号", name = "page", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "list", method = RequestMethod.GET)
-    public RestResult getHotOpinionList(String keyword, @RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan, Integer emotion, Integer sourceType) {
-        return RestResult.ok(opinionService.getHotOpinionList(keyword, timeSpan, emotion, sourceType, getPageBounds()));
+    public RestResult getHotOpinionList(String keyword, @RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan, Integer emotion, Integer mediaType) {
+        return RestResult.ok(opinionService.getHotOpinionList(keyword, timeSpan, emotion, mediaType, getPageBounds()));
     }
 
     @ApiOperation(value = "热点舆情详情", httpMethod = "GET")

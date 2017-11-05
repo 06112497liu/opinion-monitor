@@ -78,7 +78,7 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
         List<KeyValueVO> list = esQueryService.getOpinionMediaSpread();
         List<KeyValuePercentVO> rs = BeanMapperUtil.mapList(list, KeyValuePercentVO.class);
         rs.forEach(k -> {
-            k.setName(WebsiteEnum.getDescByCode(Integer.parseInt(k.getKey().toString())));
+            k.setName(WebsiteEnum.getDescByCode(k.getKey().toString()));
         });
         PercentUtil.calcLongPercents(rs);
         return rs;

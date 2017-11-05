@@ -12,6 +12,7 @@ import com.mybatis.domain.PageBounds;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -58,7 +59,7 @@ public interface EsQueryService {
     OpinionEsSearchVO queryWarningOpinion(DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb);
 
     /**
-     * 查询预警舆情
+     * 查询舆情事件
      * @param eventId: 事件ID
      * @param startTime: 开始时间
      * @param emotion: 情感
@@ -67,6 +68,17 @@ public interface EsQueryService {
      * @return
      */
     OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb);
+
+    /**
+     * 查询历史预警舆情
+     * @param startTime: 开始时间
+     * @param endTime：结束时间
+     * @param emotion: 情感
+     * @param mediaType: 媒体类型
+     * @param pb: 分页
+     * @return
+     */
+    OpinionEsSearchVO queryHistoryOpinions(DateTime startTime, DateTime endTime, Integer emotion, Integer mediaType, PageBounds pb);
 
     /**
      * 查询热点舆情（非预警）TOP100

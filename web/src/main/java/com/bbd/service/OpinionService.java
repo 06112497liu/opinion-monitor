@@ -46,7 +46,7 @@ public interface OpinionService {
      * @param sourceType
      * @return
      */
-    PageList<OpinionVO> getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType, PageBounds pb);
+    Map<String, Object> getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer sourceType, PageBounds pb);
 
     /**
      * 舆情详情

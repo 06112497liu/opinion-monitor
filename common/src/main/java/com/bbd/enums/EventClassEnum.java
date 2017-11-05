@@ -8,22 +8,23 @@ import com.google.common.base.Objects;
  */
 public enum EventClassEnum {
 
-    NAIFEN(1, "奶粉"),
-    YINPING(2, "饮品"),
-    JIADIAN(3, "家电"),
-    DIANSHANG(3, "电商"),
-    QICHE(4, "汽车"),
-    YIYAO(5, "医药"),
-    KUAIDI(6, "快递"),
-    CHAOSHI(7, "超市"),
-    RIHUA(8, "日化"),
-    QITA(9, "其他"),;
+    NAIFEN("1", "奶粉"),
+    SHIPING("2", "食品"),
+    YINPING("3", "饮品"),
+    JIADIAN("4", "家电"),
+    DIANSHANG("5", "电商"),
+    QICHE("6", "汽车"),
+    YIYAO("7", "医药"),
+    KUAIDI("8", "快递"),
+    CHAOSHI("9", "超市"),
+    RIHUA("10", "日化"),
+    QITA("11", "其他"),;
 
-    private Integer code;
+    private String code;
 
     private String desc;
 
-    public Integer getCode() {
+    public String getCode() {
         return code;
     }
 
@@ -31,7 +32,7 @@ public enum EventClassEnum {
         return desc;
     }
 
-    public static String getDescByCode(Integer code) {
+    public static String getDescByCode(String code) {
         EventClassEnum[] vals = EventClassEnum.values();
         for (int i = 0; i < vals.length; i++) {
             if(Objects.equal(vals[i].getCode(), code)) {
@@ -41,7 +42,7 @@ public enum EventClassEnum {
         return null;
     }
 
-    public static Integer getCodeByDesc(String desc) {
+    public static String getCodeByDesc(String desc) {
         EventClassEnum[] vals = EventClassEnum.values();
         for (int i = 0; i < vals.length; i++) {
             if(Objects.equal(vals[i].getDesc(), desc)) {
@@ -55,7 +56,7 @@ public enum EventClassEnum {
      * @param code
      * @param desc
      */
-    private EventClassEnum(Integer code, String desc) {
+    private EventClassEnum(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }
