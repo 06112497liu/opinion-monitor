@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bbd.dao.OpinionDictionaryDao;
 import com.bbd.dao.OpinionEventDao;
 import com.bbd.dao.OpinionEventSourceTrendDao;
-import com.bbd.dao.OpinionEventTrendDao;
+import com.bbd.dao.OpinionEventWordsDao;
 import com.bbd.dao.WarnSettingDao;
 import com.bbd.domain.Graph;
 import com.bbd.domain.OpinionDictionary;
@@ -18,12 +19,12 @@ import com.bbd.domain.OpinionDictionaryExample;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.domain.OpinionEventExample;
 import com.bbd.domain.OpinionEventExample.Criteria;
-import com.bbd.domain.OpinionEventTrend;
-import com.bbd.domain.OpinionEventTrendExample;
+import com.bbd.domain.OpinionEventWords;
+import com.bbd.domain.OpinionEventWordsExample;
 import com.bbd.domain.WarnSetting;
-import com.bbd.service.vo.GraphVO;
+import com.bbd.enums.WebsiteEnum;
 import com.bbd.service.vo.KeyValueVO;
-import com.bbd.service.vo.OpinionVO;
+import com.bbd.service.vo.OpinionEsSearchVO;
 import com.mybatis.domain.PageBounds;
 
 
@@ -43,7 +44,11 @@ public class EventService{
 	@Autowired
 	OpinionEventSourceTrendDao opinionEventSourceTrendDao;
 	@Autowired
-	OpinionEventTrendDao opinionEventTrendDao;
+	OpinionEventWordsDao opinionEventWordsDao;
+	@Autowired
+	private EsQueryService esQueryService;
+	@Autowired
+	private SystemSettingService systemSettingService;
 	/**  
 	 * @param opinionEvent 
 	 */
@@ -170,26 +175,54 @@ public class EventService{
 	 */
 	public  HashMap<String, Object> getEventInfoList(Long id, Integer cycle, Integer emotion, String source, Integer pageNo, Integer pageSize) {
 	    HashMap<String, Object> map = new HashMap<String, Object>();
-	    map.put("infoTotalNum", 86754);
-	    map.put("eventHotVal", 86);
-	    map.put("pageNo", 1);
-	    map.put("pageSize", 10);
-	    map.put("total", 20);
-	    List<OpinionVO> opinionList = new ArrayList<OpinionVO>();
-	    OpinionVO opinionVO = new OpinionVO();
-	    opinionVO.setUuid("111");
-	    opinionVO.setTitle("AAA");
-	    opinionVO.setSummary("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-	    opinionVO.setWebsite("贵阳网");
-	    opinionVO.setLevel(1);
-	    opinionVO.setEmotion(1);
-	    opinionVO.setHot(95);
-	    opinionList.add(opinionVO);
-	    map.put("items", opinionList);
-	    
+	    PageBounds pb = new PageBounds(pageNo, pageSize);
+        OpinionEsSearchVO esResult = esQueryService.queryEventOpinions(id, buildTimeSpan(cycle), emotion, 
+            source != null ? Integer.valueOf(source) : null, pb);
+        List<KeyValueVO> mediaTypeSta = esResult.getMediaTypeStats();
+        transMediaTypeToChina(mediaTypeSta);
+        map.put("opinions", esResult.getOpinions());
+        map.put("total", esResult.getTotal());
+        map.put("eventHot", opinionEventDao.selectByPrimaryKey(id).getHot());
+        mediaTypeSta.add(0, calTotal(mediaTypeSta));
+        map.put("mediaTypes", mediaTypeSta);
         return map;
+	    
 	}
 	
+	public KeyValueVO calTotal(List<KeyValueVO> mediaTypeSta) {
+	    int total = 0;
+	    for (KeyValueVO vo : mediaTypeSta) {
+	        total = total + (int)vo.getValue();
+	    }
+	    KeyValueVO tmp = new KeyValueVO();
+	    tmp.setName("全部");
+	    tmp.setValue(total);
+        return tmp;
+	    
+	}
+	
+	/**  
+	 * @param timeSpan
+	 * @return 
+	 */
+	private DateTime buildTimeSpan(Integer timeSpan) {
+	        DateTime now = DateTime.now();
+	        DateTime startTime = null;
+	        if(2 == timeSpan) startTime = now.plusDays(-7);
+	        else if(3 == timeSpan) startTime = now.plusMonths(-1);
+	        else startTime = now.plusHours(-24);
+	        return startTime;
+	    }
+	 
+	 
+	/**  
+	 * @param list 
+	 */
+	private void transMediaTypeToChina(List<KeyValueVO> list) {
+	        for(KeyValueVO v : list) {
+	            v.setName( WebsiteEnum.getDescByCode( v.getKey().toString() ) );
+	        }
+	    }
 	
 	/**  
 	 * @param id
@@ -198,51 +231,11 @@ public class EventService{
 	 * @return 
 	 */
 	public  List<KeyValueVO> eventLabelList(Long id, Integer cycle, Integer emotion){
-
-        List<KeyValueVO> websiteList = new ArrayList<KeyValueVO>();
-        KeyValueVO websiteNew = new KeyValueVO();
-        websiteNew.setKey("all");
-        websiteNew.setValue(20);
-        websiteNew.setName("全部");
-        websiteList.add(websiteNew);
-        
-        KeyValueVO websiteWeb = new KeyValueVO();
-        websiteWeb.setKey("002");
-        websiteWeb.setValue(2);
-        websiteWeb.setName("网站");
-        websiteList.add(websiteWeb);
-        
-        KeyValueVO websiteWeChat = new KeyValueVO();
-        websiteWeChat.setKey("003");
-        websiteWeChat.setValue(2);
-        websiteWeChat.setName("微信");
-        websiteList.add(websiteWeChat);
-        
-        KeyValueVO websiteLuntan = new KeyValueVO();
-        websiteLuntan.setKey("004");
-        websiteLuntan.setValue(2);
-        websiteLuntan.setName("论坛");
-        websiteList.add(websiteLuntan);
-        
-        KeyValueVO websiteWeibo = new KeyValueVO();
-        websiteWeibo.setKey("005");
-        websiteWeibo.setValue(10);
-        websiteWeibo.setName("微博");
-        websiteList.add(websiteWeibo);
-        
-        KeyValueVO websiteParty = new KeyValueVO();
-        websiteParty.setKey("006");
-        websiteParty.setValue(10);
-        websiteParty.setName("政务");
-        websiteList.add(websiteParty);
-        
-        KeyValueVO websiteOther = new KeyValueVO();
-        websiteOther.setKey("007");
-        websiteOther.setValue(10);
-        websiteOther.setName("其他");
-        websiteList.add(websiteOther);
-        
-        return websiteList;
+        PageBounds pb = new PageBounds(1, 10);
+        OpinionEsSearchVO esResult = esQueryService.queryEventOpinions(id, buildTimeSpan(cycle), emotion, null, pb);
+        List<KeyValueVO> mediaTypeSta = esResult.getMediaTypeStats();
+        transMediaTypeToChina(mediaTypeSta);
+        return mediaTypeSta;
 	}
 	
 	
@@ -251,8 +244,10 @@ public class EventService{
 	 * @param cycle
 	 * @return 
 	 */
-	public  int eventInfoTotal(Long id, Integer cycle){
-	    return 83732;
+	public  long eventInfoTotal(Long id, Integer cycle){
+        PageBounds pb = new PageBounds(1, 10);
+        OpinionEsSearchVO esResult = esQueryService.queryEventOpinions(id, buildTimeSpan(cycle), null, null, pb);
+	    return esResult.getTotal();
 	}
 	
 	
@@ -261,7 +256,7 @@ public class EventService{
 	 * @return 
 	 */
 	public  int eventHotValue(Long id){
-        return 85;
+        return opinionEventDao.selectByPrimaryKey(id).getHot();
     }
 	
 	
@@ -293,18 +288,10 @@ public class EventService{
 	 * @param cycle
 	 * @return 
 	 */
-	public HashMap<String, Object> eventSrcDis(Long id, Integer cycle) {
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        List<GraphVO> srcDisList = new ArrayList<GraphVO>();
-        GraphVO o1 = new GraphVO(null, "微博", "12");
-        GraphVO o2 = new GraphVO(null, "网站", "18");
-        GraphVO o3 = new GraphVO(null, "论坛", "12");
-        
-        srcDisList.add(o1);
-        srcDisList.add(o2);
-        srcDisList.add(o3);
-        map.put("srcDisList", srcDisList);
-        return map;
+	public List<KeyValueVO> eventSrcDis(Long id, Integer cycle) {
+	    List<KeyValueVO> rs = esQueryService.getEventOpinionMediaSpread(id, buildTimeSpan(cycle));
+	    transMediaTypeToChina(rs);
+        return rs;
 	}
 	
 	
@@ -342,103 +329,37 @@ public class EventService{
 	 * @param cycle
 	 * @return 
 	 */
-	public HashMap<String, Object> eventSrcActive(Long id, Integer cycle) {
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        List<GraphVO> srcActiveList = new ArrayList<GraphVO>();
-        GraphVO o1 = new GraphVO(null, "新浪微博", "12");
-        GraphVO o2 = new GraphVO(null, "百度贴吧", "18");
-        GraphVO o3 = new GraphVO(null, "贵阳网", "12");
-        
-        srcActiveList.add(o1);
-        srcActiveList.add(o2);
-        srcActiveList.add(o3);
-        map.put("srcActiveList", srcActiveList);
-        return map;
+	public List<KeyValueVO> eventSrcActive(Long id, Integer cycle) {
+        return esQueryService.getEventWebsiteSpread(id, buildTimeSpan(cycle));
     }
 	
 	public HashMap<String, Object> eventTrend(Long id, Integer cycle, Integer pageNo, Integer pageSize) {
         HashMap<String, Object> map = new HashMap<String, Object>();
-        
-        List<OpinionVO> trendList = new ArrayList<OpinionVO>();
-        OpinionVO o1 = new OpinionVO();
-        o1.setTitle("京昆高速多车相撞，4死5伤");
-        o1.setUuid("001");
-        o1.setWebsite("新华网");
-        o1.setSimiliarCount(45);
-        trendList.add(o1);
-        
-        OpinionVO o2 = new OpinionVO();
-        o2.setTitle("京昆高速多车相撞，5死4伤");
-        o2.setUuid("002");
-        o2.setWebsite("贵阳网");
-        o2.setSimiliarCount(49);
-        trendList.add(o2);
-        
-        OpinionVO o3 = new OpinionVO();
-        o3.setTitle("京昆高速多车相撞，6死3伤");
-        o3.setUuid("003");
-        o3.setWebsite("新浪网");
-        o3.setSimiliarCount(58);
-        trendList.add(o3);
-        
-        trendList.add(o3);
-        
-       /* OpinionEventTrendExample example = new OpinionEventTrendExample();
-        example.createCriteria().andEventIdEqualTo(id);
-        List<OpinionEventTrend> opinionEventTrendList = opinionEventTrendDao.selectByExample(example);
-        List<String> uuids = new ArrayList<String>();
-        for (OpinionEventTrend e : opinionEventTrendList) {
-            uuids.add(e.getOpinionUuid());
-        }*/
-        map.put("trendList", trendList);
-        map.put("eventTime", "2017-01-02");
+        OpinionEsSearchVO vo = esQueryService.queryEventTrendOpinions(id, buildTimeSpan(cycle), new PageBounds(pageNo, pageSize));
+        map.put("opinions", vo.getOpinions());
+        map.put("eventTime", opinionEventDao.selectByPrimaryKey(id).getGmtCreate());
         return map;
     }
 	
-	public HashMap<String, Object> eventKeywords(Long id, Integer cycle) {
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        List<GraphVO> eventKeywords = new ArrayList<GraphVO>();
-        GraphVO o1 = new GraphVO(null, "天价", "999");
-        GraphVO o2 = new GraphVO(null, "诈骗", "700");
-        GraphVO o3 = new GraphVO(null, "宰客", "600");
-        
-        GraphVO o4 = new GraphVO(null, "强制消费", "500");
-        GraphVO o5 = new GraphVO(null, "欺诈", "400");
-        GraphVO o6 = new GraphVO(null, "虚假", "300");
-        
-        GraphVO o7 = new GraphVO(null, "不合格", "250");
-        GraphVO o8 = new GraphVO(null, "投诉", "200");
-        GraphVO o9 = new GraphVO(null, "超标", "100");
-        
-        GraphVO o10 = new GraphVO(null, "瓜娃子", "20");
-        
-        eventKeywords.add(o1);
-        eventKeywords.add(o2);
-        eventKeywords.add(o3);
-        
-        eventKeywords.add(o4);
-        eventKeywords.add(o5);
-        eventKeywords.add(o6);
-        
-        eventKeywords.add(o7);
-        eventKeywords.add(o8);
-        eventKeywords.add(o9);
-        
-        eventKeywords.add(o10);
-        
-        map.put("eventKeywords", eventKeywords);
-        return map;
+	public List<KeyValueVO> eventKeywords(Long id, Integer cycle) {
+	    List<KeyValueVO> words = new ArrayList<KeyValueVO>();
+	    OpinionEventWordsExample example = new OpinionEventWordsExample();
+	    example.createCriteria().andIdEqualTo(id).andCycleEqualTo((byte)(int)cycle);
+	    List<OpinionEventWords> opinionEventWordsList = opinionEventWordsDao.selectByExampleWithBLOBs(example);
+	    if (opinionEventWordsList == null || opinionEventWordsList.size() == 0) {
+	        return words;
+	    }
+	    for (String e : opinionEventWordsList.get(0).getWords().split("#")){
+	        KeyValueVO vo = new KeyValueVO();
+	        vo.setName(e.split(",")[0]);
+	        vo.setValue(e.split(",")[1]);
+	        words.add(vo);
+	    }
+        return words;
     }
     
-	public HashMap<String, Object> eventDataType(Long id, Integer cycle) {
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        List<GraphVO> eventDataTypeList = new ArrayList<GraphVO>();
-        GraphVO o1 = new GraphVO(null, "敏感", "80");
-        GraphVO o2 = new GraphVO(null, "非敏感", "20");
-        eventDataTypeList.add(o1);
-        eventDataTypeList.add(o2);
-        map.put("eventKeywords", eventDataTypeList);
-        return map;
+	public List<KeyValueVO> eventDataType(Long id, Integer cycle) {
+        return esQueryService.getEventEmotionSpread(id, buildTimeSpan(cycle));
     }  
 	
 }

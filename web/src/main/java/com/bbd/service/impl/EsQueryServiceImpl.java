@@ -250,7 +250,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.rangeQuery(calcTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(hotField).gte(threeClass));
         query.must(QueryBuilders.termQuery(eventsField, eventId));
         if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
@@ -278,6 +278,36 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         List<KeyValueVO> mediaList = buildLongTermLists(resp, mediaAggName);
         result.setMediaTypeStats(mediaList);
+
+        return result;
+    }
+
+    /**
+     * 查询舆情事件走势
+     * @param eventId: 事件ID
+     * @param startTime: 开始时间
+     * @param pb: 分页
+     * @return
+     */
+    @Override
+    public OpinionEsSearchVO queryEventTrendOpinions(Long eventId, DateTime startTime, PageBounds pb) {
+        // step-1：构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.termQuery(eventsField, eventId));
+     
+        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setFrom(pb.getOffset()).setSize(pb.getLimit())
+                .setQuery(query)
+                .addSort(SortBuilders.fieldSort(publishTimeField).order(SortOrder.ASC));
+
+        // step-2：查询并返回结果
+        OpinionEsSearchVO result = new OpinionEsSearchVO();
+        SearchResponse resp = builder.execute().actionGet();
+        result.setTotal(resp.getHits().getTotalHits());
+        List<OpinionEsVO> opList = buildResult(resp, OpinionEsVO.class);
+        result.setOpinions(opList);
 
         return result;
     }

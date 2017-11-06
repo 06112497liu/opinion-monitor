@@ -158,7 +158,7 @@ public class EventController extends AbstractController {
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
         @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true),
-        @ApiImplicitParam(value = "舆情类型,空表示全部舆情，0表示中性舆情，1表示正面舆情，2表示负面舆情", name = "emotion", dataType = "Integer", paramType = "query", required = true)
+        @ApiImplicitParam(value = "舆情类型,空表示全部舆情，0表示中性舆情，1表示正面舆情，2表示负面舆情", name = "emotion", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "eventLabelList", method = RequestMethod.GET)
     public RestResult eventLabelList(Long id, Integer cycle, Integer emotion) {
