@@ -11,6 +11,7 @@ import com.bbd.service.param.OpinionCountStatQueryParam;
 import com.bbd.service.utils.PercentUtil;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
+import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +51,19 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
 
     @Override
     public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan) {
-        List<OpinionCountStatVO> list = esQueryService.getOpinionCountStatisticGroupTime(state, timeSpan);
-        return null;
+        Map<String, List<KeyValueVO>> map = esQueryService.getOpinionCountStatisticGroupTime(state, timeSpan);
+        List<KeyValueVO> levleOneList = map.get("levelOne");
+        List<KeyValueVO> levleTwoList = map.get("levelTwo");
+        List<KeyValueVO> levleThreeList = map.get("levelThree");
+        List<KeyValueVO> allList = Lists.newLinkedList();
+        for (int i=0; i<levleOneList.size(); i++) {
+            KeyValueVO v = new KeyValueVO();
+            v.setKey(levleOneList.get(i).getKey());
+            v.setValue((long)(levleOneList.get(i).getValue()) + (long)(levleTwoList.get(i).getValue()) + (long)(levleThreeList.get(i).getValue()));
+            allList.add(v);
+        }
+        map.put("all", allList);
+        return map;
     }
 
     @Override
