@@ -27,7 +27,7 @@ public class EsQueryServiceTest extends BaseServiceTest {
     public void testGetOpinionCountStatistic() {
         DateTime now = new DateTime();
         now = now.plusMonths(-3);
-        esQueryService.getOpinionCountStatistic(now);
+        esQueryService.getOpinionCountStatistic(1, now);
     }
 
     @Test

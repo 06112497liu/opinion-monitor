@@ -12,6 +12,7 @@ import com.bbd.service.utils.PercentUtil;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,19 +33,24 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
 
     @Override
     public OpinionCountStatVO getOpinionCountStatistic(Integer state, Integer timeSpan) {
+
         // step-1：组装条件
         DateTime now = DateTime.now();
         DateTime startTime = null;
-        if(timeSpan == 2) startTime = now.plusDays(-7);
-        else if(timeSpan == 3) startTime = now.plusMonths(-1);
-        else startTime = now.plusDays(-1);
+        if(timeSpan == 1) startTime = now.withTimeAtStartOfDay();
+        else if(timeSpan == 2) startTime = now.withDayOfWeek(DateTimeConstants.MONDAY).withTimeAtStartOfDay();
+        else if(timeSpan == 3) startTime = now.withDayOfMonth(1).withTimeAtStartOfDay();
+        else if(timeSpan == 4) startTime = now.withDayOfYear(1).withTimeAtStartOfDay();
+        else startTime = now.plusYears(-6);
+
         // step-2：执行查询
-        OpinionCountStatVO result = esQueryService.getOpinionCountStatistic(startTime);
+        OpinionCountStatVO result = esQueryService.getOpinionCountStatistic(state, startTime);
         return result;
     }
 
     @Override
-    public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(OpinionCountStatQueryParam param) {
+    public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan) {
+        List<OpinionCountStatVO> list = esQueryService.getOpinionCountStatisticGroupTime(state, timeSpan);
         return null;
     }
 

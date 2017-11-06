@@ -48,25 +48,22 @@ public class IndexController extends AbstractController {
 
     @ApiOperation(value = "预警舆情统计", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "状态：0. 全部; 1. 已处理; 2. 未处理", name = "state", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "状态：0. 未处理; 1. 已处理", name = "state", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "时间跨度：1. 本日；2. 本周； 3. 本月； 4. 本年； 5. 全部。", name = "timeSpan", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "/stat/opinion/count", method = RequestMethod.GET)
-    public RestResult getOpinionCountStatistic(@RequestParam(value = "state", defaultValue = "0") Integer state,
-                                               @RequestParam(value = "timespan", defaultValue = "3") Integer timeSpan) {
+    public RestResult getOpinionCountStatistic(Integer state, @RequestParam(value = "timeSpan", defaultValue = "3") Integer timeSpan) {
         return RestResult.ok(indexStatisticService.getOpinionCountStatistic(state, timeSpan));
     }
 
     @ApiOperation(value = "预警舆情统计坐标轴", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "状态：0. 全部; 1. 已处理; 2. 未处理", name = "status", dataType = "Integer", paramType = "query", required = true),
-            @ApiImplicitParam(value = "时间跨度：1. 本日；2. 本周； 3. 本月； 4. 本年； 5. 全部。", name = "timeSpan", dataType = "Integer", paramType = "query", required = true)
+            @ApiImplicitParam(value = "状态：0. 未处理; 1. 已处理", name = "state", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "时间跨度：1. 本日；2. 本周； 3. 本月； 4. 本年； 5. 全部。", name = "timeSpan", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "/stat/opinion/count/coordinate", method = RequestMethod.GET)
-    public RestResult getOpinionCountStatisticGroupTime(OpinionCountStatQueryParam param) {
-        ValidateUtil.checkNull(param.getStatus(), CommonErrorCode.PARAM_ERROR, "status不能为空");
-        ValidateUtil.checkNull(param.getTimeSpan(), CommonErrorCode.PARAM_ERROR, "timeSpan不能为空");
-        return RestResult.ok(indexStatisticService.getOpinionCountStatisticGroupTime(param));
+    public RestResult getOpinionCountStatisticGroupTime(Integer state, @RequestParam(value = "timeSpan", defaultValue = "3") Integer timeSpan) {
+        return RestResult.ok(indexStatisticService.getOpinionCountStatisticGroupTime(state, timeSpan));
     }
 
     @ApiOperation(value = "预警舆情top10", httpMethod = "GET")

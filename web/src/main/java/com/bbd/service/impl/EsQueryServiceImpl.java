@@ -109,7 +109,7 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @param startTime
      * @return
      */
-    public OpinionCountStatVO getOpinionCountStatistic(DateTime startTime) {
+    public OpinionCountStatVO getOpinionCountStatistic(Integer state, DateTime startTime) {
         String aggName = "level_count";
 
         // step-1：获取预警热度分界
@@ -148,6 +148,17 @@ public class EsQueryServiceImpl implements EsQueryService {
         }
         vo.setTotal(total);
         return vo;
+    }
+
+    /**
+     * 获取舆情数量折线统计图 - 首页
+     * @param state
+     * @param timeSpan
+     * @return
+     */
+    @Override
+    public List<OpinionCountStatVO> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan) {
+        return null;
     }
 
     /**

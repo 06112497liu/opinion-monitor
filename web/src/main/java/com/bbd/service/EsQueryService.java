@@ -31,10 +31,19 @@ public interface EsQueryService {
 
     /**
      * 获取舆情数量 - 首页
+     * @param state
      * @param startTime
      * @return
      */
-    OpinionCountStatVO getOpinionCountStatistic(DateTime startTime);
+    OpinionCountStatVO getOpinionCountStatistic(Integer state, DateTime startTime);
+
+    /**
+     * 获取舆情数量折线统计图 - 首页
+     * @param state
+     * @param timeSpan
+     * @return
+     */
+    List<OpinionCountStatVO> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan);
 
     /**
      * 关键词排行TOP10 - 首页
