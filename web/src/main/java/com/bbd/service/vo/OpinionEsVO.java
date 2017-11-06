@@ -40,7 +40,7 @@ public class OpinionEsVO {
     private Date     calcTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date     publicTime;
+    private Date     publishTime;
 
     public String getUuid() {
         return uuid;
@@ -138,11 +138,11 @@ public class OpinionEsVO {
         this.calcTime = calcTime;
     }
 
-    public Date getPublicTime() {
-        return publicTime;
+    public Date getPublishTime() {
+        return publishTime;
     }
 
-    public void setPublicTime(Date publicTime) {
-        this.publicTime = publicTime;
+    public void setPublishTime(Date publishTime) {
+        this.publishTime = publishTime;
     }
 }

@@ -42,12 +42,22 @@ public class HotOpinionController extends AbstractController {
 
     @ApiOperation(value = "热点舆情详情", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String uuid", paramType = "query", required = true)
+            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String", paramType = "query", required = true)
     })
-    @RequestMapping(value = "{uuid}", method = RequestMethod.GET)
-    public RestResult getWarnOpinionDetail(@PathVariable(value = "uuid") String uuid) {
+    @RequestMapping(value = "detail", method = RequestMethod.GET)
+    public RestResult getWarnOpinionDetail(String uuid) {
         ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
         return RestResult.ok(opinionService.getOpinionDetail(uuid));
+    }
+
+    @ApiOperation(value = "历史关键词搜索", httpMethod = "GET")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "搜索关键词", name = "keyWord", dataType = "String", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "history/keywords", method = RequestMethod.GET)
+    public RestResult getHistoryWordSearch(String keyWord) {
+        ValidateUtil.checkNull(keyWord, CommonErrorCode.PARAM_ERROR, "keyWord不能为空");
+        return RestResult.ok(opinionService.getHistoryWordSearch(keyWord));
     }
 
 }

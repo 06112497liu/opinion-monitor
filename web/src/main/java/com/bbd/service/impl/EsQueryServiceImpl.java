@@ -59,7 +59,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     private final String levelTwo = "levelTwo";
     private final String levelOne = "levelOne";
     private final String mediaTypeField = "mediaType";
-    private final String publicTimeField = "publicTime";
+    private final String publishTimeField = "publishTime";
     private final String emotionField = "emotion";
     private final String keysField = "keys";
     private final String eventsField = "events";
@@ -85,7 +85,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(hotField).gte(threeClass));
-        query.must(QueryBuilders.rangeQuery(publicTimeField).gte(dateTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(publishTimeField).gte(dateTime.toString(EsConstant.LONG_TIME_FORMAT)));
 
         // step-3：执行查询并返回结果
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
@@ -194,7 +194,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-2：构建es查询条件（这里差一个条件：舆情未存在舆情任务流程中）
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.rangeQuery(publicTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(hotField).gte(threeClass));
         if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
         if (mediaType != null) query.must(QueryBuilders.termQuery(mediaTypeField, mediaType));
@@ -324,7 +324,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         if (StringUtils.isNotBlank(param)) query.must(QueryBuilders.multiMatchQuery(param, titleField, contentField));
-        query.must(QueryBuilders.rangeQuery(publicTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(hotField).lt(threeClass));
         if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
         if (mediaType != null) query.must(QueryBuilders.termQuery(mediaTypeField, mediaType));

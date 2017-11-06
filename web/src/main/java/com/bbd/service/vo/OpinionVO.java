@@ -36,7 +36,7 @@ public class OpinionVO {
     private Date calcTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date publicTime;
+    private Date publishTime;
     
     private Integer level;
 
@@ -112,12 +112,12 @@ public class OpinionVO {
         this.calcTime = calcTime;
     }
 
-    public Date getPublicTime() {
-        return publicTime;
+    public Date getPublishTime() {
+        return publishTime;
     }
 
-    public void setPublicTime(Date publicTime) {
-        this.publicTime = publicTime;
+    public void setPublishTime(Date publishTime) {
+        this.publishTime = publishTime;
     }
 
     public Integer getLevel() {
