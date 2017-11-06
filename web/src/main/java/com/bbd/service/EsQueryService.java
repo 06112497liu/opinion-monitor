@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * ES查询服务
@@ -43,7 +44,7 @@ public interface EsQueryService {
      * @param timeSpan
      * @return
      */
-    List<OpinionCountStatVO> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan);
+    Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan);
 
     /**
      * 关键词排行TOP10 - 首页

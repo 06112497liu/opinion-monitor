@@ -16,6 +16,7 @@ import com.bbd.util.EsUtil;
 import com.bbd.util.JsonUtil;
 import com.bbd.util.StringUtils;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mybatis.domain.PageBounds;
 import io.swagger.models.auth.In;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -26,9 +27,15 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.range.InternalRange;
 import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.range.RangeAggregator;
+import org.elasticsearch.search.aggregations.bucket.range.date.DateRangeAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.range.date.InternalDateRange;
+import org.elasticsearch.search.aggregations.bucket.range.geodistance.InternalGeoDistance;
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
@@ -36,6 +43,8 @@ import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.Hours;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -157,8 +166,112 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     @Override
-    public List<OpinionCountStatVO> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan) {
-        return null;
+    public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan) {
+        String aggsName = "level_aggs";
+        // step-1：获取预警热度分界
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3); Integer twoClss = map.get(2); Integer oneClass = map.get(1);
+
+        // step-2：构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        SearchRequestBuilder searchBuilder = client.prepareSearch(EsConstant.IDX_OPINION)
+                .addAggregation(
+                        AggregationBuilders.range(aggsName).field(hotField).keyed(true)
+                                .addRange(levelThree, threeClass, twoClss - 1).addRange(levelTwo, twoClss, oneClass - 1).addRange(levelOne, oneClass, Integer.MAX_VALUE)
+                                .subAggregation(
+                                        buildDateRange(timeSpan)
+                                )
+                );
+        SearchResponse resp = searchBuilder.setSize(0).execute().actionGet();
+
+        // step-3：构建返回结果
+        Map<String, List<KeyValueVO>> result = Maps.newHashMap();
+        List<InternalRange.Bucket> list = ((InternalRange) (resp.getAggregations().get(aggsName))).getBuckets();
+        for(InternalRange.Bucket b : list) {
+            List<InternalDateRange.Bucket> dateList = ((InternalDateRange) (b.getAggregations().get("calc_aggs"))).getBuckets();
+            List<KeyValueVO> ls = Lists.newLinkedList();
+            for(InternalDateRange.Bucket d : dateList) {
+                KeyValueVO v = new KeyValueVO();
+                v.setKey(d.getKey()); v.setValue(d.getDocCount());
+                ls.add(v);
+            }
+            result.put(b.getKey(), ls);
+        }
+        return result;
+    }
+
+    // 创建dateRange
+    private DateRangeAggregationBuilder buildDateRange(Integer timeSpan) {
+        String aggsName = "calc_aggs";
+
+        // step-1：组装条件
+        DateTime now = DateTime.now();
+        DateTime startTime = null;
+        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(calcTimeField).keyed(true);
+        if(timeSpan == 1) {
+            startTime = now.withTimeAtStartOfDay();
+            dateRange.format("yyyy-MM-dd HH");
+            int currentHour = now.getHourOfDay();
+            int startHour = startTime.getHourOfDay();
+            int between = currentHour - startHour;
+            for (int i=between; i>=0; i--) {
+                String from = "now-" + i + "H/H";
+                String to = "now-" + (i-1) + "H/H";
+                if(i==0) to = "now+" + 1 + "H/H";
+                dateRange.addRange(between-i+1 + ":00:00", from, to);
+            }
+        } else if(timeSpan == 2) {
+            startTime = now.withDayOfWeek(DateTimeConstants.MONDAY).withTimeAtStartOfDay();
+            dateRange.format("yyyy-MM-dd");
+            int currentDay = now.getDayOfWeek();
+            int startDay = startTime.getDayOfWeek();
+            int between = currentDay - startDay;
+            for (int i=between; i>=0; i--) {
+                String from = "now-" + i + "d/d";
+                String to = "now-" + (i-1) + "d/d";
+                if(i==0) to = "now+" + 1 + "d/d";
+                dateRange.addRange("周" + (between-i+1), from, to);
+            }
+        } else if(timeSpan == 3) {
+            startTime = now.withDayOfMonth(1).withTimeAtStartOfDay();
+            dateRange.format("yyyy-MM-dd");
+            int currentMonth = now.getMonthOfYear();
+            int currentDay = now.getDayOfMonth();
+            int startDay = startTime.getDayOfMonth();
+            int between = currentDay - startDay;
+            for (int i=between; i>=0; i--) {
+                String from = "now-" + i + "d/d";
+                String to = "now-" + (i-1) + "d/d";
+                if(i==0) to = "now+" + 1 + "d/d";
+                dateRange.addRange(currentMonth + "月" + (between-i+1) + "日", from, to);
+            }
+        } else if(timeSpan == 4) {
+            startTime = now.withDayOfYear(1).withTimeAtStartOfDay();
+            dateRange.format("yyyy-MM");
+            int currentMonth = now.getMonthOfYear();
+            int startMonth = startTime.getMonthOfYear();
+            int between = currentMonth - startMonth;
+            for (int i=between; i>=0; i--) {
+                String from = "now-" + i + "M/M";
+                String to = "now-" + (i-1) + "M/M";
+                if(i==0) to = "now+" + 1 + "M/M";
+                dateRange.addRange((between-i+1) + "月", from, to);
+            }
+        } else {
+            startTime = now.plusYears(-4);
+            dateRange.format("yyyy");
+            int currentYear = now.getYear();
+            int startYear = startTime.getYear();
+            int between = currentYear - startYear;
+            for (int i=between; i>=0; i--) {
+                String from = "now-" + i + "y/y";
+                String to = "now-" + (i-1) + "y/y";
+                if(i==0) to = "now+" + 1 + "y/y";
+                dateRange.addRange(now.plusYears(-i).getYear() + "年", from, to);
+            }
+
+        }
+        return dateRange;
     }
 
     /**
