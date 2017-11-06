@@ -144,8 +144,8 @@ public class EventController extends AbstractController {
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
         @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true),
-        @ApiImplicitParam(value = "舆情类型,空表示全部舆情，0表示中性舆情，1表示正面舆情，2表示负面舆情", name = "emotion", dataType = "Integer", paramType = "query", required = true),
-        @ApiImplicitParam(value = "媒体类型,空表示全部，001表示新闻，002表示网站，003表示微信，004表示论坛，005表示微博，006表示政务，007表示其他", name = "source", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "舆情类型,空表示全部舆情，0表示中性舆情，1表示正面舆情，2表示负面舆情", name = "emotion", dataType = "Integer", paramType = "query", required = false),
+        @ApiImplicitParam(value = "媒体类型(1-新闻，2-网站，3-微信，4-论坛，5-微博，6-政务，7-其他)", name = "mediaType", dataType = "Integer", paramType = "query", required = false),
         @ApiImplicitParam(value = "起始页号", name = "pageNo", dataType = "Integer", paramType = "query", required = true),
         @ApiImplicitParam(value = "每页大小", name = "pageSize", dataType = "Integer", paramType = "query", required = true)
     })
@@ -165,7 +165,7 @@ public class EventController extends AbstractController {
         return RestResult.ok(eventService.eventLabelList(id, cycle, emotion));
     }
     
-    @ApiOperation(value = "事件信息列表/信息总量", httpMethod = "GET")
+    @ApiOperation(value = "事件信息列表/图表跟踪分析/信息总量", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
         @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)

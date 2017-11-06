@@ -422,39 +422,47 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     @Override
-    public List<KeyValueVO> getEventOpinionMediaSpread(Long eventId) {
+    public List<KeyValueVO> getEventOpinionMediaSpread(Long eventId, DateTime startTime) {
         String aggName = "media_aggs";
 
         TransportClient client = EsUtil.getClient();
-        TermQueryBuilder query = QueryBuilders.termQuery(eventsField, eventId);
+        BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
+        booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        booleanQuery.must(QueryBuilders.termQuery(eventsField, eventId));
+       
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
-                .setQuery(query)
+                .setQuery(booleanQuery)
                 .addAggregation(AggregationBuilders.terms(aggName).field(mediaTypeField).size(10)).setSize(0)
                 .execute().actionGet();
         return buildLongTermLists(resp, aggName);
     }
 
     @Override
-    public List<KeyValueVO> getEventWebsiteSpread(Long eventId) {
+    public List<KeyValueVO> getEventWebsiteSpread(Long eventId, DateTime startTime) {
         String aggName = "website_aggs";
 
         TransportClient client = EsUtil.getClient();
-        TermQueryBuilder query = QueryBuilders.termQuery(eventsField, eventId);
+        BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
+        booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        booleanQuery.must(QueryBuilders.termQuery(eventsField, eventId));
+        
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
-                .setQuery(query)
+                .setQuery(booleanQuery)
                 .addAggregation(AggregationBuilders.terms(aggName).field(websiteField).size(8)).setSize(0)
                 .execute().actionGet();
         return buildStringTermLists(resp, aggName);
     }
 
     @Override
-    public List<KeyValueVO> getEventEmotionSpread(Long eventId) {
+    public List<KeyValueVO> getEventEmotionSpread(Long eventId, DateTime startTime) {
         String aggName = "emotion_aggs";
 
         TransportClient client = EsUtil.getClient();
-        TermQueryBuilder query = QueryBuilders.termQuery(eventsField, eventId);
+        BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
+        booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        booleanQuery.must(QueryBuilders.termQuery(eventsField, eventId));
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
-                .setQuery(query)
+                .setQuery(booleanQuery)
                 .addAggregation(AggregationBuilders.terms(aggName).field(emotionField).size(10)).setSize(0)
                 .execute().actionGet();
         return buildLongTermLists(resp, aggName);

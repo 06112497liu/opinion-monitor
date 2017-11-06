@@ -108,21 +108,21 @@ public interface EsQueryService {
      * 舆情传播渠道分布 - 事件详情
      * @return
      */
-    List<KeyValueVO> getEventOpinionMediaSpread(Long eventId);
+    List<KeyValueVO> getEventOpinionMediaSpread(Long eventId, DateTime startTime);
 
     /**
      * 获取事件所有舆情网站来源占比 - 事件详情（媒体活跃度，媒体来源）
      * @param eventId
      * @return
      */
-    List<KeyValueVO> getEventWebsiteSpread(Long eventId);
+    List<KeyValueVO> getEventWebsiteSpread(Long eventId, DateTime startTime);
 
     /**
      * 获取事件所有舆情情感占比 - 事件详情
      * @param eventId
      * @return
      */
-    List<KeyValueVO> getEventEmotionSpread(Long eventId);
+    List<KeyValueVO> getEventEmotionSpread(Long eventId, DateTime startTime);
 
     /**
      * 根据舆情uuid查询舆情详情
