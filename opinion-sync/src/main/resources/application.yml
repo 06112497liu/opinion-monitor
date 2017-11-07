@@ -1,0 +1,9 @@
+mybatis:
+  mapperLocations: classpath*:mapper/**/*.xml
+
+spring:
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.81.143:3306/reddata_opinion?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true
+    username: root
+    password: uat@2017bbd
