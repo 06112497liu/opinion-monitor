@@ -49,7 +49,7 @@ public interface IndexStatisticService {
      * 舆情数据库统计
      * @return
      */
-    DBStaVO getDBsta();
+    DBStaVO getDBsta() throws NoSuchFieldException, IllegalAccessException;
 
     /**
      * 本月舆情关键词top10

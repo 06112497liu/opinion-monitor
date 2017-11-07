@@ -73,24 +73,38 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
 
     @Override
     public SystemStaVO getSystemSta() {
+
         return null;
     }
 
+    /**
+     * 舆情数据库统计
+     * @return
+     */
     @Override
-    public DBStaVO getDBsta() {
-        return null;
+    public DBStaVO getDBsta() throws NoSuchFieldException, IllegalAccessException {
+        DBStaVO v = esQueryService.getOpinionDBSta();
+        return v;
     }
 
+    /**
+     * 本月舆情关键词top10
+     * @return
+     */
     @Override
     public List<KeyValueVO> getKeywordsTopTen() {
         List<KeyValueVO> list = esQueryService.getKeywordsTopTen();
         list.sort((k1, k2) -> {
-            int a = ((Long)(k1.getValue())).intValue(); int b = ((Long)(k2.getValue())).intValue();
-            return Integer.compare(b, a);
+            long a = (long) k1.getValue(); long b = (long) k2.getValue();
+            return Long.compare(b, a);
         });
         return list;
     }
 
+    /**
+     * 舆情传播渠道分布
+     * @return
+     */
     @Override
     public List<KeyValuePercentVO> getEventChannelTrend() {
         List<KeyValueVO> list = esQueryService.getOpinionMediaSpread();

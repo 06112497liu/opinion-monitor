@@ -7,10 +7,7 @@ package com.bbd.service.impl;
 import com.bbd.constant.EsConstant;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.SystemSettingService;
-import com.bbd.service.vo.KeyValueVO;
-import com.bbd.service.vo.OpinionCountStatVO;
-import com.bbd.service.vo.OpinionEsSearchVO;
-import com.bbd.service.vo.OpinionEsVO;
+import com.bbd.service.vo.*;
 import com.bbd.util.EsUtil;
 import com.bbd.util.JsonUtil;
 import com.bbd.util.StringUtils;
@@ -21,6 +18,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -40,6 +38,7 @@ import org.joda.time.DateTimeConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -292,9 +291,49 @@ public class EsQueryServiceImpl implements EsQueryService {
         String aggName = "top_kws";
         TransportClient client = EsUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setQuery(QueryBuilders.rangeQuery(calcTimeField).gte(DateTime.now().plusMonths(-1).toString("yyyy-MM-dd HH:mm:ss")))
                 .addAggregation(AggregationBuilders.terms(aggName).field(keysField).size(10))
                 .setSize(0).execute().actionGet();
         return buildStringTermLists(resp, aggName);
+    }
+
+    /**
+     * 舆情数据库近12个月累计增量
+     * @return
+     */
+    @Override
+    public List<KeyValueVO> getOpinionHisotryCountSta() {
+        return null;
+    }
+
+    /**
+     * 获取舆情统计数据（24小时新增，7天新增，30天新增，历史总量）
+     * @return
+     */
+    @Override
+    public DBStaVO getOpinionDBSta() throws NoSuchFieldException, IllegalAccessException {
+        String aggName = "calc_aggs";
+        DateTime now = DateTime.now();
+        TransportClient client = EsUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .addAggregation(
+                        AggregationBuilders.dateRange(aggName).field(calcTimeField).keyed(true)
+                                .addUnboundedFrom("dayAdd", now.plusHours(-24))
+                                .addUnboundedFrom("weekAdd", now.plusDays(-7))
+                                .addUnboundedFrom("monthAdd", now.plusDays(-30))
+                                .addUnboundedFrom("historyTotal", now.plusYears(-10))
+                )
+                .setSize(0).execute().actionGet();
+        List<InternalRange.Bucket> agg = ((InternalRange) resp.getAggregations().get(aggName)).getBuckets();
+        DBStaVO v = new DBStaVO();
+        for (InternalRange.Bucket b : agg) {
+            String key = b.getKey();
+            long value = b.getDocCount();
+            Field s = v.getClass().getDeclaredField(key);
+            s.setAccessible(true);
+            s.set(v, value);
+        }
+        return v;
     }
 
     /**

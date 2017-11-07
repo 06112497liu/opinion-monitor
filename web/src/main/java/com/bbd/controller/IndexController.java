@@ -10,6 +10,7 @@ import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.IndexStatisticService;
 import com.bbd.service.OpinionService;
 import com.bbd.service.param.OpinionCountStatQueryParam;
+import com.bbd.service.vo.DBStaVO;
 import com.bbd.util.ValidateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -74,8 +75,9 @@ public class IndexController extends AbstractController {
 
     @ApiOperation(value = "舆情数据库统计", httpMethod = "GET")
     @RequestMapping(value = "/db/statistic", method = RequestMethod.GET)
-    public RestResult getDBsta() {
-        return RestResult.ok(indexStatisticService.getSystemSta());
+    public RestResult getDBsta() throws NoSuchFieldException, IllegalAccessException {
+        DBStaVO result = indexStatisticService.getDBsta();
+        return RestResult.ok(result);
     }
 
     @ApiOperation(value = "舆情数据库坐标轴", httpMethod = "GET")

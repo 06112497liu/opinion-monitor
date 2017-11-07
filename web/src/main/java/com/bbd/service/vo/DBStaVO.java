@@ -5,53 +5,53 @@ package com.bbd.service.vo;
  * @version Id: DBStaVO.java, v0.1 2017/11/1 Liuweibo Exp $$
  */
 public class DBStaVO {
-    private Integer historyTotal;
+    private Long historyTotal;
 
-    private Integer dayAdd;
+    private Long dayAdd;
 
-    private Integer weekAdd;
+    private Long weekAdd;
 
-    private Integer monthAdd;
+    private Long monthAdd;
 
     public DBStaVO() {
     }
 
-    public DBStaVO(Integer historyTotal, Integer dayAdd, Integer weekAdd, Integer monthAdd) {
+    public DBStaVO(Long historyTotal, Long dayAdd, Long weekAdd, Long monthAdd) {
         this.historyTotal = historyTotal;
         this.dayAdd = dayAdd;
         this.weekAdd = weekAdd;
         this.monthAdd = monthAdd;
     }
 
-    public Integer getHistoryTotal() {
+    public Long getHistoryTotal() {
         return historyTotal;
     }
 
-    public void setHistoryTotal(Integer historyTotal) {
+    public void setHistoryTotal(Long historyTotal) {
         this.historyTotal = historyTotal;
     }
 
-    public Integer getDayAdd() {
+    public Long getDayAdd() {
         return dayAdd;
     }
 
-    public void setDayAdd(Integer dayAdd) {
+    public void setDayAdd(Long dayAdd) {
         this.dayAdd = dayAdd;
     }
 
-    public Integer getWeekAdd() {
+    public Long getWeekAdd() {
         return weekAdd;
     }
 
-    public void setWeekAdd(Integer weekAdd) {
+    public void setWeekAdd(Long weekAdd) {
         this.weekAdd = weekAdd;
     }
 
-    public Integer getMonthAdd() {
+    public Long getMonthAdd() {
         return monthAdd;
     }
 
-    public void setMonthAdd(Integer monthAdd) {
+    public void setMonthAdd(Long monthAdd) {
         this.monthAdd = monthAdd;
     }
 

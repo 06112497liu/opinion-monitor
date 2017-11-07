@@ -4,10 +4,7 @@
  */
 package com.bbd.service;
 
-import com.bbd.service.vo.KeyValueVO;
-import com.bbd.service.vo.OpinionCountStatVO;
-import com.bbd.service.vo.OpinionEsSearchVO;
-import com.bbd.service.vo.OpinionEsVO;
+import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -51,6 +48,18 @@ public interface EsQueryService {
      * @return
      */
     List<KeyValueVO> getKeywordsTopTen();
+
+    /**
+     * 舆情数据库近12个月累计增量
+     * @return
+     */
+    List<KeyValueVO> getOpinionHisotryCountSta();
+
+    /**
+     * 获取舆情统计数据（24小时新增，7天新增，30天新增，历史总量）
+     * @return
+     */
+    DBStaVO getOpinionDBSta() throws NoSuchFieldException, IllegalAccessException;
 
     /**
      * 舆情传播渠道分布 - 首页
