@@ -50,6 +50,7 @@ public class EventService{
 	@Autowired
 	private SystemSettingService systemSettingService;
 	/**  
+	 * 创建事件
 	 * @param opinionEvent 
 	 */
 	public void createEvent(OpinionEvent opinionEvent) {
@@ -107,6 +108,7 @@ public class EventService{
 	
 	
 	/**  
+	 * 获取事件
 	 * @param id
 	 * @return 
 	 */
@@ -116,6 +118,7 @@ public class EventService{
 
 	
 	/**  
+	 * 修改事件
 	 * @param opinionEvent 
 	 */
 	public void modifyEvent(OpinionEvent opinionEvent) {
@@ -123,6 +126,7 @@ public class EventService{
 	}
 	
 	/**  
+	 * 删除事件
      * @param opinionEvent 
      */
     public void deleteEvent(OpinionEvent opinionEvent) {
@@ -131,6 +135,7 @@ public class EventService{
     }
     
     /**  
+     * 获取事件列表
      * @param opinionEvent
      * @param pageNo
      * @param pageSize
@@ -153,7 +158,8 @@ public class EventService{
     }
 	
 	
-	/**  
+	/** 
+	 * 获取字典表 
 	 * @param parent
 	 * @return 
 	 */
@@ -165,6 +171,7 @@ public class EventService{
 	
 	
 	/**  
+	 * 获取事件相关的舆情列表
 	 * @param id
 	 * @param cycle
 	 * @param emotion
@@ -201,10 +208,6 @@ public class EventService{
 	    
 	}
 	
-	/**  
-	 * @param timeSpan
-	 * @return 
-	 */
 	private DateTime buildTimeSpan(Integer timeSpan) {
 	        DateTime now = DateTime.now();
 	        DateTime startTime = null;
@@ -214,10 +217,6 @@ public class EventService{
 	        return startTime;
 	    }
 	 
-	 
-	/**  
-	 * @param list 
-	 */
 	private void transMediaTypeToChina(List<KeyValueVO> list) {
 	        for(KeyValueVO v : list) {
 	            v.setName( WebsiteEnum.getDescByCode( v.getKey().toString() ) );
@@ -225,6 +224,7 @@ public class EventService{
 	    }
 	
 	/**  
+	 * 获取事件舆情列表的媒体标签
 	 * @param id
 	 * @param cycle
 	 * @param emotion
@@ -239,7 +239,8 @@ public class EventService{
 	}
 	
 	
-	/**  
+	/**
+	 * 获取事件对应周期的信息总量  
 	 * @param id
 	 * @param cycle
 	 * @return 
@@ -252,6 +253,7 @@ public class EventService{
 	
 	
 	/**  
+	 * 获取事件的热度
 	 * @param id
 	 * @return 
 	 */
@@ -261,6 +263,7 @@ public class EventService{
 	
 	
 	/**  
+	 * 获取事件总体走势
 	 * @param id
 	 * @param cycle
 	 * @return 
@@ -284,6 +287,7 @@ public class EventService{
 	
 	
 	/**  
+	 * 事件媒体分布
 	 * @param id
 	 * @param cycle
 	 * @return 
@@ -296,6 +300,7 @@ public class EventService{
 	
 	
 	/**  
+	 * 事件信息走势图
 	 * @param id
 	 * @param cycle
 	 * @return 
@@ -325,6 +330,7 @@ public class EventService{
 	
 	
 	/**  
+	 * 事件媒体活跃度
 	 * @param id
 	 * @param cycle
 	 * @return 
@@ -333,6 +339,15 @@ public class EventService{
         return esQueryService.getEventWebsiteSpread(id, buildTimeSpan(cycle));
     }
 	
+	
+	/**  
+	 * 事件走势
+	 * @param id
+	 * @param cycle
+	 * @param pageNo
+	 * @param pageSize
+	 * @return 
+	 */
 	public HashMap<String, Object> eventTrend(Long id, Integer cycle, Integer pageNo, Integer pageSize) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         OpinionEsSearchVO vo = esQueryService.queryEventTrendOpinions(id, buildTimeSpan(cycle), new PageBounds(pageNo, pageSize));
@@ -341,6 +356,13 @@ public class EventService{
         return map;
     }
 	
+	
+	/** 
+	 * 事件关键词云 
+	 * @param id
+	 * @param cycle
+	 * @return 
+	 */
 	public List<KeyValueVO> eventKeywords(Long id, Integer cycle) {
 	    List<KeyValueVO> words = new ArrayList<KeyValueVO>();
 	    OpinionEventWordsExample example = new OpinionEventWordsExample();
@@ -358,6 +380,13 @@ public class EventService{
         return words;
     }
     
+	
+	/**
+	 * 事件数据类型  
+	 * @param id
+	 * @param cycle
+	 * @return 
+	 */
 	public List<KeyValueVO> eventDataType(Long id, Integer cycle) {
         return esQueryService.getEventEmotionSpread(id, buildTimeSpan(cycle));
     }  
