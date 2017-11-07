@@ -30,6 +30,11 @@ public class OpinionVO {
     
     private String website;
 
+    /**
+     * 舆情来源
+     */
+    private String source;
+
     private Integer mediaType;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -94,6 +99,14 @@ public class OpinionVO {
 
     public void setWebsite(String website) {
         this.website = website;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public Integer getMediaType() {

@@ -6,6 +6,7 @@ package com.bbd.service;
 
 import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
+import com.mybatis.domain.PageList;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
@@ -148,4 +149,21 @@ public interface EsQueryService {
      * @return
      */
     OpinionEsVO getOpinionByUUID(String uuid);
+
+    /**
+     * 当前用户待处理舆情列表
+     * @param userId
+     * @param transferType
+     * @param pb
+     * @return
+     */
+    PageList<OpinionTaskListVO> getUnProcessedList(Long userId, Integer transferType, PageBounds pb);
+
+    /**
+     * 当前用户转发、解除、监测列表
+     * @param opStatus 1. 转发；2. 已解除； 3. 已监控
+     * @param pb
+     * @return
+     */
+    PageList<OpinionTaskListVO> getProcessedList(Integer opStatus, PageBounds pb);
 }

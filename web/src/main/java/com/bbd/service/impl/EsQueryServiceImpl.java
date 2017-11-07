@@ -11,9 +11,14 @@ import com.bbd.service.vo.*;
 import com.bbd.util.EsUtil;
 import com.bbd.util.JsonUtil;
 import com.bbd.util.StringUtils;
+import com.bbd.util.UserContext;
+import com.bbd.vo.UserInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mybatis.domain.PageBounds;
+import com.mybatis.domain.PageList;
+import com.mybatis.domain.Paginator;
+import com.mybatis.util.PageListHelper;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -69,6 +74,9 @@ public class EsQueryServiceImpl implements EsQueryService {
     private final String warnTimeField = "warnTime";
     private final String hotLevelField = "hotLevel";
     private final String opStatusField = "opStatus";
+    private final String opOwnerField = "opOwner";
+    private final String transferTypeField = "transferType";
+    private final String operatorsField = "operators";
 
     /**
      * 获取预警舆情top10（排除在舆情任务中的预警舆情，以及热点舆情）
@@ -678,4 +686,97 @@ public class EsQueryServiceImpl implements EsQueryService {
         if(list.isEmpty()) return null;
         return list.get(0);
     }
+
+    /**
+     * 当前用户待处理舆情列表
+     * @param userId
+     * @param transferType
+     * @return
+     */
+    @Override
+    public PageList<OpinionTaskListVO> getUnProcessedList(Long userId, Integer transferType, PageBounds pb) {
+
+        // step-1：构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.termQuery(opStatusField, 1));
+        query.must(QueryBuilders.termQuery(opOwnerField, userId));
+        if(transferType != null) {
+            query.must(QueryBuilders.termQuery(transferTypeField, transferType));
+        }
+
+        // step-2：查询
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setFrom(pb.getOffset()).setSize(pb.getLimit())
+                .setQuery(query)
+                .addSort(hotField, SortOrder.DESC)
+                .execute().actionGet();
+
+        // step-3：返回查询结果
+        Long total = resp.getHits().getTotalHits();
+        List<OpinionTaskListVO> list = buildResult(resp, OpinionTaskListVO.class);
+            // 查询转发记录
+        Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
+        PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);
+        return result;
+    }
+
+    /**
+     * 当前用户转发、解除、监测列表
+     * @param opStatus 1. 转发（介入）；2. 已解除； 3. 已监控
+     * @param pb
+     * @return
+     */
+    @Override
+    public PageList<OpinionTaskListVO> getProcessedList(Integer opStatus, PageBounds pb) {
+
+        // step-1：构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+            // 判断当前用户是否是超级管理员(如果是管理员的话，就能看到所有的数据)
+        UserInfo user = UserContext.getUser();
+        Boolean isAdmin = user.getAdmin();
+        if(!isAdmin) query.must(QueryBuilders.matchQuery(operatorsField, user.getId())); // 操作者字段必须包含当前用户
+        if(opStatus != null) {
+            query.must(QueryBuilders.termQuery(opStatusField, opStatus));
+        }
+
+        // step-2：查询
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setFrom(pb.getOffset()).setSize(pb.getLimit())
+                .setQuery(query)
+                .addSort(hotField, SortOrder.DESC)
+                .execute().actionGet();
+
+        // step-3：返回查询结果
+        Long total = resp.getHits().getTotalHits();
+        List<OpinionTaskListVO> list = buildResult(resp, OpinionTaskListVO.class);
+            // 查询转发记录
+        Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
+        PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);
+        return result;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
