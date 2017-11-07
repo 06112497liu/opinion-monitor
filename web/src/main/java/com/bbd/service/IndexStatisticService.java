@@ -27,10 +27,11 @@ public interface IndexStatisticService {
 
     /**
      * 预警舆情数量统计坐标轴
-     * @param param
+     * @param state
+     * @param timeSpan
      * @return
      */
-    Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(OpinionCountStatQueryParam param);
+    Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan);
 
     /**
      * 舆情数据库统计坐标轴
@@ -48,7 +49,7 @@ public interface IndexStatisticService {
      * 舆情数据库统计
      * @return
      */
-    DBStaVO getDBsta();
+    DBStaVO getDBsta() throws NoSuchFieldException, IllegalAccessException;
 
     /**
      * 本月舆情关键词top10

@@ -11,7 +11,9 @@ import com.bbd.service.param.OpinionCountStatQueryParam;
 import com.bbd.service.utils.PercentUtil;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
+import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,20 +34,36 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
 
     @Override
     public OpinionCountStatVO getOpinionCountStatistic(Integer state, Integer timeSpan) {
+
         // step-1：组装条件
         DateTime now = DateTime.now();
         DateTime startTime = null;
-        if(timeSpan == 2) startTime = now.plusDays(-7);
-        else if(timeSpan == 3) startTime = now.plusMonths(-1);
-        else startTime = now.plusDays(-1);
+        if(timeSpan == 1) startTime = now.withTimeAtStartOfDay();
+        else if(timeSpan == 2) startTime = now.withDayOfWeek(DateTimeConstants.MONDAY).withTimeAtStartOfDay();
+        else if(timeSpan == 3) startTime = now.withDayOfMonth(1).withTimeAtStartOfDay();
+        else if(timeSpan == 4) startTime = now.withDayOfYear(1).withTimeAtStartOfDay();
+        else startTime = now.plusYears(-6);
+
         // step-2：执行查询
-        OpinionCountStatVO result = esQueryService.getOpinionCountStatistic(startTime);
+        OpinionCountStatVO result = esQueryService.getOpinionCountStatistic(state, startTime);
         return result;
     }
 
     @Override
-    public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(OpinionCountStatQueryParam param) {
-        return null;
+    public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan) {
+        Map<String, List<KeyValueVO>> map = esQueryService.getOpinionCountStatisticGroupTime(state, timeSpan);
+        List<KeyValueVO> levleOneList = map.get("levelOne");
+        List<KeyValueVO> levleTwoList = map.get("levelTwo");
+        List<KeyValueVO> levleThreeList = map.get("levelThree");
+        List<KeyValueVO> allList = Lists.newLinkedList();
+        for (int i=0; i<levleOneList.size(); i++) {
+            KeyValueVO v = new KeyValueVO();
+            v.setKey(levleOneList.get(i).getKey());
+            v.setValue((long)(levleOneList.get(i).getValue()) + (long)(levleTwoList.get(i).getValue()) + (long)(levleThreeList.get(i).getValue()));
+            allList.add(v);
+        }
+        map.put("all", allList);
+        return map;
     }
 
     @Override
@@ -55,24 +73,38 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
 
     @Override
     public SystemStaVO getSystemSta() {
+
         return null;
     }
 
+    /**
+     * 舆情数据库统计
+     * @return
+     */
     @Override
-    public DBStaVO getDBsta() {
-        return null;
+    public DBStaVO getDBsta() throws NoSuchFieldException, IllegalAccessException {
+        DBStaVO v = esQueryService.getOpinionDBSta();
+        return v;
     }
 
+    /**
+     * 本月舆情关键词top10
+     * @return
+     */
     @Override
     public List<KeyValueVO> getKeywordsTopTen() {
         List<KeyValueVO> list = esQueryService.getKeywordsTopTen();
         list.sort((k1, k2) -> {
-            int a = ((Long)(k1.getValue())).intValue(); int b = ((Long)(k2.getValue())).intValue();
-            return Integer.compare(b, a);
+            long a = (long) k1.getValue(); long b = (long) k2.getValue();
+            return Long.compare(b, a);
         });
         return list;
     }
 
+    /**
+     * 舆情传播渠道分布
+     * @return
+     */
     @Override
     public List<KeyValuePercentVO> getEventChannelTrend() {
         List<KeyValueVO> list = esQueryService.getOpinionMediaSpread();

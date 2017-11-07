@@ -56,6 +56,13 @@ public interface OpinionService {
     OpinionExtVO getOpinionDetail(String uuid);
 
     /**
+     * 历史关键词搜索查询
+     * @param keyword
+     * @return
+     */
+    List<String> getHistoryWordSearch(String keyword);
+
+    /**
      * 舆情相同文章数信息
      * @param uuid
      * @param pageBounds

@@ -30,13 +30,18 @@ public class OpinionVO {
     
     private String website;
 
+    /**
+     * 舆情来源
+     */
+    private String source;
+
     private Integer mediaType;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date calcTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date publicTime;
+    private Date publishTime;
     
     private Integer level;
 
@@ -96,6 +101,14 @@ public class OpinionVO {
         this.website = website;
     }
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
     public Integer getMediaType() {
         return mediaType;
     }
@@ -112,12 +125,12 @@ public class OpinionVO {
         this.calcTime = calcTime;
     }
 
-    public Date getPublicTime() {
-        return publicTime;
+    public Date getPublishTime() {
+        return publishTime;
     }
 
-    public void setPublicTime(Date publicTime) {
-        this.publicTime = publicTime;
+    public void setPublishTime(Date publishTime) {
+        this.publishTime = publishTime;
     }
 
     public Integer getLevel() {

@@ -4,16 +4,15 @@
  */
 package com.bbd.service;
 
-import com.bbd.service.vo.KeyValueVO;
-import com.bbd.service.vo.OpinionCountStatVO;
-import com.bbd.service.vo.OpinionEsSearchVO;
-import com.bbd.service.vo.OpinionEsVO;
+import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
+import com.mybatis.domain.PageList;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * ES查询服务
@@ -31,16 +30,37 @@ public interface EsQueryService {
 
     /**
      * 获取舆情数量 - 首页
+     * @param state
      * @param startTime
      * @return
      */
-    OpinionCountStatVO getOpinionCountStatistic(DateTime startTime);
+    OpinionCountStatVO getOpinionCountStatistic(Integer state, DateTime startTime);
+
+    /**
+     * 获取舆情数量折线统计图 - 首页
+     * @param state
+     * @param timeSpan
+     * @return
+     */
+    Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan);
 
     /**
      * 关键词排行TOP10 - 首页
      * @return
      */
     List<KeyValueVO> getKeywordsTopTen();
+
+    /**
+     * 舆情数据库近12个月累计增量
+     * @return
+     */
+    List<KeyValueVO> getOpinionHisotryCountSta();
+
+    /**
+     * 获取舆情统计数据（24小时新增，7天新增，30天新增，历史总量）
+     * @return
+     */
+    DBStaVO getOpinionDBSta() throws NoSuchFieldException, IllegalAccessException;
 
     /**
      * 舆情传播渠道分布 - 首页
@@ -68,6 +88,14 @@ public interface EsQueryService {
      * @return
      */
     OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb);
+    /**
+     * 查询舆情事件走势
+     * @param eventId: 事件ID
+     * @param startTime: 开始时间
+     * @param pb: 分页
+     * @return
+     */
+    OpinionEsSearchVO queryEventTrendOpinions(Long eventId, DateTime startTime, DateTime endTime, PageBounds pb);
 
     /**
      * 查询历史预警舆情
@@ -99,21 +127,21 @@ public interface EsQueryService {
      * 舆情传播渠道分布 - 事件详情
      * @return
      */
-    List<KeyValueVO> getEventOpinionMediaSpread(Long eventId);
+    List<KeyValueVO> getEventOpinionMediaSpread(Long eventId, DateTime startTime, DateTime endTime);
 
     /**
      * 获取事件所有舆情网站来源占比 - 事件详情（媒体活跃度，媒体来源）
      * @param eventId
      * @return
      */
-    List<KeyValueVO> getEventWebsiteSpread(Long eventId);
+    List<KeyValueVO> getEventWebsiteSpread(Long eventId, DateTime startTime, DateTime endTime);
 
     /**
      * 获取事件所有舆情情感占比 - 事件详情
      * @param eventId
      * @return
      */
-    List<KeyValueVO> getEventEmotionSpread(Long eventId);
+    List<KeyValueVO> getEventEmotionSpread(Long eventId, DateTime startTime, DateTime endTime);
 
     /**
      * 根据舆情uuid查询舆情详情
@@ -121,4 +149,21 @@ public interface EsQueryService {
      * @return
      */
     OpinionEsVO getOpinionByUUID(String uuid);
+
+    /**
+     * 当前用户待处理舆情列表
+     * @param userId
+     * @param transferType
+     * @param pb
+     * @return
+     */
+    PageList<OpinionTaskListVO> getUnProcessedList(Long userId, Integer transferType, PageBounds pb);
+
+    /**
+     * 当前用户转发、解除、监测列表
+     * @param opStatus 1. 转发；2. 已解除； 3. 已监控
+     * @param pb
+     * @return
+     */
+    PageList<OpinionTaskListVO> getProcessedList(Integer opStatus, PageBounds pb);
 }

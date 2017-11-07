@@ -27,7 +27,7 @@ public class EsQueryServiceTest extends BaseServiceTest {
     public void testGetOpinionCountStatistic() {
         DateTime now = new DateTime();
         now = now.plusMonths(-3);
-        esQueryService.getOpinionCountStatistic(now);
+        esQueryService.getOpinionCountStatistic(1, now);
     }
 
     @Test
@@ -71,21 +71,21 @@ public class EsQueryServiceTest extends BaseServiceTest {
     @Test
     public void testGetEventOpinionMediaSpread() {
         long eventId = 6L;
-        List<KeyValueVO> r = esQueryService.getEventOpinionMediaSpread(eventId);
+        List<KeyValueVO> r = esQueryService.getEventOpinionMediaSpread(eventId, DateTime.now());
         assertNotNull(r);
     }
 
     @Test
     public void testGetEventWebsiteSpread() {
         long eventId = 6L;
-        List<KeyValueVO> r = esQueryService.getEventWebsiteSpread(eventId);
+        List<KeyValueVO> r = esQueryService.getEventWebsiteSpread(eventId, DateTime.now());
         assertNotNull(r);
     }
 
     @Test
     public void testGetEventEmotionSpread() {
         long eventId = 6L;
-        List<KeyValueVO> r = esQueryService.getEventEmotionSpread(eventId);
+        List<KeyValueVO> r = esQueryService.getEventEmotionSpread(eventId, DateTime.now());
         assertNotNull(r);
     }
 

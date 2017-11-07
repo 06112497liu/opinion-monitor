@@ -20,7 +20,7 @@ public class OpinionExtVO extends OpinionVO {
     /**
      * 词云
      */
-    private String[] keyword;
+    private String[] keys;
 
 
     public Integer getCommentCount() {
@@ -39,12 +39,12 @@ public class OpinionExtVO extends OpinionVO {
         this.content = content;
     }
 
-    public String[] getKeyword() {
-        return keyword;
+    public String[] getKeys() {
+        return keys;
     }
 
-    public void setKeyword(String[] keyword) {
-        this.keyword = keyword;
+    public void setKeys(String[] keys) {
+        this.keys = keys;
     }
 }
     

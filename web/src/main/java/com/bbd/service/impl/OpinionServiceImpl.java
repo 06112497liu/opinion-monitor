@@ -1,11 +1,17 @@
 package com.bbd.service.impl;
 
 import com.bbd.enums.WebsiteEnum;
+import com.bbd.exception.ApplicationException;
+import com.bbd.exception.BizErrorCode;
+import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
+import com.bbd.util.RedisCacheUtil;
+import com.bbd.util.UserContext;
+import com.bbd.vo.UserInfo;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -15,11 +21,16 @@ import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -35,13 +46,19 @@ public class OpinionServiceImpl implements OpinionService {
     @Autowired
     private SystemSettingService systemSettingService;
 
+    @Autowired
+    private RedisCacheUtil redisCacheUtil;
+
+    @Resource
+    public RedisTemplate redisTemplate;
+
     @Override
     public List<WarnOpinionTopTenVO> getWarnOpinionTopTen() {
         List<WarnOpinionTopTenVO> result = Lists.newLinkedList();
         List<OpinionEsVO> esList = esQueryService.getWarnOpinionTopTen();
         esList.forEach(o -> {
             WarnOpinionTopTenVO v = new WarnOpinionTopTenVO();
-            v.setTime(o.getPublicTime());
+            v.setTime(o.getPublishTime());
             v.setHot(o.getHot());
             v.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
             v.setTitle(o.getTitle());
@@ -154,6 +171,11 @@ public class OpinionServiceImpl implements OpinionService {
         return map;
     }
 
+    /**
+     * 舆情详情
+     * @param uuid
+     * @return
+     */
     @Override
     public OpinionExtVO getOpinionDetail(String uuid) {
         OpinionEsVO o = esQueryService.getOpinionByUUID(uuid);
@@ -162,6 +184,23 @@ public class OpinionServiceImpl implements OpinionService {
         Integer level = systemSettingService.judgeOpinionSettingClass(result.getHot());
         result.setLevel(level);
         return result;
+    }
+
+    /**
+     * 历史关键词搜索查询
+     * @param keyword
+     * @return
+     */
+    @Override
+    public List<String> getHistoryWordSearch(String keyword) {
+        ListOperations listOperation = redisTemplate.opsForList();
+        UserInfo user = UserContext.getUser();
+        if(Objects.isNull(user)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
+        List list = listOperation.range("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), 0, 9);
+        if(!list.contains(keyword))
+            listOperation.leftPush("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), keyword);
+        list = listOperation.range("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), 0, 9);
+        return list;
     }
 
     @Override
