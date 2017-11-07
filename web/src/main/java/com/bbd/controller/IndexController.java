@@ -48,7 +48,7 @@ public class IndexController extends AbstractController {
 
     @ApiOperation(value = "预警舆情统计", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "状态：0. 未处理; 1. 已处理", name = "state", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "状态：0. 未处理; 1. 已处理", name = "state", dataType = "Integer", paramType = "query", required = true),
             @ApiImplicitParam(value = "时间跨度：1. 本日；2. 本周； 3. 本月； 4. 本年； 5. 全部。", name = "timeSpan", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "/stat/opinion/count", method = RequestMethod.GET)

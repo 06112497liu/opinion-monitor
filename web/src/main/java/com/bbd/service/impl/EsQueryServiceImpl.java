@@ -5,7 +5,6 @@
 package com.bbd.service.impl;
 
 import com.bbd.constant.EsConstant;
-import com.bbd.domain.Opinion;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.vo.KeyValueVO;
@@ -18,7 +17,6 @@ import com.bbd.util.StringUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mybatis.domain.PageBounds;
-import io.swagger.models.auth.In;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -27,28 +25,21 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.Aggregation;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.range.InternalRange;
 import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.range.RangeAggregator;
 import org.elasticsearch.search.aggregations.bucket.range.date.DateRangeAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.range.date.InternalDateRange;
-import org.elasticsearch.search.aggregations.bucket.range.geodistance.InternalGeoDistance;
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
-import org.joda.time.Hours;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -78,6 +69,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     private final String websiteField = "website";
     private final String warnTimeField = "warnTime";
     private final String hotLevelField = "hotLevel";
+    private final String opStatusField = "opStatus";
 
     /**
      * 获取预警舆情top10（排除在舆情任务中的预警舆情，以及热点舆情）
@@ -95,6 +87,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(hotField).gte(threeClass));
         query.must(QueryBuilders.rangeQuery(publishTimeField).gte(dateTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.termQuery(opStatusField, 0));
 
         // step-3：执行查询并返回结果
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
@@ -127,10 +120,21 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.rangeQuery(EsConstant.CALC_TIME_PROP).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        if(state != null) {
+            if(state == 0) query.must(QueryBuilders.termQuery(opStatusField, 0));
+            else query.mustNot(QueryBuilders.termQuery(opStatusField, 0));
+        }
+
+        RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(aggName).field(hotField).keyed(true)
+                .addRange(levelThree, threeClass, twoClss - 1)
+                .addRange(levelTwo, twoClss, oneClass - 1)
+                .addRange(levelOne, oneClass, Integer.MAX_VALUE);
+
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
-                .setQuery(QueryBuilders.rangeQuery(EsConstant.CALC_TIME_PROP).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)))
-                .addAggregation(AggregationBuilders.range(aggName).field(hotField).keyed(true)
-                        .addRange(levelThree, threeClass, twoClss-1).addRange(levelTwo, twoClss, oneClass-1).addRange(levelOne, oneClass, Integer.MAX_VALUE))
+                .setQuery(query)
+                .addAggregation(hotLevelAgg)
                 .setSize(0).execute().actionGet();
 
         // step-3：查询并构建结果
@@ -174,15 +178,21 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
-        SearchRequestBuilder searchBuilder = client.prepareSearch(EsConstant.IDX_OPINION)
-                .addAggregation(
-                        AggregationBuilders.range(aggsName).field(hotField).keyed(true)
-                                .addRange(levelThree, threeClass, twoClss - 1).addRange(levelTwo, twoClss, oneClass - 1).addRange(levelOne, oneClass, Integer.MAX_VALUE)
-                                .subAggregation(
-                                        buildDateRange(timeSpan)
-                                )
-                );
-        SearchResponse resp = searchBuilder.setSize(0).execute().actionGet();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        if(state != null) {
+            if(state == 0) query.must(QueryBuilders.termQuery(opStatusField, 0));
+            else query.mustNot(QueryBuilders.termQuery(opStatusField, 0));
+        }
+        RangeAggregationBuilder aggregation = AggregationBuilders.range(aggsName).field(hotField).keyed(true)
+                .addRange(levelThree, threeClass, twoClss - 1)
+                .addRange(levelTwo, twoClss, oneClass - 1)
+                .addRange(levelOne, oneClass, Integer.MAX_VALUE)
+                .subAggregation(buildDateRange(timeSpan));
+
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setQuery(query)
+                .addAggregation(aggregation)
+                .setSize(0).execute().actionGet();
 
         // step-3：构建返回结果
         Map<String, List<KeyValueVO>> result = Maps.newHashMap();
