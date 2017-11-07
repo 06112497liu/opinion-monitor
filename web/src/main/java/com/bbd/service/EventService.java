@@ -293,7 +293,7 @@ public class EventService{
 	 * @return 
 	 */
 	public List<KeyValueVO> eventSrcDis(Long id, Integer cycle) {
-	    List<KeyValueVO> rs = esQueryService.getEventOpinionMediaSpread(id, buildTimeSpan(cycle));
+	    List<KeyValueVO> rs = esQueryService.getEventOpinionMediaSpread(id, buildTimeSpan(cycle), null);
 	    transMediaTypeToChina(rs);
         return rs;
 	}
@@ -336,7 +336,7 @@ public class EventService{
 	 * @return 
 	 */
 	public List<KeyValueVO> eventSrcActive(Long id, Integer cycle) {
-        return esQueryService.getEventWebsiteSpread(id, buildTimeSpan(cycle));
+        return esQueryService.getEventWebsiteSpread(id, buildTimeSpan(cycle), null);
     }
 	
 	
@@ -350,7 +350,7 @@ public class EventService{
 	 */
 	public HashMap<String, Object> eventTrend(Long id, Integer cycle, Integer pageNo, Integer pageSize) {
         HashMap<String, Object> map = new HashMap<String, Object>();
-        OpinionEsSearchVO vo = esQueryService.queryEventTrendOpinions(id, buildTimeSpan(cycle), new PageBounds(pageNo, pageSize));
+        OpinionEsSearchVO vo = esQueryService.queryEventTrendOpinions(id, buildTimeSpan(cycle), null, new PageBounds(pageNo, pageSize));
         map.put("opinions", vo.getOpinions());
         map.put("eventTime", opinionEventDao.selectByPrimaryKey(id).getGmtCreate());
         return map;
@@ -388,7 +388,7 @@ public class EventService{
 	 * @return 
 	 */
 	public List<KeyValueVO> eventDataType(Long id, Integer cycle) {
-        return esQueryService.getEventEmotionSpread(id, buildTimeSpan(cycle));
+        return esQueryService.getEventEmotionSpread(id, buildTimeSpan(cycle), null);
     }  
 	
 }

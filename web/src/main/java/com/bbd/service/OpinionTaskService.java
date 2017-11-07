@@ -5,6 +5,9 @@ import com.bbd.service.vo.OpinionTaskListVO;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+
 /**
  * 舆情任务服务
  * @author Liuweibo
@@ -31,7 +34,7 @@ public interface OpinionTaskService {
      * 转发舆情
      * @param param
      */
-    void transferOpinion(TransferParam param);
+    void transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException;
 
 }
     

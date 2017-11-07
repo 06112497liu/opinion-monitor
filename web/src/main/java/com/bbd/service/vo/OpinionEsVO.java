@@ -77,12 +77,12 @@ public class OpinionEsVO {
     /**
      * 待操作者
      */
-    private Integer opOwner;
+    private Long opOwner;
 
     /**
      * 操作者
      */
-    private Integer[] operators;
+    private Long[] operators;
 
     /**
      * 转发类型
@@ -229,19 +229,20 @@ public class OpinionEsVO {
         this.opStatus = opStatus;
     }
 
-    public Integer getOpOwner() {
+
+    public Long getOpOwner() {
         return opOwner;
     }
 
-    public void setOpOwner(Integer opOwner) {
+    public void setOpOwner(Long opOwner) {
         this.opOwner = opOwner;
     }
 
-    public Integer[] getOperators() {
+    public Long[] getOperators() {
         return operators;
     }
 
-    public void setOperators(Integer[] operators) {
+    public void setOperators(Long[] operators) {
         this.operators = operators;
     }
 
