@@ -6,6 +6,7 @@ package com.bbd.service.impl;
 
 import com.bbd.constant.EsConstant;
 import com.bbd.service.EsQueryService;
+import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.vo.*;
 import com.bbd.util.EsUtil;
@@ -46,6 +47,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 
 /**
  * ES查询服务
@@ -727,6 +729,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();
         List<OpinionTaskListVO> list = buildResult(resp, OpinionTaskListVO.class);
+        list.forEach(o -> o.setLevel(settingService.judgeOpinionSettingClass(o.getHot())));
             // 查询转发记录
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);
@@ -763,6 +766,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();
         List<OpinionTaskListVO> list = buildResult(resp, OpinionTaskListVO.class);
+        list.forEach(o -> o.setLevel(settingService.judgeOpinionSettingClass(o.getHot())));
             // 查询转发记录
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);
