@@ -1,5 +1,6 @@
 package com.bbd.service;
 
+import com.bbd.service.param.TransferParam;
 import com.bbd.service.vo.OpinionTaskListVO;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
@@ -25,6 +26,12 @@ public interface OpinionTaskService {
      * @return
      */
     PageList<OpinionTaskListVO> getProcessedList(Integer opStatus, PageBounds pb);
+
+    /**
+     * 转发舆情
+     * @param param
+     */
+    void transferOpinion(TransferParam param);
 
 }
     

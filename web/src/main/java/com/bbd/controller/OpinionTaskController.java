@@ -1,8 +1,11 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
+import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionTaskService;
+import com.bbd.service.param.TransferParam;
 import com.bbd.service.vo.OpinionTaskListVO;
+import com.bbd.util.ValidateUtil;
 import com.mybatis.domain.PageList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -32,10 +35,37 @@ public class OpinionTaskController extends AbstractController{
             @ApiImplicitParam(value = "起始页号", name = "page", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
     })
-    @RequestMapping(value = "no/processed/list", method = RequestMethod.GET)
+    @RequestMapping(value = "un/processed/list", method = RequestMethod.GET)
     public RestResult getUnProcessedList(Integer transferType) {
         PageList<OpinionTaskListVO> result = opinionTaskService.getUnProcessedList(transferType, getPageBounds());
         return RestResult.ok(result);
+    }
+
+    @ApiOperation(value = "当前用户转发、解除、监测列表", httpMethod = "GET")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "1. 转发（介入）；2. 已解除； 3. 已监控", name = "opStatus", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "起始页号", name = "page", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
+    })
+    @RequestMapping(value = "processed/list", method = RequestMethod.GET)
+    public RestResult getProcessedList(Integer transferType) {
+        PageList<OpinionTaskListVO> result = opinionTaskService.getProcessedList(transferType, getPageBounds());
+        return RestResult.ok(result);
+    }
+
+    @ApiOperation(value = "转发舆情", httpMethod = "POST")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String", paramType = "form", required = true),
+            @ApiImplicitParam(value = "区域", name = "district", dataType = "String", paramType = "form", required = true),
+            @ApiImplicitParam(value = "用户名", name = "username", dataType = "String", paramType = "form", required = true),
+            @ApiImplicitParam(value = "转发类型: 1. 请示，2. 回复", name = "transferType", dataType = "Integer", paramType = "form", required = true),
+            @ApiImplicitParam(value = "转发备注", name = "transferNote", dataType = "Integer", paramType = "form", required = false)
+    })
+    @RequestMapping(value = "transfer", method = RequestMethod.POST)
+        public RestResult transferOpinion(TransferParam param) {
+        ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, param.getDistrict(), param.getUuid(), param.getUsername(), param.getTransferType());
+        opinionTaskService.transferOpinion(param);
+        return RestResult.ok();
     }
 }
     

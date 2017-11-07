@@ -2,6 +2,7 @@ package com.bbd.service.impl;
 
 import com.bbd.service.EsQueryService;
 import com.bbd.service.OpinionTaskService;
+import com.bbd.service.param.TransferParam;
 import com.bbd.service.vo.OpinionTaskListVO;
 import com.bbd.util.UserContext;
 import com.mybatis.domain.PageBounds;
@@ -41,6 +42,15 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     public PageList<OpinionTaskListVO> getProcessedList(Integer opStatus, PageBounds pb) {
         PageList<OpinionTaskListVO> result = esQueryService.getProcessedList(opStatus, pb);
         return result;
+    }
+
+    /**
+     * 转发舆情
+     * @param param
+     */
+    @Override
+    public void transferOpinion(TransferParam param) {
+        
     }
 }
     
