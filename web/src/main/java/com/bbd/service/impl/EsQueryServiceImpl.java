@@ -460,11 +460,14 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     @Override
-    public OpinionEsSearchVO queryEventTrendOpinions(Long eventId, DateTime startTime, PageBounds pb) {
+    public OpinionEsSearchVO queryEventTrendOpinions(Long eventId, DateTime startTime, DateTime endTime, PageBounds pb) {
         // step-1：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        if (endTime != null) {
+            query.must(QueryBuilders.rangeQuery(publishTimeField).lte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        }
         query.must(QueryBuilders.termQuery(eventsField, eventId));
      
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
@@ -622,12 +625,15 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     @Override
-    public List<KeyValueVO> getEventOpinionMediaSpread(Long eventId, DateTime startTime) {
+    public List<KeyValueVO> getEventOpinionMediaSpread(Long eventId, DateTime startTime, DateTime endTime) {
         String aggName = "media_aggs";
 
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
         booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        if (endTime != null) {
+            booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).lte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        }
         booleanQuery.must(QueryBuilders.termQuery(eventsField, eventId));
        
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
@@ -638,12 +644,15 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     @Override
-    public List<KeyValueVO> getEventWebsiteSpread(Long eventId, DateTime startTime) {
+    public List<KeyValueVO> getEventWebsiteSpread(Long eventId, DateTime startTime, DateTime endTime) {
         String aggName = "website_aggs";
 
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
         booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        if (endTime != null) {
+            booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).lte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        }
         booleanQuery.must(QueryBuilders.termQuery(eventsField, eventId));
         
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
@@ -654,12 +663,15 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     @Override
-    public List<KeyValueVO> getEventEmotionSpread(Long eventId, DateTime startTime) {
+    public List<KeyValueVO> getEventEmotionSpread(Long eventId, DateTime startTime, DateTime endTime) {
         String aggName = "emotion_aggs";
 
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
         booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        if (endTime != null) {
+            booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).lte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        }
         booleanQuery.must(QueryBuilders.termQuery(eventsField, eventId));
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
                 .setQuery(booleanQuery)

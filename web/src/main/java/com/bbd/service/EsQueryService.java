@@ -95,7 +95,7 @@ public interface EsQueryService {
      * @param pb: 分页
      * @return
      */
-    OpinionEsSearchVO queryEventTrendOpinions(Long eventId, DateTime startTime, PageBounds pb);
+    OpinionEsSearchVO queryEventTrendOpinions(Long eventId, DateTime startTime, DateTime endTime, PageBounds pb);
 
     /**
      * 查询历史预警舆情
@@ -127,21 +127,21 @@ public interface EsQueryService {
      * 舆情传播渠道分布 - 事件详情
      * @return
      */
-    List<KeyValueVO> getEventOpinionMediaSpread(Long eventId, DateTime startTime);
+    List<KeyValueVO> getEventOpinionMediaSpread(Long eventId, DateTime startTime, DateTime endTime);
 
     /**
      * 获取事件所有舆情网站来源占比 - 事件详情（媒体活跃度，媒体来源）
      * @param eventId
      * @return
      */
-    List<KeyValueVO> getEventWebsiteSpread(Long eventId, DateTime startTime);
+    List<KeyValueVO> getEventWebsiteSpread(Long eventId, DateTime startTime, DateTime endTime);
 
     /**
      * 获取事件所有舆情情感占比 - 事件详情
      * @param eventId
      * @return
      */
-    List<KeyValueVO> getEventEmotionSpread(Long eventId, DateTime startTime);
+    List<KeyValueVO> getEventEmotionSpread(Long eventId, DateTime startTime, DateTime endTime);
 
     /**
      * 根据舆情uuid查询舆情详情
