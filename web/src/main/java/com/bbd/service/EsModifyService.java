@@ -27,13 +27,9 @@ public interface EsModifyService {
      */
     void recordTransfer(OpinionOpRecordVO recordVO);
 
-    /**
-     * 获取某条舆情的转发记录
-     * @param keyMap
-     * @param size
-     * @return
-     */
-    List<OpinionOpRecordVO> getOpinionOpRecordByUUID(Map<String, Object> keyMap, Integer size);
+
+
+
 
 }
     

@@ -57,7 +57,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
             String username = UserContext.getUser().getUsername();
             Map<String, Object> keyMap = Maps.newHashMap();
             keyMap.put("uuid", uuid); keyMap.put("targeter", username);
-            List<OpinionOpRecordVO> list = esModifyService.getOpinionOpRecordByUUID(keyMap, 1);
+            List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 1);
             if(!list.isEmpty()) {
                 o.setOpinionOpRecord(list.get(0));
             }
@@ -81,11 +81,14 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                     String username = UserContext.getUser().getUsername();
                     Map<String, Object> keyMap = Maps.newHashMap();
                     keyMap.put("uuid", uuid); keyMap.put("operator", username);
-                    List<OpinionOpRecordVO> list = esModifyService.getOpinionOpRecordByUUID(keyMap, 1);
+                    List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 1);
                     if(!list.isEmpty()) {
                         o.setOpinionOpRecord(list.get(0));
                     }
                 });
+            }
+            if(opStatus == 3) {
+
             }
         }
 

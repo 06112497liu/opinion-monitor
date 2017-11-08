@@ -166,4 +166,12 @@ public interface EsQueryService {
      * @return
      */
     PageList<OpinionTaskListVO> getProcessedList(Integer opStatus, PageBounds pb);
+
+    /**
+     * 获取某条舆情的转发记录
+     * @param keyMap
+     * @param size
+     * @return
+     */
+    List<OpinionOpRecordVO> getOpinionOpRecordByUUID(Map<String, Object> keyMap, Integer size);
 }

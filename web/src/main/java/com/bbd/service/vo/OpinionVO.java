@@ -42,6 +42,12 @@ public class OpinionVO {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Date publishTime;
+
+    /**
+     * 添加监测事件的时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private Date gmtCreate;
     
     private Integer level;
 
@@ -135,6 +141,14 @@ public class OpinionVO {
 
     public Integer getLevel() {
         return level;
+    }
+
+    public Date getGmtCreate() {
+        return gmtCreate;
+    }
+
+    public void setGmtCreate(Date gmtCreate) {
+        this.gmtCreate = gmtCreate;
     }
 
     public void setLevel(Integer level) {

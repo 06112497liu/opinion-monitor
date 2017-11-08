@@ -21,6 +21,7 @@ import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -77,6 +78,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     private final String opOwnerField = "opOwner";
     private final String transferTypeField = "transferType";
     private final String operatorsField = "operators";
+    private final String opTimeField = "opTime";
 
     /**
      * 获取预警舆情top10（排除在舆情任务中的预警舆情，以及热点舆情）
@@ -755,6 +757,36 @@ public class EsQueryServiceImpl implements EsQueryService {
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);
         return result;
+    }
+
+    /**
+     * 获取某条舆情的转发记录
+     * @param keyMap
+     * @param szie
+     * @return
+     */
+    @Override
+    public List<OpinionOpRecordVO> getOpinionOpRecordByUUID(Map<String, Object> keyMap, Integer szie) {
+        TransportClient client = EsUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setTypes(EsConstant.OPINION_OP_RECORD_TYPE)
+                .setSearchType(SearchType.DEFAULT).setSize(szie)
+                .setQuery(buildSearchRequest(keyMap))
+                .addSort(opTimeField, SortOrder.DESC)
+                .execute().actionGet();
+        List<OpinionOpRecordVO> list = EsUtil.buildResult(resp, OpinionOpRecordVO.class);
+        return list;
+    }
+
+    private BoolQueryBuilder buildSearchRequest(Map<String, Object> keyMap) {
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        if(keyMap != null) {
+            for(String key : keyMap.keySet()) {
+                Object value = keyMap.get(key);
+                query.must(QueryBuilders.termsQuery(key, value));
+            }
+        }
+        return query;
     }
 }
 
