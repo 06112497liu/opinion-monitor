@@ -397,7 +397,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchResponse resp = builder.execute().actionGet();
         SearchHits hits = resp.getHits();
         result.setTotal(hits.getTotalHits());
-        List<OpinionEsVO> opList = buildResult(resp, OpinionEsVO.class);
+        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
         List<KeyValueVO> hotLevelList = buildHotLevelLists(resp, hotLevelAggName);
@@ -442,7 +442,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         OpinionEsSearchVO result = new OpinionEsSearchVO();
         SearchResponse resp = builder.execute().actionGet();
         result.setTotal(resp.getHits().getTotalHits());
-        List<OpinionEsVO> opList = buildResult(resp, OpinionEsVO.class);
+        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
 
@@ -479,7 +479,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         OpinionEsSearchVO result = new OpinionEsSearchVO();
         SearchResponse resp = builder.execute().actionGet();
         result.setTotal(resp.getHits().getTotalHits());
-        List<OpinionEsVO> opList = buildResult(resp, OpinionEsVO.class);
+        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
         return result;
@@ -513,7 +513,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-3：构建返回结果
         OpinionEsSearchVO result = new OpinionEsSearchVO();
         result.setTotal(resp.getHits().getTotalHits());
-        List<OpinionEsVO> opList = buildResult(resp, OpinionEsVO.class);
+        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
         List<KeyValueVO> mediaList = buildLongTermLists(resp, mediaAggName);
@@ -550,24 +550,12 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-3：查询并返回结果
         OpinionEsSearchVO result = new OpinionEsSearchVO();
         result.setTotal(resp.getHits().getTotalHits());
-        List<OpinionEsVO> opList = buildResult(resp, OpinionEsVO.class);
+        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
         return result;
     }
 
-    // 构建返回结果
-    private <T> List<T> buildResult(SearchResponse resp, Class<T> clazz) {
-        List<T> list = Lists.newLinkedList();
-        SearchHits hits = resp.getHits();
-        SearchHit[] items = hits.getHits();
-        for(SearchHit s : items) {
-            String source = s.getSourceAsString();
-            T t = JsonUtil.parseObject(source, clazz);
-            list.add(t);
-        }
-        return list;
-    }
 
     private List<KeyValueVO> buildHotLevelLists(SearchResponse resp, String aggName) {
         List<KeyValueVO> result = Lists.newArrayList();
@@ -694,7 +682,7 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .setQuery(query).setFrom(0).setSize(1)
                 .execute().actionGet();
 
-        List<OpinionEsVO> list = buildResult(resp, OpinionEsVO.class);
+        List<OpinionEsVO> list = EsUtil.buildResult(resp, OpinionEsVO.class);
         if(list.isEmpty()) return null;
         return list.get(0);
     }
@@ -727,7 +715,7 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();
-        List<OpinionTaskListVO> list = buildResult(resp, OpinionTaskListVO.class);
+        List<OpinionTaskListVO> list = EsUtil.buildResult(resp, OpinionTaskListVO.class);
             // 查询转发记录
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);
@@ -748,8 +736,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         BoolQueryBuilder query = QueryBuilders.boolQuery();
             // 判断当前用户是否是超级管理员(如果是管理员的话，就能看到所有的数据)
         UserInfo user = UserContext.getUser();
-        Boolean isAdmin = user.getAdmin();
-        if(!isAdmin) query.must(QueryBuilders.matchQuery(operatorsField, user.getId())); // 操作者字段必须包含当前用户
+        if(!UserContext.isAdmin()) query.must(QueryBuilders.matchQuery(operatorsField, user.getId())); // 操作者字段必须包含当前用户
         if(opStatus != null) {
             query.must(QueryBuilders.termQuery(opStatusField, opStatus));
         }
@@ -763,7 +750,7 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();
-        List<OpinionTaskListVO> list = buildResult(resp, OpinionTaskListVO.class);
+        List<OpinionTaskListVO> list = EsUtil.buildResult(resp, OpinionTaskListVO.class);
             // 查询转发记录
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);

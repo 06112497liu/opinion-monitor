@@ -3,9 +3,10 @@ package com.bbd.service;
 import com.bbd.service.param.TransferParam;
 import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.vo.UserInfo;
-import org.elasticsearch.action.support.replication.ReplicationResponse;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -25,6 +26,14 @@ public interface EsModifyService {
      * @param recordVO
      */
     void recordTransfer(OpinionOpRecordVO recordVO);
+
+    /**
+     * 获取某条舆情的转发记录
+     * @param keyMap
+     * @param size
+     * @return
+     */
+    List<OpinionOpRecordVO> getOpinionOpRecordByUUID(Map<String, Object> keyMap, Integer size);
 
 }
     

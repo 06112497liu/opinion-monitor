@@ -36,4 +36,9 @@ public class UserContext {
     public static void removeUser() {
         SessionContext.removeSession(ADMIN_INFO_SESSION);
     }
+
+    public static boolean isAdmin() {
+        UserInfo user = getUser();
+        return user.getAdmin();
+    }
 }

@@ -1,6 +1,7 @@
 package com.bbd.service.impl;
 
 import com.bbd.constant.EsConstant;
+import com.bbd.domain.SimiliarNews;
 import com.bbd.service.EsModifyService;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.param.TransferParam;
@@ -8,17 +9,27 @@ import com.bbd.service.vo.OpinionEsVO;
 import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.util.EsUtil;
 import com.bbd.util.JsonUtil;
+import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import org.apache.commons.lang3.ArrayUtils;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -50,6 +61,9 @@ public class EsModifyServiceImpl implements EsModifyService {
     private final String opOwnerField = "opOwner";
     private final String transferTypeField = "transferType";
     private final String operatorsField = "operators";
+    private final String opTimeField = "opTime";
+    private final String uuidField = "uuid";
+    private final String targeterField = "targeter";
 
     /**
      * 转发舆情
@@ -100,6 +114,37 @@ public class EsModifyServiceImpl implements EsModifyService {
         // 插入数据
         bulkRequest.get();
     }
+
+    /**
+     * 获取某条舆情的转发记录
+     * @param keyMap
+     * @param szie
+     * @return
+     */
+    @Override
+    public List<OpinionOpRecordVO> getOpinionOpRecordByUUID(Map<String, Object> keyMap, Integer szie) {
+        TransportClient client = EsUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setTypes(EsConstant.OPINION_OP_RECORD_TYPE)
+                .setSearchType(SearchType.DEFAULT).setSize(szie)
+                .setQuery(buildSearchRequest(keyMap))
+                .addSort(opTimeField, SortOrder.DESC)
+                .execute().actionGet();
+        List<OpinionOpRecordVO> list = EsUtil.buildResult(resp, OpinionOpRecordVO.class);
+        return list;
+    }
+
+    private BoolQueryBuilder buildSearchRequest(Map<String, Object> keyMap) {
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        if(keyMap != null) {
+            for(String key : keyMap.keySet()) {
+                Object value = keyMap.get(key);
+                query.must(QueryBuilders.termsQuery(key, value));
+            }
+        }
+        return query;
+    }
+
 }
     
     

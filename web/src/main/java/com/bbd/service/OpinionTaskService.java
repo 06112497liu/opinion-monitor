@@ -25,7 +25,7 @@ public interface OpinionTaskService {
 
     /**
      * 当前用户转发、解除、监测列表
-     * @param opStatus 1. 转发；2. 已解除； 3. 已监控
+     * @param opStatus 1. 转发（介入）；2. 已解除； 3. 已监控
      * @param pb
      * @return
      */
