@@ -1,10 +1,13 @@
 package com.bbd.dao;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.bbd.domain.Graph;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.domain.OpinionEventExample;
 import com.mybatis.domain.PageBounds;
-import java.util.List;
-import org.apache.ibatis.annotations.Param;
 
 public interface OpinionEventDao {
     int deleteByPrimaryKey(Long id);
@@ -32,4 +35,8 @@ public interface OpinionEventDao {
     int updateByPrimaryKeyWithBLOBs(OpinionEvent record);
 
     int updateByPrimaryKey(OpinionEvent record);
+    
+    List<Graph> eventTypeDis();
+    
+    List<Graph> eventRegionDis();
 }

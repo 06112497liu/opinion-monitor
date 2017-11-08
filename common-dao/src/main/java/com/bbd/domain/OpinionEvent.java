@@ -43,10 +43,16 @@ public class OpinionEvent {
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Date gmtCreate;
-
+   
     private Long modifiedBy;
 
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Date gmtModified;
+
+    private Long fileBy;
+
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+    private Date gmtFile;
 
     private String description;
 
@@ -224,6 +230,22 @@ public class OpinionEvent {
 
     public void setGmtModified(Date gmtModified) {
         this.gmtModified = gmtModified;
+    }
+
+    public Long getFileBy() {
+        return fileBy;
+    }
+
+    public void setFileBy(Long fileBy) {
+        this.fileBy = fileBy;
+    }
+
+    public Date getGmtFile() {
+        return gmtFile;
+    }
+
+    public void setGmtFile(Date gmtFile) {
+        this.gmtFile = gmtFile;
     }
 
     public String getDescription() {

@@ -1484,6 +1484,126 @@ public class OpinionEventExample {
             addCriterion("gmt_modified not between", value1, value2, "gmtModified");
             return (Criteria) this;
         }
+
+        public Criteria andFileByIsNull() {
+            addCriterion("file_by is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileByIsNotNull() {
+            addCriterion("file_by is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileByEqualTo(Long value) {
+            addCriterion("file_by =", value, "fileBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileByNotEqualTo(Long value) {
+            addCriterion("file_by <>", value, "fileBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileByGreaterThan(Long value) {
+            addCriterion("file_by >", value, "fileBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileByGreaterThanOrEqualTo(Long value) {
+            addCriterion("file_by >=", value, "fileBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileByLessThan(Long value) {
+            addCriterion("file_by <", value, "fileBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileByLessThanOrEqualTo(Long value) {
+            addCriterion("file_by <=", value, "fileBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileByIn(List<Long> values) {
+            addCriterion("file_by in", values, "fileBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileByNotIn(List<Long> values) {
+            addCriterion("file_by not in", values, "fileBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileByBetween(Long value1, Long value2) {
+            addCriterion("file_by between", value1, value2, "fileBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileByNotBetween(Long value1, Long value2) {
+            addCriterion("file_by not between", value1, value2, "fileBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andGmtFileIsNull() {
+            addCriterion("gmt_file is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGmtFileIsNotNull() {
+            addCriterion("gmt_file is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGmtFileEqualTo(Date value) {
+            addCriterion("gmt_file =", value, "gmtFile");
+            return (Criteria) this;
+        }
+
+        public Criteria andGmtFileNotEqualTo(Date value) {
+            addCriterion("gmt_file <>", value, "gmtFile");
+            return (Criteria) this;
+        }
+
+        public Criteria andGmtFileGreaterThan(Date value) {
+            addCriterion("gmt_file >", value, "gmtFile");
+            return (Criteria) this;
+        }
+
+        public Criteria andGmtFileGreaterThanOrEqualTo(Date value) {
+            addCriterion("gmt_file >=", value, "gmtFile");
+            return (Criteria) this;
+        }
+
+        public Criteria andGmtFileLessThan(Date value) {
+            addCriterion("gmt_file <", value, "gmtFile");
+            return (Criteria) this;
+        }
+
+        public Criteria andGmtFileLessThanOrEqualTo(Date value) {
+            addCriterion("gmt_file <=", value, "gmtFile");
+            return (Criteria) this;
+        }
+
+        public Criteria andGmtFileIn(List<Date> values) {
+            addCriterion("gmt_file in", values, "gmtFile");
+            return (Criteria) this;
+        }
+
+        public Criteria andGmtFileNotIn(List<Date> values) {
+            addCriterion("gmt_file not in", values, "gmtFile");
+            return (Criteria) this;
+        }
+
+        public Criteria andGmtFileBetween(Date value1, Date value2) {
+            addCriterion("gmt_file between", value1, value2, "gmtFile");
+            return (Criteria) this;
+        }
+
+        public Criteria andGmtFileNotBetween(Date value1, Date value2) {
+            addCriterion("gmt_file not between", value1, value2, "gmtFile");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
