@@ -11,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.elasticsearch.action.support.replication.ReplicationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,8 +69,8 @@ public class OpinionTaskController extends AbstractController{
     @RequestMapping(value = "transfer", method = RequestMethod.POST)
         public RestResult transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
         ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, param.getDistrict(), param.getUuid(), param.getUsername(), param.getTransferType());
-        opinionTaskService.transferOpinion(param);
-        return RestResult.ok();
+        ReplicationResponse.ShardInfo result = opinionTaskService.transferOpinion(param);
+        return RestResult.ok(result);
     }
 }
     

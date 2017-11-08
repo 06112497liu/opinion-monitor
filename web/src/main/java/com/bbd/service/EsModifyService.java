@@ -2,6 +2,7 @@ package com.bbd.service;
 
 import com.bbd.service.param.TransferParam;
 import com.bbd.vo.UserInfo;
+import org.elasticsearch.action.support.replication.ReplicationResponse;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -16,7 +17,12 @@ public interface EsModifyService {
      * 转发舆情
      * @param param
      */
-    void transferOpinion(UserInfo operator, Long opOwnerId, TransferParam param) throws IOException, ExecutionException, InterruptedException;
+    ReplicationResponse.ShardInfo transferOpinion(UserInfo operator, Long opOwnerId, TransferParam param) throws IOException, ExecutionException, InterruptedException;
+
+    /**
+     *
+     */
+    void recordTransfer();
 
 }
     

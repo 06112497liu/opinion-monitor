@@ -7,11 +7,15 @@ import com.bbd.service.param.TransferParam;
 import com.bbd.service.vo.OpinionEsVO;
 import com.bbd.util.EsUtil;
 import com.bbd.vo.UserInfo;
+import org.apache.commons.lang3.ArrayUtils;
+import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.support.replication.ReplicationResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.get.GetResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,20 +62,17 @@ public class EsModifyServiceImpl implements EsModifyService {
      * @param param
      */
     @Override
-    public void transferOpinion(UserInfo operator, Long opOwnerId, TransferParam param) throws IOException, ExecutionException, InterruptedException {
+    public ReplicationResponse.ShardInfo transferOpinion(UserInfo operator, Long opOwnerId, TransferParam param) throws IOException, ExecutionException, InterruptedException {
         OpinionEsVO opinion = esQueryService.getOpinionByUUID(param.getUuid());
         Long operatorId = operator.getId();
+
         Long[] original = opinion.getOperators();
-        Long[] operators = original;
-        if(original == null) {
-            operators = new Long[]{operatorId};
-        } else {
-            List<Long> operatorsList = Arrays.asList(original);
-            if(!operatorsList.contains(operator.getId())) {
-                operators = Arrays.copyOf(original, original.length+1);
-                operators[operators.length-1] = operatorId;
-            }
+        boolean flag = ArrayUtils.contains(original, operatorId);
+        Long[] newArr = original;
+        if(!flag) {
+            newArr = ArrayUtils.add(original, operatorId);
         }
+
         TransportClient client = EsUtil.getClient();
         UpdateRequest request = new UpdateRequest();
         request.index(EsConstant.IDX_OPINION);
@@ -82,12 +83,18 @@ public class EsModifyServiceImpl implements EsModifyService {
                 XContentFactory.jsonBuilder().startObject()
                         .field(opStatusField, 1)
                         .field(opOwnerField, opOwnerId)
-                        .field(operatorsField, operators)
+                        .field(operatorsField, newArr)
                         .field(transferTypeField, param.getTransferType())
                 .endObject()
         );
         UpdateResponse resp = client.update(request).get();
-        System.out.println(resp);
+        ReplicationResponse.ShardInfo info = resp.getShardInfo();
+        return info;
+    }
+
+    @Override
+    public void recordTransfer() {
+
     }
 }
     
