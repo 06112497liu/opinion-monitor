@@ -4,6 +4,8 @@
  */
 package com.bbd.listener;
 
+import com.bbd.util.JsonUtil;
+import com.bbd.vo.OpinionVO;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -22,6 +24,8 @@ public class OpinionListener {
     public void Listen(List<ConsumerRecord<String, String>> records) {
         for (ConsumerRecord<String, String> record : records) {
             System.out.printf("offset = %d, key = %s, value = %s\n", record.offset(), record.key(), record.value());
+            OpinionVO vo = JsonUtil.parseObject(record.value(), OpinionVO.class);
+            System.out.println(vo.toString());
         }
     }
 
