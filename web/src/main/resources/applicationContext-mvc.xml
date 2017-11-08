@@ -77,6 +77,15 @@
     <!--</mvc:interceptor>-->
     <!--</mvc:interceptors>-->
 
+    <!-- 拦截器 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**/*"/>
+            <mvc:exclude-mapping path="/api/login/login"/>
+            <bean class="com.bbd.filter.LoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
     <!-- 配置SpringMVC的视图解析器 为结果地址加上前缀和后缀 -->
     <bean id="internalResourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/views/"/>
