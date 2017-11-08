@@ -35,3 +35,10 @@ spring:
         connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=1000
         # 合并多个DruidDataSource的监控数据
         #useGlobalDataSourceStat: true
+
+#spring:
+#  kafka:
+#    bootstrap-servers: 10.28.100.69:9092
+#    consumer.group-id: test-group
+#    # 指定listener 容器中的线程数，用于提高并发量
+#    listener.concurrency: 1
