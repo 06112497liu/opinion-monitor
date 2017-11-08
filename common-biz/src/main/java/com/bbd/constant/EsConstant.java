@@ -15,6 +15,7 @@ public class EsConstant {
 
     public static final String IDX_OPINION      = "bbd_opinion_mock_a";
     public static final String OPINION_TYPE     = "opinion";
+    public static final String OPINION_OP_RECORD_TYPE     = "opinion_op_record";
 
     public static final String CALC_TIME_PROP   = "calcTime";
 

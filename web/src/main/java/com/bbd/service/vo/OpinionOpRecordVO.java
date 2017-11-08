@@ -1,5 +1,7 @@
 package com.bbd.service.vo;
 
+import javafx.beans.DefaultProperty;
+
 import java.util.Date;
 
 /**
@@ -16,9 +18,14 @@ public class OpinionOpRecordVO {
     private Integer opType;
 
     /**
-     * 转发类型: 1. 请示，2. 回复
+     * 转发类型: 1/2/3：请示，4/5/6：回复
      */
     private Integer transferType;
+
+    /**
+     * 转发内容
+     */
+    private String transferContent;
 
     /**
      * 转发备注
@@ -41,9 +48,9 @@ public class OpinionOpRecordVO {
     private Date opTime;
 
     /**
-     * 解除理由
+     * 解除理由, 1. 非敏感舆情；2. 非消费舆情； 3. 非职能范围； 4. 已处理同类舆情
      */
-    private String removeReason;
+    private Integer removeReason;
 
     /**
      * 解除备注
@@ -106,11 +113,19 @@ public class OpinionOpRecordVO {
         this.opTime = opTime;
     }
 
-    public String getRemoveReason() {
+    public Integer getRemoveReason() {
         return removeReason;
     }
 
-    public void setRemoveReason(String removeReason) {
+    public String getTransferContent() {
+        return transferContent;
+    }
+
+    public void setTransferContent(String transferContent) {
+        this.transferContent = transferContent;
+    }
+
+    public void setRemoveReason(Integer removeReason) {
         this.removeReason = removeReason;
     }
 
