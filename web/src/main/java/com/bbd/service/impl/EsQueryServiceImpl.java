@@ -468,7 +468,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         if (endTime != null) {
-            query.must(QueryBuilders.rangeQuery(publishTimeField).lte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+            query.must(QueryBuilders.rangeQuery(publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
         }
         query.must(QueryBuilders.termQuery(eventsField, eventId));
      
@@ -622,7 +622,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
         booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         if (endTime != null) {
-            booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).lte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+            booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
         }
         booleanQuery.must(QueryBuilders.termQuery(eventsField, eventId));
        
@@ -641,7 +641,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
         booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         if (endTime != null) {
-            booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).lte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+            booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
         }
         booleanQuery.must(QueryBuilders.termQuery(eventsField, eventId));
         
@@ -660,7 +660,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
         booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         if (endTime != null) {
-            booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).lte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+            booleanQuery.must(QueryBuilders.rangeQuery(publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
         }
         booleanQuery.must(QueryBuilders.termQuery(eventsField, eventId));
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
