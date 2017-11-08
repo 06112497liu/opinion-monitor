@@ -18,7 +18,7 @@ public interface OpinionTaskService {
 
     /**
      * 当前用户待处理舆情列表
-     * @param transferType 转发类型: 1. 请示，2. 回复
+     * @param transferType 转发类型: 1/2/3：请示，4/5/6：回复
      * @return
      */
     PageList<OpinionTaskListVO> getUnProcessedList(Integer transferType, PageBounds pb);

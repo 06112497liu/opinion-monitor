@@ -36,7 +36,7 @@ public class OpinionTaskController extends AbstractController{
 
     @ApiOperation(value = "当前用户待处理舆情列表", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "转发类型: 1. 请示，2. 回复", name = "transferType", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "转发类型: 1/2/3：请示，4/5/6：回复", name = "transferType", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "起始页号", name = "page", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
     })
@@ -63,7 +63,7 @@ public class OpinionTaskController extends AbstractController{
             @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String", paramType = "query", required = true),
             @ApiImplicitParam(value = "区域", name = "district", dataType = "String", paramType = "query", required = true),
             @ApiImplicitParam(value = "用户名", name = "username", dataType = "String", paramType = "query", required = true),
-            @ApiImplicitParam(value = "转发类型: 1. 请示，2. 回复", name = "transferType", dataType = "Integer", paramType = "query", required = true),
+            @ApiImplicitParam(value = "转发类型: 1/2/3：请示，4/5/6：回复", name = "transferType", dataType = "Integer", paramType = "query", required = true),
             @ApiImplicitParam(value = "转发备注", name = "transferNote", dataType = "String", paramType = "query", required = false)
     })
     @RequestMapping(value = "transfer", method = RequestMethod.POST)

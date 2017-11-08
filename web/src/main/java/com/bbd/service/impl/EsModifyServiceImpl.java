@@ -1,14 +1,19 @@
 package com.bbd.service.impl;
 
+import com.bbd.bean.EsBase;
 import com.bbd.constant.EsConstant;
 import com.bbd.service.EsModifyService;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.param.TransferParam;
 import com.bbd.service.vo.OpinionEsVO;
+import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.util.EsUtil;
+import com.bbd.util.JsonUtil;
 import com.bbd.vo.UserInfo;
 import org.apache.commons.lang3.ArrayUtils;
 import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.support.replication.ReplicationResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
@@ -92,9 +97,21 @@ public class EsModifyServiceImpl implements EsModifyService {
         return info;
     }
 
+    /**
+     * 添加转发记录
+     * @param recordVO
+     */
     @Override
-    public void recordTransfer() {
+    public void recordTransfer(OpinionOpRecordVO recordVO) {
 
+        TransportClient client = EsUtil.getClient();
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
+        bulkRequest.add(
+                client.prepareIndex(EsConstant.IDX_OPINION, EsConstant.OPINION_OP_RECORD_TYPE)
+                        .setSource(JsonUtil.fromJson(recordVO), XContentType.JSON)
+        );
+        BulkResponse bulkResponse = bulkRequest.get();
+        bulkResponse.getTookInMillis();
     }
 }
     
