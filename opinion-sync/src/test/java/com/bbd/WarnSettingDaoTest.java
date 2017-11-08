@@ -27,7 +27,7 @@ public class WarnSettingDaoTest {
 
     @Test
     public void testQuery() {
-        WarnSetting data = warnSettingDao.selectByPrimaryKey(1L);
-        Assert.assertNotNull(data);
+        WarnSetting item = warnSettingDao.selectById(1L);
+        Assert.assertNotNull(item);
     }
 }
