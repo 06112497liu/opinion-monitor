@@ -35,7 +35,7 @@ public interface OpinionTaskService {
      * 转发舆情
      * @param param
      */
-    ReplicationResponse.ShardInfo transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException;
+    void transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException;
 
 }
     

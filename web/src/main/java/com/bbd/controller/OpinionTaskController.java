@@ -69,8 +69,8 @@ public class OpinionTaskController extends AbstractController{
     @RequestMapping(value = "transfer", method = RequestMethod.POST)
         public RestResult transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
         ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, param.getDistrict(), param.getUuid(), param.getUsername(), param.getTransferType());
-        ReplicationResponse.ShardInfo result = opinionTaskService.transferOpinion(param);
-        return RestResult.ok(result);
+        opinionTaskService.transferOpinion(param);
+        return RestResult.ok();
     }
 }
     

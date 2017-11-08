@@ -47,8 +47,6 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
      */
     @Override
     public PageList<OpinionTaskListVO> getUnProcessedList(Integer transferType, PageBounds pb) {
-        UserInfo user = UserContext.getUser();
-        if(Objects.isNull(user)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
         Long userId = UserContext.getUser().getId();
         PageList<OpinionTaskListVO> result = esQueryService.getUnProcessedList(userId, transferType, pb);
         return result;
@@ -71,12 +69,12 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
      * @param param
      */
     @Override
-    public ReplicationResponse.ShardInfo transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
+    public void transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
         // step-1：修改舆情的状态
         UserInfo operator = UserContext.getUser();
         if(Objects.isNull(operator)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
         User opOwner = userService.queryUserByUserame(param.getUsername()).get();
-        ReplicationResponse.ShardInfo info = esModifyService.transferOpinion(operator, opOwner.getId(), param);
+        esModifyService.transferOpinion(operator, opOwner.getId(), param);
 
         // step-2：记录转发记录
             // 构建转发记录对象
@@ -92,7 +90,6 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
             // 向es中添加转发记录
         esModifyService.recordTransfer(recordVO);
-        return info;
     }
 }
     

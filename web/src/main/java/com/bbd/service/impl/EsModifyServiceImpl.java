@@ -1,6 +1,5 @@
 package com.bbd.service.impl;
 
-import com.bbd.bean.EsBase;
 import com.bbd.constant.EsConstant;
 import com.bbd.service.EsModifyService;
 import com.bbd.service.EsQueryService;
@@ -11,25 +10,15 @@ import com.bbd.util.EsUtil;
 import com.bbd.util.JsonUtil;
 import com.bbd.vo.UserInfo;
 import org.apache.commons.lang3.ArrayUtils;
-import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.support.replication.ReplicationResponse;
 import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.get.GetResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -67,7 +56,7 @@ public class EsModifyServiceImpl implements EsModifyService {
      * @param param
      */
     @Override
-    public ReplicationResponse.ShardInfo transferOpinion(UserInfo operator, Long opOwnerId, TransferParam param) throws IOException, ExecutionException, InterruptedException {
+    public void transferOpinion(UserInfo operator, Long opOwnerId, TransferParam param) throws IOException, ExecutionException, InterruptedException {
         OpinionEsVO opinion = esQueryService.getOpinionByUUID(param.getUuid());
         Long operatorId = operator.getId();
 
@@ -92,9 +81,7 @@ public class EsModifyServiceImpl implements EsModifyService {
                         .field(transferTypeField, param.getTransferType())
                 .endObject()
         );
-        UpdateResponse resp = client.update(request).get();
-        ReplicationResponse.ShardInfo info = resp.getShardInfo();
-        return info;
+        client.update(request).get();
     }
 
     /**
@@ -110,8 +97,8 @@ public class EsModifyServiceImpl implements EsModifyService {
                 client.prepareIndex(EsConstant.IDX_OPINION, EsConstant.OPINION_OP_RECORD_TYPE)
                         .setSource(JsonUtil.fromJson(recordVO), XContentType.JSON)
         );
-        BulkResponse bulkResponse = bulkRequest.get();
-        bulkResponse.getTookInMillis();
+        // 插入数据
+        bulkRequest.get();
     }
 }
     
