@@ -2,6 +2,7 @@ package com.bbd.service.impl;
 
 import com.bbd.domain.User;
 import com.bbd.enums.TransferEnum;
+import com.bbd.enums.WarnReasonEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.*;
@@ -42,6 +43,15 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     @Autowired
     private SystemSettingService settingService;
 
+    private final String opOwnerField = "opOwner";
+    private final String opStatusField = "opStatus";
+    private final String targeterField = "targeter";
+    private final String transferTypeField = "transferType";
+    private final String operatorsField = "operators";
+    private final String uuidField = "uuid";
+    private final String removeReasonField = "removeReason";
+    private final String removeNoteField = "removeNote";
+
     /**
      * 当前用户待处理舆情列表
      * @param transferType 转发类型: 1/2/3：请示，4/5/6：回复
@@ -80,7 +90,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                     String uuid = o.getUuid();
                     String username = UserContext.getUser().getUsername();
                     Map<String, Object> keyMap = Maps.newHashMap();
-                    keyMap.put("uuid", uuid); keyMap.put("operator", username);
+                    keyMap.put(uuidField, uuid); keyMap.put(operatorsField, username);
                     List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 1);
                     if(!list.isEmpty()) {
                         o.setOpinionOpRecord(list.get(0));
@@ -105,7 +115,10 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         UserInfo operator = UserContext.getUser();
         if(Objects.isNull(operator)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
         User opOwner = userService.queryUserByUserame(param.getUsername()).get();
-        esModifyService.transferOpinion(operator, opOwner.getId(), param);
+
+        Map<String, Object> map = Maps.newHashMap();
+        map.put(opStatusField, 1); map.put(opOwnerField, opOwner.getId()); map.put(transferTypeField, param.getTransferType());
+        esModifyService.updateOpinion(operator, param.getUuid(), map);
 
         // step-2：记录转发记录
             // 构建转发记录对象
@@ -120,7 +133,32 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         recordVO.setTransferContent(TransferEnum.getDescByCode(param.getTransferType().toString()));
 
             // 向es中添加转发记录
-        esModifyService.recordTransfer(recordVO);
+        esModifyService.recordOpinionOp(recordVO);
+    }
+
+    /**
+     * 解除预警
+     * @param uuid
+     * @param removeReason
+     * @param removeNote
+     */
+    @Override
+    public void removeWarn(String uuid, Integer removeReason, String removeNote) throws InterruptedException, ExecutionException, IOException {
+        // step-1：修改舆情记录
+        UserInfo operator = UserContext.getUser();
+        Map<String, Object> map = Maps.newHashMap();
+        map.put(removeNoteField, removeNote); map.put(removeNoteField, removeNote); map.put(opStatusField, 2);
+        esModifyService.updateOpinion(operator, uuid, map);
+
+        // step-2：记录解除记录
+        OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
+        recordVO.setOpTime(new Date());
+        recordVO.setOperator(UserContext.getUser().getUsername());
+        recordVO.setUuid(uuid);
+        recordVO.setRemoveReason(removeReason);
+        recordVO.setRemoveContent(WarnReasonEnum.getDescByCode(removeReason.toString()));
+        recordVO.setRemoveNote(removeNote);
+        esModifyService.recordOpinionOp(recordVO);
     }
 }
     

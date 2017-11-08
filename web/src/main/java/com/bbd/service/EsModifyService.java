@@ -17,18 +17,17 @@ public interface EsModifyService {
 
     /**
      * 转发舆情
-     * @param param
+     * @param operator
+     * @param uuid
+     * @param fieldMap
      */
-    void transferOpinion(UserInfo operator, Long opOwnerId, TransferParam param) throws IOException, ExecutionException, InterruptedException;
+    void updateOpinion(UserInfo operator, String uuid, Map<String, Object> fieldMap) throws IOException, ExecutionException, InterruptedException;
 
     /**
-     * 添加转发记录
+     * 添加舆情操作记录
      * @param recordVO
      */
-    void recordTransfer(OpinionOpRecordVO recordVO);
-
-
-
+    void recordOpinionOp(OpinionOpRecordVO recordVO);
 
 
 }

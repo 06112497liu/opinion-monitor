@@ -37,6 +37,14 @@ public interface OpinionTaskService {
      */
     void transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException;
 
+    /**
+     * 解除预警
+     * @param uuid
+     * @param removeReason
+     * @param removeNote
+     */
+    void removeWarn(String uuid, Integer removeReason, String removeNote) throws InterruptedException, ExecutionException, IOException;
+
 }
     
     

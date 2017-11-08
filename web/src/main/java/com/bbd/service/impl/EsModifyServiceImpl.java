@@ -13,12 +13,14 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -55,11 +57,13 @@ public class EsModifyServiceImpl implements EsModifyService {
 
     /**
      * 转发舆情
-     * @param param
+     * @param operator
+     * @param uuid
+     * @param fieldMap
      */
     @Override
-    public void transferOpinion(UserInfo operator, Long opOwnerId, TransferParam param) throws IOException, ExecutionException, InterruptedException {
-        OpinionEsVO opinion = esQueryService.getOpinionByUUID(param.getUuid());
+    public void updateOpinion(UserInfo operator, String uuid, Map<String, Object> fieldMap) throws IOException, ExecutionException, InterruptedException {
+        OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
         Long operatorId = operator.getId();
 
         Long[] original = opinion.getOperators();
@@ -73,17 +77,22 @@ public class EsModifyServiceImpl implements EsModifyService {
         UpdateRequest request = new UpdateRequest();
         request.index(EsConstant.IDX_OPINION);
         request.type(EsConstant.OPINION_TYPE);
-        request.id(param.getUuid());
+        request.id(uuid);
+        fieldMap.put(operatorsField, newArr);
 
-        request.doc(
-                XContentFactory.jsonBuilder().startObject()
-                        .field(opStatusField, 1)
-                        .field(opOwnerField, opOwnerId)
-                        .field(operatorsField, newArr)
-                        .field(transferTypeField, param.getTransferType())
-                .endObject()
-        );
+        request.doc(buildXContentBuilder(fieldMap));
         client.update(request).get();
+    }
+
+    private XContentBuilder buildXContentBuilder(Map<String, Object> map) throws IOException {
+        XContentBuilder result = XContentFactory.jsonBuilder().startObject();
+        if(map != null) {
+            for(String key : map.keySet()) {
+                result.field(key, map.get(key));
+            }
+        }
+        result.endObject();
+        return result;
     }
 
     /**
@@ -91,7 +100,7 @@ public class EsModifyServiceImpl implements EsModifyService {
      * @param recordVO
      */
     @Override
-    public void recordTransfer(OpinionOpRecordVO recordVO) {
+    public void recordOpinionOp(OpinionOpRecordVO recordVO) {
 
         TransportClient client = EsUtil.getClient();
         BulkRequestBuilder bulkRequest = client.prepareBulk();

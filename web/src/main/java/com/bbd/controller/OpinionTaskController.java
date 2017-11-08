@@ -67,9 +67,22 @@ public class OpinionTaskController extends AbstractController{
             @ApiImplicitParam(value = "转发备注", name = "transferNote", dataType = "String", paramType = "query", required = false)
     })
     @RequestMapping(value = "transfer", method = RequestMethod.POST)
-        public RestResult transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
+    public RestResult transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
         ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, param.getDistrict(), param.getUuid(), param.getUsername(), param.getTransferType());
         opinionTaskService.transferOpinion(param);
+        return RestResult.ok();
+    }
+
+    @ApiOperation(value = "解除舆情预警", httpMethod = "POST")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String", paramType = "query", required = true),
+            @ApiImplicitParam(value = "解除理由（1. 非敏感舆情；2. 非消费舆情； 3. 非职能范围； 4. 已处理同类舆情）", name = "removeReason", dataType = "Integer", paramType = "query", required = true),
+            @ApiImplicitParam(value = "解除备注", name = "removeNote", dataType = "String", paramType = "query", required = false)
+    })
+    @RequestMapping(value = "remove", method = RequestMethod.POST)
+    public RestResult removeWarn(String uuid, Integer removeReason, String removeNote) throws InterruptedException, ExecutionException, IOException {
+        ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, uuid, removeNote);
+        opinionTaskService.removeWarn(uuid, removeReason, removeNote);
         return RestResult.ok();
     }
 }
