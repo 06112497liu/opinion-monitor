@@ -38,6 +38,7 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
     public static final Logger logger = LoggerFactory.getLogger(MyBatisConfig.class);
     @Value("${mybatis.mapperLocations}")
     private String             mapperLocations;
+
     @Autowired
     private JDBCProperties     jdbcProperties;
 

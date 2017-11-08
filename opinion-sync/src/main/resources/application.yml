@@ -38,7 +38,7 @@ spring:
 
 #spring:
 #  kafka:
-#    bootstrap-servers: 10.28.100.69:9092
 #    consumer.group-id: test-group
-#    # 指定listener 容器中的线程数，用于提高并发量
-#    listener.concurrency: 1
+#    auto-offset-reset: earliest
+    # 指定listener 容器中的线程数，用于提高并发量
+    #listener.concurrency: 1

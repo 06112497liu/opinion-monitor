@@ -4,7 +4,11 @@
  */
 package com.bbd.listener;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  *
@@ -14,9 +18,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpinionListener {
 
-    //@KafkaListener(topics = "test", groupId = "test-group")
-    //    public void Listen(ConsumerRecord<String, String> record) {
-    //        System.out.printf("offset = %d, key = %s, value = %s\n", record.offset(), record.key(), record.value());
-    //    }
+    @KafkaListener(topics = "test", group = "test-group", containerFactory = "kafkaListenerContainerFactory")
+    public void Listen(List<ConsumerRecord<String, String>> records) {
+        for (ConsumerRecord<String, String> record : records) {
+            System.out.printf("offset = %d, key = %s, value = %s\n", record.offset(), record.key(), record.value());
+        }
+    }
 
 }
