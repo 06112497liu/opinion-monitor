@@ -2,6 +2,8 @@ package com.bbd.domain;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class OpinionEventTrendStatistic {
     private Long id;
 
@@ -13,22 +15,22 @@ public class OpinionEventTrendStatistic {
 
     private Integer hot;
 
-    private Integer similiarcount;
+    private Integer similiarCount;
 
-    private Integer commentcount;
+    private Integer commentCount;
 
     private Integer emotion;
 
     private String website;
 
     private String source;
-
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Date calcTime;
-
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Date publishTime;
-
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Date gmtCreate;
-
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Date gmtModified;
 
     private String summary;
@@ -81,20 +83,20 @@ public class OpinionEventTrendStatistic {
         this.hot = hot;
     }
 
-    public Integer getSimiliarcount() {
-        return similiarcount;
+    public Integer getSimiliarCount() {
+        return similiarCount;
     }
 
-    public void setSimiliarcount(Integer similiarcount) {
-        this.similiarcount = similiarcount;
+    public void setSimiliarCount(Integer similiarCount) {
+        this.similiarCount = similiarCount;
     }
 
-    public Integer getCommentcount() {
-        return commentcount;
+    public Integer getCommentCount() {
+        return commentCount;
     }
 
-    public void setCommentcount(Integer commentcount) {
-        this.commentcount = commentcount;
+    public void setCommentCount(Integer commentCount) {
+        this.commentCount = commentCount;
     }
 
     public Integer getEmotion() {

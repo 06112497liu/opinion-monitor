@@ -7,8 +7,8 @@
     <result column="uuid" jdbcType="VARCHAR" property="uuid" />
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="hot" jdbcType="INTEGER" property="hot" />
-    <result column="similiarCount" jdbcType="INTEGER" property="similiarcount" />
-    <result column="commentCount" jdbcType="INTEGER" property="commentcount" />
+    <result column="similiar_count" jdbcType="INTEGER" property="similiarCount" />
+    <result column="comment_count" jdbcType="INTEGER" property="commentCount" />
     <result column="emotion" jdbcType="INTEGER" property="emotion" />
     <result column="website" jdbcType="VARCHAR" property="website" />
     <result column="source" jdbcType="VARCHAR" property="source" />
@@ -83,8 +83,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, event_id, uuid, title, hot, similiarCount, commentCount, emotion, website, source, 
-    calc_time, publish_time, gmt_create, gmt_modified
+    id, event_id, uuid, title, hot, similiar_count, comment_count, emotion, website, 
+    source, calc_time, publish_time, gmt_create, gmt_modified
   </sql>
   <sql id="Blob_Column_List">
     summary, content, link, keyword, keys
@@ -138,14 +138,14 @@
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into bbd_opinion_event_trend_statistic (event_id, uuid, title, 
-      hot, similiarCount, commentCount, 
+      hot, similiar_count, comment_count, 
       emotion, website, source, 
       calc_time, publish_time, gmt_create, 
       gmt_modified, summary, content, 
       link, keyword, keys
       )
     values (#{eventId,jdbcType=BIGINT}, #{uuid,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
-      #{hot,jdbcType=INTEGER}, #{similiarcount,jdbcType=INTEGER}, #{commentcount,jdbcType=INTEGER}, 
+      #{hot,jdbcType=INTEGER}, #{similiarCount,jdbcType=INTEGER}, #{commentCount,jdbcType=INTEGER}, 
       #{emotion,jdbcType=INTEGER}, #{website,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR}, 
       #{calcTime,jdbcType=TIMESTAMP}, #{publishTime,jdbcType=TIMESTAMP}, #{gmtCreate,jdbcType=TIMESTAMP}, 
       #{gmtModified,jdbcType=TIMESTAMP}, #{summary,jdbcType=LONGVARCHAR}, #{content,jdbcType=LONGVARCHAR}, 
@@ -170,11 +170,11 @@
       <if test="hot != null">
         hot,
       </if>
-      <if test="similiarcount != null">
-        similiarCount,
+      <if test="similiarCount != null">
+        similiar_count,
       </if>
-      <if test="commentcount != null">
-        commentCount,
+      <if test="commentCount != null">
+        comment_count,
       </if>
       <if test="emotion != null">
         emotion,
@@ -226,11 +226,11 @@
       <if test="hot != null">
         #{hot,jdbcType=INTEGER},
       </if>
-      <if test="similiarcount != null">
-        #{similiarcount,jdbcType=INTEGER},
+      <if test="similiarCount != null">
+        #{similiarCount,jdbcType=INTEGER},
       </if>
-      <if test="commentcount != null">
-        #{commentcount,jdbcType=INTEGER},
+      <if test="commentCount != null">
+        #{commentCount,jdbcType=INTEGER},
       </if>
       <if test="emotion != null">
         #{emotion,jdbcType=INTEGER},
@@ -288,11 +288,11 @@
       <if test="record.hot != null">
         hot = #{record.hot,jdbcType=INTEGER},
       </if>
-      <if test="record.similiarcount != null">
-        similiarCount = #{record.similiarcount,jdbcType=INTEGER},
+      <if test="record.similiarCount != null">
+        similiar_count = #{record.similiarCount,jdbcType=INTEGER},
       </if>
-      <if test="record.commentcount != null">
-        commentCount = #{record.commentcount,jdbcType=INTEGER},
+      <if test="record.commentCount != null">
+        comment_count = #{record.commentCount,jdbcType=INTEGER},
       </if>
       <if test="record.emotion != null">
         emotion = #{record.emotion,jdbcType=INTEGER},
@@ -342,8 +342,8 @@
       uuid = #{record.uuid,jdbcType=VARCHAR},
       title = #{record.title,jdbcType=VARCHAR},
       hot = #{record.hot,jdbcType=INTEGER},
-      similiarCount = #{record.similiarcount,jdbcType=INTEGER},
-      commentCount = #{record.commentcount,jdbcType=INTEGER},
+      similiar_count = #{record.similiarCount,jdbcType=INTEGER},
+      comment_count = #{record.commentCount,jdbcType=INTEGER},
       emotion = #{record.emotion,jdbcType=INTEGER},
       website = #{record.website,jdbcType=VARCHAR},
       source = #{record.source,jdbcType=VARCHAR},
@@ -367,8 +367,8 @@
       uuid = #{record.uuid,jdbcType=VARCHAR},
       title = #{record.title,jdbcType=VARCHAR},
       hot = #{record.hot,jdbcType=INTEGER},
-      similiarCount = #{record.similiarcount,jdbcType=INTEGER},
-      commentCount = #{record.commentcount,jdbcType=INTEGER},
+      similiar_count = #{record.similiarCount,jdbcType=INTEGER},
+      comment_count = #{record.commentCount,jdbcType=INTEGER},
       emotion = #{record.emotion,jdbcType=INTEGER},
       website = #{record.website,jdbcType=VARCHAR},
       source = #{record.source,jdbcType=VARCHAR},
@@ -395,11 +395,11 @@
       <if test="hot != null">
         hot = #{hot,jdbcType=INTEGER},
       </if>
-      <if test="similiarcount != null">
-        similiarCount = #{similiarcount,jdbcType=INTEGER},
+      <if test="similiarCount != null">
+        similiar_count = #{similiarCount,jdbcType=INTEGER},
       </if>
-      <if test="commentcount != null">
-        commentCount = #{commentcount,jdbcType=INTEGER},
+      <if test="commentCount != null">
+        comment_count = #{commentCount,jdbcType=INTEGER},
       </if>
       <if test="emotion != null">
         emotion = #{emotion,jdbcType=INTEGER},
@@ -446,8 +446,8 @@
       uuid = #{uuid,jdbcType=VARCHAR},
       title = #{title,jdbcType=VARCHAR},
       hot = #{hot,jdbcType=INTEGER},
-      similiarCount = #{similiarcount,jdbcType=INTEGER},
-      commentCount = #{commentcount,jdbcType=INTEGER},
+      similiar_count = #{similiarCount,jdbcType=INTEGER},
+      comment_count = #{commentCount,jdbcType=INTEGER},
       emotion = #{emotion,jdbcType=INTEGER},
       website = #{website,jdbcType=VARCHAR},
       source = #{source,jdbcType=VARCHAR},
@@ -468,8 +468,8 @@
       uuid = #{uuid,jdbcType=VARCHAR},
       title = #{title,jdbcType=VARCHAR},
       hot = #{hot,jdbcType=INTEGER},
-      similiarCount = #{similiarcount,jdbcType=INTEGER},
-      commentCount = #{commentcount,jdbcType=INTEGER},
+      similiar_count = #{similiarCount,jdbcType=INTEGER},
+      comment_count = #{commentCount,jdbcType=INTEGER},
       emotion = #{emotion,jdbcType=INTEGER},
       website = #{website,jdbcType=VARCHAR},
       source = #{source,jdbcType=VARCHAR},
@@ -494,4 +494,24 @@
       order by ${orderByClause}
     </if>
   </select>
+  
+     <insert id="insertBatch" parameterType="java.util.List">
+    insert into bbd_opinion_event_trend_statistic (
+      event_id, uuid, title, 
+      hot, similiar_count, comment_count, 
+      emotion, website, source, 
+      calc_time,  publish_time, gmt_create, 
+      gmt_modified, summary, content, 
+      link, keyword, `keys`
+      )
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+       (#{item.eventId,jdbcType=BIGINT}, #{item.uuid,jdbcType=VARCHAR}, #{item.title,jdbcType=VARCHAR}, 
+      #{item.hot,jdbcType=INTEGER}, #{item.similiarCount,jdbcType=INTEGER}, #{item.commentCount,jdbcType=INTEGER}, 
+      #{item.emotion,jdbcType=INTEGER}, #{item.website,jdbcType=VARCHAR}, #{item.source,jdbcType=VARCHAR}, 
+      #{item.calcTime,jdbcType=TIMESTAMP}, #{item.publishTime,jdbcType=TIMESTAMP}, #{item.gmtCreate,jdbcType=TIMESTAMP}, 
+      #{item.gmtModified,jdbcType=TIMESTAMP}, #{item.summary,jdbcType=LONGVARCHAR}, #{item.content,jdbcType=LONGVARCHAR}, 
+      #{item.link,jdbcType=LONGVARCHAR}, #{item.keyword,jdbcType=LONGVARCHAR}, #{item.keys,jdbcType=LONGVARCHAR})
+    </foreach>
+    </insert>
 </mapper>

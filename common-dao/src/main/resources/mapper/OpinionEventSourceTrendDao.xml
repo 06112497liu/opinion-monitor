@@ -283,7 +283,14 @@
 	<if test="sourceType != null">
      AND a.`source_type`=#{sourceType} 
     </if>
-	AND `event_id`=#{id} AND `pick_time` >=DATE_SUB(NOW(),INTERVAL #{days} DAY) 
+	AND `event_id`=#{id} AND `pick_time` >=DATE_SUB(NOW(), 
+	<if test="days == 365">
+     INTERVAL 1 YEAR
+    </if>
+    <if test="days != 365">
+     INTERVAL #{days} DAY
+    </if>
+	) 
 	GROUP BY `pick_time`
   </select>
 </mapper>

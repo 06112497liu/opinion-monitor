@@ -425,123 +425,123 @@ public class OpinionEventTrendStatisticExample {
             return (Criteria) this;
         }
 
-        public Criteria andSimiliarcountIsNull() {
-            addCriterion("similiarCount is null");
+        public Criteria andSimiliarCountIsNull() {
+            addCriterion("similiar_count is null");
             return (Criteria) this;
         }
 
-        public Criteria andSimiliarcountIsNotNull() {
-            addCriterion("similiarCount is not null");
+        public Criteria andSimiliarCountIsNotNull() {
+            addCriterion("similiar_count is not null");
             return (Criteria) this;
         }
 
-        public Criteria andSimiliarcountEqualTo(Integer value) {
-            addCriterion("similiarCount =", value, "similiarcount");
+        public Criteria andSimiliarCountEqualTo(Integer value) {
+            addCriterion("similiar_count =", value, "similiarCount");
             return (Criteria) this;
         }
 
-        public Criteria andSimiliarcountNotEqualTo(Integer value) {
-            addCriterion("similiarCount <>", value, "similiarcount");
+        public Criteria andSimiliarCountNotEqualTo(Integer value) {
+            addCriterion("similiar_count <>", value, "similiarCount");
             return (Criteria) this;
         }
 
-        public Criteria andSimiliarcountGreaterThan(Integer value) {
-            addCriterion("similiarCount >", value, "similiarcount");
+        public Criteria andSimiliarCountGreaterThan(Integer value) {
+            addCriterion("similiar_count >", value, "similiarCount");
             return (Criteria) this;
         }
 
-        public Criteria andSimiliarcountGreaterThanOrEqualTo(Integer value) {
-            addCriterion("similiarCount >=", value, "similiarcount");
+        public Criteria andSimiliarCountGreaterThanOrEqualTo(Integer value) {
+            addCriterion("similiar_count >=", value, "similiarCount");
             return (Criteria) this;
         }
 
-        public Criteria andSimiliarcountLessThan(Integer value) {
-            addCriterion("similiarCount <", value, "similiarcount");
+        public Criteria andSimiliarCountLessThan(Integer value) {
+            addCriterion("similiar_count <", value, "similiarCount");
             return (Criteria) this;
         }
 
-        public Criteria andSimiliarcountLessThanOrEqualTo(Integer value) {
-            addCriterion("similiarCount <=", value, "similiarcount");
+        public Criteria andSimiliarCountLessThanOrEqualTo(Integer value) {
+            addCriterion("similiar_count <=", value, "similiarCount");
             return (Criteria) this;
         }
 
-        public Criteria andSimiliarcountIn(List<Integer> values) {
-            addCriterion("similiarCount in", values, "similiarcount");
+        public Criteria andSimiliarCountIn(List<Integer> values) {
+            addCriterion("similiar_count in", values, "similiarCount");
             return (Criteria) this;
         }
 
-        public Criteria andSimiliarcountNotIn(List<Integer> values) {
-            addCriterion("similiarCount not in", values, "similiarcount");
+        public Criteria andSimiliarCountNotIn(List<Integer> values) {
+            addCriterion("similiar_count not in", values, "similiarCount");
             return (Criteria) this;
         }
 
-        public Criteria andSimiliarcountBetween(Integer value1, Integer value2) {
-            addCriterion("similiarCount between", value1, value2, "similiarcount");
+        public Criteria andSimiliarCountBetween(Integer value1, Integer value2) {
+            addCriterion("similiar_count between", value1, value2, "similiarCount");
             return (Criteria) this;
         }
 
-        public Criteria andSimiliarcountNotBetween(Integer value1, Integer value2) {
-            addCriterion("similiarCount not between", value1, value2, "similiarcount");
+        public Criteria andSimiliarCountNotBetween(Integer value1, Integer value2) {
+            addCriterion("similiar_count not between", value1, value2, "similiarCount");
             return (Criteria) this;
         }
 
-        public Criteria andCommentcountIsNull() {
-            addCriterion("commentCount is null");
+        public Criteria andCommentCountIsNull() {
+            addCriterion("comment_count is null");
             return (Criteria) this;
         }
 
-        public Criteria andCommentcountIsNotNull() {
-            addCriterion("commentCount is not null");
+        public Criteria andCommentCountIsNotNull() {
+            addCriterion("comment_count is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCommentcountEqualTo(Integer value) {
-            addCriterion("commentCount =", value, "commentcount");
+        public Criteria andCommentCountEqualTo(Integer value) {
+            addCriterion("comment_count =", value, "commentCount");
             return (Criteria) this;
         }
 
-        public Criteria andCommentcountNotEqualTo(Integer value) {
-            addCriterion("commentCount <>", value, "commentcount");
+        public Criteria andCommentCountNotEqualTo(Integer value) {
+            addCriterion("comment_count <>", value, "commentCount");
             return (Criteria) this;
         }
 
-        public Criteria andCommentcountGreaterThan(Integer value) {
-            addCriterion("commentCount >", value, "commentcount");
+        public Criteria andCommentCountGreaterThan(Integer value) {
+            addCriterion("comment_count >", value, "commentCount");
             return (Criteria) this;
         }
 
-        public Criteria andCommentcountGreaterThanOrEqualTo(Integer value) {
-            addCriterion("commentCount >=", value, "commentcount");
+        public Criteria andCommentCountGreaterThanOrEqualTo(Integer value) {
+            addCriterion("comment_count >=", value, "commentCount");
             return (Criteria) this;
         }
 
-        public Criteria andCommentcountLessThan(Integer value) {
-            addCriterion("commentCount <", value, "commentcount");
+        public Criteria andCommentCountLessThan(Integer value) {
+            addCriterion("comment_count <", value, "commentCount");
             return (Criteria) this;
         }
 
-        public Criteria andCommentcountLessThanOrEqualTo(Integer value) {
-            addCriterion("commentCount <=", value, "commentcount");
+        public Criteria andCommentCountLessThanOrEqualTo(Integer value) {
+            addCriterion("comment_count <=", value, "commentCount");
             return (Criteria) this;
         }
 
-        public Criteria andCommentcountIn(List<Integer> values) {
-            addCriterion("commentCount in", values, "commentcount");
+        public Criteria andCommentCountIn(List<Integer> values) {
+            addCriterion("comment_count in", values, "commentCount");
             return (Criteria) this;
         }
 
-        public Criteria andCommentcountNotIn(List<Integer> values) {
-            addCriterion("commentCount not in", values, "commentcount");
+        public Criteria andCommentCountNotIn(List<Integer> values) {
+            addCriterion("comment_count not in", values, "commentCount");
             return (Criteria) this;
         }
 
-        public Criteria andCommentcountBetween(Integer value1, Integer value2) {
-            addCriterion("commentCount between", value1, value2, "commentcount");
+        public Criteria andCommentCountBetween(Integer value1, Integer value2) {
+            addCriterion("comment_count between", value1, value2, "commentCount");
             return (Criteria) this;
         }
 
-        public Criteria andCommentcountNotBetween(Integer value1, Integer value2) {
-            addCriterion("commentCount not between", value1, value2, "commentcount");
+        public Criteria andCommentCountNotBetween(Integer value1, Integer value2) {
+            addCriterion("comment_count not between", value1, value2, "commentCount");
             return (Criteria) this;
         }
 
