@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbd.dao.OpinionEventStatisticDao">
+  <resultMap id="BaseResultMap" type="com.bbd.domain.OpinionEventStatistic">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="event_id" jdbcType="BIGINT" property="eventId" />
+    <result column="info_total" jdbcType="INTEGER" property="infoTotal" />
+    <result column="media_type" jdbcType="VARCHAR" property="mediaType" />
+    <result column="source" jdbcType="VARCHAR" property="source" />
+    <result column="data_type" jdbcType="VARCHAR" property="dataType" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.bbd.domain.OpinionEventStatistic">
+    <result column="words" jdbcType="LONGVARCHAR" property="words" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, event_id, info_total, media_type, source, data_type, gmt_create, gmt_modified
+  </sql>
+  <sql id="Blob_Column_List">
+    words
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.bbd.domain.OpinionEventStatisticExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from bbd_opinion_event_statistic
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.bbd.domain.OpinionEventStatisticExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from bbd_opinion_event_statistic
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from bbd_opinion_event_statistic
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from bbd_opinion_event_statistic
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.bbd.domain.OpinionEventStatistic">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bbd_opinion_event_statistic (event_id, info_total, media_type, 
+      source, data_type, gmt_create, 
+      gmt_modified, words)
+    values (#{eventId,jdbcType=BIGINT}, #{infoTotal,jdbcType=INTEGER}, #{mediaType,jdbcType=VARCHAR}, 
+      #{source,jdbcType=VARCHAR}, #{dataType,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP}, 
+      #{gmtModified,jdbcType=TIMESTAMP}, #{words,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bbd.domain.OpinionEventStatistic">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bbd_opinion_event_statistic
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="eventId != null">
+        event_id,
+      </if>
+      <if test="infoTotal != null">
+        info_total,
+      </if>
+      <if test="mediaType != null">
+        media_type,
+      </if>
+      <if test="source != null">
+        source,
+      </if>
+      <if test="dataType != null">
+        data_type,
+      </if>
+      <if test="gmtCreate != null">
+        gmt_create,
+      </if>
+      <if test="gmtModified != null">
+        gmt_modified,
+      </if>
+      <if test="words != null">
+        words,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="eventId != null">
+        #{eventId,jdbcType=BIGINT},
+      </if>
+      <if test="infoTotal != null">
+        #{infoTotal,jdbcType=INTEGER},
+      </if>
+      <if test="mediaType != null">
+        #{mediaType,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        #{source,jdbcType=VARCHAR},
+      </if>
+      <if test="dataType != null">
+        #{dataType,jdbcType=VARCHAR},
+      </if>
+      <if test="gmtCreate != null">
+        #{gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gmtModified != null">
+        #{gmtModified,jdbcType=TIMESTAMP},
+      </if>
+      <if test="words != null">
+        #{words,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByExampleSelective" parameterType="map">
+    update bbd_opinion_event_statistic
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.eventId != null">
+        event_id = #{record.eventId,jdbcType=BIGINT},
+      </if>
+      <if test="record.infoTotal != null">
+        info_total = #{record.infoTotal,jdbcType=INTEGER},
+      </if>
+      <if test="record.mediaType != null">
+        media_type = #{record.mediaType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.source != null">
+        source = #{record.source,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dataType != null">
+        data_type = #{record.dataType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gmtCreate != null">
+        gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.gmtModified != null">
+        gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.words != null">
+        words = #{record.words,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update bbd_opinion_event_statistic
+    set id = #{record.id,jdbcType=BIGINT},
+      event_id = #{record.eventId,jdbcType=BIGINT},
+      info_total = #{record.infoTotal,jdbcType=INTEGER},
+      media_type = #{record.mediaType,jdbcType=VARCHAR},
+      source = #{record.source,jdbcType=VARCHAR},
+      data_type = #{record.dataType,jdbcType=VARCHAR},
+      gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+      gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
+      words = #{record.words,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update bbd_opinion_event_statistic
+    set id = #{record.id,jdbcType=BIGINT},
+      event_id = #{record.eventId,jdbcType=BIGINT},
+      info_total = #{record.infoTotal,jdbcType=INTEGER},
+      media_type = #{record.mediaType,jdbcType=VARCHAR},
+      source = #{record.source,jdbcType=VARCHAR},
+      data_type = #{record.dataType,jdbcType=VARCHAR},
+      gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+      gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bbd.domain.OpinionEventStatistic">
+    update bbd_opinion_event_statistic
+    <set>
+      <if test="eventId != null">
+        event_id = #{eventId,jdbcType=BIGINT},
+      </if>
+      <if test="infoTotal != null">
+        info_total = #{infoTotal,jdbcType=INTEGER},
+      </if>
+      <if test="mediaType != null">
+        media_type = #{mediaType,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        source = #{source,jdbcType=VARCHAR},
+      </if>
+      <if test="dataType != null">
+        data_type = #{dataType,jdbcType=VARCHAR},
+      </if>
+      <if test="gmtCreate != null">
+        gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gmtModified != null">
+        gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      </if>
+      <if test="words != null">
+        words = #{words,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.bbd.domain.OpinionEventStatistic">
+    update bbd_opinion_event_statistic
+    set event_id = #{eventId,jdbcType=BIGINT},
+      info_total = #{infoTotal,jdbcType=INTEGER},
+      media_type = #{mediaType,jdbcType=VARCHAR},
+      source = #{source,jdbcType=VARCHAR},
+      data_type = #{dataType,jdbcType=VARCHAR},
+      gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      words = #{words,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bbd.domain.OpinionEventStatistic">
+    update bbd_opinion_event_statistic
+    set event_id = #{eventId,jdbcType=BIGINT},
+      info_total = #{infoTotal,jdbcType=INTEGER},
+      media_type = #{mediaType,jdbcType=VARCHAR},
+      source = #{source,jdbcType=VARCHAR},
+      data_type = #{dataType,jdbcType=VARCHAR},
+      gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.OpinionEventStatisticExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from bbd_opinion_event_statistic
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+</mapper>

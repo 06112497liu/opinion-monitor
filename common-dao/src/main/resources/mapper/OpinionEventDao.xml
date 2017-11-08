@@ -23,6 +23,8 @@
     <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
     <result column="modified_by" jdbcType="BIGINT" property="modifiedBy" />
     <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+    <result column="file_by" jdbcType="BIGINT" property="fileBy" />
+    <result column="gmt_file" jdbcType="TIMESTAMP" property="gmtFile" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.bbd.domain.OpinionEvent">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
@@ -92,7 +94,7 @@
   <sql id="Base_Column_List">
     id, event_name, event_group, monitor, region, event_level, merchant, brand, address, 
     merchant_tel, consumer, consumer_tel, hot, opinion_count, warn_count, file_reason, 
-    is_delete, create_by, gmt_create, modified_by, gmt_modified
+    is_delete, create_by, gmt_create, modified_by, gmt_modified, file_by, gmt_file
   </sql>
   <sql id="Blob_Column_List">
     description, include_words, keywords, exclude_words, remark
@@ -151,18 +153,20 @@
       consumer, consumer_tel, hot, 
       opinion_count, warn_count, file_reason, 
       is_delete, create_by, gmt_create, 
-      modified_by, gmt_modified, description, 
-      include_words, keywords, exclude_words, 
-      remark)
+      modified_by, gmt_modified, file_by, 
+      gmt_file, description, include_words, 
+      keywords, exclude_words, remark
+      )
     values (#{eventName,jdbcType=VARCHAR}, #{eventGroup,jdbcType=VARCHAR}, #{monitor,jdbcType=VARCHAR}, 
       #{region,jdbcType=VARCHAR}, #{eventLevel,jdbcType=VARCHAR}, #{merchant,jdbcType=VARCHAR}, 
       #{brand,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{merchantTel,jdbcType=VARCHAR}, 
       #{consumer,jdbcType=VARCHAR}, #{consumerTel,jdbcType=VARCHAR}, #{hot,jdbcType=INTEGER}, 
       #{opinionCount,jdbcType=INTEGER}, #{warnCount,jdbcType=INTEGER}, #{fileReason,jdbcType=VARCHAR}, 
-      #{isDelete,jdbcType=TINYINT}, #{createBy,jdbcType=BIGINT}, NOW(),
-      #{modifiedBy,jdbcType=BIGINT}, #{gmtModified,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}, 
-      #{includeWords,jdbcType=LONGVARCHAR}, #{keywords,jdbcType=LONGVARCHAR}, #{excludeWords,jdbcType=LONGVARCHAR}, 
-      #{remark,jdbcType=LONGVARCHAR})
+      #{isDelete,jdbcType=TINYINT}, #{createBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, 
+      #{modifiedBy,jdbcType=BIGINT}, #{gmtModified,jdbcType=TIMESTAMP}, #{fileBy,jdbcType=BIGINT}, 
+      #{gmtFile,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}, #{includeWords,jdbcType=LONGVARCHAR}, 
+      #{keywords,jdbcType=LONGVARCHAR}, #{excludeWords,jdbcType=LONGVARCHAR}, #{remark,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.bbd.domain.OpinionEvent">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -229,6 +233,12 @@
       </if>
       <if test="gmtModified != null">
         gmt_modified,
+      </if>
+      <if test="fileBy != null">
+        file_by,
+      </if>
+      <if test="gmtFile != null">
+        gmt_file,
       </if>
       <if test="description != null">
         description,
@@ -306,6 +316,12 @@
       </if>
       <if test="gmtModified != null">
         #{gmtModified,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fileBy != null">
+        #{fileBy,jdbcType=BIGINT},
+      </if>
+      <if test="gmtFile != null">
+        #{gmtFile,jdbcType=TIMESTAMP},
       </if>
       <if test="description != null">
         #{description,jdbcType=LONGVARCHAR},
@@ -390,6 +406,12 @@
       <if test="record.gmtModified != null">
         gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.fileBy != null">
+        file_by = #{record.fileBy,jdbcType=BIGINT},
+      </if>
+      <if test="record.gmtFile != null">
+        gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP},
+      </if>
       <if test="record.description != null">
         description = #{record.description,jdbcType=LONGVARCHAR},
       </if>
@@ -433,6 +455,8 @@
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       modified_by = #{record.modifiedBy,jdbcType=BIGINT},
       gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
+      file_by = #{record.fileBy,jdbcType=BIGINT},
+      gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP},
       description = #{record.description,jdbcType=LONGVARCHAR},
       include_words = #{record.includeWords,jdbcType=LONGVARCHAR},
       keywords = #{record.keywords,jdbcType=LONGVARCHAR},
@@ -464,7 +488,9 @@
       create_by = #{record.createBy,jdbcType=BIGINT},
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       modified_by = #{record.modifiedBy,jdbcType=BIGINT},
-      gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP}
+      gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
+      file_by = #{record.fileBy,jdbcType=BIGINT},
+      gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -529,7 +555,15 @@
       <if test="modifiedBy != null">
         modified_by = #{modifiedBy,jdbcType=BIGINT},
       </if>
-        gmt_modified = NOW(),
+      <if test="gmtModified != null">
+        gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fileBy != null">
+        file_by = #{fileBy,jdbcType=BIGINT},
+      </if>
+      <if test="gmtFile != null">
+        gmt_file = #{gmtFile,jdbcType=TIMESTAMP},
+      </if>
       <if test="description != null">
         description = #{description,jdbcType=LONGVARCHAR},
       </if>
@@ -570,6 +604,8 @@
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       modified_by = #{modifiedBy,jdbcType=BIGINT},
       gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      file_by = #{fileBy,jdbcType=BIGINT},
+      gmt_file = #{gmtFile,jdbcType=TIMESTAMP},
       description = #{description,jdbcType=LONGVARCHAR},
       include_words = #{includeWords,jdbcType=LONGVARCHAR},
       keywords = #{keywords,jdbcType=LONGVARCHAR},
@@ -598,7 +634,9 @@
       create_by = #{createBy,jdbcType=BIGINT},
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       modified_by = #{modifiedBy,jdbcType=BIGINT},
-      gmt_modified = NOW()
+      gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      file_by = #{fileBy,jdbcType=BIGINT},
+      gmt_file = #{gmtFile,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
   <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.OpinionEventExample" resultMap="BaseResultMap">
@@ -615,5 +653,20 @@
     <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
+  </select>
+  
+   <resultMap id="Graph" type="com.bbd.domain.Graph">
+   </resultMap>  
+  <select id="eventTypeDis" resultMap="Graph">
+    SELECT b.`name` AS `category`,COUNT(1) AS `value`
+	FROM `bbd_opinion_event` a, `bbd_opinion_dictionary` b 
+	WHERE a.`event_group` = b.`code` AND `parent`='A' AND `is_delete`=0
+	GROUP BY b.`name`
+  </select>
+  <select id="eventRegionDis" resultMap="Graph">
+    SELECT b.`name` AS `category`,COUNT(1) AS `value`
+	FROM `bbd_opinion_event` a, `bbd_opinion_dictionary` b 
+	WHERE a.`region` = b.`code` AND `parent`='C' AND `is_delete`=0
+	GROUP BY b.`name`
   </select>
 </mapper>

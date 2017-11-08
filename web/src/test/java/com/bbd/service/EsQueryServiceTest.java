@@ -71,21 +71,21 @@ public class EsQueryServiceTest extends BaseServiceTest {
     @Test
     public void testGetEventOpinionMediaSpread() {
         long eventId = 6L;
-        List<KeyValueVO> r = esQueryService.getEventOpinionMediaSpread(eventId, DateTime.now());
+        List<KeyValueVO> r = esQueryService.getEventOpinionMediaSpread(eventId, DateTime.now(), null);
         assertNotNull(r);
     }
 
     @Test
     public void testGetEventWebsiteSpread() {
         long eventId = 6L;
-        List<KeyValueVO> r = esQueryService.getEventWebsiteSpread(eventId, DateTime.now());
+        List<KeyValueVO> r = esQueryService.getEventWebsiteSpread(eventId, DateTime.now(), null);
         assertNotNull(r);
     }
 
     @Test
     public void testGetEventEmotionSpread() {
         long eventId = 6L;
-        List<KeyValueVO> r = esQueryService.getEventEmotionSpread(eventId, DateTime.now());
+        List<KeyValueVO> r = esQueryService.getEventEmotionSpread(eventId, DateTime.now(), null);
         assertNotNull(r);
     }
 

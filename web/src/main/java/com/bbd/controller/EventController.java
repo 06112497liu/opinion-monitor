@@ -9,9 +9,11 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +22,7 @@ import com.bbd.RestResult;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.service.EventService;
+import com.bbd.util.UserContext;
 
 
 @RestController
@@ -51,7 +54,7 @@ public class EventController extends AbstractController {
         })
     @RequestMapping(value = "createEvent", method = RequestMethod.POST)
     public RestResult createEvent(OpinionEvent opinionEvent) {
-        //opinionEvent.setCreateBy(createBy);
+        opinionEvent.setCreateBy(UserContext.getUser().getId());
     	eventService.createEvent(opinionEvent);
         return RestResult.ok();
     }
@@ -78,7 +81,7 @@ public class EventController extends AbstractController {
         })
     @RequestMapping(value = "modifyEvent", method = RequestMethod.POST)
     public RestResult modifyEvent(OpinionEvent opinionEvent) {
-        //opinionEvent.setModifiedBy(modifiedBy);
+        opinionEvent.setModifiedBy(UserContext.getUser().getId());
     	eventService.modifyEvent(opinionEvent);
         return RestResult.ok();
     }
@@ -92,7 +95,18 @@ public class EventController extends AbstractController {
         HashMap map= new HashMap();
         OpinionEvent event = eventService.getEvent(opinionEvent.getId()); 
         map.put("event", event);
-        map.put("username", /*获取对应ID的用户名SSO*/event.getCreateBy());
+        map.put("user", UserContext.getUser());
+        return RestResult.ok(map);
+    }
+    @ApiOperation(value = "显示事件", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "getEventChinese", method = RequestMethod.GET)
+    public RestResult getEventChinese(OpinionEvent opinionEvent) {
+        HashMap map= new HashMap();
+        OpinionEvent event = eventService.getEvent(opinionEvent.getId()); 
+        map.put("event", event);
         return RestResult.ok(map);
     }
     
@@ -102,7 +116,7 @@ public class EventController extends AbstractController {
     })
     @RequestMapping(value = "deleteEvent", method = RequestMethod.POST)
     public RestResult deleteEvent(OpinionEvent opinionEvent) {
-       //opinionEvent.setModifiedBy(modifiedBy);
+        opinionEvent.setModifiedBy(UserContext.getUser().getId());
         eventService.deleteEvent(opinionEvent);
         return RestResult.ok();
     }
@@ -115,7 +129,8 @@ public class EventController extends AbstractController {
     })
     @RequestMapping(value = "fileEvent", method = RequestMethod.POST)
     public RestResult fileEvent(OpinionEvent opinionEvent) {
-        eventService.modifyEvent(opinionEvent);
+        opinionEvent.setFileBy(UserContext.getUser().getId());
+        eventService.fileEvent(opinionEvent);
         return RestResult.ok();
     }
     
@@ -254,6 +269,33 @@ public class EventController extends AbstractController {
     @RequestMapping(value = "eventDataType", method = RequestMethod.GET)
     public RestResult eventDataType(Long id, Integer cycle) {
        return RestResult.ok(eventService.eventDataType(id, cycle));
+    }
+    
+    @ApiOperation(value = "舆情首页/舆情事件类别分布", httpMethod = "GET")
+    @RequestMapping(value = "eventTypeDis", method = RequestMethod.GET)
+    public RestResult eventTypeDis() {
+       return RestResult.ok(eventService.eventTypeDis());
+    }
+    
+    @ApiOperation(value = "舆情首页/舆情事件地区分布", httpMethod = "GET")
+    @RequestMapping(value = "eventRegionDis", method = RequestMethod.GET)
+    public RestResult eventRegionDis() {
+       return RestResult.ok(eventService.eventRegionDis());
+    }
+    
+    @ApiOperation(value = "历史舆情事件", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件级别,1表示一级事件，2表示二级事件，3表示三级事件", name = "eventLevel", dataType = "String", paramType = "query", required = false),
+        @ApiImplicitParam(value = "地区,空表示全市", name = "region", dataType = "String", paramType = "query", required = false),
+        @ApiImplicitParam(value = "开始时间", name = "startTime", dataType = "Date", paramType = "query", required = true),
+        @ApiImplicitParam(value = "结束时间", name = "endTime", dataType = "Date", paramType = "query", required = true),
+        @ApiImplicitParam(value = "起始页号", name = "pageNo", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "每页大小", name = "pageSize", dataType = "Integer", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "hisEventList", method = RequestMethod.GET)
+    public RestResult hisEventList(String eventLevel, String region, @DateTimeFormat(pattern="yyyy-MM-dd")Date startTime, 
+                                   @DateTimeFormat(pattern="yyyy-MM-dd")Date endTime, Integer pageNo, Integer pageSize) {
+        return RestResult.ok(eventService.getHisEventList(eventLevel, region, startTime, endTime, pageNo, pageSize));
     }
     
 }
