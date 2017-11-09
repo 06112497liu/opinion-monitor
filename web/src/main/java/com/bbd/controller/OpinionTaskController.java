@@ -76,7 +76,7 @@ public class OpinionTaskController extends AbstractController{
     @ApiOperation(value = "查询处于任务舆情中的舆情详情", httpMethod = "GET")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String", paramType = "query", required = true),
-            @ApiImplicitParam(value = "详情类型", name = "type", dataType = "Integer", paramType = "query", required = true)
+            @ApiImplicitParam(value = "详情类型(1-待处理详情、2-转发详情)", name = "type", dataType = "Integer", paramType = "query", required = true)
     })
     @RequestMapping(value = "transfer/detail", method = RequestMethod.GET)
     public RestResult getWarnOpinionDetail(String uuid, Integer type) {

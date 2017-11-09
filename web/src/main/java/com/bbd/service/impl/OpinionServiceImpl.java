@@ -85,6 +85,11 @@ public class OpinionServiceImpl implements OpinionService {
         return map;
     }
 
+    /**
+     * 热点舆情top100
+     * @param keyword
+     * @return
+     */
     @Override
     public Map<String, Object> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb) {
 
@@ -93,24 +98,29 @@ public class OpinionServiceImpl implements OpinionService {
         List<OpinionEsVO> esOpinons = esResult.getOpinions();
 
         // step-2：代码分页
-        int index = (pb.getPage()-1) * (pb.getLimit());
         List<OpinionVO> allOpinions = BeanMapperUtil.mapList(esOpinons, OpinionVO.class);
         allOpinions.forEach(o -> {
             o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
         });
-        List<OpinionVO> opinions = allOpinions.subList(index, index + pb.getLimit());
+
+        int firstIndex = pb.getOffset(); int toIndex = pb.getLimit() * pb.getPage();
+        if(toIndex > allOpinions.size()) {
+            toIndex = allOpinions.size();
+        }
+        if(firstIndex > toIndex) {
+            firstIndex = 0;
+            pb.setPage(1);
+        }
+        List<OpinionVO> opinions = allOpinions.subList(firstIndex, toIndex);
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), esResult.getTotal().intValue());
         PageList p = PageListHelper.create(opinions, paginator);
 
         // step-3：舆情来源和热度等级统计数据
         Map<Integer, Long> mediaMap = allOpinions.stream().collect(Collectors.groupingBy(OpinionVO::getMediaType, Collectors.counting()));
-        Map<Integer, Long> levelMap = allOpinions.stream().collect(Collectors.groupingBy(OpinionVO::getLevel, Collectors.counting()));
         List<KeyValueVO> mediaTypeSta = buildKeyValueVOS(mediaMap); transMediaTypeToChina(mediaTypeSta);
-        List<KeyValueVO> hotLevelSta = buildKeyValueVOS(levelMap);
         Map<String, Object> map = Maps.newHashMap();
-        map.put("opinions", p);
-        map.put("mediaType", mediaTypeSta);
-        map.put("level", hotLevelSta);
+        map.put("opinionsList", p);
+        map.put("mediaTypeCount", esResult.getMediaTypeStats());
         return map;
     }
 

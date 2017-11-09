@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * 热点舆情控制器
@@ -36,8 +37,12 @@ public class HotOpinionController extends AbstractController {
             @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "list", method = RequestMethod.GET)
-    public RestResult getHotOpinionList(String keyword, @RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan, Integer emotion, Integer mediaType) {
-        return RestResult.ok(opinionService.getHotOpinionList(keyword, timeSpan, emotion, mediaType, getPageBounds()));
+    public RestResult getHotOpinionList(@RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan,
+                                        String keyword,
+                                        Integer emotion,
+                                        Integer mediaType) {
+        Map<String, Object> result = opinionService.getHotOpinionList(keyword, timeSpan, emotion, mediaType, getPageBounds());
+        return RestResult.ok(result);
     }
 
     @ApiOperation(value = "热点舆情详情", httpMethod = "GET")
