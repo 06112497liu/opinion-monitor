@@ -2,7 +2,7 @@
  * BBD Service Inc
  * All Rights Reserved @2017
  */
-package com.bbd.service.vo;
+package com.bbd.bean;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -12,82 +12,87 @@ import java.util.Date;
  * @author daijinlong 
  * @version $Id: OpinionVO.java, v 0.1 2017年10月31日 下午3:07:22 daijinlong Exp $ 
  */
-public class OpinionEsVO {
+public class OpinionEsVO implements EsBase {
 
     /** 1.舆情基本信息 */
 
-    private String   uuid;
+    private String    uuid;
 
-    private String   title;
+    private String    title;
 
-    private String   summary;
+    private String    summary;
 
-    private String   content;
+    private String    content;
 
-    private Integer  hot;
+    private Integer   hot;
 
-    private String link;
+    private String    link;
 
-    private Integer  similiarCount;
+    private Integer   similiarCount;
 
-    private Integer commentCount;
+    private Integer   commentCount;
 
-    private Integer  emotion;
+    private Integer   emotion;
 
     /**
      * 关键词
      */
-    private String[] keyword;
+    private String[]  keyword;
 
     /**
      * 词云
      */
-    private String[] keys;
+    private String[]  keys;
 
-    private String   website;
+    private String    website;
 
     /**
      * 1.新闻；2.微博；3.微信；4.政务；5.网站；6.论坛；7.其他
      */
-    private Integer mediaType;
+    private Integer   mediaType;
 
     /**
      * 来源
      */
-    private String source;
+    private String    source;
 
     /**
      * 所属事件
      */
     private Integer[] events;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date     calcTime;
-
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date     publishTime;
+    private Date      publishTime;
 
     /** 2.操作信息 */
 
     /**
      *  0. 未操作；1. 转发；2. 已解除； 3. 已监控
      */
-    private Integer opStatus;
+    private Integer   opStatus;
 
     /**
      * 待操作者
      */
-    private Long opOwner;
+    private Long      opOwner;
 
     /**
      * 操作者
      */
-    private Long[] operators;
+    private Long[]    operators;
 
     /**
      * 转发类型
      */
-    private Integer transferType;
+    private Integer   transferType;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date      firstWarnTime;
+
+    @Override
+    public String getEsId() {
+        return getUuid();
+    }
 
     public String getUuid() {
         return uuid;
@@ -177,16 +182,12 @@ public class OpinionEsVO {
         this.mediaType = mediaType;
     }
 
-    public Date getCalcTime() {
-        return calcTime;
-    }
-
-    public void setCalcTime(Date calcTime) {
-        this.calcTime = calcTime;
-    }
-
     public Date getPublishTime() {
         return publishTime;
+    }
+
+    public void setPublishTime(Date publishTime) {
+        this.publishTime = publishTime;
     }
 
     public String getLink() {
@@ -229,7 +230,6 @@ public class OpinionEsVO {
         this.opStatus = opStatus;
     }
 
-
     public Long getOpOwner() {
         return opOwner;
     }
@@ -254,7 +254,11 @@ public class OpinionEsVO {
         this.transferType = transferType;
     }
 
-    public void setPublishTime(Date publishTime) {
-        this.publishTime = publishTime;
+    public Date getFirstWarnTime() {
+        return firstWarnTime;
+    }
+
+    public void setFirstWarnTime(Date firstWarnTime) {
+        this.firstWarnTime = firstWarnTime;
     }
 }

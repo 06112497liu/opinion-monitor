@@ -4,13 +4,13 @@
  */
 package com.bbd.service;
 
+import com.bbd.bean.OpinionEsVO;
 import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -88,6 +88,7 @@ public interface EsQueryService {
      * @return
      */
     OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb);
+
     /**
      * 查询舆情事件走势
      * @param eventId: 事件ID

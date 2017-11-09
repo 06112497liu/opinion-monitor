@@ -4,6 +4,8 @@
  */
 package com.bbd.service.vo;
 
+import com.bbd.bean.OpinionEsVO;
+
 import java.util.List;
 
 /**
