@@ -48,7 +48,7 @@ public class OpinionListener {
     private static final Logger logger = LoggerFactory.getLogger(OpinionListener.class);
 
     @Autowired
-    private WarnSettingDao      warnSettingDao;
+    private WarnSettingDao warnSettingDao;
 
     @KafkaListener(topics = "bbd_opinion", containerFactory = "kafkaListenerContainerFactory")
     public void Listen(List<ConsumerRecord<String, String>> records) {
@@ -67,7 +67,7 @@ public class OpinionListener {
             vos.add(vo);
         }
 
-        //List<OpinionVO> warnVos = Lists.newArrayList();
+        List<OpinionVO> warnVos = Lists.newArrayList();
         List<OpinionHotEsVO> hotVos = Lists.newArrayList();
         List<OpinionEsSyncVO> updateVos = Lists.newArrayList();
         List<OpinionEsSyncVO> indexVos = Lists.newArrayList();
@@ -81,7 +81,6 @@ public class OpinionListener {
 
             boolean warn = matchWarnLevel(vo.getHot(), settings);
             if (warn) {
-                //addWarnVos(vo, warnVos);
                 addHotRecord(vo, hotVos);
 
                 if (existMap.keySet().contains(uuid)) {
@@ -90,6 +89,7 @@ public class OpinionListener {
                         nvo.setFirstWarnTime(now);
                     }
                     updateVos.add(nvo);
+                    addWarnVos(vo, esVo, warnVos, settings);
                 } else {
                     nvo.setFirstWarnTime(now);
                     indexVos.add(nvo);
@@ -105,6 +105,7 @@ public class OpinionListener {
 
         syncOpinionIndex(updateVos, indexVos);
         saveOpinionHotVos(hotVos);
+        sendWarnMessage(warnVos);
 
         long end = System.currentTimeMillis();
         logger.info("Process {} opinions success, time used: {}", records.size(), (end - start));
@@ -112,6 +113,7 @@ public class OpinionListener {
 
     /**
      * 获取舆情预警设置
+     *
      * @return
      */
     private List<WarnSetting> getWarnSetting() {
@@ -122,6 +124,7 @@ public class OpinionListener {
 
     /**
      * 获取ES中已存在的舆情数据
+     *
      * @param vos
      * @return
      */
@@ -132,7 +135,7 @@ public class OpinionListener {
         long start = System.currentTimeMillis();
 
         MultiGetRequestBuilder builder = EsUtil.getClient().prepareMultiGet();
-        String[] includeFields = { EsConstant.OPINION_UUID, EsConstant.OPINION_HOT_PROP, EsConstant.OPINION_FIRST_WARN_TIME };
+        String[] includeFields = {EsConstant.OPINION_UUID, EsConstant.OPINION_HOT_PROP, EsConstant.OPINION_FIRST_WARN_TIME};
         String[] excludeFields = {};
         FetchSourceContext sourceContext = new FetchSourceContext(true, includeFields, excludeFields);
         for (OpinionVO vo : vos) {
@@ -160,7 +163,8 @@ public class OpinionListener {
 
     /**
      * 获取预警级别, 0. 未达到预警；1.一级预警；2.二级预警；3.三级预警
-     * @param hot: 热度
+     *
+     * @param hot:      热度
      * @param settings: 设置
      * @return
      */
@@ -177,6 +181,7 @@ public class OpinionListener {
 
     /**
      * 判断是否达到预警级别
+     *
      * @param hot
      * @param settings
      * @return
@@ -187,14 +192,21 @@ public class OpinionListener {
 
     /**
      * 发送预警消息
+     *
      * @param vo
      */
-    private void addWarnVos(OpinionVO vo, List<OpinionVO> warnVos) {
-        warnVos.add(vo);
+    private void addWarnVos(OpinionVO vo, OpinionEsSyncVO old, List<OpinionVO> warnVos, List<WarnSetting> settings) {
+        Integer newLevel = getWarnLevel(vo.getHot(), settings);
+        Integer oldLevel = getWarnLevel(old.getHot(), settings);
+        // 新舆情达到预警级别，且与旧舆情级别不同
+        if (newLevel > 0 && (newLevel != oldLevel)) {
+            warnVos.add(vo);
+        }
     }
 
     /**
      * 舆情是否到达过预警级别
+     *
      * @param vo
      * @return
      */
@@ -204,6 +216,7 @@ public class OpinionListener {
 
     /**
      * 新增热度记录
+     *
      * @param vo: 新舆情信息
      */
     private void addHotRecord(OpinionVO vo, List<OpinionHotEsVO> hotVos) {
@@ -217,6 +230,7 @@ public class OpinionListener {
 
     /**
      * 批量保存舆情热度信息
+     *
      * @param vos
      */
     private void saveOpinionHotVos(List<OpinionHotEsVO> vos) {
@@ -245,8 +259,9 @@ public class OpinionListener {
 
     /**
      * 批量同步舆情信息
+     *
      * @param updateVos: 待更新数据
-     * @param indexVos: 待新增数据
+     * @param indexVos:  待新增数据
      */
     private void syncOpinionIndex(List<OpinionEsSyncVO> updateVos, List<OpinionEsSyncVO> indexVos) {
         String index = EsUtil.INDEX;
@@ -277,9 +292,12 @@ public class OpinionListener {
 
     /**
      * 发送预警消息
+     *
      * @param vos: 待发送舆情
      */
     private void sendWarnMessage(List<OpinionVO> vos) {
-
+        if (vos.size() == 0) {
+            return;
+        }
     }
 }
