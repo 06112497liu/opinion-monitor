@@ -382,6 +382,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         query.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(hotField).gte(threeClass));
         query.must(QueryBuilders.termQuery(opStatusField, 0)); // 必须是未进入舆情任务中的舆情
+        if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
 
         RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(hotField).keyed(true)
                 .addRange("levelOne", oneClass, Integer.MAX_VALUE).addRange("levelTwo", twoClss, oneClass-1).addRange("levelThree", threeClass, twoClss-1);
@@ -394,7 +395,6 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .addAggregation(hotLevelAgg)
                 .addAggregation(mediaAgg);
         if (mediaType != null) builder.setPostFilter(QueryBuilders.termQuery(mediaTypeField, mediaType));
-        if (emotion != null) builder.setPostFilter(QueryBuilders.termQuery(emotionField, emotion));
 
         //step-3：查询并返回结果
         OpinionEsSearchVO result = new OpinionEsSearchVO();

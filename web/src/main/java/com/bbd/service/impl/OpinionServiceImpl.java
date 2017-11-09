@@ -64,6 +64,13 @@ public class OpinionServiceImpl implements OpinionService {
         return result;
     }
 
+    /**
+     * 预警舆情列表
+     * @param timeSpan
+     * @param emotion
+     * @param sourceType
+     * @return
+     */
     @Override
     public Map<String, Object> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb) {
 
