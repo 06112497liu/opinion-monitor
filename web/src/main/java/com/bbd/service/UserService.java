@@ -66,7 +66,8 @@ public class UserService {
      */
     public Long getUserId() {
         UserInfo u = UserContext.getUser();
-        if(Objects.isNull(u)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登陆");
+        if (Objects.isNull(u))
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登陆");
         return u.getId();
     }
 

@@ -76,6 +76,68 @@ PUT bbd_opinion
           "format": "yyyy-MM-dd HH:mm:ss"
         }
       }
+    },
+    "opinion_op_record": {
+        "properties": {
+           "opTime": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+           },
+           "opType": {
+              "type": "integer"
+           },
+           "operator": {
+              "type": "keyword"
+           },
+           "removeContent": {
+              "type": "text",
+              "fields": {
+                 "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                 }
+              }
+           },
+           "removeNote": {
+              "type": "text",
+              "fields": {
+                 "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                 }
+              }
+           },
+           "removeReason": {
+              "type": "integer"
+           },
+           "targeter": {
+              "type": "keyword"
+           },
+           "transferContent": {
+              "type": "text",
+              "fields": {
+                 "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                 }
+              }
+           },
+           "transferNote": {
+              "type": "text",
+              "fields": {
+                 "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                 }
+              }
+           },
+           "transferType": {
+              "type": "integer"
+           },
+           "uuid": {
+              "type": "keyword"
+           }
+        }
     }
   }
 }
