@@ -1,5 +1,7 @@
 package com.bbd.service.impl;
 
+import com.bbd.dao.OpinionEventDao;
+import com.bbd.domain.OpinionEventExample;
 import com.bbd.domain.User;
 import com.bbd.enums.TransferEnum;
 import com.bbd.enums.WarnReasonEnum;
@@ -43,6 +45,9 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     @Autowired
     private SystemSettingService settingService;
 
+    @Autowired
+    private OpinionEventDao opinionEventDao;
+
     private final String opOwnerField = "opOwner";
     private final String opStatusField = "opStatus";
     private final String targeterField = "targeter";
@@ -68,9 +73,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
             Map<String, Object> keyMap = Maps.newHashMap();
             keyMap.put("uuid", uuid); keyMap.put("targeter", username);
             List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 1);
-            if(!list.isEmpty()) {
-                o.setOpinionOpRecord(list.get(0));
-            }
+            o.setRecords(list);
         });
         return result;
     }
@@ -92,16 +95,14 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                     Map<String, Object> keyMap = Maps.newHashMap();
                     keyMap.put(uuidField, uuid); keyMap.put(operatorsField, username);
                     List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 1);
-                    if(!list.isEmpty()) {
-                        o.setOpinionOpRecord(list.get(0));
-                    }
+                    o.setRecords(list);
                 });
             }
-            if(opStatus == 3) {
-
+            if(opStatus == 3) { // 如果是已监控页面，查询事件的一些信息
+                OpinionEventExample exam = new OpinionEventExample();
+                opinionEventDao.selectByExample(exam);
             }
         }
-
         return result;
     }
 

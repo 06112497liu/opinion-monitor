@@ -3,7 +3,6 @@ package com.bbd.service.impl;
 import com.bbd.constant.EsConstant;
 import com.bbd.service.EsModifyService;
 import com.bbd.service.EsQueryService;
-import com.bbd.service.param.TransferParam;
 import com.bbd.service.vo.OpinionEsVO;
 import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.util.EsUtil;
