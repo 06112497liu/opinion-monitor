@@ -35,6 +35,7 @@ public class EventController extends AbstractController {
 	
     @ApiOperation(value = "创建事件", httpMethod = "POST")
     @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "舆情ID", name = "uuid", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "事件名称", name = "eventName", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "事件分组", name = "eventGroup", dataType = "String", paramType = "query", required = true),
     	@ApiImplicitParam(value = "监管主体", name = "monitor", dataType = "String", paramType = "query", required = true),
