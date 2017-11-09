@@ -3,6 +3,7 @@
 <mapper namespace="com.bbd.dao.OpinionEventDao">
   <resultMap id="BaseResultMap" type="com.bbd.domain.OpinionEvent">
     <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="uuid" jdbcType="VARCHAR" property="uuid" />
     <result column="event_name" jdbcType="VARCHAR" property="eventName" />
     <result column="event_group" jdbcType="VARCHAR" property="eventGroup" />
     <result column="monitor" jdbcType="VARCHAR" property="monitor" />
@@ -15,8 +16,6 @@
     <result column="consumer" jdbcType="VARCHAR" property="consumer" />
     <result column="consumer_tel" jdbcType="VARCHAR" property="consumerTel" />
     <result column="hot" jdbcType="INTEGER" property="hot" />
-    <result column="opinion_count" jdbcType="INTEGER" property="opinionCount" />
-    <result column="warn_count" jdbcType="INTEGER" property="warnCount" />
     <result column="file_reason" jdbcType="VARCHAR" property="fileReason" />
     <result column="is_delete" jdbcType="TINYINT" property="isDelete" />
     <result column="create_by" jdbcType="BIGINT" property="createBy" />
@@ -92,9 +91,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, event_name, event_group, monitor, region, event_level, merchant, brand, address, 
-    merchant_tel, consumer, consumer_tel, hot, opinion_count, warn_count, file_reason, 
-    is_delete, create_by, gmt_create, modified_by, gmt_modified, file_by, gmt_file
+    id, uuid, event_name, event_group, monitor, region, event_level, merchant, brand,
+    address, merchant_tel, consumer, consumer_tel, hot, file_reason, is_delete, create_by,
+    gmt_create, modified_by, gmt_modified, file_by, gmt_file
   </sql>
   <sql id="Blob_Column_List">
     description, include_words, keywords, exclude_words, remark
@@ -147,26 +146,24 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_opinion_event (event_name, event_group, monitor, 
-      region, event_level, merchant, 
-      brand, address, merchant_tel, 
-      consumer, consumer_tel, hot, 
-      opinion_count, warn_count, file_reason, 
-      is_delete, create_by, gmt_create, 
-      modified_by, gmt_modified, file_by, 
-      gmt_file, description, include_words, 
-      keywords, exclude_words, remark
-      )
-    values (#{eventName,jdbcType=VARCHAR}, #{eventGroup,jdbcType=VARCHAR}, #{monitor,jdbcType=VARCHAR}, 
-      #{region,jdbcType=VARCHAR}, #{eventLevel,jdbcType=VARCHAR}, #{merchant,jdbcType=VARCHAR}, 
-      #{brand,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{merchantTel,jdbcType=VARCHAR}, 
-      #{consumer,jdbcType=VARCHAR}, #{consumerTel,jdbcType=VARCHAR}, #{hot,jdbcType=INTEGER}, 
-      #{opinionCount,jdbcType=INTEGER}, #{warnCount,jdbcType=INTEGER}, #{fileReason,jdbcType=VARCHAR}, 
-      #{isDelete,jdbcType=TINYINT}, #{createBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, 
-      #{modifiedBy,jdbcType=BIGINT}, #{gmtModified,jdbcType=TIMESTAMP}, #{fileBy,jdbcType=BIGINT}, 
-      #{gmtFile,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}, #{includeWords,jdbcType=LONGVARCHAR}, 
-      #{keywords,jdbcType=LONGVARCHAR}, #{excludeWords,jdbcType=LONGVARCHAR}, #{remark,jdbcType=LONGVARCHAR}
-      )
+    insert into bbd_opinion_event (uuid, event_name, event_group,
+      monitor, region, event_level,
+      merchant, brand, address,
+      merchant_tel, consumer, consumer_tel,
+      hot, file_reason, is_delete,
+      create_by, gmt_create, modified_by,
+      gmt_modified, file_by, gmt_file,
+      description, include_words, keywords,
+      exclude_words, remark)
+    values (#{uuid,jdbcType=VARCHAR}, #{eventName,jdbcType=VARCHAR}, #{eventGroup,jdbcType=VARCHAR},
+      #{monitor,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR}, #{eventLevel,jdbcType=VARCHAR},
+      #{merchant,jdbcType=VARCHAR}, #{brand,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR},
+      #{merchantTel,jdbcType=VARCHAR}, #{consumer,jdbcType=VARCHAR}, #{consumerTel,jdbcType=VARCHAR},
+      #{hot,jdbcType=INTEGER}, #{fileReason,jdbcType=VARCHAR}, #{isDelete,jdbcType=TINYINT},
+      #{createBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{modifiedBy,jdbcType=BIGINT},
+      #{gmtModified,jdbcType=TIMESTAMP}, #{fileBy,jdbcType=BIGINT}, #{gmtFile,jdbcType=TIMESTAMP},
+      #{description,jdbcType=LONGVARCHAR}, #{includeWords,jdbcType=LONGVARCHAR}, #{keywords,jdbcType=LONGVARCHAR},
+      #{excludeWords,jdbcType=LONGVARCHAR}, #{remark,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.bbd.domain.OpinionEvent">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -174,6 +171,9 @@
     </selectKey>
     insert into bbd_opinion_event
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="uuid != null">
+        uuid,
+      </if>
       <if test="eventName != null">
         event_name,
       </if>
@@ -209,12 +209,6 @@
       </if>
       <if test="hot != null">
         hot,
-      </if>
-      <if test="opinionCount != null">
-        opinion_count,
-      </if>
-      <if test="warnCount != null">
-        warn_count,
       </if>
       <if test="fileReason != null">
         file_reason,
@@ -257,6 +251,9 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="uuid != null">
+        #{uuid,jdbcType=VARCHAR},
+      </if>
       <if test="eventName != null">
         #{eventName,jdbcType=VARCHAR},
       </if>
@@ -292,12 +289,6 @@
       </if>
       <if test="hot != null">
         #{hot,jdbcType=INTEGER},
-      </if>
-      <if test="opinionCount != null">
-        #{opinionCount,jdbcType=INTEGER},
-      </if>
-      <if test="warnCount != null">
-        #{warnCount,jdbcType=INTEGER},
       </if>
       <if test="fileReason != null">
         #{fileReason,jdbcType=VARCHAR},
@@ -346,6 +337,9 @@
       <if test="record.id != null">
         id = #{record.id,jdbcType=BIGINT},
       </if>
+      <if test="record.uuid != null">
+        uuid = #{record.uuid,jdbcType=VARCHAR},
+      </if>
       <if test="record.eventName != null">
         event_name = #{record.eventName,jdbcType=VARCHAR},
       </if>
@@ -381,12 +375,6 @@
       </if>
       <if test="record.hot != null">
         hot = #{record.hot,jdbcType=INTEGER},
-      </if>
-      <if test="record.opinionCount != null">
-        opinion_count = #{record.opinionCount,jdbcType=INTEGER},
-      </if>
-      <if test="record.warnCount != null">
-        warn_count = #{record.warnCount,jdbcType=INTEGER},
       </if>
       <if test="record.fileReason != null">
         file_reason = #{record.fileReason,jdbcType=VARCHAR},
@@ -435,6 +423,7 @@
   <update id="updateByExampleWithBLOBs" parameterType="map">
     update bbd_opinion_event
     set id = #{record.id,jdbcType=BIGINT},
+      uuid = #{record.uuid,jdbcType=VARCHAR},
       event_name = #{record.eventName,jdbcType=VARCHAR},
       event_group = #{record.eventGroup,jdbcType=VARCHAR},
       monitor = #{record.monitor,jdbcType=VARCHAR},
@@ -447,8 +436,6 @@
       consumer = #{record.consumer,jdbcType=VARCHAR},
       consumer_tel = #{record.consumerTel,jdbcType=VARCHAR},
       hot = #{record.hot,jdbcType=INTEGER},
-      opinion_count = #{record.opinionCount,jdbcType=INTEGER},
-      warn_count = #{record.warnCount,jdbcType=INTEGER},
       file_reason = #{record.fileReason,jdbcType=VARCHAR},
       is_delete = #{record.isDelete,jdbcType=TINYINT},
       create_by = #{record.createBy,jdbcType=BIGINT},
@@ -469,6 +456,7 @@
   <update id="updateByExample" parameterType="map">
     update bbd_opinion_event
     set id = #{record.id,jdbcType=BIGINT},
+      uuid = #{record.uuid,jdbcType=VARCHAR},
       event_name = #{record.eventName,jdbcType=VARCHAR},
       event_group = #{record.eventGroup,jdbcType=VARCHAR},
       monitor = #{record.monitor,jdbcType=VARCHAR},
@@ -481,8 +469,6 @@
       consumer = #{record.consumer,jdbcType=VARCHAR},
       consumer_tel = #{record.consumerTel,jdbcType=VARCHAR},
       hot = #{record.hot,jdbcType=INTEGER},
-      opinion_count = #{record.opinionCount,jdbcType=INTEGER},
-      warn_count = #{record.warnCount,jdbcType=INTEGER},
       file_reason = #{record.fileReason,jdbcType=VARCHAR},
       is_delete = #{record.isDelete,jdbcType=TINYINT},
       create_by = #{record.createBy,jdbcType=BIGINT},
@@ -498,6 +484,9 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.bbd.domain.OpinionEvent">
     update bbd_opinion_event
     <set>
+      <if test="uuid != null">
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
       <if test="eventName != null">
         event_name = #{eventName,jdbcType=VARCHAR},
       </if>
@@ -533,12 +522,6 @@
       </if>
       <if test="hot != null">
         hot = #{hot,jdbcType=INTEGER},
-      </if>
-      <if test="opinionCount != null">
-        opinion_count = #{opinionCount,jdbcType=INTEGER},
-      </if>
-      <if test="warnCount != null">
-        warn_count = #{warnCount,jdbcType=INTEGER},
       </if>
       <if test="fileReason != null">
         file_reason = #{fileReason,jdbcType=VARCHAR},
@@ -584,7 +567,8 @@
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.bbd.domain.OpinionEvent">
     update bbd_opinion_event
-    set event_name = #{eventName,jdbcType=VARCHAR},
+    set uuid = #{uuid,jdbcType=VARCHAR},
+      event_name = #{eventName,jdbcType=VARCHAR},
       event_group = #{eventGroup,jdbcType=VARCHAR},
       monitor = #{monitor,jdbcType=VARCHAR},
       region = #{region,jdbcType=VARCHAR},
@@ -596,8 +580,6 @@
       consumer = #{consumer,jdbcType=VARCHAR},
       consumer_tel = #{consumerTel,jdbcType=VARCHAR},
       hot = #{hot,jdbcType=INTEGER},
-      opinion_count = #{opinionCount,jdbcType=INTEGER},
-      warn_count = #{warnCount,jdbcType=INTEGER},
       file_reason = #{fileReason,jdbcType=VARCHAR},
       is_delete = #{isDelete,jdbcType=TINYINT},
       create_by = #{createBy,jdbcType=BIGINT},
@@ -615,7 +597,8 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.bbd.domain.OpinionEvent">
     update bbd_opinion_event
-    set event_name = #{eventName,jdbcType=VARCHAR},
+    set uuid = #{uuid,jdbcType=VARCHAR},
+      event_name = #{eventName,jdbcType=VARCHAR},
       event_group = #{eventGroup,jdbcType=VARCHAR},
       monitor = #{monitor,jdbcType=VARCHAR},
       region = #{region,jdbcType=VARCHAR},
@@ -627,8 +610,6 @@
       consumer = #{consumer,jdbcType=VARCHAR},
       consumer_tel = #{consumerTel,jdbcType=VARCHAR},
       hot = #{hot,jdbcType=INTEGER},
-      opinion_count = #{opinionCount,jdbcType=INTEGER},
-      warn_count = #{warnCount,jdbcType=INTEGER},
       file_reason = #{fileReason,jdbcType=VARCHAR},
       is_delete = #{isDelete,jdbcType=TINYINT},
       create_by = #{createBy,jdbcType=BIGINT},
