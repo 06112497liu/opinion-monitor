@@ -165,6 +165,76 @@ public class OpinionEventExample {
             return (Criteria) this;
         }
 
+        public Criteria andUuidIsNull() {
+            addCriterion("uuid is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidIsNotNull() {
+            addCriterion("uuid is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidEqualTo(String value) {
+            addCriterion("uuid =", value, "uuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidNotEqualTo(String value) {
+            addCriterion("uuid <>", value, "uuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidGreaterThan(String value) {
+            addCriterion("uuid >", value, "uuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidGreaterThanOrEqualTo(String value) {
+            addCriterion("uuid >=", value, "uuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidLessThan(String value) {
+            addCriterion("uuid <", value, "uuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidLessThanOrEqualTo(String value) {
+            addCriterion("uuid <=", value, "uuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidLike(String value) {
+            addCriterion("uuid like", value, "uuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidNotLike(String value) {
+            addCriterion("uuid not like", value, "uuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidIn(List<String> values) {
+            addCriterion("uuid in", values, "uuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidNotIn(List<String> values) {
+            addCriterion("uuid not in", values, "uuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidBetween(String value1, String value2) {
+            addCriterion("uuid between", value1, value2, "uuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUuidNotBetween(String value1, String value2) {
+            addCriterion("uuid not between", value1, value2, "uuid");
+            return (Criteria) this;
+        }
+
         public Criteria andEventNameIsNull() {
             addCriterion("event_name is null");
             return (Criteria) this;
@@ -992,126 +1062,6 @@ public class OpinionEventExample {
 
         public Criteria andHotNotBetween(Integer value1, Integer value2) {
             addCriterion("hot not between", value1, value2, "hot");
-            return (Criteria) this;
-        }
-
-        public Criteria andOpinionCountIsNull() {
-            addCriterion("opinion_count is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andOpinionCountIsNotNull() {
-            addCriterion("opinion_count is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andOpinionCountEqualTo(Integer value) {
-            addCriterion("opinion_count =", value, "opinionCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andOpinionCountNotEqualTo(Integer value) {
-            addCriterion("opinion_count <>", value, "opinionCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andOpinionCountGreaterThan(Integer value) {
-            addCriterion("opinion_count >", value, "opinionCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andOpinionCountGreaterThanOrEqualTo(Integer value) {
-            addCriterion("opinion_count >=", value, "opinionCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andOpinionCountLessThan(Integer value) {
-            addCriterion("opinion_count <", value, "opinionCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andOpinionCountLessThanOrEqualTo(Integer value) {
-            addCriterion("opinion_count <=", value, "opinionCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andOpinionCountIn(List<Integer> values) {
-            addCriterion("opinion_count in", values, "opinionCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andOpinionCountNotIn(List<Integer> values) {
-            addCriterion("opinion_count not in", values, "opinionCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andOpinionCountBetween(Integer value1, Integer value2) {
-            addCriterion("opinion_count between", value1, value2, "opinionCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andOpinionCountNotBetween(Integer value1, Integer value2) {
-            addCriterion("opinion_count not between", value1, value2, "opinionCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andWarnCountIsNull() {
-            addCriterion("warn_count is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andWarnCountIsNotNull() {
-            addCriterion("warn_count is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andWarnCountEqualTo(Integer value) {
-            addCriterion("warn_count =", value, "warnCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andWarnCountNotEqualTo(Integer value) {
-            addCriterion("warn_count <>", value, "warnCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andWarnCountGreaterThan(Integer value) {
-            addCriterion("warn_count >", value, "warnCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andWarnCountGreaterThanOrEqualTo(Integer value) {
-            addCriterion("warn_count >=", value, "warnCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andWarnCountLessThan(Integer value) {
-            addCriterion("warn_count <", value, "warnCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andWarnCountLessThanOrEqualTo(Integer value) {
-            addCriterion("warn_count <=", value, "warnCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andWarnCountIn(List<Integer> values) {
-            addCriterion("warn_count in", values, "warnCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andWarnCountNotIn(List<Integer> values) {
-            addCriterion("warn_count not in", values, "warnCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andWarnCountBetween(Integer value1, Integer value2) {
-            addCriterion("warn_count between", value1, value2, "warnCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andWarnCountNotBetween(Integer value1, Integer value2) {
-            addCriterion("warn_count not between", value1, value2, "warnCount");
             return (Criteria) this;
         }
 

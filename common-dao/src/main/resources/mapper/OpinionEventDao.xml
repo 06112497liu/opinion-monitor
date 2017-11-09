@@ -3,6 +3,7 @@
 <mapper namespace="com.bbd.dao.OpinionEventDao">
   <resultMap id="BaseResultMap" type="com.bbd.domain.OpinionEvent">
     <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="uuid" jdbcType="VARCHAR" property="uuid" />
     <result column="event_name" jdbcType="VARCHAR" property="eventName" />
     <result column="event_group" jdbcType="VARCHAR" property="eventGroup" />
     <result column="monitor" jdbcType="VARCHAR" property="monitor" />
@@ -15,8 +16,6 @@
     <result column="consumer" jdbcType="VARCHAR" property="consumer" />
     <result column="consumer_tel" jdbcType="VARCHAR" property="consumerTel" />
     <result column="hot" jdbcType="INTEGER" property="hot" />
-    <result column="opinion_count" jdbcType="INTEGER" property="opinionCount" />
-    <result column="warn_count" jdbcType="INTEGER" property="warnCount" />
     <result column="file_reason" jdbcType="VARCHAR" property="fileReason" />
     <result column="is_delete" jdbcType="TINYINT" property="isDelete" />
     <result column="create_by" jdbcType="BIGINT" property="createBy" />
@@ -92,9 +91,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, event_name, event_group, monitor, region, event_level, merchant, brand, address, 
-    merchant_tel, consumer, consumer_tel, hot, opinion_count, warn_count, file_reason, 
-    is_delete, create_by, gmt_create, modified_by, gmt_modified, file_by, gmt_file
+    id, uuid, event_name, event_group, monitor, region, event_level, merchant, brand, 
+    address, merchant_tel, consumer, consumer_tel, hot, file_reason, is_delete, create_by, 
+    gmt_create, modified_by, gmt_modified, file_by, gmt_file
   </sql>
   <sql id="Blob_Column_List">
     description, include_words, keywords, exclude_words, remark
@@ -147,26 +146,24 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_opinion_event (event_name, event_group, monitor, 
-      region, event_level, merchant, 
-      brand, address, merchant_tel, 
-      consumer, consumer_tel, hot, 
-      opinion_count, warn_count, file_reason, 
-      is_delete, create_by, gmt_create, 
-      modified_by, gmt_modified, file_by, 
-      gmt_file, description, include_words, 
-      keywords, exclude_words, remark
-      )
-    values (#{eventName,jdbcType=VARCHAR}, #{eventGroup,jdbcType=VARCHAR}, #{monitor,jdbcType=VARCHAR}, 
-      #{region,jdbcType=VARCHAR}, #{eventLevel,jdbcType=VARCHAR}, #{merchant,jdbcType=VARCHAR}, 
-      #{brand,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{merchantTel,jdbcType=VARCHAR}, 
-      #{consumer,jdbcType=VARCHAR}, #{consumerTel,jdbcType=VARCHAR}, #{hot,jdbcType=INTEGER}, 
-      #{opinionCount,jdbcType=INTEGER}, #{warnCount,jdbcType=INTEGER}, #{fileReason,jdbcType=VARCHAR}, 
-      #{isDelete,jdbcType=TINYINT}, #{createBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, 
-      #{modifiedBy,jdbcType=BIGINT}, #{gmtModified,jdbcType=TIMESTAMP}, #{fileBy,jdbcType=BIGINT}, 
-      #{gmtFile,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}, #{includeWords,jdbcType=LONGVARCHAR}, 
-      #{keywords,jdbcType=LONGVARCHAR}, #{excludeWords,jdbcType=LONGVARCHAR}, #{remark,jdbcType=LONGVARCHAR}
-      )
+    insert into bbd_opinion_event (uuid, event_name, event_group, 
+      monitor, region, event_level, 
+      merchant, brand, address, 
+      merchant_tel, consumer, consumer_tel, 
+      hot, file_reason, is_delete, 
+      create_by, gmt_create, modified_by, 
+      gmt_modified, file_by, gmt_file, 
+      description, include_words, keywords, 
+      exclude_words, remark)
+    values (#{uuid,jdbcType=VARCHAR}, #{eventName,jdbcType=VARCHAR}, #{eventGroup,jdbcType=VARCHAR}, 
+      #{monitor,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR}, #{eventLevel,jdbcType=VARCHAR}, 
+      #{merchant,jdbcType=VARCHAR}, #{brand,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
+      #{merchantTel,jdbcType=VARCHAR}, #{consumer,jdbcType=VARCHAR}, #{consumerTel,jdbcType=VARCHAR}, 
+      #{hot,jdbcType=INTEGER}, #{fileReason,jdbcType=VARCHAR}, #{isDelete,jdbcType=TINYINT}, 
+      #{createBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{modifiedBy,jdbcType=BIGINT}, 
+      #{gmtModified,jdbcType=TIMESTAMP}, #{fileBy,jdbcType=BIGINT}, #{gmtFile,jdbcType=TIMESTAMP}, 
+      #{description,jdbcType=LONGVARCHAR}, #{includeWords,jdbcType=LONGVARCHAR}, #{keywords,jdbcType=LONGVARCHAR}, 
+      #{excludeWords,jdbcType=LONGVARCHAR}, #{remark,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.bbd.domain.OpinionEvent">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -174,6 +171,643 @@
     </selectKey>
     insert into bbd_opinion_event
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="uuid != null">
+        uuid,
+      </if>
+      <if test="eventName != null">
+        event_name,
+      </if>
+      <if test="eventGroup != null">
+        event_group,
+      </if>
+      <if test="monitor != null">
+        monitor,
+      </if>
+      <if test="region != null">
+        region,
+      </if>
+      <if test="eventLevel != null">
+        event_level,
+      </if>
+      <if test="merchant != null">
+        merchant,
+      </if>
+      <if test="brand != null">
+        brand,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="merchantTel != null">
+        merchant_tel,
+      </if>
+      <if test="consumer != null">
+        consumer,
+      </if>
+      <if test="consumerTel != null">
+        consumer_tel,
+      </if>
+      <if test="hot != null">
+        hot,
+      </if>
+      <if test="fileReason != null">
+        file_reason,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="createBy != null">
+        create_by,
+      </if>
+      <if test="gmtCreate != null">
+        gmt_create,
+      </if>
+      <if test="modifiedBy != null">
+        modified_by,
+      </if>
+      <if test="gmtModified != null">
+        gmt_modified,
+      </if>
+      <if test="fileBy != null">
+        file_by,
+      </if>
+      <if test="gmtFile != null">
+        gmt_file,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="includeWords != null">
+        include_words,
+      </if>
+      <if test="keywords != null">
+        keywords,
+      </if>
+      <if test="excludeWords != null">
+        exclude_words,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="uuid != null">
+        #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="eventName != null">
+        #{eventName,jdbcType=VARCHAR},
+      </if>
+      <if test="eventGroup != null">
+        #{eventGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="monitor != null">
+        #{monitor,jdbcType=VARCHAR},
+      </if>
+      <if test="region != null">
+        #{region,jdbcType=VARCHAR},
+      </if>
+      <if test="eventLevel != null">
+        #{eventLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="merchant != null">
+        #{merchant,jdbcType=VARCHAR},
+      </if>
+      <if test="brand != null">
+        #{brand,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantTel != null">
+        #{merchantTel,jdbcType=VARCHAR},
+      </if>
+      <if test="consumer != null">
+        #{consumer,jdbcType=VARCHAR},
+      </if>
+      <if test="consumerTel != null">
+        #{consumerTel,jdbcType=VARCHAR},
+      </if>
+      <if test="hot != null">
+        #{hot,jdbcType=INTEGER},
+      </if>
+      <if test="fileReason != null">
+        #{fileReason,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createBy != null">
+        #{createBy,jdbcType=BIGINT},
+      </if>
+      <if test="gmtCreate != null">
+        #{gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifiedBy != null">
+        #{modifiedBy,jdbcType=BIGINT},
+      </if>
+      <if test="gmtModified != null">
+        #{gmtModified,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fileBy != null">
+        #{fileBy,jdbcType=BIGINT},
+      </if>
+      <if test="gmtFile != null">
+        #{gmtFile,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="includeWords != null">
+        #{includeWords,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="keywords != null">
+        #{keywords,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="excludeWords != null">
+        #{excludeWords,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByExampleSelective" parameterType="map">
+    update bbd_opinion_event
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.uuid != null">
+        uuid = #{record.uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.eventName != null">
+        event_name = #{record.eventName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.eventGroup != null">
+        event_group = #{record.eventGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="record.monitor != null">
+        monitor = #{record.monitor,jdbcType=VARCHAR},
+      </if>
+      <if test="record.region != null">
+        region = #{record.region,jdbcType=VARCHAR},
+      </if>
+      <if test="record.eventLevel != null">
+        event_level = #{record.eventLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="record.merchant != null">
+        merchant = #{record.merchant,jdbcType=VARCHAR},
+      </if>
+      <if test="record.brand != null">
+        brand = #{record.brand,jdbcType=VARCHAR},
+      </if>
+      <if test="record.address != null">
+        address = #{record.address,jdbcType=VARCHAR},
+      </if>
+      <if test="record.merchantTel != null">
+        merchant_tel = #{record.merchantTel,jdbcType=VARCHAR},
+      </if>
+      <if test="record.consumer != null">
+        consumer = #{record.consumer,jdbcType=VARCHAR},
+      </if>
+      <if test="record.consumerTel != null">
+        consumer_tel = #{record.consumerTel,jdbcType=VARCHAR},
+      </if>
+      <if test="record.hot != null">
+        hot = #{record.hot,jdbcType=INTEGER},
+      </if>
+      <if test="record.fileReason != null">
+        file_reason = #{record.fileReason,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isDelete != null">
+        is_delete = #{record.isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="record.createBy != null">
+        create_by = #{record.createBy,jdbcType=BIGINT},
+      </if>
+      <if test="record.gmtCreate != null">
+        gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.modifiedBy != null">
+        modified_by = #{record.modifiedBy,jdbcType=BIGINT},
+      </if>
+      <if test="record.gmtModified != null">
+        gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.fileBy != null">
+        file_by = #{record.fileBy,jdbcType=BIGINT},
+      </if>
+      <if test="record.gmtFile != null">
+        gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.description != null">
+        description = #{record.description,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.includeWords != null">
+        include_words = #{record.includeWords,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.keywords != null">
+        keywords = #{record.keywords,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.excludeWords != null">
+        exclude_words = #{record.excludeWords,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.remark != null">
+        remark = #{record.remark,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update bbd_opinion_event
+    set id = #{record.id,jdbcType=BIGINT},
+      uuid = #{record.uuid,jdbcType=VARCHAR},
+      event_name = #{record.eventName,jdbcType=VARCHAR},
+      event_group = #{record.eventGroup,jdbcType=VARCHAR},
+      monitor = #{record.monitor,jdbcType=VARCHAR},
+      region = #{record.region,jdbcType=VARCHAR},
+      event_level = #{record.eventLevel,jdbcType=VARCHAR},
+      merchant = #{record.merchant,jdbcType=VARCHAR},
+      brand = #{record.brand,jdbcType=VARCHAR},
+      address = #{record.address,jdbcType=VARCHAR},
+      merchant_tel = #{record.merchantTel,jdbcType=VARCHAR},
+      consumer = #{record.consumer,jdbcType=VARCHAR},
+      consumer_tel = #{record.consumerTel,jdbcType=VARCHAR},
+      hot = #{record.hot,jdbcType=INTEGER},
+      file_reason = #{record.fileReason,jdbcType=VARCHAR},
+      is_delete = #{record.isDelete,jdbcType=TINYINT},
+      create_by = #{record.createBy,jdbcType=BIGINT},
+      gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+      modified_by = #{record.modifiedBy,jdbcType=BIGINT},
+      gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
+      file_by = #{record.fileBy,jdbcType=BIGINT},
+      gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP},
+      description = #{record.description,jdbcType=LONGVARCHAR},
+      include_words = #{record.includeWords,jdbcType=LONGVARCHAR},
+      keywords = #{record.keywords,jdbcType=LONGVARCHAR},
+      exclude_words = #{record.excludeWords,jdbcType=LONGVARCHAR},
+      remark = #{record.remark,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update bbd_opinion_event
+    set id = #{record.id,jdbcType=BIGINT},
+      uuid = #{record.uuid,jdbcType=VARCHAR},
+      event_name = #{record.eventName,jdbcType=VARCHAR},
+      event_group = #{record.eventGroup,jdbcType=VARCHAR},
+      monitor = #{record.monitor,jdbcType=VARCHAR},
+      region = #{record.region,jdbcType=VARCHAR},
+      event_level = #{record.eventLevel,jdbcType=VARCHAR},
+      merchant = #{record.merchant,jdbcType=VARCHAR},
+      brand = #{record.brand,jdbcType=VARCHAR},
+      address = #{record.address,jdbcType=VARCHAR},
+      merchant_tel = #{record.merchantTel,jdbcType=VARCHAR},
+      consumer = #{record.consumer,jdbcType=VARCHAR},
+      consumer_tel = #{record.consumerTel,jdbcType=VARCHAR},
+      hot = #{record.hot,jdbcType=INTEGER},
+      file_reason = #{record.fileReason,jdbcType=VARCHAR},
+      is_delete = #{record.isDelete,jdbcType=TINYINT},
+      create_by = #{record.createBy,jdbcType=BIGINT},
+      gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+      modified_by = #{record.modifiedBy,jdbcType=BIGINT},
+      gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
+      file_by = #{record.fileBy,jdbcType=BIGINT},
+      gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bbd.domain.OpinionEvent">
+    update bbd_opinion_event
+    <set>
+      <if test="uuid != null">
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="eventName != null">
+        event_name = #{eventName,jdbcType=VARCHAR},
+      </if>
+      <if test="eventGroup != null">
+        event_group = #{eventGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="monitor != null">
+        monitor = #{monitor,jdbcType=VARCHAR},
+      </if>
+      <if test="region != null">
+        region = #{region,jdbcType=VARCHAR},
+      </if>
+      <if test="eventLevel != null">
+        event_level = #{eventLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="merchant != null">
+        merchant = #{merchant,jdbcType=VARCHAR},
+      </if>
+      <if test="brand != null">
+        brand = #{brand,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantTel != null">
+        merchant_tel = #{merchantTel,jdbcType=VARCHAR},
+      </if>
+      <if test="consumer != null">
+        consumer = #{consumer,jdbcType=VARCHAR},
+      </if>
+      <if test="consumerTel != null">
+        consumer_tel = #{consumerTel,jdbcType=VARCHAR},
+      </if>
+      <if test="hot != null">
+        hot = #{hot,jdbcType=INTEGER},
+      </if>
+      <if test="fileReason != null">
+        file_reason = #{fileReason,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=BIGINT},
+      </if>
+      <if test="gmtCreate != null">
+        gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifiedBy != null">
+        modified_by = #{modifiedBy,jdbcType=BIGINT},
+      </if>
+      <if test="gmtModified != null">
+        gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fileBy != null">
+        file_by = #{fileBy,jdbcType=BIGINT},
+      </if>
+      <if test="gmtFile != null">
+        gmt_file = #{gmtFile,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="includeWords != null">
+        include_words = #{includeWords,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="keywords != null">
+        keywords = #{keywords,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="excludeWords != null">
+        exclude_words = #{excludeWords,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.bbd.domain.OpinionEvent">
+    update bbd_opinion_event
+    set uuid = #{uuid,jdbcType=VARCHAR},
+      event_name = #{eventName,jdbcType=VARCHAR},
+      event_group = #{eventGroup,jdbcType=VARCHAR},
+      monitor = #{monitor,jdbcType=VARCHAR},
+      region = #{region,jdbcType=VARCHAR},
+      event_level = #{eventLevel,jdbcType=VARCHAR},
+      merchant = #{merchant,jdbcType=VARCHAR},
+      brand = #{brand,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      merchant_tel = #{merchantTel,jdbcType=VARCHAR},
+      consumer = #{consumer,jdbcType=VARCHAR},
+      consumer_tel = #{consumerTel,jdbcType=VARCHAR},
+      hot = #{hot,jdbcType=INTEGER},
+      file_reason = #{fileReason,jdbcType=VARCHAR},
+      is_delete = #{isDelete,jdbcType=TINYINT},
+      create_by = #{createBy,jdbcType=BIGINT},
+      gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      modified_by = #{modifiedBy,jdbcType=BIGINT},
+      gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      file_by = #{fileBy,jdbcType=BIGINT},
+      gmt_file = #{gmtFile,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=LONGVARCHAR},
+      include_words = #{includeWords,jdbcType=LONGVARCHAR},
+      keywords = #{keywords,jdbcType=LONGVARCHAR},
+      exclude_words = #{excludeWords,jdbcType=LONGVARCHAR},
+      remark = #{remark,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bbd.domain.OpinionEvent">
+    update bbd_opinion_event
+    set uuid = #{uuid,jdbcType=VARCHAR},
+      event_name = #{eventName,jdbcType=VARCHAR},
+      event_group = #{eventGroup,jdbcType=VARCHAR},
+      monitor = #{monitor,jdbcType=VARCHAR},
+      region = #{region,jdbcType=VARCHAR},
+      event_level = #{eventLevel,jdbcType=VARCHAR},
+      merchant = #{merchant,jdbcType=VARCHAR},
+      brand = #{brand,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      merchant_tel = #{merchantTel,jdbcType=VARCHAR},
+      consumer = #{consumer,jdbcType=VARCHAR},
+      consumer_tel = #{consumerTel,jdbcType=VARCHAR},
+      hot = #{hot,jdbcType=INTEGER},
+      file_reason = #{fileReason,jdbcType=VARCHAR},
+      is_delete = #{isDelete,jdbcType=TINYINT},
+      create_by = #{createBy,jdbcType=BIGINT},
+      gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      modified_by = #{modifiedBy,jdbcType=BIGINT},
+      gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      file_by = #{fileBy,jdbcType=BIGINT},
+      gmt_file = #{gmtFile,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.OpinionEventExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from bbd_opinion_event
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <resultMap id="BaseResultMap" type="com.bbd.domain.OpinionEvent">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="uuid" jdbcType="VARCHAR" property="uuid" />
+    <result column="event_name" jdbcType="VARCHAR" property="eventName" />
+    <result column="event_group" jdbcType="VARCHAR" property="eventGroup" />
+    <result column="monitor" jdbcType="VARCHAR" property="monitor" />
+    <result column="region" jdbcType="VARCHAR" property="region" />
+    <result column="event_level" jdbcType="VARCHAR" property="eventLevel" />
+    <result column="merchant" jdbcType="VARCHAR" property="merchant" />
+    <result column="brand" jdbcType="VARCHAR" property="brand" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="merchant_tel" jdbcType="VARCHAR" property="merchantTel" />
+    <result column="consumer" jdbcType="VARCHAR" property="consumer" />
+    <result column="consumer_tel" jdbcType="VARCHAR" property="consumerTel" />
+    <result column="hot" jdbcType="INTEGER" property="hot" />
+    <result column="opinion_count" jdbcType="INTEGER" property="opinionCount" />
+    <result column="warn_count" jdbcType="INTEGER" property="warnCount" />
+    <result column="file_reason" jdbcType="VARCHAR" property="fileReason" />
+    <result column="is_delete" jdbcType="TINYINT" property="isDelete" />
+    <result column="create_by" jdbcType="BIGINT" property="createBy" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="modified_by" jdbcType="BIGINT" property="modifiedBy" />
+    <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.bbd.domain.OpinionEvent">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+    <result column="include_words" jdbcType="LONGVARCHAR" property="includeWords" />
+    <result column="keywords" jdbcType="LONGVARCHAR" property="keywords" />
+    <result column="exclude_words" jdbcType="LONGVARCHAR" property="excludeWords" />
+    <result column="remark" jdbcType="LONGVARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, uuid, event_name, event_group, monitor, region, event_level, merchant, brand, 
+    address, merchant_tel, consumer, consumer_tel, hot, opinion_count, warn_count, file_reason, 
+    is_delete, create_by, gmt_create, modified_by, gmt_modified
+  </sql>
+  <sql id="Blob_Column_List">
+    description, include_words, keywords, exclude_words, remark
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.bbd.domain.OpinionEventExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from bbd_opinion_event
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.bbd.domain.OpinionEventExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from bbd_opinion_event
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from bbd_opinion_event
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from bbd_opinion_event
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.bbd.domain.OpinionEvent">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bbd_opinion_event (uuid, event_name, event_group, 
+      monitor, region, event_level, 
+      merchant, brand, address, 
+      merchant_tel, consumer, consumer_tel, 
+      hot, opinion_count, warn_count, 
+      file_reason, is_delete, create_by, 
+      gmt_create, modified_by, gmt_modified, 
+      description, include_words, keywords, 
+      exclude_words, remark)
+    values (#{uuid,jdbcType=VARCHAR}, #{eventName,jdbcType=VARCHAR}, #{eventGroup,jdbcType=VARCHAR}, 
+      #{monitor,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR}, #{eventLevel,jdbcType=VARCHAR}, 
+      #{merchant,jdbcType=VARCHAR}, #{brand,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
+      #{merchantTel,jdbcType=VARCHAR}, #{consumer,jdbcType=VARCHAR}, #{consumerTel,jdbcType=VARCHAR}, 
+      #{hot,jdbcType=INTEGER}, #{opinionCount,jdbcType=INTEGER}, #{warnCount,jdbcType=INTEGER}, 
+      #{fileReason,jdbcType=VARCHAR}, #{isDelete,jdbcType=TINYINT}, #{createBy,jdbcType=BIGINT}, 
+      #{gmtCreate,jdbcType=TIMESTAMP}, #{modifiedBy,jdbcType=BIGINT}, #{gmtModified,jdbcType=TIMESTAMP}, 
+      #{description,jdbcType=LONGVARCHAR}, #{includeWords,jdbcType=LONGVARCHAR}, #{keywords,jdbcType=LONGVARCHAR}, 
+      #{excludeWords,jdbcType=LONGVARCHAR}, #{remark,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bbd.domain.OpinionEvent">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bbd_opinion_event
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="uuid != null">
+        uuid,
+      </if>
       <if test="eventName != null">
         event_name,
       </if>
@@ -234,12 +868,6 @@
       <if test="gmtModified != null">
         gmt_modified,
       </if>
-      <if test="fileBy != null">
-        file_by,
-      </if>
-      <if test="gmtFile != null">
-        gmt_file,
-      </if>
       <if test="description != null">
         description,
       </if>
@@ -257,6 +885,9 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="uuid != null">
+        #{uuid,jdbcType=VARCHAR},
+      </if>
       <if test="eventName != null">
         #{eventName,jdbcType=VARCHAR},
       </if>
@@ -317,12 +948,6 @@
       <if test="gmtModified != null">
         #{gmtModified,jdbcType=TIMESTAMP},
       </if>
-      <if test="fileBy != null">
-        #{fileBy,jdbcType=BIGINT},
-      </if>
-      <if test="gmtFile != null">
-        #{gmtFile,jdbcType=TIMESTAMP},
-      </if>
       <if test="description != null">
         #{description,jdbcType=LONGVARCHAR},
       </if>
@@ -345,6 +970,9 @@
     <set>
       <if test="record.id != null">
         id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.uuid != null">
+        uuid = #{record.uuid,jdbcType=VARCHAR},
       </if>
       <if test="record.eventName != null">
         event_name = #{record.eventName,jdbcType=VARCHAR},
@@ -406,12 +1034,6 @@
       <if test="record.gmtModified != null">
         gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.fileBy != null">
-        file_by = #{record.fileBy,jdbcType=BIGINT},
-      </if>
-      <if test="record.gmtFile != null">
-        gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP},
-      </if>
       <if test="record.description != null">
         description = #{record.description,jdbcType=LONGVARCHAR},
       </if>
@@ -435,6 +1057,7 @@
   <update id="updateByExampleWithBLOBs" parameterType="map">
     update bbd_opinion_event
     set id = #{record.id,jdbcType=BIGINT},
+      uuid = #{record.uuid,jdbcType=VARCHAR},
       event_name = #{record.eventName,jdbcType=VARCHAR},
       event_group = #{record.eventGroup,jdbcType=VARCHAR},
       monitor = #{record.monitor,jdbcType=VARCHAR},
@@ -455,8 +1078,6 @@
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       modified_by = #{record.modifiedBy,jdbcType=BIGINT},
       gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
-      file_by = #{record.fileBy,jdbcType=BIGINT},
-      gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP},
       description = #{record.description,jdbcType=LONGVARCHAR},
       include_words = #{record.includeWords,jdbcType=LONGVARCHAR},
       keywords = #{record.keywords,jdbcType=LONGVARCHAR},
@@ -469,6 +1090,7 @@
   <update id="updateByExample" parameterType="map">
     update bbd_opinion_event
     set id = #{record.id,jdbcType=BIGINT},
+      uuid = #{record.uuid,jdbcType=VARCHAR},
       event_name = #{record.eventName,jdbcType=VARCHAR},
       event_group = #{record.eventGroup,jdbcType=VARCHAR},
       monitor = #{record.monitor,jdbcType=VARCHAR},
@@ -488,9 +1110,7 @@
       create_by = #{record.createBy,jdbcType=BIGINT},
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       modified_by = #{record.modifiedBy,jdbcType=BIGINT},
-      gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
-      file_by = #{record.fileBy,jdbcType=BIGINT},
-      gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP}
+      gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -498,6 +1118,9 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.bbd.domain.OpinionEvent">
     update bbd_opinion_event
     <set>
+      <if test="uuid != null">
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
       <if test="eventName != null">
         event_name = #{eventName,jdbcType=VARCHAR},
       </if>
@@ -558,12 +1181,6 @@
       <if test="gmtModified != null">
         gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
       </if>
-      <if test="fileBy != null">
-        file_by = #{fileBy,jdbcType=BIGINT},
-      </if>
-      <if test="gmtFile != null">
-        gmt_file = #{gmtFile,jdbcType=TIMESTAMP},
-      </if>
       <if test="description != null">
         description = #{description,jdbcType=LONGVARCHAR},
       </if>
@@ -584,7 +1201,8 @@
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.bbd.domain.OpinionEvent">
     update bbd_opinion_event
-    set event_name = #{eventName,jdbcType=VARCHAR},
+    set uuid = #{uuid,jdbcType=VARCHAR},
+      event_name = #{eventName,jdbcType=VARCHAR},
       event_group = #{eventGroup,jdbcType=VARCHAR},
       monitor = #{monitor,jdbcType=VARCHAR},
       region = #{region,jdbcType=VARCHAR},
@@ -604,8 +1222,6 @@
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       modified_by = #{modifiedBy,jdbcType=BIGINT},
       gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
-      file_by = #{fileBy,jdbcType=BIGINT},
-      gmt_file = #{gmtFile,jdbcType=TIMESTAMP},
       description = #{description,jdbcType=LONGVARCHAR},
       include_words = #{includeWords,jdbcType=LONGVARCHAR},
       keywords = #{keywords,jdbcType=LONGVARCHAR},
@@ -615,7 +1231,8 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.bbd.domain.OpinionEvent">
     update bbd_opinion_event
-    set event_name = #{eventName,jdbcType=VARCHAR},
+    set uuid = #{uuid,jdbcType=VARCHAR},
+      event_name = #{eventName,jdbcType=VARCHAR},
       event_group = #{eventGroup,jdbcType=VARCHAR},
       monitor = #{monitor,jdbcType=VARCHAR},
       region = #{region,jdbcType=VARCHAR},
@@ -634,9 +1251,7 @@
       create_by = #{createBy,jdbcType=BIGINT},
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       modified_by = #{modifiedBy,jdbcType=BIGINT},
-      gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
-      file_by = #{fileBy,jdbcType=BIGINT},
-      gmt_file = #{gmtFile,jdbcType=TIMESTAMP}
+      gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
   <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.OpinionEventExample" resultMap="BaseResultMap">
