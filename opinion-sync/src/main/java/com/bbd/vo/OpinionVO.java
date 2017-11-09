@@ -12,8 +12,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author daijinlong
- * @version $Id: OpinionVO.java, v 0.1 2017年10月31日 下午3:07:22 daijinlong Exp $
+ * Kafka推送的舆情数据
+ * @author tjwang
+ * @version $Id: OpinionVO.java, v 0.1 2017年10月31日 下午3:07:22 tjwang Exp $
  */
 public class OpinionVO {
 

@@ -5,7 +5,8 @@
 package com.bbd.bean;
 
 /**
- * 保存ES中的全量数据
+ * 舆情热度记录
+ * 
  * @author tjwang
  * @version $Id: OpinionHotEsVO.java, v 0.1 2017/11/9 0009 13:47 tjwang Exp $
  */

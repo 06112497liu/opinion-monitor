@@ -5,7 +5,6 @@
 package com.bbd.bean;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
 import java.util.List;
@@ -72,7 +71,7 @@ public class OpinionEsSyncVO implements EsBase {
     private Date         firstWarnTime;
 
     @Override
-    @JsonIgnore
+    @JSONField(serialize = false)
     public String getEsId() {
         return getUuid();
     }

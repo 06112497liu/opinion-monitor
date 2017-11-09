@@ -9,8 +9,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 
 /**
- * @author daijinlong 
- * @version $Id: OpinionVO.java, v 0.1 2017年10月31日 下午3:07:22 daijinlong Exp $ 
+ * 保存ES中的全量数据
+ * 
+ * @author tjwang
+ * @version $Id: OpinionVO.java, v 0.1 2017年10月31日 下午3:07:22 tjwang Exp $
  */
 public class OpinionEsVO implements EsBase {
 
