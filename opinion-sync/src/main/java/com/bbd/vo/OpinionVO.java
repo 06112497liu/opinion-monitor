@@ -5,7 +5,9 @@
 package com.bbd.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.google.common.collect.Lists;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -15,38 +17,38 @@ import java.util.List;
  */
 public class OpinionVO {
 
-    private String       uuid;
+    private String     uuid;
 
-    private String       title;
+    private String     title;
 
-    private String       summary;
+    private String     summary;
 
-    private Integer      hot;
+    private Integer    hot;
 
-    private String       content;
+    private String     content;
 
-    private String       source;
+    private String     source;
 
-    private String       link;
+    private String     link;
 
-    private Integer      similiarCount;
+    private Integer    similiarCount;
 
-    private Integer      commentCount;
+    private Integer    commentCount;
 
-    private Integer      emotion;
+    private Integer    emotion;
 
-    private List<String> keyword;
+    private String     keyword;
 
-    private List<String> keys;
+    private String     keys;
 
-    private String       website;
+    private String     website;
 
-    private Integer      mediaType;
+    private Integer    mediaType;
 
-    private List<Long>   events;
+    private List<Long> events;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date         publishTime;
+    private Date       publishTime;
 
     @Override
     public String toString() {
@@ -136,18 +138,24 @@ public class OpinionVO {
     }
 
     public List<String> getKeyword() {
-        return keyword;
+        if (keyword != null && !keyword.equals("")) {
+            return Arrays.asList(keyword.split(","));
+        }
+        return Lists.newArrayList();
     }
 
-    public void setKeyword(List<String> keyword) {
+    public void setKeyword(String keyword) {
         this.keyword = keyword;
     }
 
     public List<String> getKeys() {
-        return keys;
+        if (keys != null && !keys.equals("")) {
+            return Arrays.asList(keys.split(","));
+        }
+        return Lists.newArrayList();
     }
 
-    public void setKeys(List<String> keys) {
+    public void setKeys(String keys) {
         this.keys = keys;
     }
 

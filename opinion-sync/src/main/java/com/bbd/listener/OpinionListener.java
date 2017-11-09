@@ -6,6 +6,7 @@ package com.bbd.listener;
 
 import com.bbd.bean.OpinionEsSyncVO;
 import com.bbd.bean.OpinionHotEsVO;
+import com.bbd.constant.EsConstant;
 import com.bbd.dao.WarnSettingDao;
 import com.bbd.domain.WarnSetting;
 import com.bbd.domain.WarnSettingExample;
@@ -24,6 +25,7 @@ import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -48,7 +50,7 @@ public class OpinionListener {
     @Autowired
     private WarnSettingDao      warnSettingDao;
 
-    @KafkaListener(topics = "test", group = "test-group", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "bbd_opinion", containerFactory = "kafkaListenerContainerFactory")
     public void Listen(List<ConsumerRecord<String, String>> records) {
         if (records.size() == 0) {
             return;
@@ -127,10 +129,15 @@ public class OpinionListener {
         String index = EsUtil.INDEX;
         String type = EsUtil.TYPE;
 
+        long start = System.currentTimeMillis();
+
         MultiGetRequestBuilder builder = EsUtil.getClient().prepareMultiGet();
+        String[] includeFields = { EsConstant.OPINION_UUID, EsConstant.OPINION_HOT_PROP, EsConstant.OPINION_FIRST_WARN_TIME };
+        String[] excludeFields = {};
+        FetchSourceContext sourceContext = new FetchSourceContext(true, includeFields, excludeFields);
         for (OpinionVO vo : vos) {
             MultiGetRequest.Item item = new MultiGetRequest.Item(index, type, vo.getUuid());
-            //item.storedFields(EsConstant.OPINION_UUID, EsConstant.OPINION_HOT_PROP, EsConstant.OPINION_FIRST_WARN_TIME);
+            item.fetchSourceContext(sourceContext);
             builder.add(item);
         }
 
@@ -144,6 +151,9 @@ public class OpinionListener {
                 map.put(vo.getUuid(), vo);
             }
         }
+
+        long end = System.currentTimeMillis();
+        logger.info("Get exists opinion time used: {}", (end - start));
 
         return map;
     }
@@ -210,6 +220,9 @@ public class OpinionListener {
      * @param vos
      */
     private void saveOpinionHotVos(List<OpinionHotEsVO> vos) {
+        if (vos.size() == 0) {
+            return;
+        }
         String index = EsUtil.HOT_INDEX;
         String type = EsUtil.HOT_TYPE;
 
