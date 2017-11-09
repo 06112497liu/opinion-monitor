@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class OpinionEvent {
     private Long id;
 
+    private String uuid;
+
     private String eventName;
 
     private String eventGroup;
@@ -31,27 +33,20 @@ public class OpinionEvent {
 
     private Integer hot;
 
-    private Integer opinionCount;
-
-    private Integer warnCount;
-
     private String fileReason;
 
     private Byte isDelete;
 
     private Long createBy;
-
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
     private Date gmtCreate;
-   
-    private Long modifiedBy;
 
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+    private Long modifiedBy;
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
     private Date gmtModified;
 
     private Long fileBy;
-
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
     private Date gmtFile;
 
     private String description;
@@ -70,6 +65,14 @@ public class OpinionEvent {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getEventName() {
@@ -166,22 +169,6 @@ public class OpinionEvent {
 
     public void setHot(Integer hot) {
         this.hot = hot;
-    }
-
-    public Integer getOpinionCount() {
-        return opinionCount;
-    }
-
-    public void setOpinionCount(Integer opinionCount) {
-        this.opinionCount = opinionCount;
-    }
-
-    public Integer getWarnCount() {
-        return warnCount;
-    }
-
-    public void setWarnCount(Integer warnCount) {
-        this.warnCount = warnCount;
     }
 
     public String getFileReason() {
