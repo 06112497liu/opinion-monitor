@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * 保存ES中的全量数据
- * 
+ *
  * @author tjwang
  * @version $Id: OpinionVO.java, v 0.1 2017年10月31日 下午3:07:22 tjwang Exp $
  */
