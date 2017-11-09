@@ -1,5 +1,6 @@
 package com.bbd.service.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import javafx.beans.DefaultProperty;
 
 import java.util.Date;
@@ -45,12 +46,18 @@ public class OpinionOpRecordVO {
     /**
      * 操作时间
      */
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
     private Date opTime;
 
     /**
      * 解除理由, 1. 非敏感舆情；2. 非消费舆情； 3. 非职能范围； 4. 已处理同类舆情
      */
     private Integer removeReason;
+
+    /**
+     * 解除内容：非敏感舆情、非消费舆情、非职能范围、已处理同类舆情
+     */
+    private String removeContent;
 
     /**
      * 解除备注
@@ -127,6 +134,14 @@ public class OpinionOpRecordVO {
 
     public void setRemoveReason(Integer removeReason) {
         this.removeReason = removeReason;
+    }
+
+    public String getRemoveContent() {
+        return removeContent;
+    }
+
+    public void setRemoveContent(String removeContent) {
+        this.removeContent = removeContent;
     }
 
     public String getRemoveNote() {

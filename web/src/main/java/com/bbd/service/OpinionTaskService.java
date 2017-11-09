@@ -25,7 +25,7 @@ public interface OpinionTaskService {
 
     /**
      * 当前用户转发、解除、监测列表
-     * @param opStatus 1. 转发；2. 已解除； 3. 已监控
+     * @param opStatus 1. 转发（介入）；2. 已解除； 3. 已监控
      * @param pb
      * @return
      */
@@ -36,6 +36,22 @@ public interface OpinionTaskService {
      * @param param
      */
     void transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException;
+
+    /**
+     * 解除预警
+     * @param uuid
+     * @param removeReason
+     * @param removeNote
+     */
+    void removeWarn(String uuid, Integer removeReason, String removeNote) throws InterruptedException, ExecutionException, IOException;
+
+    /**
+     * 查询处于任务舆情中的舆情详情
+     * @param uuid
+     * @param type
+     * @return
+     */
+    OpinionTaskListVO getTransferDetail(String uuid, Integer type);
 
 }
     

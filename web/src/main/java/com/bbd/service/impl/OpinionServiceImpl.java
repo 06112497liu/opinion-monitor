@@ -1,5 +1,6 @@
 package com.bbd.service.impl;
 
+import com.bbd.bean.OpinionEsVO;
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;

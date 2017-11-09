@@ -90,6 +90,25 @@ public class EsUtil {
         return client;
     }
 
+    /**
+     * 通过es的SearchResponse构建返回结果
+     * @param resp
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    public static <T> List<T> buildResult(SearchResponse resp, Class<T> clazz) {
+        List<T> list = Lists.newLinkedList();
+        SearchHits hits = resp.getHits();
+        SearchHit[] items = hits.getHits();
+        for(SearchHit s : items) {
+            String source = s.getSourceAsString();
+            T t = JsonUtil.parseObject(source, clazz);
+            list.add(t);
+        }
+        return list;
+    }
+
     //    @Value("${es.host}")
     //    private String                 es_host;
     //    @Value("${es.port}")

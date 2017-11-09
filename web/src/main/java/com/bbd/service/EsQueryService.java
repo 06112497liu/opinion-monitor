@@ -11,6 +11,7 @@ import com.mybatis.domain.PageList;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -88,7 +89,6 @@ public interface EsQueryService {
      * @return
      */
     OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb);
-
     /**
      * 查询舆情事件走势
      * @param eventId: 事件ID
@@ -152,6 +152,13 @@ public interface EsQueryService {
     OpinionEsVO getOpinionByUUID(String uuid);
 
     /**
+     * 根据舆情uuid查询该条舆情的操作人
+     * @param uuid
+     * @return
+     */
+    Long[] getOperatorsByUUID(String uuid);
+
+    /**
      * 当前用户待处理舆情列表
      * @param userId
      * @param transferType
@@ -167,4 +174,12 @@ public interface EsQueryService {
      * @return
      */
     PageList<OpinionTaskListVO> getProcessedList(Integer opStatus, PageBounds pb);
+
+    /**
+     * 获取某条舆情的转发记录
+     * @param keyMap
+     * @param size
+     * @return
+     */
+    List<OpinionOpRecordVO> getOpinionOpRecordByUUID(Map<String, Object> keyMap, Integer size);
 }
