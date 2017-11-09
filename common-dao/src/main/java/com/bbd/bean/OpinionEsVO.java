@@ -5,6 +5,7 @@
 package com.bbd.bean;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
 
@@ -91,6 +92,7 @@ public class OpinionEsVO implements EsBase {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date      firstWarnTime;
 
+    @JsonIgnore
     @Override
     public String getEsId() {
         return getUuid();
