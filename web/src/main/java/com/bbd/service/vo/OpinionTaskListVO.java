@@ -17,6 +17,11 @@ public class OpinionTaskListVO extends OpinionVO {
     private List<OpinionOpRecordVO> records;
 
     /**
+     * 所属事件名称
+     */
+    private String eventName;
+
+    /**
      * 添加监测时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
@@ -28,6 +33,14 @@ public class OpinionTaskListVO extends OpinionVO {
 
     public void setRecords(List<OpinionOpRecordVO> records) {
         this.records = records;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
     }
 
     public Date getMonitorTime() {

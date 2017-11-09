@@ -151,6 +151,13 @@ public interface EsQueryService {
     OpinionEsVO getOpinionByUUID(String uuid);
 
     /**
+     * 根据舆情uuid查询该条舆情的操作人
+     * @param uuid
+     * @return
+     */
+    Long[] getOperatorsByUUID(String uuid);
+
+    /**
      * 当前用户待处理舆情列表
      * @param userId
      * @param transferType

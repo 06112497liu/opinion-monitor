@@ -24,7 +24,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -47,6 +46,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * ES查询服务
@@ -687,6 +687,21 @@ public class EsQueryServiceImpl implements EsQueryService {
         List<OpinionEsVO> list = EsUtil.buildResult(resp, OpinionEsVO.class);
         if(list.isEmpty()) return null;
         return list.get(0);
+    }
+
+    /**
+     * 根据舆情uuid查询该条舆情的操作人
+     * @param uuid
+     * @return
+     */
+    @Override
+    public Long[] getOperatorsByUUID(String uuid) {
+        OpinionEsVO opinion = getOpinionByUUID(uuid);
+        Long[] result = opinion.getOperators();
+        if(Objects.isNull(result))
+            return new Long[0];
+        else
+            return result;
     }
 
     /**

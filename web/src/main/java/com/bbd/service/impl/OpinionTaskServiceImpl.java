@@ -1,6 +1,7 @@
 package com.bbd.service.impl;
 
 import com.bbd.dao.OpinionEventDao;
+import com.bbd.domain.OpinionEvent;
 import com.bbd.domain.OpinionEventExample;
 import com.bbd.domain.User;
 import com.bbd.enums.TransferEnum;
@@ -99,8 +100,18 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                 });
             }
             if(opStatus == 3) { // 如果是已监控页面，查询事件的一些信息
-                OpinionEventExample exam = new OpinionEventExample();
-                opinionEventDao.selectByExample(exam);
+                result.forEach(o -> {
+                    String uuid = o.getUuid();
+                    OpinionEventExample exam = new OpinionEventExample();
+                    exam.createCriteria().andUuidEqualTo(uuid);
+                    List<OpinionEvent> events = opinionEventDao.selectByExample(exam);
+                    OpinionEvent event = null;
+                    if(!events.isEmpty()) {
+                        event = events.get(0);
+                        o.setMonitorTime(event.getGmtCreate()); o.setEventName(event.getEventName());
+                    }
+                });
+
             }
         }
         return result;

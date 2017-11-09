@@ -32,27 +32,7 @@ public class EsModifyServiceImpl implements EsModifyService {
     @Autowired
     private EsQueryService esQueryService;
 
-    private final String hotField = "hot";
-    private final String levelThree = "levelThree";
-    private final String levelTwo = "levelTwo";
-    private final String levelOne = "levelOne";
-    private final String mediaTypeField = "mediaType";
-    private final String publishTimeField = "publishTime";
-    private final String emotionField = "emotion";
-    private final String keysField = "keys";
-    private final String eventsField = "events";
-    private final String calcTimeField = "calcTime";
-    private final String titleField = "title";
-    private final String contentField = "content";
-    private final String websiteField = "website";
-    private final String warnTimeField = "warnTime";
-    private final String hotLevelField = "hotLevel";
-    private final String opStatusField = "opStatus";
-    private final String opOwnerField = "opOwner";
-    private final String transferTypeField = "transferType";
     private final String operatorsField = "operators";
-    private final String uuidField = "uuid";
-    private final String targeterField = "targeter";
 
     /**
      * 转发舆情
@@ -71,15 +51,15 @@ public class EsModifyServiceImpl implements EsModifyService {
         if(!flag) {
             newArr = ArrayUtils.add(original, operatorId);
         }
+        fieldMap.put(operatorsField, newArr);
 
         TransportClient client = EsUtil.getClient();
         UpdateRequest request = new UpdateRequest();
         request.index(EsConstant.IDX_OPINION);
         request.type(EsConstant.OPINION_TYPE);
         request.id(uuid);
-        fieldMap.put(operatorsField, newArr);
-
         request.doc(buildXContentBuilder(fieldMap));
+
         client.update(request).get();
     }
 
