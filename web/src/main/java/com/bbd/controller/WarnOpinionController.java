@@ -78,7 +78,7 @@ public class WarnOpinionController extends AbstractController {
             @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "news/list", method = RequestMethod.GET)
-    public RestResult getWarnOpinionSimiliarNewsList(@PathVariable(value = "uuid") String uuid) {
+    public RestResult getWarnOpinionSimiliarNewsList(String uuid) {
         ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
         return RestResult.ok(opinionService.getOpinionSimiliarNewsList(uuid, getPageBounds()));
     }
