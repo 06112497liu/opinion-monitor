@@ -2,14 +2,13 @@ package com.bbd.service.impl;
 
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.exception.ApplicationException;
-import com.bbd.exception.BizErrorCode;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
+import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
-import com.bbd.util.RedisCacheUtil;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.collect.ComparisonChain;
@@ -23,7 +22,6 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -45,9 +43,6 @@ public class OpinionServiceImpl implements OpinionService {
 
     @Autowired
     private SystemSettingService systemSettingService;
-
-    @Autowired
-    private RedisCacheUtil redisCacheUtil;
 
     @Resource
     public RedisTemplate redisTemplate;
@@ -72,7 +67,7 @@ public class OpinionServiceImpl implements OpinionService {
     public Map<String, Object> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb) {
 
         // step-1：查询es
-        OpinionEsSearchVO esResult = esQueryService.queryWarningOpinion(buildTimeSpan(timeSpan), emotion, sourceType, pb);
+        OpinionEsSearchVO esResult = esQueryService.queryWarningOpinion(BusinessUtils.getDateByTimeSpan(timeSpan), emotion, sourceType, pb);
         List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
         opinions.forEach(o -> {
             o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
@@ -82,10 +77,10 @@ public class OpinionServiceImpl implements OpinionService {
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), esResult.getTotal().intValue());
         PageList p = PageListHelper.create(opinions, paginator);
         Map<String, Object> map = Maps.newHashMap();
-        map.put("opinions", p);
+        map.put("opinionsList", p);
         List<KeyValueVO> mediaTypeSta = esResult.getMediaTypeStats(); transMediaTypeToChina(mediaTypeSta);
-        map.put("mediaType", mediaTypeSta);
-        map.put("level", esResult.getHotLevelStats());
+        map.put("mediaTypeCount", mediaTypeSta);
+        map.put("levelCount", esResult.getHotLevelStats());
 
         return map;
     }
@@ -94,7 +89,7 @@ public class OpinionServiceImpl implements OpinionService {
     public Map<String, Object> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb) {
 
         // step-1：查询es
-        OpinionEsSearchVO esResult = esQueryService.queryTop100HotOpinion(keyword, buildTimeSpan(timeSpan), emotion, sourceType);
+        OpinionEsSearchVO esResult = esQueryService.queryTop100HotOpinion(keyword, BusinessUtils.getDateByTimeSpan(timeSpan), emotion, sourceType);
         List<OpinionEsVO> esOpinons = esResult.getOpinions();
 
         // step-2：代码分页
@@ -117,15 +112,6 @@ public class OpinionServiceImpl implements OpinionService {
         map.put("mediaType", mediaTypeSta);
         map.put("level", hotLevelSta);
         return map;
-    }
-
-    private DateTime buildTimeSpan(Integer timeSpan) {
-        DateTime now = DateTime.now();
-        DateTime startTime = null;
-        if(2 == timeSpan) startTime = now.plusDays(-7);
-        else if(3 == timeSpan) startTime = now.plusMonths(-1);
-        else startTime = now.plusHours(-24);
-        return startTime;
     }
 
     // map -> 构建KevyValueVO对象

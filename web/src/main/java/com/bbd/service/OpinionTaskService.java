@@ -45,6 +45,14 @@ public interface OpinionTaskService {
      */
     void removeWarn(String uuid, Integer removeReason, String removeNote) throws InterruptedException, ExecutionException, IOException;
 
+    /**
+     * 查询处于任务舆情中的舆情详情
+     * @param uuid
+     * @param type
+     * @return
+     */
+    OpinionTaskListVO getTransferDetail(String uuid, Integer type);
+
 }
     
     

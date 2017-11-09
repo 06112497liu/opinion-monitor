@@ -10,8 +10,10 @@ import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.*;
 import com.bbd.service.param.TransferParam;
+import com.bbd.service.vo.OpinionEsVO;
 import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.service.vo.OpinionTaskListVO;
+import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.collect.Maps;
@@ -57,6 +59,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     private final String uuidField = "uuid";
     private final String removeReasonField = "removeReason";
     private final String removeNoteField = "removeNote";
+    private final String opTypeField = "opType";
 
     /**
      * 当前用户待处理舆情列表
@@ -164,6 +167,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
         // step-2：记录解除记录
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
+        recordVO.setOpType(2);
         recordVO.setOpTime(new Date());
         recordVO.setOperator(UserContext.getUser().getUsername());
         recordVO.setUuid(uuid);
@@ -171,6 +175,31 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         recordVO.setRemoveContent(WarnReasonEnum.getDescByCode(removeReason.toString()));
         recordVO.setRemoveNote(removeNote);
         esModifyService.recordOpinionOp(recordVO);
+    }
+
+    /**
+     * 查询处于任务舆情中的舆情详情
+     * @param uuid
+     * @return
+     */
+    @Override
+    public OpinionTaskListVO getTransferDetail(String uuid, Integer type) {
+        // step-1：查询舆情详情
+        OpinionEsVO o = esQueryService.getOpinionByUUID(uuid);
+        OpinionTaskListVO result = BeanMapperUtil.map(o, OpinionTaskListVO.class);
+
+        // step-2：查询该条舆情的转发记录
+        Map<String, Object> map = Maps.newHashMap();
+        map.put(uuidField, uuid);
+        map.put(opTypeField, 1);
+        List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(map, 10000);
+        OpinionOpRecordVO v = null;
+        if(type == 1) v = records.stream().findFirst().get();
+        else if(type ==2) v = records.stream().filter(p -> p.getOperator().equals(UserContext.getUser().getUsername())).findFirst().get();
+
+        records.add(0, v);
+        result.setRecords(records);
+        return result;
     }
 }
     

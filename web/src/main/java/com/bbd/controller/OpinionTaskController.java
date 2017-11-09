@@ -73,6 +73,19 @@ public class OpinionTaskController extends AbstractController{
         return RestResult.ok();
     }
 
+    @ApiOperation(value = "查询处于任务舆情中的舆情详情", httpMethod = "GET")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String", paramType = "query", required = true),
+            @ApiImplicitParam(value = "详情类型", name = "type", dataType = "Integer", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "transfer/detail", method = RequestMethod.GET)
+    public RestResult getWarnOpinionDetail(String uuid, Integer type) {
+        ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
+        ValidateUtil.checkNull(type, CommonErrorCode.PARAM_ERROR, "type不能为空");
+        OpinionTaskListVO result = opinionTaskService.getTransferDetail(uuid, type);
+        return RestResult.ok(result);
+    }
+
     @ApiOperation(value = "解除舆情预警", httpMethod = "POST")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String", paramType = "query", required = true),
