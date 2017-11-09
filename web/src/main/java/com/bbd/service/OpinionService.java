@@ -1,5 +1,6 @@
 package com.bbd.service;
 
+import com.bbd.bean.OpinionEsVO;
 import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
@@ -32,11 +33,20 @@ public interface OpinionService {
     Map<String, Object> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb);
 
     /**
-     * 热点舆情top100
+     * 推荐热点舆情top100
+     * @param timeSpan
+     * @param emotion
+     * @param pb
+     * @return
+     */
+    PageList<OpinionVO> getHotOpinionListTop100(Integer timeSpan, Integer emotion, PageBounds pb);
+
+    /**
+     * 热点舆情模糊查询
      * @param keyword
      * @return
      */
-    Map<String, Object> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb);
+    PageList<OpinionVO> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, PageBounds pb);
 
     /**
      * 历史预警舆情

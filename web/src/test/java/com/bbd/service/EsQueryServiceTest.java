@@ -58,7 +58,7 @@ public class EsQueryServiceTest extends BaseServiceTest {
         String param = "会";
         DateTime startTime = new DateTime().plusMonths(-3);
         Integer emotion = null;
-        OpinionEsSearchVO r = esQueryService.queryTop100HotOpinion(param, startTime, emotion, 1);
+        OpinionEsSearchVO r = esQueryService.queryTop100HotOpinion(startTime, emotion);
         assertNotNull(r);
     }
 

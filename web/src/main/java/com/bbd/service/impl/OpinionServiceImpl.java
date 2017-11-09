@@ -95,14 +95,16 @@ public class OpinionServiceImpl implements OpinionService {
 
     /**
      * 热点舆情top100
-     * @param keyword
+     * @param timeSpan
+     * @param emotion
+     * @param pb
      * @return
      */
     @Override
-    public Map<String, Object> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb) {
+    public PageList<OpinionVO> getHotOpinionListTop100(Integer timeSpan, Integer emotion, PageBounds pb) {
 
         // step-1：查询es
-        OpinionEsSearchVO esResult = esQueryService.queryTop100HotOpinion(keyword, BusinessUtils.getDateByTimeSpan(timeSpan), emotion, sourceType);
+        OpinionEsSearchVO esResult = esQueryService.queryTop100HotOpinion(BusinessUtils.getDateByTimeSpan(timeSpan), emotion);
         List<OpinionEsVO> esOpinons = esResult.getOpinions();
 
         // step-2：代码分页
@@ -123,13 +125,22 @@ public class OpinionServiceImpl implements OpinionService {
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), esResult.getTotal().intValue());
         PageList p = PageListHelper.create(opinions, paginator);
 
-        // step-3：舆情来源和热度等级统计数据
-        Map<Integer, Long> mediaMap = allOpinions.stream().collect(Collectors.groupingBy(OpinionVO::getMediaType, Collectors.counting()));
-        List<KeyValueVO> mediaTypeSta = buildKeyValueVOS(mediaMap); transMediaTypeToChina(mediaTypeSta);
-        Map<String, Object> map = Maps.newHashMap();
-        map.put("opinionsList", p);
-        map.put("mediaTypeCount", esResult.getMediaTypeStats());
-        return map;
+        return p;
+    }
+
+    /**
+     * 热点舆情模糊查询
+     * @param keyword
+     * @return
+     */
+    @Override
+    public PageList<OpinionVO> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, PageBounds pb) {
+        DateTime startTime = BusinessUtils.getDateByTimeSpan(timeSpan);
+        OpinionEsSearchVO esResult = esQueryService.getHotOpinionList(keyword, startTime, emotion, pb);
+        Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), esResult.getTotal().intValue());
+        List<OpinionVO> list = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
+        PageList<OpinionVO> result = PageListHelper.create(list, paginator);
+        return result;
     }
 
     // map -> 构建KevyValueVO对象

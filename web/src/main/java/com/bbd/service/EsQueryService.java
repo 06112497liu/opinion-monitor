@@ -111,12 +111,21 @@ public interface EsQueryService {
 
     /**
      * 查询热点舆情（非预警）TOP100
-     * @param param: 查询字符创
      * @param startTime
      * @param emotion
      * @return
      */
-    OpinionEsSearchVO queryTop100HotOpinion(String param, DateTime startTime, Integer emotion, Integer mediaType);
+    OpinionEsSearchVO queryTop100HotOpinion(DateTime startTime, Integer emotion);
+
+    /**
+     * 热点舆情模糊查询
+     * @param keyword
+     * @param startTime
+     * @param emotion
+     * @param pb
+     * @return
+     */
+    OpinionEsSearchVO getHotOpinionList(String keyword, DateTime startTime, Integer emotion, PageBounds pb);
 
     /**
      * 查询事件对应舆情数量

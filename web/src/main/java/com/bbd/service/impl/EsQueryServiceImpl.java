@@ -527,35 +527,27 @@ public class EsQueryServiceImpl implements EsQueryService {
 
     /**
      * 查询热点舆情（非预警）TOP100
-     * @param param: 查询字符创
      * @param startTime
      * @param emotion
      * @return
      */
-    public OpinionEsSearchVO queryTop100HotOpinion(String param, DateTime startTime, Integer emotion, Integer mediaType) {
-
-        String mediaAggName = "media_agg";
-
+    public OpinionEsSearchVO queryTop100HotOpinion(DateTime startTime, Integer emotion) {
         // step-1：获取预警热度分界
         Map<Integer, Integer> map = settingService.getWarnClass();
         Integer threeClass = map.get(3);
 
-        // step-2：构建es查询条件（这里还差一个条件：添加了监测的热点舆情不显示）
+        // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        if (StringUtils.isNotBlank(param)) query.must(QueryBuilders.multiMatchQuery(param, titleField, contentField));
         query.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(hotField).lt(threeClass));
-
-        TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(mediaTypeField);
+        query.must(QueryBuilders.termQuery(opStatusField, 0)); // 必须是未处于舆情任务中的热点舆情
+        if (emotion != null) query.must(QueryBuilders.termQuery(emotionField, emotion));
 
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT)
                 .setSize(100)
                 .setQuery(query)
-                .addSort(SortBuilders.fieldSort(hotField).order(SortOrder.DESC))
-                .addAggregation(mediaAgg);
-        if (mediaType != null) builder.setPostFilter(QueryBuilders.termQuery(mediaTypeField, mediaType));
-        if (emotion != null) builder.setPostFilter(QueryBuilders.termQuery(emotionField, emotion));
+                .addSort(SortBuilders.fieldSort(hotField).order(SortOrder.DESC));
 
         // step-3：查询并返回结果
         OpinionEsSearchVO result = new OpinionEsSearchVO();
@@ -564,10 +556,49 @@ public class EsQueryServiceImpl implements EsQueryService {
             // 列表结果
         List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
-            // 来源类型统计结果
-        List<KeyValueVO> mediaList = buildLongTermLists(resp, mediaAggName);
-        result.setMediaTypeStats(mediaList);
 
+        return result;
+    }
+
+    /**
+     * 热点舆情模糊查询
+     * @param keyword
+     * @param startTime
+     * @param emotion
+     * @param pb
+     * @return
+     */
+    @Override
+    public OpinionEsSearchVO getHotOpinionList(String keyword, DateTime startTime, Integer emotion, PageBounds pb) {
+        // step-1：获取预警热度分界
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3);
+
+        // step-2：构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        if (StringUtils.isNotBlank(keyword)) {
+            query.must(QueryBuilders.multiMatchQuery(keyword, titleField, contentField));
+        }
+        query.must(QueryBuilders.rangeQuery(publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(hotField).lt(threeClass));
+        query.must(QueryBuilders.termQuery(opStatusField, 0)); // 必须是未处于舆情任务中的热点舆情
+        if (emotion != null) {
+            query.must(QueryBuilders.termQuery(emotionField, emotion));
+        }
+
+        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT)
+                .setFrom(pb.getOffset()).setSize(pb.getLimit())
+                .setQuery(query)
+                .addSort(SortBuilders.fieldSort(hotField).order(SortOrder.DESC));
+
+        // step-3：查询并返回结果
+        OpinionEsSearchVO result = new OpinionEsSearchVO();
+        SearchResponse resp = builder.execute().actionGet();
+        result.setTotal(resp.getHits().getTotalHits());
+        // 列表结果
+        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
+        result.setOpinions(opList);
         return result;
     }
 

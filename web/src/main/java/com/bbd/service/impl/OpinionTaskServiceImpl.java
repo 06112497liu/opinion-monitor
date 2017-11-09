@@ -199,11 +199,12 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.opTypeField, 1);
         List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(map, 10000);
         OpinionOpRecordVO v = null;
-        if (type == 1)
-            v = records.stream().findFirst().get();
-        else if (type == 2)
-            v = records.stream().filter(p -> p.getOperator().equals(UserContext.getUser().getUsername())).findFirst().get();
-
+        if(!records.isEmpty()) {
+            if (type == 1)
+                v = records.stream().findFirst().get();
+            else if (type == 2)
+                v = records.stream().filter(p -> p.getOperator().equals(UserContext.getUser().getUsername())).findFirst().get();
+        }
         records.add(0, v);
         result.setRecords(records);
         return result;
