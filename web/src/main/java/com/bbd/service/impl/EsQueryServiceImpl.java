@@ -20,7 +20,6 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
-
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -118,7 +117,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.rangeQuery(EsConstant.CALC_TIME_PROP).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(EsConstant.firstWarnTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         if(state != null) {
             if(state == 0) query.must(QueryBuilders.termQuery(EsConstant.opStatusField, 0));
             else query.mustNot(QueryBuilders.termQuery(EsConstant.opStatusField, 0));
@@ -127,7 +126,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(aggName).field(EsConstant.hotField).keyed(true)
                 .addRange(levelThree, threeClass, twoClss - 1)
                 .addRange(levelTwo, twoClss, oneClass - 1)
-                .addRange(levelOne, oneClass, Integer.MAX_VALUE);
+                .addRange(levelOne, oneClass, 101);
 
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
                 .setQuery(query)
@@ -183,13 +182,13 @@ public class EsQueryServiceImpl implements EsQueryService {
         RangeAggregationBuilder aggregation = AggregationBuilders.range(aggsName).field(EsConstant.hotField).keyed(true)
                 .addRange(levelThree, threeClass, twoClss - 1)
                 .addRange(levelTwo, twoClss, oneClass - 1)
-                .addRange(levelOne, oneClass, Integer.MAX_VALUE)
+                .addRange(levelOne, oneClass, 101)
                 .subAggregation(buildDateRange(timeSpan));
 
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT)
                 .setQuery(query)
                 .addAggregation(aggregation)
-                .setSize(0).execute().actionGet();
+                .setSize(100).execute().actionGet();
 
         // step-3：构建返回结果
         Map<String, List<KeyValueVO>> result = Maps.newHashMap();
@@ -289,22 +288,17 @@ public class EsQueryServiceImpl implements EsQueryService {
     // 创建dateRange
     private DateRangeAggregationBuilder buildDateRange(Integer timeSpan) {
         String aggsName = "calc_aggs";
-
-        // step-1：组装条件
         DateTime now = DateTime.now();
-        DateTime startTime = null;
-        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.calcTimeField).keyed(true);
+        DateTime startTime;
+        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.firstWarnTimeField).keyed(true);
         if(timeSpan == 1) {
             startTime = now.withTimeAtStartOfDay();
             dateRange.format("yyyy-MM-dd HH");
             int currentHour = now.getHourOfDay();
             int startHour = startTime.getHourOfDay();
             int between = currentHour - startHour;
-            for (int i=between; i>=0; i--) {
-                String from = "now-" + i + "H/H";
-                String to = "now-" + (i-1) + "H/H";
-                if(i==0) to = "now+" + 1 + "H/H";
-                dateRange.addRange(between-i+1 + ":00:00", from, to);
+            for(int i=0; i<=between; i++) {
+                dateRange.addRange(startTime.plusHours(i).toString("HH:mm"), startTime, startTime.plusHours(i));
             }
         } else if(timeSpan == 2) {
             startTime = now.withDayOfWeek(DateTimeConstants.MONDAY).withTimeAtStartOfDay();
@@ -312,24 +306,17 @@ public class EsQueryServiceImpl implements EsQueryService {
             int currentDay = now.getDayOfWeek();
             int startDay = startTime.getDayOfWeek();
             int between = currentDay - startDay;
-            for (int i=between; i>=0; i--) {
-                String from = "now-" + i + "d/d";
-                String to = "now-" + (i-1) + "d/d";
-                if(i==0) to = "now+" + 1 + "d/d";
-                dateRange.addRange("周" + (between-i+1), from, to);
+            for(int i=0; i<=between; i++) {
+                dateRange.addRange(startTime.plusDays(i).toString("MM月dd日"), startTime, startTime.plusDays(i+1));
             }
         } else if(timeSpan == 3) {
             startTime = now.withDayOfMonth(1).withTimeAtStartOfDay();
             dateRange.format("yyyy-MM-dd");
-            int currentMonth = now.getMonthOfYear();
             int currentDay = now.getDayOfMonth();
             int startDay = startTime.getDayOfMonth();
             int between = currentDay - startDay;
-            for (int i=between; i>=0; i--) {
-                String from = "now-" + i + "d/d";
-                String to = "now-" + (i-1) + "d/d";
-                if(i==0) to = "now+" + 1 + "d/d";
-                dateRange.addRange(currentMonth + "月" + (between-i+1) + "日", from, to);
+            for(int i=0; i<=between; i++) {
+                dateRange.addRange(startTime.plusDays(i).toString("MM月dd日"), startTime, startTime.plusDays(i+1));
             }
         } else if(timeSpan == 4) {
             startTime = now.withDayOfYear(1).withTimeAtStartOfDay();
@@ -337,26 +324,20 @@ public class EsQueryServiceImpl implements EsQueryService {
             int currentMonth = now.getMonthOfYear();
             int startMonth = startTime.getMonthOfYear();
             int between = currentMonth - startMonth;
-            for (int i=between; i>=0; i--) {
-                String from = "now-" + i + "M/M";
-                String to = "now-" + (i-1) + "M/M";
-                if(i==0) to = "now+" + 1 + "M/M";
-                dateRange.addRange((between-i+1) + "月", from, to);
+            for(int i=0; i<=between; i++) {
+                dateRange.addRange(startTime.plusMonths(i).toString("MM月"), startTime, startTime.plusMonths(i+1));
             }
         } else {
-            startTime = now.plusYears(-4);
+            startTime = now.withDayOfYear(1).withTimeAtStartOfDay().plusYears(-4);
             dateRange.format("yyyy");
             int currentYear = now.getYear();
             int startYear = startTime.getYear();
             int between = currentYear - startYear;
-            for (int i=between; i>=0; i--) {
-                String from = "now-" + i + "y/y";
-                String to = "now-" + (i-1) + "y/y";
-                if(i==0) to = "now+" + 1 + "y/y";
-                dateRange.addRange(now.plusYears(-i).getYear() + "年", from, to);
+            for(int i=0; i<=between; i++) {
+                dateRange.addRange(startTime.plusYears(i).toString("yyyy年"), startTime, startTime.plusMonths(i+1));
             }
-
         }
+        String s = dateRange.toString();
         return dateRange;
     }
 
@@ -554,39 +535,61 @@ public class EsQueryServiceImpl implements EsQueryService {
         return result;
     }
 
+    /**
+     * 查询历史预警舆情
+     * @param startTime: 开始时间
+     * @param endTime：结束时间
+     * @param emotion: 情感
+     * @param mediaType: 媒体类型
+     * @param pb: 分页
+     * @return
+     */
     @Override
     public OpinionEsSearchVO queryHistoryOpinions(DateTime startTime, DateTime endTime, Integer emotion, Integer mediaType, PageBounds pb) {
         String hotLevelAggName = "hot_level_agg";
         String mediaAggName = "media_agg";
+        // step-1：获取预警等级分界线
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3); Integer twoClss = map.get(2); Integer oneClass = map.get(1);
 
-        // step-1：构建es查询条件
+        // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.rangeQuery(EsConstant.warnTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
-        query.must(QueryBuilders.rangeQuery(EsConstant.hotLevelField).gte(3)); // 预警等级必须达到3
+        query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass)); // 预警等级必须达到3
+        query.must(QueryBuilders.termsQuery(EsConstant.opStatusField, new Integer[]{2, 3})); // 必须是已经解除的和已经添加监测的
         if (emotion != null) query.must(QueryBuilders.termQuery(EsConstant.emotionField, emotion));
-        if (mediaType != null) query.must(QueryBuilders.termQuery(EsConstant.mediaTypeField, mediaType));
+
 
         TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(EsConstant.mediaTypeField);
-        TermsAggregationBuilder hotLevelAgg = AggregationBuilders.terms(hotLevelAggName).field(EsConstant.hotLevelField);
+        RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(EsConstant.hotField).keyed(true)
+                .addRange("levelOne", oneClass, 101)
+                .addRange("levelTwo", twoClss, oneClass-1)
+                .addRange("levelThree", threeClass, twoClss-1);
 
-        // step-2：查询es
+        // step-3：查询es
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
                 .setFrom(pb.getOffset()).setSize(pb.getLimit())
                 .setQuery(query)
                 .addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC))
                 .addAggregation(hotLevelAgg)
                 .addAggregation(mediaAgg);
+        if (mediaType != null) builder.setPostFilter(QueryBuilders.termQuery(EsConstant.mediaTypeField, mediaType));
         SearchResponse resp = builder.execute().actionGet();
 
-        // step-3：构建返回结果
+        // step-4：构建返回结果
         OpinionEsSearchVO result = new OpinionEsSearchVO();
         result.setTotal(resp.getHits().getTotalHits());
         List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
+            // 舆情来源类型统计
         List<KeyValueVO> mediaList = buildLongTermLists(resp, mediaAggName);
         result.setMediaTypeStats(mediaList);
+            // 预警等级水平统计
+        List<KeyValueVO> hotLevleList = buildHotLevelLists(resp, hotLevelAggName);
+        result.setHotLevelStats(hotLevleList);
+
         return result;
     }
 

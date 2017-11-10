@@ -179,9 +179,12 @@ public class OpinionServiceImpl implements OpinionService {
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), esResult.getTotal().intValue());
         PageList p = PageListHelper.create(opinions, paginator);
         Map<String, Object> map = Maps.newHashMap();
-        map.put("opinions", p);
-        map.put("mediaType", esResult.getMediaTypeStats());
-        map.put("level", esResult.getHotLevelStats());
+        map.put("opinionsList", p);
+            // 媒体类型中文描述转化
+        List<KeyValueVO> mediaTypeList = esResult.getMediaTypeStats();
+        transMediaTypeToChina(mediaTypeList);
+        map.put("mediaTypeCount", mediaTypeList);
+        map.put("levelCount", esResult.getHotLevelStats());
 
         return map;
     }
