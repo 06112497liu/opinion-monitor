@@ -2,6 +2,8 @@ package com.bbd.domain;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class OpinionEventSourceTrend {
     private Long id;
 
@@ -12,11 +14,11 @@ public class OpinionEventSourceTrend {
     private Integer count;
 
     private Integer warnCount;
-
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
     private Date pickTime;
-
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
     private Date gmtCreate;
-
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
     private Date gmtModified;
 
     public Long getId() {

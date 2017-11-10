@@ -2,15 +2,17 @@ package com.bbd.domain;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class OpinionEventWords {
     private Long id;
 
     private Long eventId;
 
     private Byte cycle;
-
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
     private Date gmtCreate;
-
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
     private Date gmtModified;
 
     private String words;

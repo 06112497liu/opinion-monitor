@@ -125,7 +125,11 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
      */
     @Override
     public void transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
-        // step-1：修改舆情的状态
+
+        // step-1：校验当前用户是否有操作资格
+        checkPermission(param.getUuid());
+
+        // step-2：修改舆情的状态
         UserInfo operator = UserContext.getUser();
         if (Objects.isNull(operator))
             throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
@@ -134,15 +138,14 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
             throw new ApplicationException(UserErrorCode.USERNAME_NOT_EXIST, "操作对象用户名不存在");
         }
         User opOwner = userOpt.get();
-
         Map<String, Object> map = Maps.newHashMap();
         map.put(EsConstant.opStatusField, 1);
         map.put(EsConstant.opOwnerField, opOwner.getId());
         map.put(EsConstant.transferTypeField, param.getTransferType());
         esModifyService.updateOpinion(operator, param.getUuid(), map);
 
-        // step-2：记录转发记录
-        // 构建转发记录对象
+        // step-3：记录转发记录
+            // 构建转发记录对象
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
         recordVO.setUuid(param.getUuid());
         recordVO.setOpType(1);
@@ -153,7 +156,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         recordVO.setOpTime(new Date());
         recordVO.setTransferContent(TransferEnum.getDescByCode(param.getTransferType().toString()));
 
-        // 向es中添加转发记录
+            // 向es中添加转发记录
         esModifyService.recordOpinionOp(recordVO);
     }
 
@@ -166,7 +169,11 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
      */
     @Override
     public void removeWarn(String uuid, Integer removeReason, String removeNote) throws InterruptedException, ExecutionException, IOException {
-        // step-1：修改舆情记录
+
+        // step-1：校验当前用户是否有操作资格
+        checkPermission(uuid);
+
+        // step-2：修改舆情记录
         UserInfo operator = UserContext.getUser();
         Map<String, Object> map = Maps.newHashMap();
         map.put(EsConstant.removeNoteField, removeNote);
@@ -174,7 +181,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.opStatusField, 2);
         esModifyService.updateOpinion(operator, uuid, map);
 
-        // step-2：记录解除记录
+        // step-3：记录解除记录
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
         recordVO.setOpType(2);
         recordVO.setOpTime(new Date());
@@ -213,5 +220,18 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         records.add(0, v);
         result.setRecords(records);
         return result;
+    }
+
+    // 校验当前用户是否有操作该条舆情的资格
+    private void checkPermission(String uuid) {
+        UserInfo user = UserContext.getUser();
+        // 如果不是超级管理员，判断当前用户是否是该条舆情的待操作者
+        if(!UserContext.isAdmin()) {
+            OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
+            Long ownerId = opinion.getOpOwner();
+            if(!Objects.equals(user.getId(), ownerId)) {
+                throw new ApplicationException(CommonErrorCode.PERMISSION_ERROR);
+            }
+        }
     }
 }

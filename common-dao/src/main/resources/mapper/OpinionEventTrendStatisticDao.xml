@@ -494,4 +494,25 @@
       order by ${orderByClause}
     </if>
   </select>
+  
+  
+     <insert id="insertBatch" parameterType="java.util.List">
+    insert into bbd_opinion_event_trend_statistic (
+      event_id, uuid, title, 
+      hot, similiar_count, comment_count, 
+      emotion, website, source, 
+      calc_time,  publish_time, gmt_create, 
+      gmt_modified, summary, content, 
+      link, keyword, `keys`
+      )
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+       (#{item.eventId,jdbcType=BIGINT}, #{item.uuid,jdbcType=VARCHAR}, #{item.title,jdbcType=VARCHAR}, 
+      #{item.hot,jdbcType=INTEGER}, #{item.similiarCount,jdbcType=INTEGER}, #{item.commentCount,jdbcType=INTEGER}, 
+      #{item.emotion,jdbcType=INTEGER}, #{item.website,jdbcType=VARCHAR}, #{item.source,jdbcType=VARCHAR}, 
+      #{item.calcTime,jdbcType=TIMESTAMP}, #{item.publishTime,jdbcType=TIMESTAMP}, #{item.gmtCreate,jdbcType=TIMESTAMP}, 
+      #{item.gmtModified,jdbcType=TIMESTAMP}, #{item.summary,jdbcType=LONGVARCHAR}, #{item.content,jdbcType=LONGVARCHAR}, 
+      #{item.link,jdbcType=LONGVARCHAR}, #{item.keyword,jdbcType=LONGVARCHAR}, #{item.keys,jdbcType=LONGVARCHAR})
+    </foreach>
+    </insert>
 </mapper>
