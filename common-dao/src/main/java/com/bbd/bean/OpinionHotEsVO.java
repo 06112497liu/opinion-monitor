@@ -5,6 +5,7 @@
 package com.bbd.bean;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
@@ -30,6 +31,7 @@ public class OpinionHotEsVO implements EsBase {
      * 热点事件
      */
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:00:00")
     private Date    hotTime;
 
     @Override

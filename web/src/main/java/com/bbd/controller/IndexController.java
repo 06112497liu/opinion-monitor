@@ -11,6 +11,7 @@ import com.bbd.service.IndexStatisticService;
 import com.bbd.service.OpinionService;
 import com.bbd.service.param.OpinionCountStatQueryParam;
 import com.bbd.service.vo.DBStaVO;
+import com.bbd.service.vo.KeyValueVO;
 import com.bbd.util.ValidateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -64,7 +67,8 @@ public class IndexController extends AbstractController {
     })
     @RequestMapping(value = "/stat/opinion/count/coordinate", method = RequestMethod.GET)
     public RestResult getOpinionCountStatisticGroupTime(Integer state, @RequestParam(value = "timeSpan", defaultValue = "3") Integer timeSpan) {
-        return RestResult.ok(indexStatisticService.getOpinionCountStatisticGroupTime(state, timeSpan));
+        Map<String, List<KeyValueVO>> result = indexStatisticService.getOpinionCountStatisticGroupTime(state, timeSpan);
+        return RestResult.ok(result);
     }
 
     @ApiOperation(value = "预警舆情top10", httpMethod = "GET")

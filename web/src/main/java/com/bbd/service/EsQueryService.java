@@ -5,6 +5,7 @@
 package com.bbd.service;
 
 import com.bbd.bean.OpinionEsVO;
+import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
@@ -200,4 +201,12 @@ public interface EsQueryService {
      * @return
      */
     List<OpinionOpRecordVO> getOpinionOpRecordByUUID(Map<String, Object> keyMap, Integer size);
+
+    /**
+     * 获取舆情热度走势
+     * @param uuid
+     * @param dateTime
+     * @return
+     */
+    List<OpinionHotEsVO> getOpinionHotTrend(String uuid, DateTime dateTime);
 }

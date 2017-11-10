@@ -1,8 +1,10 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
+import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionService;
+import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionVO;
 import com.bbd.util.ValidateUtil;
 import com.mybatis.domain.PageList;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -83,6 +86,17 @@ public class WarnOpinionController extends AbstractController {
         return RestResult.ok(opinionService.getOpinionSimiliarNewsList(uuid, getPageBounds()));
     }
 
+    @ApiOperation(value = "舆情热度变化趋势", httpMethod = "GET")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String uuid", paramType = "query", required = true),
+            @ApiImplicitParam(value = "时间周期(1-24小时，2-7天，3-30天)", name = "timeSpan", dataType = "Integer", paramType = "query", required = false)
+    })
+    @RequestMapping(value = "hot/trend", method = RequestMethod.GET)
+    public RestResult getOpinionHotTrend(String uuid, @RequestParam(name = "timeSpan", defaultValue = "1") Integer timeSpan) {
+        ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
+        List<OpinionHotEsVO> result = opinionService.getOpinionHotTrend(uuid, timeSpan);
+        return RestResult.ok(result);
+    }
 
 }
     

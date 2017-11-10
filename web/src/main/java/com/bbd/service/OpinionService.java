@@ -1,6 +1,7 @@
 package com.bbd.service;
 
 import com.bbd.bean.OpinionEsVO;
+import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
@@ -79,4 +80,12 @@ public interface OpinionService {
      * @return
      */
     PageList<SimiliarNewsVO> getOpinionSimiliarNewsList(String uuid, PageBounds pageBounds);
+
+    /**
+     * 获取舆情热度走势
+     * @param uuid
+     * @param timeSpan
+     * @return
+     */
+    List<OpinionHotEsVO> getOpinionHotTrend(String uuid, Integer timeSpan);
 }

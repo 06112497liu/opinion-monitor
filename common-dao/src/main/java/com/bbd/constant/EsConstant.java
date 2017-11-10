@@ -16,7 +16,8 @@ public class EsConstant {
     public static final String IDX_OPINION             = "bbd_opinion_mock_a";
     public static final String OPINION_TYPE            = "opinion";
     public static final String OPINION_OP_RECORD_TYPE  = "opinion_op_record";
-    public static final String CALC_TIME_PROP          = "calcTime";
+    public static final String IDX_OPINION_HOT = "bbd_opinion_hot";
+    public static final String OPINION_HOT_TYPE = "hot";
     public static final String OPINION_UUID            = "uuid";
     public static final String OPINION_HOT_PROP        = "hot";
     public static final String OPINION_FIRST_WARN_TIME = "firstWarnTime";
@@ -37,13 +38,14 @@ public class EsConstant {
     public static final String contentField       = "content";
     public static final String publishTimeField   = "publishTime";
     public static final String hotField           = "hot";
-    public static final String calcTimeField      = "calcTime";
     public static final String opTimeField        = "opTime";
     public static final String eventsField        = "events";
     public static final String mediaTypeField     = "mediaType";
-    public static final String keysField          = "keys";
     public static final String emotionField       = "emotion";
     public static final String firstWarnTimeField = "firstWarnTime";
     public static final String websiteField       = "website";
     public static final String keywordField = "keyword";
+
+    // =========== 舆情热度记录字段 ==========================
+    public static final String hotTimeField = "hotTime";
 }

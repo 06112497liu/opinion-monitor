@@ -1,6 +1,7 @@
 package com.bbd.service.impl;
 
 import com.bbd.bean.OpinionEsVO;
+import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.constant.EsConstant;
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.exception.ApplicationException;
@@ -224,6 +225,33 @@ public class OpinionServiceImpl implements OpinionService {
     @Override
     public PageList<SimiliarNewsVO> getOpinionSimiliarNewsList(String uuid, PageBounds pageBounds) {
         return null;
+    }
+
+    /**
+     * 获取舆情热度走势
+     * @param uuid
+     * @param timeSpan
+     * @return
+     */
+    @Override
+    public List<OpinionHotEsVO> getOpinionHotTrend(String uuid, Integer timeSpan) {
+        DateTime startTime = BusinessUtils.getDateByTimeSpan(timeSpan);
+        List<OpinionHotEsVO> result = esQueryService.getOpinionHotTrend(uuid, startTime);
+
+        // 根据横坐标去重
+        Set<OpinionHotEsVO> set;
+        if(timeSpan == 1)
+            set = new TreeSet<>(Comparator.comparing(o -> new DateTime(o.getHotTime()).toString("yyyy-MM-dd HH:00:00")));
+        else
+            set = new TreeSet<>(Comparator.comparing(o -> new DateTime(o.getHotTime()).toString("yyyy-MM-dd")));
+
+        set.addAll(result);
+        List<OpinionHotEsVO> list = new ArrayList<>();
+        list.addAll(set);
+        list.sort((o1, o2) -> {
+            return -(o1.getHotTime().compareTo(o2.getHotTime()));
+        });
+        return list;
     }
 }
 
