@@ -2,6 +2,8 @@ package com.bbd.domain;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class OpinionDictionary {
     private Long id;
 
@@ -10,9 +12,9 @@ public class OpinionDictionary {
     private String code;
 
     private String name;
-
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
     private Date gmtCreate;
-
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
     private Date gmtModified;
 
     public Long getId() {

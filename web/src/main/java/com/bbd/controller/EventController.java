@@ -9,8 +9,10 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -53,7 +55,7 @@ public class EventController extends AbstractController {
     	@ApiImplicitParam(value = "包含关键词", name = "includeWords", dataType = "String", paramType = "query", required = true),
         })
     @RequestMapping(value = "createEvent", method = RequestMethod.POST)
-    public RestResult createEvent(OpinionEvent opinionEvent) {
+    public RestResult createEvent(OpinionEvent opinionEvent) throws IOException, ExecutionException, InterruptedException {
         opinionEvent.setCreateBy(UserContext.getUser().getId());
     	eventService.createEvent(opinionEvent);
         return RestResult.ok();

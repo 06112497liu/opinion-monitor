@@ -10,6 +10,8 @@ public interface OpinionEventTrendStatisticDao {
     int deleteByPrimaryKey(Long id);
 
     int insert(OpinionEventTrendStatistic record);
+    
+    int insertBatch(List<OpinionEventTrendStatistic> records);
 
     int insertSelective(OpinionEventTrendStatistic record);
 
