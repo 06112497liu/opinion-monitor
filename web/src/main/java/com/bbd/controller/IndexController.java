@@ -97,17 +97,4 @@ public class IndexController extends AbstractController {
     public RestResult getEventChannelTrend() {
         return RestResult.ok(indexStatisticService.getEventChannelTrend());
     }
-
-    @ApiOperation(value = "历史舆情事件类别分布", httpMethod = "GET")
-    @RequestMapping(value = "/event/class/trend", method = RequestMethod.GET)
-    public RestResult getEventClassTrend() {
-        return RestResult.ok(indexStatisticService.getEventClassTrend());
-    }
-
-    @ApiOperation(value = "历史舆情事件地域分布", httpMethod = "GET")
-    @RequestMapping(value = "/event/area/trend", method = RequestMethod.GET)
-    public RestResult getEventAreaTrend() {
-        return RestResult.ok(indexStatisticService.getEventAreaTrend());
-    }
-
 }

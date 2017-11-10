@@ -349,8 +349,8 @@ public class EsQueryServiceImpl implements EsQueryService {
         String aggName = "top_kws";
         TransportClient client = EsUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
-                .setQuery(QueryBuilders.rangeQuery(EsConstant.calcTimeField).gte(DateTime.now().plusMonths(-1).toString("yyyy-MM-dd HH:mm:ss")))
-                .addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.keysField).size(10))
+                .setQuery(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(DateTime.now().withDayOfMonth(1).withTimeAtStartOfDay().toString("yyyy-MM-dd HH:mm:ss")))
+                .addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.keywordField).size(10))
                 .setSize(0).execute().actionGet();
         return buildStringTermLists(resp, aggName);
     }
@@ -375,11 +375,11 @@ public class EsQueryServiceImpl implements EsQueryService {
         TransportClient client = EsUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
                 .addAggregation(
-                        AggregationBuilders.dateRange(aggName).field(EsConstant.calcTimeField).keyed(true)
+                        AggregationBuilders.dateRange(aggName).field(EsConstant.publishTimeField).keyed(true)
                                 .addUnboundedFrom("dayAdd", now.plusHours(-24))
-                                .addUnboundedFrom("weekAdd", now.plusDays(-7))
-                                .addUnboundedFrom("monthAdd", now.plusDays(-30))
-                                .addUnboundedFrom("historyTotal", now.plusYears(-10))
+                                .addUnboundedFrom("weekAdd", now.plusDays(-7).withTimeAtStartOfDay())
+                                .addUnboundedFrom("monthAdd", now.plusDays(-30).withTimeAtStartOfDay())
+                                .addUnboundedFrom("historyTotal", now.plusYears(-6))
                 )
                 .setSize(0).execute().actionGet();
         List<InternalRange.Bucket> agg = ((InternalRange) resp.getAggregations().get(aggName)).getBuckets();
