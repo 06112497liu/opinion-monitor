@@ -4,11 +4,23 @@
  */
 package com.bbd.service.impl;
 
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+import com.bbd.bean.OpinionEsVO;
+import com.bbd.bean.OpinionHotEsVO;
+import com.bbd.constant.EsConstant;
+import com.bbd.service.EsQueryService;
+import com.bbd.service.SystemSettingService;
+import com.bbd.service.vo.*;
+import com.bbd.util.EsUtil;
+import com.bbd.util.JsonUtil;
+import com.bbd.util.StringUtils;
+import com.bbd.util.UserContext;
+import com.bbd.vo.UserInfo;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.mybatis.domain.PageBounds;
+import com.mybatis.domain.PageList;
+import com.mybatis.domain.Paginator;
+import com.mybatis.util.PageListHelper;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -36,27 +48,10 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bbd.bean.OpinionEsVO;
-import com.bbd.constant.EsConstant;
-import com.bbd.service.EsQueryService;
-import com.bbd.service.SystemSettingService;
-import com.bbd.service.vo.DBStaVO;
-import com.bbd.service.vo.KeyValueVO;
-import com.bbd.service.vo.OpinionCountStatVO;
-import com.bbd.service.vo.OpinionEsSearchVO;
-import com.bbd.service.vo.OpinionOpRecordVO;
-import com.bbd.service.vo.OpinionTaskListVO;
-import com.bbd.util.EsUtil;
-import com.bbd.util.JsonUtil;
-import com.bbd.util.StringUtils;
-import com.bbd.util.UserContext;
-import com.bbd.vo.UserInfo;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.mybatis.domain.PageBounds;
-import com.mybatis.domain.PageList;
-import com.mybatis.domain.Paginator;
-import com.mybatis.util.PageListHelper;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * ES查询服务
@@ -250,7 +245,6 @@ public class EsQueryServiceImpl implements EsQueryService {
         }
         return ls;
     }
-
 
 
     public DateRangeAggregationBuilder buildEventDayeRange(int cycle) {
@@ -909,6 +903,22 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .execute().actionGet();
         List<OpinionOpRecordVO> list = EsUtil.buildResult(resp, OpinionOpRecordVO.class);
         return list;
+    }
+
+    /**
+     * 获取舆情热度走势
+     * @param uuid
+     * @param startTime
+     * @return
+     */
+    @Override
+    public List<OpinionHotEsVO> getOpinionHotTrend(String uuid, DateTime startTime) {
+        TransportClient client = EsUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_HOT).setTypes(EsConstant.OPINION_HOT_TYPE).setSearchType(SearchType.DEFAULT)
+                .setQuery(QueryBuilders.rangeQuery(EsConstant.hotTimeField).gte(startTime.toString("yyyy-MM-dd HH:mm:ss")))
+                .setSize(10000).execute().actionGet();
+        List<OpinionHotEsVO> result = EsUtil.buildResult(resp, OpinionHotEsVO.class);
+        return result;
     }
 
     // 创建BoolQueryBuilder
