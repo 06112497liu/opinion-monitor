@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
@@ -32,65 +33,64 @@ import com.bbd.util.UserContext;
 @Api(description = "监测事件")
 public class EventController extends AbstractController {
 
-	@Autowired
-	EventService eventService;
-	
+    @Autowired
+    EventService eventService;
+    
     @ApiOperation(value = "创建事件", httpMethod = "POST")
     @ApiImplicitParams({ 
-    	@ApiImplicitParam(value = "事件名称", name = "eventName", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "事件分组", name = "eventGroup", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "监管主体", name = "monitor", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "事发区域", name = "region", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "事件级别", name = "eventLevel", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "事件描述", name = "description", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "商家主体", name = "merchant", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "品牌", name = "brand", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "商家地址", name = "address", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "商家联系方式", name = "merchantTel", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "消费者", name = "consumer", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "消费者联系方式", name = "consumerTel", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "包含关键词", name = "includeWords", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "主体关键词", name = "keywords", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "排除关键词", name = "excludeWords", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "包含关键词", name = "includeWords", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "舆情ID", name = "uuid", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "事件名称", name = "eventName", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "事件分组", name = "eventGroup", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "监管主体", name = "monitor", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "事发区域", name = "region", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "事件级别", name = "eventLevel", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "事件描述", name = "description", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "商家主体", name = "merchant", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "品牌", name = "brand", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "商家地址", name = "address", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "商家联系方式", name = "merchantTel", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "消费者", name = "consumer", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "消费者联系方式", name = "consumerTel", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "包含关键词", name = "includeWords", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "主体关键词", name = "keywords", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "排除关键词", name = "excludeWords", dataType = "String", paramType = "query", required = true)
         })
     @RequestMapping(value = "createEvent", method = RequestMethod.POST)
     public RestResult createEvent(OpinionEvent opinionEvent) throws IOException, ExecutionException, InterruptedException {
         opinionEvent.setCreateBy(UserContext.getUser().getId());
-    	eventService.createEvent(opinionEvent);
+        eventService.createEvent(opinionEvent);
         return RestResult.ok();
     }
     
     @ApiOperation(value = "修改事件", httpMethod = "POST")
     @ApiImplicitParams({ 
-    	@ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "事件名称", name = "eventName", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "事件分组", name = "eventGroup", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "监管主体", name = "monitor", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "事发区域", name = "region", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "事件级别", name = "eventLevel", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "事件描述", name = "description", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "商家主体", name = "merchant", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "品牌", name = "brand", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "商家地址", name = "address", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "商家联系方式", name = "merchantTel", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "消费者", name = "consumer", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "消费者联系方式", name = "consumerTel", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "包含关键词", name = "includeWords", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "主体关键词", name = "keywords", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "排除关键词", name = "excludeWords", dataType = "String", paramType = "query", required = true),
-    	@ApiImplicitParam(value = "包含关键词", name = "includeWords", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
+        @ApiImplicitParam(value = "事件名称", name = "eventName", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "事件分组", name = "eventGroup", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "监管主体", name = "monitor", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "事发区域", name = "region", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "事件级别", name = "eventLevel", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "事件描述", name = "description", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "商家主体", name = "merchant", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "品牌", name = "brand", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "商家地址", name = "address", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "商家联系方式", name = "merchantTel", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "消费者", name = "consumer", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "消费者联系方式", name = "consumerTel", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "包含关键词", name = "includeWords", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "主体关键词", name = "keywords", dataType = "String", paramType = "query", required = true),
+        @ApiImplicitParam(value = "排除关键词", name = "excludeWords", dataType = "String", paramType = "query", required = true)
         })
     @RequestMapping(value = "modifyEvent", method = RequestMethod.POST)
     public RestResult modifyEvent(OpinionEvent opinionEvent) {
         opinionEvent.setModifiedBy(UserContext.getUser().getId());
-    	eventService.modifyEvent(opinionEvent);
+        eventService.modifyEvent(opinionEvent);
         return RestResult.ok();
     }
     
     @ApiOperation(value = "显示事件", httpMethod = "GET")
     @ApiImplicitParams({ 
-    	@ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true)
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true)
     })
     @RequestMapping(value = "getEvent", method = RequestMethod.GET)
     public RestResult getEvent(OpinionEvent opinionEvent) {
@@ -107,7 +107,7 @@ public class EventController extends AbstractController {
     @RequestMapping(value = "getEventChinese", method = RequestMethod.GET)
     public RestResult getEventChinese(OpinionEvent opinionEvent) {
         HashMap map= new HashMap();
-        OpinionEvent event = eventService.getEvent(opinionEvent.getId()); 
+        OpinionEvent event = eventService.getEventChinese(opinionEvent.getId()); 
         map.put("event", event);
         return RestResult.ok(map);
     }
@@ -130,7 +130,7 @@ public class EventController extends AbstractController {
         @ApiImplicitParam(value = "备注", name = "remark", dataType = "String", paramType = "query", required = false)
     })
     @RequestMapping(value = "fileEvent", method = RequestMethod.POST)
-    public RestResult fileEvent(OpinionEvent opinionEvent) {
+    public RestResult fileEvent(OpinionEvent opinionEvent) throws ParseException {
         opinionEvent.setFileBy(UserContext.getUser().getId());
         eventService.fileEvent(opinionEvent);
         return RestResult.ok();
@@ -185,7 +185,7 @@ public class EventController extends AbstractController {
     @ApiOperation(value = "事件信息列表/图表跟踪分析/信息总量", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
-        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true)
     })
     @RequestMapping(value = "eventInfoTotal", method = RequestMethod.GET)
     public RestResult eventInfoTotal(Long id, Integer cycle) {
@@ -204,7 +204,7 @@ public class EventController extends AbstractController {
     @ApiOperation(value = "图表跟踪分析/事件总体走势", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
-        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true)
         })
     @RequestMapping(value = "eventWholeTrend", method = RequestMethod.GET)
     public RestResult eventWholeTrend(Long id, Integer cycle) {
@@ -214,7 +214,7 @@ public class EventController extends AbstractController {
     @ApiOperation(value = "图表跟踪分析/舆情事件信息传播渠道分布", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
-        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true)
         })
     @RequestMapping(value = "eventSrcDis", method = RequestMethod.GET)
     public RestResult eventSrcDis(Long id, Integer cycle) {
@@ -224,7 +224,7 @@ public class EventController extends AbstractController {
     @ApiOperation(value = "图表跟踪分析/信息走势图", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
-        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true)
         })
     @RequestMapping(value = "eventInfoTrend", method = RequestMethod.GET)
     public RestResult eventInfoTrend(Long id, Integer cycle) {
@@ -234,7 +234,7 @@ public class EventController extends AbstractController {
     @ApiOperation(value = "图表跟踪分析/媒体活跃度和媒体来源占比", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
-        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true)
         })
     @RequestMapping(value = "eventSrcActive", method = RequestMethod.GET)
     public RestResult eventSrcActive(Long id, Integer cycle) {
@@ -244,7 +244,7 @@ public class EventController extends AbstractController {
     @ApiOperation(value = "图表跟踪分析/事件走势", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
-        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true),
         @ApiImplicitParam(value = "起始页号", name = "pageNo", dataType = "Integer", paramType = "query", required = true),
         @ApiImplicitParam(value = "每页大小", name = "pageSize", dataType = "Integer", paramType = "query", required = true)
         })
@@ -256,7 +256,7 @@ public class EventController extends AbstractController {
     @ApiOperation(value = "图表跟踪分析/事件关键词云", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
-        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true)
         })
     @RequestMapping(value = "eventKeywords", method = RequestMethod.GET)
     public RestResult eventKeywords(Long id, Integer cycle) {
@@ -266,7 +266,7 @@ public class EventController extends AbstractController {
     @ApiOperation(value = "图表跟踪分析/数据类型", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
-        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true)
         })
     @RequestMapping(value = "eventDataType", method = RequestMethod.GET)
     public RestResult eventDataType(Long id, Integer cycle) {

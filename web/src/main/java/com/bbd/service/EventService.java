@@ -1,6 +1,8 @@
 package com.bbd.service;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
@@ -21,6 +24,7 @@ import com.bbd.dao.OpinionEventDao;
 import com.bbd.dao.OpinionEventSourceTrendDao;
 import com.bbd.dao.OpinionEventStatisticDao;
 import com.bbd.dao.OpinionEventTrendStatisticDao;
+import com.bbd.dao.OpinionEventWholeTrendStatisticDao;
 import com.bbd.dao.OpinionEventWordsDao;
 import com.bbd.dao.WarnSettingDao;
 import com.bbd.domain.Graph;
@@ -33,6 +37,8 @@ import com.bbd.domain.OpinionEventStatistic;
 import com.bbd.domain.OpinionEventStatisticExample;
 import com.bbd.domain.OpinionEventTrendStatistic;
 import com.bbd.domain.OpinionEventTrendStatisticExample;
+import com.bbd.domain.OpinionEventWholeTrendStatistic;
+import com.bbd.domain.OpinionEventWholeTrendStatisticExample;
 import com.bbd.domain.OpinionEventWords;
 import com.bbd.domain.OpinionEventWordsExample;
 import com.bbd.domain.WarnSetting;
@@ -66,6 +72,8 @@ public class EventService{
     @Autowired
     OpinionEventStatisticDao opinionEventStatisticDao;
     @Autowired
+    OpinionEventWholeTrendStatisticDao opinionEventWholeTrendStatisticDao;
+    @Autowired
     private EsQueryService esQueryService;
     @Autowired
     private EsModifyService esModifyService;
@@ -82,7 +90,7 @@ public class EventService{
         opinionEvent.setIsDelete((byte)0);
         opinionEvent.setGmtCreate(new Date());
         opinionEventDao.insert(opinionEvent);
-        
+        //设置事件预警初始值
         WarnSetting recordNew = new WarnSetting();
         recordNew.setEventId(opinionEvent.getId());
         recordNew.setType(1);
@@ -131,6 +139,7 @@ public class EventService{
         recordWhole3.setCreateBy(opinionEvent.getCreateBy());
         warnSettingDao.insert(recordWhole3);
         
+        //更新事件关联舆情
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
         recordVO.setOperator(UserContext.getUser().getUsername());
         recordVO.setOpTime(new Date());
@@ -176,8 +185,9 @@ public class EventService{
     /**  
      * 归档事件
      * @param opinionEvent 
+     * @throws ParseException 
      */
-    public void fileEvent(OpinionEvent opinionEvent) {
+    public void fileEvent(OpinionEvent opinionEvent) throws ParseException {
         opinionEvent.setGmtFile(new Date());
         opinionEventDao.updateByPrimaryKeySelective(opinionEvent);
         OpinionEvent tmp =  opinionEventDao.selectByPrimaryKey(opinionEvent.getId());
@@ -187,6 +197,8 @@ public class EventService{
         if (oneYearBefore.getMillis() > startTime.getMillis()) {
             startTime = oneYearBefore;
         }
+        
+        //归档事件走势信息
         List<OpinionEsVO> opinions = new ArrayList<OpinionEsVO>();
         for (int i=1; i<Integer.MAX_VALUE; i++) {
             List<OpinionEsVO> tmpOpinions = esQueryService.queryEventTrendOpinions(tmp.getId(), startTime, endTime, new PageBounds(i,5000)).getOpinions();
@@ -196,7 +208,26 @@ public class EventService{
                 break;
             }
         }
+
+        List<OpinionEventTrendStatistic>  records = new ArrayList<OpinionEventTrendStatistic>();
+        for (OpinionEsVO vo : opinions) {
+            OpinionEventTrendStatistic evtTrend = new OpinionEventTrendStatistic();
+            evtTrend.setEventId(opinionEvent.getId());
+            BeanUtils.copyProperties(vo, evtTrend);
+            evtTrend.setKeys(StringUtils.join(vo.getKeys(), ","));
+            evtTrend.setKeyword(StringUtils.join(vo.getKeyword(), ","));
+            evtTrend.setGmtCreate(new Date());
+            records.add(evtTrend);
+            if (records.size() == 2000) {
+                opinionEventTrendStatisticDao.insertBatch(records);
+                records.clear();
+            }
+        }
+        if (records.size() > 0) {
+            opinionEventTrendStatisticDao.insertBatch(records);
+        }
         
+        //归档事件媒体分布、媒体活跃度、媒体来源、数据情感信息
         List<KeyValueVO> mediaSpreadList = esQueryService.getEventOpinionMediaSpread(tmp.getId(), startTime, endTime);
         StringBuilder mediaSpread = new StringBuilder();
         for (KeyValueVO e : mediaSpreadList) {
@@ -212,33 +243,33 @@ public class EventService{
         for (KeyValueVO e : emotionSpreadList) {
             emotionSpread.append(e.getKey()).append(",").append(e.getValue()).append("#");
         }
+        OpinionEventStatistic opinionEventStatistic = new OpinionEventStatistic();
+        opinionEventStatistic.setEventId(opinionEvent.getId());
+        opinionEventStatistic.setInfoTotal(opinions.size());
+        opinionEventStatistic.setDataType(StringUtils.removeEnd(emotionSpread.toString(), "#"));
+        opinionEventStatistic.setMediaType(StringUtils.removeEnd(mediaSpread.toString(), "#"));
+        opinionEventStatistic.setSource(StringUtils.removeEnd(websiteSpread.toString(), "#"));
+        opinionEventStatistic.setGmtCreate(new Date());
+        opinionEventStatisticDao.insert(opinionEventStatistic);
         
-       List<OpinionEventTrendStatistic>  records = new ArrayList<OpinionEventTrendStatistic>();
-       for (OpinionEsVO vo : opinions) {
-           OpinionEventTrendStatistic evtTrend = new OpinionEventTrendStatistic();
-           evtTrend.setEventId(opinionEvent.getId());
-           BeanUtils.copyProperties(vo, evtTrend);
-           evtTrend.setKeys(StringUtils.join(vo.getKeys(), ","));
-           evtTrend.setKeyword(StringUtils.join(vo.getKeyword(), ","));
-           evtTrend.setGmtCreate(new Date());
-           records.add(evtTrend);
-           if (records.size() == 2000) {
-               opinionEventTrendStatisticDao.insertBatch(records);
-               records.clear();
-           }
+       //归档事件总体走势信息
+       Map<String, List<KeyValueVO>> map = eventWholeTrend(opinionEvent.getId(), 4);
+       List<KeyValueVO> infoList = map.get("infoList");
+       List<KeyValueVO> warnList = map.get("warnList");
+       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+       List<OpinionEventWholeTrendStatistic>  recordList = new ArrayList<OpinionEventWholeTrendStatistic>();
+       for (int i=0; i<infoList.size(); i++) {
+           OpinionEventWholeTrendStatistic evtWholeTrd = new OpinionEventWholeTrendStatistic();
+           evtWholeTrd.setEventId(opinionEvent.getId());
+           evtWholeTrd.setInfoTotal((Integer) infoList.get(i).getValue());
+           evtWholeTrd.setWarnTotal((Integer) warnList.get(i).getValue());
+           evtWholeTrd.setPickTime(sdf.parse((String)infoList.get(i).getKey()));
+           evtWholeTrd.setGmtCreate(new Date());
+           recordList.add(evtWholeTrd);
        }
-       if (records.size() > 0) {
-           opinionEventTrendStatisticDao.insertBatch(records);
+       if (recordList.size() > 0) {
+           opinionEventWholeTrendStatisticDao.insertBatch(recordList);
        }
-       
-       OpinionEventStatistic opinionEventStatistic = new OpinionEventStatistic();
-       opinionEventStatistic.setEventId(opinionEvent.getId());
-       opinionEventStatistic.setInfoTotal(opinions.size());
-       opinionEventStatistic.setDataType(StringUtils.removeEnd(emotionSpread.toString(), "#"));
-       opinionEventStatistic.setMediaType(StringUtils.removeEnd(mediaSpread.toString(), "#"));
-       opinionEventStatistic.setSource(StringUtils.removeEnd(websiteSpread.toString(), "#"));
-       opinionEventStatistic.setGmtCreate(new Date());
-       opinionEventStatisticDao.insert(opinionEventStatistic);
     }
     
     /**  
@@ -302,7 +333,7 @@ public class EventService{
         OpinionEsSearchVO esResult = esQueryService.queryEventOpinions(id, buildTimeSpan(cycle), emotion, 
             source != null ? Integer.valueOf(source) : null, pb);
         List<KeyValueVO> mediaTypeSta = esResult.getMediaTypeStats();
-        transMediaTypeToChina(mediaTypeSta);
+        transToChinese(mediaTypeSta, "F");
         map.put("opinions", esResult.getOpinions());
         map.put("total", esResult.getTotal());
         map.put("eventHot", opinionEventDao.selectByPrimaryKey(id).getHot());
@@ -332,12 +363,6 @@ public class EventService{
             else startTime = now.plusHours(-24);
             return startTime;
         }
-     
-    private void transMediaTypeToChina(List<KeyValueVO> list) {
-            for(KeyValueVO v : list) {
-                v.setName( WebsiteEnum.getDescByCode( v.getKey().toString() ) );
-            }
-        }
     
     /**  
      * 获取事件舆情列表的媒体标签
@@ -350,7 +375,7 @@ public class EventService{
         PageBounds pb = new PageBounds(1, 10);
         OpinionEsSearchVO esResult = esQueryService.queryEventOpinions(id, buildTimeSpan(cycle), emotion, null, pb);
         List<KeyValueVO> mediaTypeSta = esResult.getMediaTypeStats();
-        transMediaTypeToChina(mediaTypeSta);
+        transToChinese(mediaTypeSta, "F");
         return mediaTypeSta;
     }
     
@@ -390,12 +415,33 @@ public class EventService{
      * @param cycle
      * @return 
      */
-    public Map<String, Object> eventWholeTrend(Long id, Integer cycle) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        List<KeyValueVO> infoList = esQueryService.getEventStatisticInfoBySourceAndCycle(id, null, null, cycle);
-        List<KeyValueVO> warnList = esQueryService.getEventStatisticInfoBySourceAndCycle(id, null, "notNull", cycle);
-        map.put("infoList", infoList);
-        map.put("warnList", warnList);
+    public Map<String, List<KeyValueVO>> eventWholeTrend(Long id, Integer cycle) {
+        Map<String, List<KeyValueVO>> map = new HashMap<String, List<KeyValueVO>>();
+        List<KeyValueVO> infoList;
+        List<KeyValueVO> warnList;
+        if (cycle != 4) {
+            infoList = esQueryService.getEventStatisticInfoBySourceAndCycle(id, null, null, cycle);
+            warnList = esQueryService.getEventStatisticInfoBySourceAndCycle(id, null, "notNull", cycle);
+            map.put("infoList", infoList);
+            map.put("warnList", warnList);
+        } else {
+            OpinionEventWholeTrendStatisticExample example = new OpinionEventWholeTrendStatisticExample();
+            example.createCriteria().andEventIdEqualTo(id);
+            List<OpinionEventWholeTrendStatistic> rs = opinionEventWholeTrendStatisticDao.selectByExample(example);
+            infoList = new ArrayList<KeyValueVO>();
+            warnList = new ArrayList<KeyValueVO>();
+            for (OpinionEventWholeTrendStatistic e : rs) {
+                KeyValueVO info = new KeyValueVO();
+                KeyValueVO warn = new KeyValueVO();
+                info.setKey(e.getPickTime());
+                info.setValue(e.getWarnTotal());
+                warn.setKey(e.getPickTime());
+                warn.setValue(e.getInfoTotal());
+                infoList.add(info);
+                warnList.add(warn);
+            }
+        }
+        
         return map;
        /* HashMap<String, Object> map = new HashMap<String, Object>();
         Integer days;
@@ -426,7 +472,6 @@ public class EventService{
         List<KeyValueVO> rs = null;
         if (cycle.intValue() != 4) {
             rs = esQueryService.getEventOpinionMediaSpread(id, buildTimeSpan(cycle), null);
-            
         } else {
             OpinionEventStatisticExample example = new OpinionEventStatisticExample();
             example.createCriteria().andEventIdEqualTo(id);
@@ -455,9 +500,16 @@ public class EventService{
         List<List<KeyValueVO>> list = new ArrayList<List<KeyValueVO>>();
         List<OpinionDictionary> opinionDictionaryList = getDictionary("F");
         List<KeyValueVO> allList = esQueryService.getEventStatisticInfoBySourceAndCycle(id, null, null, cycle);
+        for (KeyValueVO t : allList) {
+            t.setName("全部");
+        }
         list.add(allList);
         for (OpinionDictionary e : opinionDictionaryList) {
             List<KeyValueVO> tmp = esQueryService.getEventStatisticInfoBySourceAndCycle(id, e.getCode(), null, cycle);
+            for (KeyValueVO f : tmp) {
+                f.setName(e.getName());
+            }
+            transToChinese(tmp, "F");
             if (tmp!=null && tmp.size()>0) {
                 list.add(tmp);
             }
@@ -545,13 +597,8 @@ public class EventService{
     public List<KeyValueVO> eventKeywords(Long id, Integer cycle) {
         List<KeyValueVO> words = new ArrayList<KeyValueVO>();
         OpinionEventWordsExample example = new OpinionEventWordsExample();
-        example.createCriteria().andIdEqualTo(id).andCycleEqualTo((byte)(int)cycle);
+        example.createCriteria().andIdEqualTo(id).andCycleEqualTo((byte)(int)(cycle == 4 ? 3 : cycle));
         List<OpinionEventWords> opinionEventWordsList = opinionEventWordsDao.selectByExampleWithBLOBs(example);
-        if (cycle == 4 && (opinionEventWordsList == null || opinionEventWordsList.size() == 0)) {
-            OpinionEventWordsExample tmp = new OpinionEventWordsExample();
-            tmp.createCriteria().andIdEqualTo(id).andCycleEqualTo((byte)3);
-            opinionEventWordsList = opinionEventWordsDao.selectByExampleWithBLOBs(tmp);
-        }
         if (opinionEventWordsList == null || opinionEventWordsList.size() == 0) {
             return words;
         }
