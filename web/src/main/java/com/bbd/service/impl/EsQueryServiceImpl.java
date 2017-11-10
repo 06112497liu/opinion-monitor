@@ -20,6 +20,7 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
+
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -42,6 +43,8 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -202,6 +205,85 @@ public class EsQueryServiceImpl implements EsQueryService {
             result.put(b.getKey(), ls);
         }
         return result;
+    }
+
+
+    /**
+     * 获取事件数量折线统计图 - 图表跟踪分析
+     * @param eventId
+     * @param sourceType
+     * @param isInfo
+     * @return
+     */
+    @Override
+    public List<KeyValueVO> getEventStatisticInfoBySourceAndCycle(Long eventId, String sourceType,
+        String isInfo, Integer cycle) {
+
+        // step-1：构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
+        if (sourceType != null) {
+            query.must(QueryBuilders.termQuery(EsConstant.mediaTypeField, Integer.valueOf(sourceType)));
+        }
+        if (isInfo != null) {
+            query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(settingService.getWarnClass().get(3)));
+        }
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setQuery(query)
+                .addAggregation(buildEventDayeRange(cycle))
+                .setSize(0).execute().actionGet();
+
+        // step-2：构建返回结果
+        List<InternalDateRange.Bucket> dateList = ((InternalDateRange) (resp.getAggregations().get("event_calc_aggs"))).getBuckets();
+        List<KeyValueVO> ls = Lists.newLinkedList();
+        for(InternalDateRange.Bucket d : dateList) {
+            KeyValueVO v = new KeyValueVO();
+            v.setKey(d.getKey());
+            v.setValue(d.getDocCount());
+            ls.add(v);
+        }
+        return ls;
+    }
+
+
+
+    public DateRangeAggregationBuilder buildEventDayeRange(int cycle) {
+        String aggsName = "event_calc_aggs";
+        DateTime endTime = null;
+        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.calcTimeField).keyed(true);
+        DateTime now = DateTime.now();
+        DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        if (cycle == 1) {
+            DateTime latestEvenHour = DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " +
+                                        (now.getHourOfDay()%2 == 0 ? now.getHourOfDay() : now.getHourOfDay()-1) + ":00:00", format);
+            for (int i=0; i<=11; i++) {
+                endTime = latestEvenHour.minusHours(i*2);
+                dateRange.addUnboundedTo(endTime.toString("yyyy-MM-dd HH:mm"), endTime);
+            }
+        } else if (cycle == 2) {
+            DateTime latest12Hour = DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " +
+                    (now.getHourOfDay()/12 == 0 ? 0 : 12 + ":00:00"), format);
+            for (int i=0; i<=13; i++) {
+                endTime = latest12Hour.minusHours(i*12);
+                dateRange.addUnboundedTo(endTime.toString("yyyy-MM-dd HH:mm"), endTime);
+            }
+        } else if (cycle == 3) {
+            DateTime latestDay = DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " +
+                                                    "00:00:00", format);
+            for (int i=0; i<=29; i++) {
+                endTime = latestDay.minusDays(i);
+                dateRange.addUnboundedTo(endTime.toString("yyyy-MM-dd HH:mm"), endTime);
+            }
+        } else {
+            DateTime latestDay = DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " +
+                    "00:00:00", format);
+            for (int i=0; i<=364; i++) {
+                endTime = latestDay.minusDays(i);
+                dateRange.addUnboundedTo(endTime.toString("yyyy-MM-dd HH:mm"), endTime);
+            }
+        }
+        return dateRange;
     }
 
     // 创建dateRange
@@ -536,7 +618,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         OpinionEsSearchVO result = new OpinionEsSearchVO();
         SearchResponse resp = builder.execute().actionGet();
         result.setTotal(resp.getHits().getTotalHits());
-        // 列表结果
+            // 列表结果
         List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
@@ -760,7 +842,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();
         List<OpinionTaskListVO> list = EsUtil.buildResult(resp, OpinionTaskListVO.class);
-        // 查询转发记录
+            // 查询转发记录
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);
         return result;
@@ -778,7 +860,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-1：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        // 判断当前用户是否是超级管理员(如果是管理员的话，就能看到所有的数据)
+            // 判断当前用户是否是超级管理员(如果是管理员的话，就能看到所有的数据)
         UserInfo user = UserContext.getUser();
         if(!UserContext.isAdmin()) query.must(QueryBuilders.matchQuery(EsConstant.operatorsField, user.getId())); // 操作者字段必须包含当前用户
         if(opStatus != null) {
@@ -795,7 +877,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();
         List<OpinionTaskListVO> list = EsUtil.buildResult(resp, OpinionTaskListVO.class);
-        // 查询转发记录
+            // 查询转发记录
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);
         return result;
