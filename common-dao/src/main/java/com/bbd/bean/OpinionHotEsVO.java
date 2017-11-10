@@ -4,6 +4,10 @@
  */
 package com.bbd.bean;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
+import java.util.Date;
+
 /**
  * 舆情热度记录
  * 
@@ -12,11 +16,24 @@ package com.bbd.bean;
  */
 public class OpinionHotEsVO implements EsBase {
 
+    /**
+     * 舆情号
+     */
     private String  uuid;
 
+    /**
+     * 热度
+     */
     private Integer hot;
 
+    /**
+     * 热点事件
+     */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    private Date    hotTime;
+
     @Override
+    @JSONField(serialize = false)
     public String getEsId() {
         return null;
     }
@@ -35,5 +52,13 @@ public class OpinionHotEsVO implements EsBase {
 
     public void setHot(Integer hot) {
         this.hot = hot;
+    }
+
+    public Date getHotTime() {
+        return hotTime;
+    }
+
+    public void setHotTime(Date hotTime) {
+        this.hotTime = hotTime;
     }
 }

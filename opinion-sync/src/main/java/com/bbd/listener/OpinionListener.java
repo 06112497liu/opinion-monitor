@@ -48,7 +48,7 @@ public class OpinionListener {
     private static final Logger logger = LoggerFactory.getLogger(OpinionListener.class);
 
     @Autowired
-    private WarnSettingDao warnSettingDao;
+    private WarnSettingDao      warnSettingDao;
 
     @KafkaListener(topics = "bbd_opinion", containerFactory = "kafkaListenerContainerFactory")
     public void Listen(List<ConsumerRecord<String, String>> records) {
@@ -135,7 +135,7 @@ public class OpinionListener {
         long start = System.currentTimeMillis();
 
         MultiGetRequestBuilder builder = EsUtil.getClient().prepareMultiGet();
-        String[] includeFields = {EsConstant.OPINION_UUID, EsConstant.OPINION_HOT_PROP, EsConstant.OPINION_FIRST_WARN_TIME};
+        String[] includeFields = { EsConstant.OPINION_UUID, EsConstant.OPINION_HOT_PROP, EsConstant.OPINION_FIRST_WARN_TIME };
         String[] excludeFields = {};
         FetchSourceContext sourceContext = new FetchSourceContext(true, includeFields, excludeFields);
         for (OpinionVO vo : vos) {
@@ -222,10 +222,12 @@ public class OpinionListener {
     private void addHotRecord(OpinionVO vo, List<OpinionHotEsVO> hotVos) {
         String uuid = vo.getUuid();
         Integer hot = vo.getHot();
+        Date hotTime = new Date();
         OpinionHotEsVO hotVo = new OpinionHotEsVO();
         hotVo.setUuid(uuid);
         hotVo.setHot(hot);
         hotVos.add(hotVo);
+        hotVo.setHotTime(hotTime);
     }
 
     /**

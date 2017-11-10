@@ -71,7 +71,7 @@ PUT bbd_opinion
         },
         "firstWarnTime": {
           "type": "date",
-          "format": ["yyyy-MM-dd HH:mm:ss"]
+          "format": "yyyy-MM-dd HH:mm:ss"
         }
       }
     }
@@ -88,14 +88,15 @@ PUT /bbd_opinion_hot
   "mappings": {
     "hot": {
       "properties": {
-        "id": {
-          "type": "keyword"
-        },
         "uuid": {
           "type": "keyword"
         },
         "hot": {
           "type": "integer"
+        },
+        "hotTime": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss"
         }
       }
     }
