@@ -20,6 +20,7 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
+
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -42,6 +43,8 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -219,6 +222,86 @@ public class EsQueryServiceImpl implements EsQueryService {
             result.put(b.getKey(), ls);
         }
         return result;
+    }
+    
+
+    /**
+     * 获取事件数量折线统计图 - 图表跟踪分析
+     * @param eventId
+     * @param sourceType
+     * @param isInfo
+     * @param days
+     * @return
+     */
+    @Override
+    public List<KeyValueVO> getEventStatisticInfoBySourceAndCycle(Long eventId, String sourceType, 
+        String isInfo, Integer cycle) {
+        
+        // step-1：构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.termQuery(eventsField, eventId));
+        if (sourceType != null) {
+            query.must(QueryBuilders.termQuery(mediaTypeField, Integer.valueOf(sourceType)));
+        }
+        if (isInfo != null) {
+            query.must(QueryBuilders.rangeQuery(hotField).gte(settingService.getWarnClass().get(3)));
+        }
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setQuery(query)
+                .addAggregation(buildEventDayeRange(cycle))
+                .setSize(0).execute().actionGet();
+
+        // step-2：构建返回结果
+        List<InternalDateRange.Bucket> dateList = ((InternalDateRange) (resp.getAggregations().get("event_calc_aggs"))).getBuckets();
+        List<KeyValueVO> ls = Lists.newLinkedList();
+        for(InternalDateRange.Bucket d : dateList) {
+            KeyValueVO v = new KeyValueVO();
+            v.setKey(d.getKey()); 
+            v.setValue(d.getDocCount());
+            ls.add(v);
+        }
+        return ls;
+    }
+    
+    
+    
+    public DateRangeAggregationBuilder buildEventDayeRange(int cycle) {
+        String aggsName = "event_calc_aggs";
+        DateTime endTime = null;
+        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(calcTimeField).keyed(true);
+        DateTime now = DateTime.now();
+        DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        if (cycle == 1) {
+            DateTime latestEvenHour = DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " + 
+                                        (now.getHourOfDay()%2 == 0 ? now.getHourOfDay() : now.getHourOfDay()-1) + ":00:00", format);
+            for (int i=0; i<=11; i++) {
+                endTime = latestEvenHour.minusHours(i*2);
+                dateRange.addUnboundedTo(endTime.toString("yyyy-MM-dd HH:mm"), endTime);
+            }
+        } else if (cycle == 2) {
+            DateTime latest12Hour = DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " + 
+                    (now.getHourOfDay()/12 == 0 ? 0 : 12 + ":00:00"), format);
+            for (int i=0; i<=13; i++) {
+                endTime = latest12Hour.minusHours(i*12);
+                dateRange.addUnboundedTo(endTime.toString("yyyy-MM-dd HH:mm"), endTime);
+            }
+        } else if (cycle == 3) {
+            DateTime latestDay = DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " + 
+                                                    "00:00:00", format);
+            for (int i=0; i<=29; i++) {
+                endTime = latestDay.minusDays(i);
+                dateRange.addUnboundedTo(endTime.toString("yyyy-MM-dd HH:mm"), endTime);
+            }
+        } else {
+            DateTime latestDay = DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " + 
+                    "00:00:00", format);
+            for (int i=0; i<=364; i++) {
+                endTime = latestDay.minusDays(i);
+                dateRange.addUnboundedTo(endTime.toString("yyyy-MM-dd HH:mm"), endTime);
+            } 
+        }
+        return dateRange;
     }
 
     // 创建dateRange
@@ -847,6 +930,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         }
         return query;
     }
+
 }
 
 

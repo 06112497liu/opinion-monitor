@@ -302,8 +302,14 @@ public class EventService{
      * @param cycle
      * @return 
      */
-    public HashMap<String, Object> eventWholeTrend(Long id, Integer cycle) {
-        HashMap<String, Object> map = new HashMap<String, Object>();
+    public Map<String, Object> eventWholeTrend(Long id, Integer cycle) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        List<KeyValueVO> infoList = esQueryService.getEventStatisticInfoBySourceAndCycle(id, null, null, cycle);
+        List<KeyValueVO> warnList = esQueryService.getEventStatisticInfoBySourceAndCycle(id, null, "notNull", cycle);
+        map.put("infoList", infoList);
+        map.put("warnList", warnList);
+        return map;
+       /* HashMap<String, Object> map = new HashMap<String, Object>();
         Integer days;
         if (cycle == 1) {
             days = 1;
@@ -316,7 +322,7 @@ public class EventService{
         map.put("infoList", infoList);
         List<Graph> warnList = opinionEventSourceTrendDao.selectBySourceAndCycle(id, null, null, days);
         map.put("warnList", warnList);
-        return map;
+        return map;*/
     }
     
     
