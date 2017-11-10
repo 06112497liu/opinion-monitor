@@ -94,7 +94,7 @@ public class OpinionTaskController extends AbstractController{
     })
     @RequestMapping(value = "remove", method = RequestMethod.POST)
     public RestResult removeWarn(String uuid, Integer removeReason, String removeNote) throws InterruptedException, ExecutionException, IOException {
-        ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, uuid, removeNote);
+        ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, uuid, removeReason);
         opinionTaskService.removeWarn(uuid, removeReason, removeNote);
         return RestResult.ok();
     }
