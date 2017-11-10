@@ -42,7 +42,7 @@ public class HotOpinionController extends AbstractController {
         return RestResult.ok(result);
     }
 
-    @ApiOperation(value = "热点舆情关键词查询", httpMethod = "GET")
+    @ApiOperation(value = "热点舆情关键词模糊查询", httpMethod = "GET")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "搜索关键词", name = "keyword", dataType = "String", paramType = "query", required = false),
             @ApiImplicitParam(value = "时间周期(1-24小时，2-7天，3-30天)", name = "timeSpan", dataType = "Integer", paramType = "query", required = false),

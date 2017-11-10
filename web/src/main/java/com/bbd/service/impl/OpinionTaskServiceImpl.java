@@ -40,22 +40,23 @@ import java.util.concurrent.ExecutionException;
 public class OpinionTaskServiceImpl implements OpinionTaskService {
 
     @Autowired
-    private EsQueryService       esQueryService;
+    private EsQueryService esQueryService;
 
     @Autowired
-    private EsModifyService      esModifyService;
+    private EsModifyService esModifyService;
 
     @Autowired
-    private UserService          userService;
+    private UserService userService;
 
     @Autowired
     private SystemSettingService settingService;
 
     @Autowired
-    private OpinionEventDao      opinionEventDao;
+    private OpinionEventDao opinionEventDao;
 
     /**
      * 当前用户待处理舆情列表
+     *
      * @param transferType 转发类型: 1/2/3：请示，4/5/6：回复
      * @return
      */
@@ -78,6 +79,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
     /**
      * 当前用户转发、解除、监测列表
+     *
      * @param opStatus 1. 转发（介入）；2. 已解除； 3. 已监控
      * @param pb
      * @return
@@ -118,6 +120,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
     /**
      * 转发舆情
+     *
      * @param param
      */
     @Override
@@ -156,6 +159,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
     /**
      * 解除预警
+     *
      * @param uuid
      * @param removeReason
      * @param removeNote
@@ -184,6 +188,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
     /**
      * 查询处于任务舆情中的舆情详情
+     *
      * @param uuid
      * @return
      */
@@ -199,7 +204,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.opTypeField, 1);
         List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(map, 10000);
         OpinionOpRecordVO v = null;
-        if(!records.isEmpty()) {
+        if (!records.isEmpty()) {
             if (type == 1)
                 v = records.stream().findFirst().get();
             else if (type == 2)

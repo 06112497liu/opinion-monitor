@@ -8,6 +8,8 @@ import com.bbd.bean.OpinionEsVO;
 import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
+
+import org.apache.ibatis.annotations.Param;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +46,13 @@ public interface EsQueryService {
      * @return
      */
     Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan);
+    /**
+     * 获取舆情数量折线统计图 - 首页
+     * @param state
+     * @param timeSpan
+     * @return
+     */
+    List<KeyValueVO> getEventStatisticInfoBySourceAndCycle(Long eventId, String sourceType, String isInfo, Integer cycle);
 
     /**
      * 关键词排行TOP10 - 首页
