@@ -250,7 +250,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public DateRangeAggregationBuilder buildEventDayeRange(int cycle) {
         String aggsName = "event_calc_aggs";
         DateTime endTime = null;
-        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.calcTimeField).keyed(true);
+        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.publishTimeField).keyed(true);
         DateTime now = DateTime.now();
         DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
         if (cycle == 1) {
