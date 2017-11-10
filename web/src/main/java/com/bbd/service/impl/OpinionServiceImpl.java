@@ -1,6 +1,7 @@
 package com.bbd.service.impl;
 
 import com.bbd.bean.OpinionEsVO;
+import com.bbd.constant.EsConstant;
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
@@ -10,6 +11,7 @@ import com.bbd.service.SystemSettingService;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
+import com.bbd.util.StringUtils;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.collect.ComparisonChain;
@@ -26,10 +28,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -136,6 +135,7 @@ public class OpinionServiceImpl implements OpinionService {
     @Override
     public PageList<OpinionVO> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, PageBounds pb) {
         DateTime startTime = BusinessUtils.getDateByTimeSpan(timeSpan);
+
         OpinionEsSearchVO esResult = esQueryService.getHotOpinionList(keyword, startTime, emotion, pb);
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), esResult.getTotal().intValue());
         List<OpinionVO> list = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);

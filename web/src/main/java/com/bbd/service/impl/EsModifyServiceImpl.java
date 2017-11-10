@@ -32,7 +32,6 @@ public class EsModifyServiceImpl implements EsModifyService {
     @Autowired
     private EsQueryService esQueryService;
 
-    private final String operatorsField = "operators";
 
     /**
      * 转发舆情
@@ -51,7 +50,7 @@ public class EsModifyServiceImpl implements EsModifyService {
         if(!flag) {
             newArr = ArrayUtils.add(original, operatorId);
         }
-        fieldMap.put(operatorsField, newArr);
+        fieldMap.put(EsConstant.operatorsField, newArr);
 
         TransportClient client = EsUtil.getClient();
         UpdateRequest request = new UpdateRequest();
