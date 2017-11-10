@@ -8,10 +8,10 @@
     <modules>
         <module>parent</module>
         <module>common-dao</module>
-        <!--<module>common</module>-->
-        <!--<module>web</module>-->
-        <!--<module>common-web</module>-->
-        <!--<module>common-biz</module>-->
+        <module>common</module>
+        <module>web</module>
+        <module>common-web</module>
+        <module>common-biz</module>
         <module>opinion-sync</module>
     </modules>
     <packaging>pom</packaging>
