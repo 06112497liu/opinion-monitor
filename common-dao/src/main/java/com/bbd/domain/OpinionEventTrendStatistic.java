@@ -15,9 +15,9 @@ public class OpinionEventTrendStatistic {
 
     private Integer hot;
 
-    private Integer similiarcount;
+    private Integer similiarCount;
 
-    private Integer commentcount;
+    private Integer commentCount;
 
     private Integer emotion;
 
@@ -83,20 +83,20 @@ public class OpinionEventTrendStatistic {
         this.hot = hot;
     }
 
-    public Integer getSimiliarcount() {
-        return similiarcount;
+    public Integer getSimiliarCount() {
+        return similiarCount;
     }
 
-    public void setSimiliarcount(Integer similiarcount) {
-        this.similiarcount = similiarcount;
+    public void setSimiliarCount(Integer similiarCount) {
+        this.similiarCount = similiarCount;
     }
 
-    public Integer getCommentcount() {
-        return commentcount;
+    public Integer getCommentCount() {
+        return commentCount;
     }
 
-    public void setCommentcount(Integer commentcount) {
-        this.commentcount = commentcount;
+    public void setCommentCount(Integer commentCount) {
+        this.commentCount = commentCount;
     }
 
     public Integer getEmotion() {

@@ -4,22 +4,11 @@
  */
 package com.bbd.service.impl;
 
-import com.bbd.bean.OpinionEsVO;
-import com.bbd.constant.EsConstant;
-import com.bbd.service.EsQueryService;
-import com.bbd.service.SystemSettingService;
-import com.bbd.service.vo.*;
-import com.bbd.util.EsUtil;
-import com.bbd.util.JsonUtil;
-import com.bbd.util.StringUtils;
-import com.bbd.util.UserContext;
-import com.bbd.vo.UserInfo;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.mybatis.domain.PageBounds;
-import com.mybatis.domain.PageList;
-import com.mybatis.domain.Paginator;
-import com.mybatis.util.PageListHelper;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -47,10 +36,27 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import com.bbd.bean.OpinionEsVO;
+import com.bbd.constant.EsConstant;
+import com.bbd.service.EsQueryService;
+import com.bbd.service.SystemSettingService;
+import com.bbd.service.vo.DBStaVO;
+import com.bbd.service.vo.KeyValueVO;
+import com.bbd.service.vo.OpinionCountStatVO;
+import com.bbd.service.vo.OpinionEsSearchVO;
+import com.bbd.service.vo.OpinionOpRecordVO;
+import com.bbd.service.vo.OpinionTaskListVO;
+import com.bbd.util.EsUtil;
+import com.bbd.util.JsonUtil;
+import com.bbd.util.StringUtils;
+import com.bbd.util.UserContext;
+import com.bbd.vo.UserInfo;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.mybatis.domain.PageBounds;
+import com.mybatis.domain.PageList;
+import com.mybatis.domain.Paginator;
+import com.mybatis.util.PageListHelper;
 
 /**
  * ES查询服务

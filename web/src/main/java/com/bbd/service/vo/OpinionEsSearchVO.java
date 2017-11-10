@@ -4,9 +4,9 @@
  */
 package com.bbd.service.vo;
 
-import com.bbd.bean.OpinionEsVO;
-
 import java.util.List;
+
+import com.bbd.bean.OpinionEsVO;
 
 /**
  * 舆情ES查询结果
