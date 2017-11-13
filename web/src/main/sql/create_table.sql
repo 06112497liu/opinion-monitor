@@ -28,6 +28,7 @@ CREATE TABLE `bbd_permission` (
   `id` BIGINT(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `code` VARCHAR(64) DEFAULT NULL,
   `name` VARCHAR(64) DEFAULT NULL,
+  `priority` INT DEFAULT 0,
   `gmt_create` DATETIME DEFAULT NULL COMMENT '创建时间',
   `gmt_modified` DATETIME DEFAULT NULL COMMENT '修改时间',
   UNIQUE(`code`)

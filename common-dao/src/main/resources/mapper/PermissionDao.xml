@@ -5,6 +5,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="code" jdbcType="VARCHAR" property="code" />
     <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="priority" jdbcType="INTEGER" property="priority" />
     <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
     <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
   </resultMap>
@@ -67,7 +68,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, code, name, gmt_create, gmt_modified
+    id, code, name, priority, gmt_create, gmt_modified
   </sql>
   <select id="selectByExample" parameterType="com.bbd.domain.PermissionExample" resultMap="BaseResultMap">
     select
@@ -104,10 +105,10 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_permission (code, name, gmt_create, 
-      gmt_modified)
-    values (#{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP}, 
-      #{gmtModified,jdbcType=TIMESTAMP})
+    insert into bbd_permission (code, name, priority, 
+      gmt_create, gmt_modified)
+    values (#{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{priority,jdbcType=INTEGER}, 
+      #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.bbd.domain.Permission">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -120,6 +121,9 @@
       </if>
       <if test="name != null">
         name,
+      </if>
+      <if test="priority != null">
+        priority,
       </if>
       <if test="gmtCreate != null">
         gmt_create,
@@ -134,6 +138,9 @@
       </if>
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="priority != null">
+        #{priority,jdbcType=INTEGER},
       </if>
       <if test="gmtCreate != null">
         #{gmtCreate,jdbcType=TIMESTAMP},
@@ -155,6 +162,9 @@
       <if test="record.name != null">
         name = #{record.name,jdbcType=VARCHAR},
       </if>
+      <if test="record.priority != null">
+        priority = #{record.priority,jdbcType=INTEGER},
+      </if>
       <if test="record.gmtCreate != null">
         gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       </if>
@@ -171,6 +181,7 @@
     set id = #{record.id,jdbcType=BIGINT},
       code = #{record.code,jdbcType=VARCHAR},
       name = #{record.name,jdbcType=VARCHAR},
+      priority = #{record.priority,jdbcType=INTEGER},
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -186,6 +197,9 @@
       <if test="name != null">
         name = #{name,jdbcType=VARCHAR},
       </if>
+      <if test="priority != null">
+        priority = #{priority,jdbcType=INTEGER},
+      </if>
       <if test="gmtCreate != null">
         gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       </if>
@@ -199,6 +213,7 @@
     update bbd_permission
     set code = #{code,jdbcType=VARCHAR},
       name = #{name,jdbcType=VARCHAR},
+      priority = #{priority,jdbcType=INTEGER},
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}

@@ -9,6 +9,8 @@ public class Permission {
 
     private String name;
 
+    private Integer priority;
+
     private Date gmtCreate;
 
     private Date gmtModified;
@@ -35,6 +37,14 @@ public class Permission {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 
     public Date getGmtCreate() {
