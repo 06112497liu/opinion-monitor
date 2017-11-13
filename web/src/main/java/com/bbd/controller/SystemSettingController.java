@@ -1,6 +1,7 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
+import com.bbd.domain.MonitorKeywords;
 import com.bbd.domain.WarnNotifier;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.SystemSettingService;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Liuweibo
@@ -113,7 +116,8 @@ public class SystemSettingController {
     @RequestMapping(value = "keywords/add", method = RequestMethod.GET)
     public RestResult addKeywords(String keywords) {
         ValidateUtil.checkNull(keywords, CommonErrorCode.PARAM_ERROR, "关键词不能为空");
-        return RestResult.ok(settingService.addKeyWords(keywords));
+        Integer result = settingService.addKeyWords(keywords);
+        return RestResult.ok(result);
     }
 
     @ApiOperation(value = "删除舆情关键词", httpMethod = "GET")
@@ -123,14 +127,16 @@ public class SystemSettingController {
     @RequestMapping(value = "keywords/del", method = RequestMethod.GET)
     public RestResult delKeywords(Long id) {
         ValidateUtil.checkNull(id, CommonErrorCode.PARAM_ERROR, "id不能为空");
-        return RestResult.ok(settingService.delKeyWords(id));
+        Integer result = settingService.delKeyWords(id);
+        return RestResult.ok(result);
     }
 
 
     @ApiOperation(value = "获取关键词列表", httpMethod = "GET")
     @RequestMapping(value = "keywords/list", method = RequestMethod.GET)
     public RestResult getKeywords() {
-        return RestResult.ok(settingService.getKeywords());
+        Map<Integer, List<MonitorKeywords>> result = settingService.getKeywords();
+        return RestResult.ok(result);
     }
 
 }
