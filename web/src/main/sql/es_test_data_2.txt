@@ -76,7 +76,17 @@ PUT bbd_opinion
           "format": "yyyy-MM-dd HH:mm:ss"
         }
       }
-    },
+    }
+  }
+}
+
+PUT bbd_opinion_op_record
+{
+  "settings": {
+    "number_of_replicas": 0,
+    "number_of_shards": 1
+  },
+  "mappings": {
     "opinion_op_record": {
         "properties": {
            "opTime": {
@@ -140,7 +150,7 @@ PUT bbd_opinion
         }
     }
   }
-}
+ }
 
 
 // 舆情数据

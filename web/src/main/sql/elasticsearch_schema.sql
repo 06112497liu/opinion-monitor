@@ -102,3 +102,102 @@ PUT /bbd_opinion_hot
     }
   }
 }
+
+DELETE /bbd_opinion_op_record
+PUT bbd_opinion_op_record
+{
+  "settings": {
+    "number_of_replicas": 0,
+    "number_of_shards": 1
+  },
+  "mappings": {
+    "opinion_op_record": {
+        "properties": {
+           "opTime": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+           },
+           "opType": {
+              "type": "integer"
+           },
+           "operator": {
+              "type": "keyword"
+           },
+           "removeContent": {
+              "type": "text",
+              "fields": {
+                 "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                 }
+              }
+           },
+           "removeNote": {
+              "type": "text",
+              "fields": {
+                 "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                 }
+              }
+           },
+           "removeReason": {
+              "type": "integer"
+           },
+           "targeter": {
+              "type": "keyword"
+           },
+           "transferContent": {
+              "type": "text",
+              "fields": {
+                 "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                 }
+              }
+           },
+           "transferNote": {
+              "type": "text",
+              "fields": {
+                 "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                 }
+              }
+           },
+           "transferType": {
+              "type": "integer"
+           },
+           "uuid": {
+              "type": "keyword"
+           }
+        }
+    }
+  }
+ }
+
+
+DELETE /bbd_opinion_event_record
+PUT bbd_opinion_op_record
+{
+  "settings": {
+    "number_of_replicas": 0,
+    "number_of_shards": 1
+  },
+  "mappings": {
+    "opinion_event_record": {
+        "properties": {
+           "opinionId": {
+              "type": "keyword"
+           },
+           "eventId": {
+              "type": "long"
+           },
+           "matchTime": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+           }
+        }
+    }
+  }
+ }
