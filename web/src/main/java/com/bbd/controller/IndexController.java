@@ -90,7 +90,8 @@ public class IndexController extends AbstractController {
     @ApiOperation(value = "舆情数据库坐标轴", httpMethod = "GET")
     @RequestMapping(value = "/opinion/db/coordinate", method = RequestMethod.GET)
     public RestResult getOpinionDBCoordinate() {
-        return RestResult.ok(indexStatisticService.getOpinionDBCoordinate());
+        List<KeyValueVO> result = indexStatisticService.getOpinionDBCoordinate();
+        return RestResult.ok(result);
     }
 
     @ApiOperation(value = "本月关键词top10", httpMethod = "GET")

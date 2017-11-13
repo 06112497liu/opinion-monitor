@@ -84,6 +84,7 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
 
     @Override
     public List<KeyValueVO> getOpinionDBCoordinate() {
+        esQueryService.getOpinionStaLine();
         return null;
     }
 

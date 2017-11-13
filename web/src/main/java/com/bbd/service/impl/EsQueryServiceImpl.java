@@ -946,6 +946,45 @@ public class EsQueryServiceImpl implements EsQueryService {
         return list;
     }
 
+    /**
+     * 舆情数据库折线图
+     * @return
+     */
+    @Override
+    public void getOpinionStaLine() {
+        String monthAgg = "month_agg";
+        String countAgg = "count_agg";
+        TransportClient client = EsUtil.getClient();
+        SearchRequestBuilder requestBuilder = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT).setSize(0);
+
+        DateRangeAggregationBuilder monthRange = AggregationBuilders.dateRange(monthAgg).field(EsConstant.publishTimeField).keyed(true);
+        addRange(monthRange, 2);
+        DateRangeAggregationBuilder countRange = AggregationBuilders.dateRange(countAgg).field(EsConstant.publishTimeField).keyed(true);
+        addRange(countRange, 1);
+        SearchResponse resp = requestBuilder.addAggregation(monthRange).addAggregation(countRange).execute().actionGet();
+        List<KeyValueVO> month = buildHotLevelLists(resp, monthAgg);
+        List<KeyValueVO> count = buildHotLevelLists(resp, countAgg);
+
+    }
+
+    /**
+     * 添加范围查询
+     * @param dateRange
+     * @param state 1-累积总量；2-当月数量
+     */
+    private void addRange(DateRangeAggregationBuilder dateRange, Integer state) {
+        DateTime now = DateTime.now();
+        DateTime startTime = now.plusMonths(-12).withTimeAtStartOfDay();
+        dateRange.format("yyyy-MM");
+        int currentMonth = now.getMonthOfYear();
+        int startMonth = startTime.getMonthOfYear();
+        int between = currentMonth - startMonth;
+        for(int i=0; i<=between; i++) {
+            if(state == 1) dateRange.addRange(startTime.plusMonths(i).toString("yyyy年MM月"), startTime, startTime.plusMonths(i+1));
+            else if(state == 2) dateRange.addRange(startTime.plusMonths(i).toString("yyyy年MM月"), startTime.plusMonths(i), startTime.plusMonths(i+1));
+        }
+    }
+
     // 创建BoolQueryBuilder
     private BoolQueryBuilder buildSearchRequest(Map<String, List<String>> matchMap, Map<String, Object> keyMap) {
         BoolQueryBuilder query = QueryBuilders.boolQuery();
