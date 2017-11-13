@@ -42,11 +42,10 @@ public interface EsQueryService {
 
     /**
      * 获取舆情数量折线统计图 - 首页
-     * @param state
      * @param timeSpan
      * @return
      */
-    Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan);
+    Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer timeSpan);
     /**
      * 获取舆情数量折线统计图 - 首页
      * @param eventId
@@ -222,5 +221,12 @@ public interface EsQueryService {
      * 舆情数据库折线图
      * @return
      */
-    void getOpinionStaLine();
+    Map<String, List<KeyValueVO>> getOpinionStaLine();
+
+    /**
+     * 实时统计预警舆情数量
+     * @param eventId
+     * @return
+     */
+    List<KeyValueVO> opinionInstant(Long eventId);
 }

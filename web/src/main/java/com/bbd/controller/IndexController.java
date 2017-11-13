@@ -59,18 +59,16 @@ public class IndexController extends AbstractController {
     })
     @RequestMapping(value = "/stat/opinion/count", method = RequestMethod.GET)
     public RestResult getOpinionCountStatistic(Integer state, @RequestParam(value = "timeSpan", defaultValue = "3") Integer timeSpan) {
-
         return RestResult.ok(indexStatisticService.getOpinionCountStatistic(state, timeSpan));
     }
 
     @ApiOperation(value = "预警舆情统计坐标轴", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "状态：0. 未处理; 1. 已处理", name = "state", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "时间跨度：1. 本日；2. 本周； 3. 本月； 4. 本年； 5. 全部。", name = "timeSpan", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "/stat/opinion/count/coordinate", method = RequestMethod.GET)
-    public RestResult getOpinionCountStatisticGroupTime(Integer state, @RequestParam(value = "timeSpan", defaultValue = "3") Integer timeSpan) {
-        Map<String, List<KeyValueVO>> result = indexStatisticService.getOpinionCountStatisticGroupTime(state, timeSpan);
+    public RestResult getOpinionCountStatisticGroupTime(@RequestParam(value = "timeSpan", defaultValue = "3") Integer timeSpan) {
+        Map<String, List<KeyValueVO>> result = indexStatisticService.getOpinionCountStatisticGroupTime(timeSpan);
         return RestResult.ok(result);
     }
 
@@ -90,7 +88,7 @@ public class IndexController extends AbstractController {
     @ApiOperation(value = "舆情数据库坐标轴", httpMethod = "GET")
     @RequestMapping(value = "/opinion/db/coordinate", method = RequestMethod.GET)
     public RestResult getOpinionDBCoordinate() {
-        List<KeyValueVO> result = indexStatisticService.getOpinionDBCoordinate();
+        Map<String, List<KeyValueVO>> result = indexStatisticService.getOpinionDBCoordinate();
         return RestResult.ok(result);
     }
 

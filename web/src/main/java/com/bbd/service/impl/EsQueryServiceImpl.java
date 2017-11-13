@@ -9,6 +9,7 @@ import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.constant.EsConstant;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.SystemSettingService;
+import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
 import com.bbd.util.EsUtil;
 import com.bbd.util.JsonUtil;
@@ -43,6 +44,7 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.Months;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,12 +164,11 @@ public class EsQueryServiceImpl implements EsQueryService {
 
     /**
      * 获取舆情数量折线统计图 - 首页
-     * @param state
      * @param timeSpan
      * @return
      */
     @Override
-    public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan) {
+    public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer timeSpan) {
         String aggsName = "level_aggs";
         // step-1：获取预警热度分界
         Map<Integer, Integer> map = settingService.getWarnClass();
@@ -176,10 +177,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        if(state != null) {
-            if(state == 0) query.must(QueryBuilders.termQuery(EsConstant.opStatusField, 0));
-            else query.mustNot(QueryBuilders.termQuery(EsConstant.opStatusField, 0));
-        }
+
         RangeAggregationBuilder aggregation = AggregationBuilders.range(aggsName).field(EsConstant.hotField).keyed(true)
                 .addRange(levelThree, threeClass, twoClss - 1)
                 .addRange(levelTwo, twoClss, oneClass - 1)
@@ -951,7 +949,7 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     @Override
-    public void getOpinionStaLine() {
+    public Map<String, List<KeyValueVO>> getOpinionStaLine() {
         String monthAgg = "month_agg";
         String countAgg = "count_agg";
         TransportClient client = EsUtil.getClient();
@@ -965,6 +963,38 @@ public class EsQueryServiceImpl implements EsQueryService {
         List<KeyValueVO> month = buildHotLevelLists(resp, monthAgg);
         List<KeyValueVO> count = buildHotLevelLists(resp, countAgg);
 
+        Map<String, List<KeyValueVO>> map = Maps.newHashMap();
+        map.put("month", month);
+        map.put("count", count);
+        return map;
+    }
+
+    /**
+     * 实时统计预警舆情数量
+     * @param eventId
+     * @return
+     */
+    @Override
+    public List<KeyValueVO> opinionInstant(Long eventId) {
+        String hotAgg = "hotAgg";
+        TransportClient client = EsUtil.getClient();
+        // step-1：获取预警热度分界
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3); Integer twoClss = map.get(2); Integer oneClass = map.get(1);
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.termQuery(EsConstant.opStatusField, 0));
+        query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(BusinessUtils.getDateByTimeSpan(3).toString("yyyy-MM-dd HH:mm:ss")));
+        if(eventId != null) query.must(QueryBuilders.matchQuery(EsConstant.eventsField, eventId));
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT).setSize(0)
+                                    .setQuery(query)
+                                    .addAggregation(
+                                            AggregationBuilders.range(hotAgg).field(EsConstant.hotField).keyed(true)
+                                                    .addRange(levelThree, threeClass, twoClss - 1)
+                                                    .addRange(levelTwo, twoClss, oneClass - 1)
+                                                    .addRange(levelOne, oneClass, 101)
+                                    ).execute().actionGet();
+        List<KeyValueVO> list = buildHotLevelLists(resp, hotAgg);
+        return list;
     }
 
     /**
@@ -974,13 +1004,11 @@ public class EsQueryServiceImpl implements EsQueryService {
      */
     private void addRange(DateRangeAggregationBuilder dateRange, Integer state) {
         DateTime now = DateTime.now();
-        DateTime startTime = now.plusMonths(-12).withTimeAtStartOfDay();
+        DateTime startTime = now.plusMonths(-11).withTimeAtStartOfDay();
         dateRange.format("yyyy-MM");
-        int currentMonth = now.getMonthOfYear();
-        int startMonth = startTime.getMonthOfYear();
-        int between = currentMonth - startMonth;
+        int between = Months.monthsBetween(startTime, now).getMonths();
         for(int i=0; i<=between; i++) {
-            if(state == 1) dateRange.addRange(startTime.plusMonths(i).toString("yyyy年MM月"), startTime, startTime.plusMonths(i+1));
+            if(state == 1) dateRange.addRange(startTime.plusMonths(i).toString("yyyy年MM月"), startTime.plusYears(-10), startTime.plusMonths(i+1));
             else if(state == 2) dateRange.addRange(startTime.plusMonths(i).toString("yyyy年MM月"), startTime.plusMonths(i), startTime.plusMonths(i+1));
         }
     }
