@@ -25,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
+
 /**
  * 预警配置服务接口
  * @author Liuweibo
@@ -146,8 +148,11 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     }
 
     @Override
-    public List<MonitorKeywords> getKeywords() {
-        return keywordsDao.selectByExample(new MonitorKeywordsExample());
+    public Map<Integer, List<MonitorKeywords>> getKeywords() {
+        List<MonitorKeywords> list = keywordsDao.selectByExample(new MonitorKeywordsExample());
+        Map<Integer, List<MonitorKeywords>> map =
+                list.stream().collect(Collectors.groupingBy(MonitorKeywords::getState));
+        return map;
     }
 
     @Override

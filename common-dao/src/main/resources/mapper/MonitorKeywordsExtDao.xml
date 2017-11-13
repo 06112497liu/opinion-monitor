@@ -8,10 +8,10 @@
   <insert id="batchInsertKeywords" parameterType="java.util.List">
     INSERT INTO 
       bbd_monitor_keywords
-      (value)
+      (value, state, gmt_create)
     VALUES
     <foreach collection="list" item="item" index="index" separator=",">
-      (#{item})
+      (#{item}, 1, now())
     </foreach>
 
   </insert>
