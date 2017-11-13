@@ -431,7 +431,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         if (emotion != null) query.must(QueryBuilders.termQuery(EsConstant.emotionField, emotion));
 
         RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(EsConstant.hotField).keyed(true)
-                .addRange("levelOne", oneClass, Integer.MAX_VALUE).addRange("levelTwo", twoClss, oneClass-1).addRange("levelThree", threeClass, twoClss-1);
+                .addRange("levelOne", oneClass, 101).addRange("levelTwo", twoClss, oneClass-1).addRange("levelThree", threeClass, twoClss-1);
         TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(EsConstant.mediaTypeField);
 
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
@@ -919,6 +919,31 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .setSize(10000).execute().actionGet();
         List<OpinionHotEsVO> result = EsUtil.buildResult(resp, OpinionHotEsVO.class);
         return result;
+    }
+
+    /**
+     * 获取舆情总量和预警总量
+     * @return
+     */
+    @Override
+    public List<KeyValueVO> getOpinionSta() {
+        String aggsname = "opinon_group_sta";
+        // step-1：预警热度分解
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3);
+        
+        // 查询
+        TransportClient client = EsUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT)
+                .addAggregation(
+                        AggregationBuilders.range("opinon_group_sta").field(EsConstant.hotField).keyed(true)
+                                .addRange("opinionCount", 0, 101)
+                                .addRange("warnCount", threeClass, 101)
+                )
+                .setSize(0)
+                .execute().actionGet();
+        List<KeyValueVO> list = buildHotLevelLists(resp, aggsname);
+        return list;
     }
 
     // 创建BoolQueryBuilder

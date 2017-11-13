@@ -54,7 +54,7 @@ public interface SystemSettingService {
      * 查询关键词库
      * @return
      */
-    Map<Integer, List<MonitorKeywords>> getKeywords();
+    Map<String, List<MonitorKeywords>> getKeywords();
 
     /**
      * 删除舆情关键词

@@ -209,4 +209,10 @@ public interface EsQueryService {
      * @return
      */
     List<OpinionHotEsVO> getOpinionHotTrend(String uuid, DateTime dateTime);
+
+    /**
+     * 获取舆情总量和预警总量
+     * @return
+     */
+    List<KeyValueVO> getOpinionSta();
 }
