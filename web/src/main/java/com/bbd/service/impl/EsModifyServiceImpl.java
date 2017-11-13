@@ -83,7 +83,7 @@ public class EsModifyServiceImpl implements EsModifyService {
         TransportClient client = EsUtil.getClient();
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         bulkRequest.add(
-                client.prepareIndex(EsConstant.IDX_OPINION, EsConstant.OPINION_OP_RECORD_TYPE)
+                client.prepareIndex(EsConstant.IDX_OPINION_OP_RECORD, EsConstant.OPINION_OP_RECORD_TYPE)
                         .setSource(JsonUtil.fromJson(recordVO), XContentType.JSON)
         );
         // 插入数据

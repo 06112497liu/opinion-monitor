@@ -893,7 +893,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     @Override
     public List<OpinionOpRecordVO> getOpinionOpRecordByUUID(Map<String, Object> keyMap, Integer szie) {
         TransportClient client = EsUtil.getClient();
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_OP_RECORD)
                 .setTypes(EsConstant.OPINION_OP_RECORD_TYPE)
                 .setSearchType(SearchType.DEFAULT).setSize(szie)
                 .setQuery(buildSearchRequest(null, keyMap))
