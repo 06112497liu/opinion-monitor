@@ -135,7 +135,7 @@ public class SystemSettingController {
     @ApiOperation(value = "获取关键词列表", httpMethod = "GET")
     @RequestMapping(value = "keywords/list", method = RequestMethod.GET)
     public RestResult getKeywords() {
-        Map<Integer, List<MonitorKeywords>> result = settingService.getKeywords();
+        Map<String, List<MonitorKeywords>> result = settingService.getKeywords();
         return RestResult.ok(result);
     }
 

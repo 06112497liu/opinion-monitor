@@ -43,7 +43,7 @@ public interface IndexStatisticService {
      * 系统运行情况统计
      * @return
      */
-    SystemStaVO getSystemSta();
+    SystemStaVO getSystemSta() throws NoSuchFieldException, IllegalAccessException;
 
     /**
      * 舆情数据库统计

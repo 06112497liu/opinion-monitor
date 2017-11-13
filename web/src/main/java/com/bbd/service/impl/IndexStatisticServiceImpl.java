@@ -4,6 +4,9 @@
  */
 package com.bbd.service.impl;
 
+import com.bbd.dao.OpinionEventDao;
+import com.bbd.domain.OpinionEvent;
+import com.bbd.domain.OpinionEventExample;
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.IndexStatisticService;
@@ -12,12 +15,19 @@ import com.bbd.service.utils.PercentUtil;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
 import com.google.common.collect.Lists;
+import com.mybatis.domain.PageBounds;
+import com.mybatis.domain.PageList;
+import com.mybatis.util.PageListHelper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +41,12 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
 
     @Autowired
     private EsQueryService esQueryService;
+
+    @Value("${systemRunDate}")
+    private String systemRunDate;
+
+    @Autowired
+    private OpinionEventDao eventDao;
 
     @Override
     public OpinionCountStatVO getOpinionCountStatistic(Integer state, Integer timeSpan) {
@@ -72,9 +88,27 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     }
 
     @Override
-    public SystemStaVO getSystemSta() {
+    public SystemStaVO getSystemSta() throws NoSuchFieldException, IllegalAccessException {
+        SystemStaVO v = new SystemStaVO();
+        // step-1：系统运行时间
+        DateTime runDate = new DateTime(systemRunDate);
+        DateTime now = DateTime.now();
+        v.setRunDays(Days.daysBetween(runDate, now).getDays());
 
-        return null;
+        // step-2：舆情数据
+        List<KeyValueVO> opinionNum = esQueryService.getOpinionSta();
+        for (KeyValueVO vo : opinionNum) {
+            Field f = v.getClass().getDeclaredField(vo.getKey().toString());
+            f.setAccessible(true);
+            f.set(v, vo.getValue());
+        }
+        
+        // step-3：事件数量
+        OpinionEventExample example = new OpinionEventExample();
+        PageList<OpinionEvent> list = (PageList<OpinionEvent>) eventDao.selectByExampleWithPageBounds(example, new PageBounds(0, 0));
+        int total = list.getPaginator().getTotalCount();
+        v.setEventCount(total);
+        return v;
     }
 
     /**

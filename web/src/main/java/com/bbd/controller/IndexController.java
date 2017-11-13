@@ -12,6 +12,7 @@ import com.bbd.service.OpinionService;
 import com.bbd.service.param.OpinionCountStatQueryParam;
 import com.bbd.service.vo.DBStaVO;
 import com.bbd.service.vo.KeyValueVO;
+import com.bbd.service.vo.SystemStaVO;
 import com.bbd.util.ValidateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -46,8 +47,9 @@ public class IndexController extends AbstractController {
 
     @ApiOperation(value = "系统运行情况统计", httpMethod = "GET")
     @RequestMapping(value = "/system/statistic", method = RequestMethod.GET)
-    public RestResult getSystemSta() {
-        return RestResult.ok(indexStatisticService.getSystemSta());
+    public RestResult getSystemSta() throws NoSuchFieldException, IllegalAccessException {
+        SystemStaVO result = indexStatisticService.getSystemSta();
+        return RestResult.ok(result);
     }
 
     @ApiOperation(value = "预警舆情统计", httpMethod = "GET")
@@ -57,6 +59,7 @@ public class IndexController extends AbstractController {
     })
     @RequestMapping(value = "/stat/opinion/count", method = RequestMethod.GET)
     public RestResult getOpinionCountStatistic(Integer state, @RequestParam(value = "timeSpan", defaultValue = "3") Integer timeSpan) {
+
         return RestResult.ok(indexStatisticService.getOpinionCountStatistic(state, timeSpan));
     }
 

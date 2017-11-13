@@ -148,10 +148,14 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     }
 
     @Override
-    public Map<Integer, List<MonitorKeywords>> getKeywords() {
+    public Map<String, List<MonitorKeywords>> getKeywords() {
         List<MonitorKeywords> list = keywordsDao.selectByExample(new MonitorKeywordsExample());
-        Map<Integer, List<MonitorKeywords>> map =
-                list.stream().collect(Collectors.groupingBy(MonitorKeywords::getState));
+        list.sort(Comparator.comparing(MonitorKeywords::getGmtCreate));
+        Map<String, List<MonitorKeywords>> map =
+                list.stream().collect(Collectors.groupingBy((MonitorKeywords o) -> {
+                    Integer state = o.getState();
+                    return state == 0 ? "original" : "add";
+                }));
         return map;
     }
 

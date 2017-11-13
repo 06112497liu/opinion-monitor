@@ -8,21 +8,11 @@ public class SystemStaVO {
 
     private Integer runDays;
 
-    private Integer dayAdd;
+    private Integer opinionCount;
 
-    private Integer weekAdd;
+    private Integer warnCount;
 
-    private Integer monthAdd;
-
-    public SystemStaVO(Integer runDays, Integer dayAdd, Integer weekAdd, Integer monthAdd) {
-        this.runDays = runDays;
-        this.dayAdd = dayAdd;
-        this.weekAdd = weekAdd;
-        this.monthAdd = monthAdd;
-    }
-
-    public SystemStaVO() {
-    }
+    private Integer eventCount;
 
     public Integer getRunDays() {
         return runDays;
@@ -32,38 +22,28 @@ public class SystemStaVO {
         this.runDays = runDays;
     }
 
-    public Integer getDayAdd() {
-        return dayAdd;
+    public Integer getOpinionCount() {
+        return opinionCount;
     }
 
-    public void setDayAdd(Integer dayAdd) {
-        this.dayAdd = dayAdd;
+    public Integer getWarnCount() {
+        return warnCount;
     }
 
-    public Integer getWeekAdd() {
-        return weekAdd;
+    public void setWarnCount(Integer warnCount) {
+        this.warnCount = warnCount;
     }
 
-    public void setWeekAdd(Integer weekAdd) {
-        this.weekAdd = weekAdd;
+    public void setOpinionCount(Integer opinionCount) {
+        this.opinionCount = opinionCount;
     }
 
-    public Integer getMonthAdd() {
-        return monthAdd;
+    public Integer getEventCount() {
+        return eventCount;
     }
 
-    public void setMonthAdd(Integer monthAdd) {
-        this.monthAdd = monthAdd;
-    }
-
-    @Override
-    public String toString() {
-        return "SystemStaVO{" +
-                "runDays=" + runDays +
-                ", dayAdd=" + dayAdd +
-                ", weekAdd=" + weekAdd +
-                ", monthAdd=" + monthAdd +
-                '}';
+    public void setEventCount(Integer eventCount) {
+        this.eventCount = eventCount;
     }
 }
     
