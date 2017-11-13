@@ -1,3 +1,4 @@
+# 舆情
 DELETE bbd_opinion
 PUT bbd_opinion
 {
@@ -69,15 +70,30 @@ PUT bbd_opinion
         "transferType": {
           "type": "integer"
         },
-        "firstWarnTime": {
-          "type": "date",
-          "format": "yyyy-MM-dd HH:mm:ss"
+        "warnTime" {
+          "firstWarnTime": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss"
+          },
+          "firstWarnTimeOne": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss"
+          },
+          "firstWarnTimeTwo": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss"
+          },
+          "firstWarnTimeThree": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss"
+          }
         }
       }
     }
   }
 }
 
+# 舆情热度
 DELETE /bbd_opinion_hot
 PUT /bbd_opinion_hot
 {
@@ -103,6 +119,7 @@ PUT /bbd_opinion_hot
   }
 }
 
+# 舆情操作记录
 DELETE /bbd_opinion_op_record
 PUT bbd_opinion_op_record
 {
@@ -177,8 +194,9 @@ PUT bbd_opinion_op_record
  }
 
 
+# 舆情事件记录
 DELETE /bbd_opinion_event_record
-PUT bbd_opinion_op_record
+PUT bbd_opinion_event_record
 {
   "settings": {
     "number_of_replicas": 0,
@@ -194,6 +212,28 @@ PUT bbd_opinion_op_record
               "type": "long"
            },
            "matchTime": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+           },
+           "matchTimeTrim": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+           }
+        }
+    },
+    "opinion_event_hot_record": {
+        "properties": {
+           "opinionId": {
+              "type": "keyword"
+           },
+           "eventId": {
+              "type": "long"
+           },
+           "matchTime": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+           },
+           "matchTimeTrim": {
               "type": "date",
               "format": "yyyy-MM-dd HH:mm:ss"
            }
