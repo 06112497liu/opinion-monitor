@@ -48,7 +48,7 @@ public class OpinionTaskController extends AbstractController{
 
     @ApiOperation(value = "当前用户转发、解除、监测列表", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "1. 转发（介入）；2. 已解除； 3. 已监控", name = "opStatus", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "1.转发（介入）；2.已解除； 3.已监控", name = "opStatus", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "起始页号", name = "page", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
     })

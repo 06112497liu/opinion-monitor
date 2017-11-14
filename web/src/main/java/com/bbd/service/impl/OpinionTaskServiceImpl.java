@@ -177,7 +177,6 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         UserInfo operator = UserContext.getUser();
         Map<String, Object> map = Maps.newHashMap();
         map.put(EsConstant.removeNoteField, removeNote);
-        map.put(EsConstant.removeNoteField, removeNote);
         map.put(EsConstant.opStatusField, 2);
         esModifyService.updateOpinion(operator, uuid, map);
 

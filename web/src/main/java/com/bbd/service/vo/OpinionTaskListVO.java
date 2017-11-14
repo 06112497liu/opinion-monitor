@@ -25,7 +25,7 @@ public class OpinionTaskListVO extends OpinionVO {
      * 添加监测时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private Date MonitorTime;
+    private Date monitorTime;
 
     public List<OpinionOpRecordVO> getRecords() {
         return records;
@@ -44,11 +44,11 @@ public class OpinionTaskListVO extends OpinionVO {
     }
 
     public Date getMonitorTime() {
-        return MonitorTime;
+        return monitorTime;
     }
 
     public void setMonitorTime(Date monitorTime) {
-        MonitorTime = monitorTime;
+        this.monitorTime = monitorTime;
     }
 }
     
