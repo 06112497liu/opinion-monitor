@@ -7,11 +7,13 @@ package com.bbd.service;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionEsSearchVO;
 import com.mybatis.domain.PageBounds;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -92,5 +94,16 @@ public class EsQueryServiceTest extends BaseServiceTest {
     @Test
     public void testGetOpinionByUUID() {
         esQueryService.getOpinionByUUID("88");
+    }
+
+    @Test
+    public void testGetOpinionCountStatisticGroupTime() {
+        DateTime dateTime = new DateTime();
+        DateTime startTime = dateTime.plusDays(-10);
+        DateTime endTime = dateTime;
+        DateHistogramInterval interval = DateHistogramInterval.HOUR;
+
+        Map<String, List<KeyValueVO>> map = esQueryService.getOpinionCountStatisticGroupTime(startTime, endTime, interval);
+        System.out.println("size: " + map.size());
     }
 }

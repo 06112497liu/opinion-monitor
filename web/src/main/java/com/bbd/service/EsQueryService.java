@@ -9,12 +9,10 @@ import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
-
-import org.apache.ibatis.annotations.Param;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +44,16 @@ public interface EsQueryService {
      * @return
      */
     Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer timeSpan);
+
+    /**
+     * 获取舆情数量折线统计图 - 首页
+     * @param startTime: 开始时间
+     * @param  endTime: 结束时间
+     * @param interval: 间隔类型
+     * @return
+     */
+    Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(DateTime startTime, DateTime endTime, DateHistogramInterval interval);
+
     /**
      * 获取舆情数量折线统计图 - 首页
      * @param eventId
@@ -100,6 +108,7 @@ public interface EsQueryService {
      * @return
      */
     OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb);
+
     /**
      * 查询舆情事件走势
      * @param eventId: 事件ID
