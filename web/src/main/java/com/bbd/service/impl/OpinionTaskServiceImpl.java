@@ -94,7 +94,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                     String username = UserContext.getUser().getUsername();
                     Map<String, Object> keyMap = Maps.newHashMap();
                     keyMap.put(EsConstant.uuidField, uuid);
-                    keyMap.put(EsConstant.operatorsField, username);
+                    keyMap.put(EsConstant.targeterField, username);
                     List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 1);
                     o.setRecords(list);
                 });
@@ -227,6 +227,9 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         // 如果不是超级管理员，判断当前用户是否是该条舆情的待操作者
         if(!UserContext.isAdmin()) {
             OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
+            if(Objects.isNull(opinion)) {
+                throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
+            }
             Long ownerId = opinion.getOpOwner();
             if(!Objects.equals(user.getId(), ownerId)) {
                 throw new ApplicationException(CommonErrorCode.PERMISSION_ERROR);
