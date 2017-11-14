@@ -167,8 +167,8 @@ public class EventController extends AbstractController {
         @ApiImplicitParam(value = "每页大小", name = "pageSize", dataType = "Integer", paramType = "query", required = true)
     })
     @RequestMapping(value = "eventInfoList", method = RequestMethod.GET)
-    public RestResult eventInfoList(Long id, Integer cycle, Integer emotion, String source, Integer pageNo, Integer pageSize) {
-        return RestResult.ok(eventService.getEventInfoList(id, cycle, emotion, source, pageNo, pageSize));
+    public RestResult eventInfoList(Long id, Integer cycle, Integer emotion, Integer mediaType, Integer pageNo, Integer pageSize) {
+        return RestResult.ok(eventService.getEventInfoList(id, cycle, emotion, mediaType, pageNo, pageSize));
     }
     
     @ApiOperation(value = "事件信息列表/媒体类型标签", httpMethod = "GET")

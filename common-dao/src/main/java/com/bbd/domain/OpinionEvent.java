@@ -36,7 +36,7 @@ public class OpinionEvent {
     private String fileReason;
 
     private Byte isDelete;
-
+    
     private Long createBy;
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
     private Date gmtCreate;

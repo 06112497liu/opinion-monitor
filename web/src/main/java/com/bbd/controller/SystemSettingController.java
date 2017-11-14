@@ -4,7 +4,10 @@ import com.bbd.RestResult;
 import com.bbd.domain.MonitorKeywords;
 import com.bbd.domain.WarnNotifier;
 import com.bbd.exception.CommonErrorCode;
+import com.bbd.service.EsQueryService;
+import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
+import com.bbd.service.vo.KeyValueVO;
 import com.bbd.util.ValidateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -32,6 +35,9 @@ public class SystemSettingController {
 
     @Autowired
     private SystemSettingService settingService;
+
+    @Autowired
+    private EsQueryService esQueryService;
 
     @ApiOperation(value = "获取预警配置列表信息", httpMethod = "GET")
     @ApiImplicitParams({
@@ -136,6 +142,13 @@ public class SystemSettingController {
     @RequestMapping(value = "keywords/list", method = RequestMethod.GET)
     public RestResult getKeywords() {
         Map<String, List<MonitorKeywords>> result = settingService.getKeywords();
+        return RestResult.ok(result);
+    }
+
+    @ApiOperation(value = "实时预警数量统计", httpMethod = "GET")
+    @RequestMapping(value = "ins/warn/sta", method = RequestMethod.GET)
+    public RestResult getInsWarnSta() {
+        List<KeyValueVO> result = esQueryService.opinionInstant(null);
         return RestResult.ok(result);
     }
 

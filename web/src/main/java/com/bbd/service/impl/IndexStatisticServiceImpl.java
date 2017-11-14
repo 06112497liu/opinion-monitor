@@ -66,8 +66,8 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     }
 
     @Override
-    public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan) {
-        Map<String, List<KeyValueVO>> map = esQueryService.getOpinionCountStatisticGroupTime(state, timeSpan);
+    public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer timeSpan) {
+        Map<String, List<KeyValueVO>> map = esQueryService.getOpinionCountStatisticGroupTime(timeSpan);
         List<KeyValueVO> levleOneList = map.get("levelOne");
         List<KeyValueVO> levleTwoList = map.get("levelTwo");
         List<KeyValueVO> levleThreeList = map.get("levelThree");
@@ -83,8 +83,9 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     }
 
     @Override
-    public List<KeyValueVO> getOpinionDBCoordinate() {
-        return null;
+    public Map<String, List<KeyValueVO>> getOpinionDBCoordinate() {
+        Map<String, List<KeyValueVO>> map = esQueryService.getOpinionStaLine();
+        return map;
     }
 
     @Override

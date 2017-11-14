@@ -27,17 +27,16 @@ public interface IndexStatisticService {
 
     /**
      * 预警舆情数量统计坐标轴
-     * @param state
      * @param timeSpan
      * @return
      */
-    Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer state, Integer timeSpan);
+    Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer timeSpan);
 
     /**
      * 舆情数据库统计坐标轴
      * @return
      */
-    List<KeyValueVO> getOpinionDBCoordinate();
+    Map<String, List<KeyValueVO>> getOpinionDBCoordinate();
 
     /**
      * 系统运行情况统计
