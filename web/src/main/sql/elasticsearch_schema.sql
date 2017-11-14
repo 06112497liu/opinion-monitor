@@ -35,7 +35,7 @@ PUT bbd_opinion
         },
         "publishTime": {
           "type": "date",
-          "format": ["yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss"]
+          "format": "yyyy-MM-dd||yyyy-MM-dd HH:mm:ss"
         },
         "hot": {
           "type": "integer"
@@ -70,22 +70,24 @@ PUT bbd_opinion
         "transferType": {
           "type": "integer"
         },
-        "warnTime" {
-          "firstWarnTime": {
-            "type": "date",
-            "format": "yyyy-MM-dd HH:mm:ss"
-          },
-          "firstWarnTimeOne": {
-            "type": "date",
-            "format": "yyyy-MM-dd HH:mm:ss"
-          },
-          "firstWarnTimeTwo": {
-            "type": "date",
-            "format": "yyyy-MM-dd HH:mm:ss"
-          },
-          "firstWarnTimeThree": {
-            "type": "date",
-            "format": "yyyy-MM-dd HH:mm:ss"
+        "warnTime": {
+          "properties": {
+            "firstWarnTime": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+            },
+            "firstWarnTimeOne": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+            },
+            "firstWarnTimeTwo": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+            },
+            "firstWarnTimeThree": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+            }
           }
         }
       }

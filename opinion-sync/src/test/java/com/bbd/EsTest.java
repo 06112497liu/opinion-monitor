@@ -5,12 +5,21 @@
 package com.bbd;
 
 import com.bbd.bean.OpinionEsSyncVO;
+import com.bbd.bean.OpinionEventRecordVO;
+import com.bbd.bean.OpinionWarnTime;
+import com.bbd.constant.EsConstant;
 import com.bbd.util.EsUtil;
 import com.bbd.util.JsonUtil;
+import com.google.common.collect.Maps;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptType;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -100,7 +109,15 @@ public class EsTest {
         vo.setMediaType(2);
         vo.setEvents(Arrays.asList(3L));
         vo.setPublishTime(new Date());
-        vo.setFirstWarnTime(new Date());
+
+        Date now = new Date();
+        OpinionWarnTime warnTime = new OpinionWarnTime();
+        warnTime.setFirstWarnTime(now);
+        warnTime.setFirstWarnTimeOne(now);
+        warnTime.setFirstWarnTimeTwo(now);
+        warnTime.setFirstWarnTimeThree(now);
+
+        vo.setWarnTime(warnTime);
 
         return vo;
     }
@@ -122,5 +139,40 @@ public class EsTest {
         BulkResponse resp = bulk.get();
         System.out.println("Has failure: " + resp.hasFailures());
         System.out.println("Time used : " + resp.getTookInMillis());
+    }
+
+    @Test
+    public void testIndexOpinionEventRecord() {
+
+        String index = EsConstant.IDX_OPINION_EVENT_RECORD;
+        String type = EsConstant.OPINION_EVENT_RECORD_TYPE;
+
+        OpinionEventRecordVO vo = new OpinionEventRecordVO();
+
+        vo.setOpinionId("123123213");
+        vo.setEventId(123L);
+        String id = String.valueOf(vo.hashCode());
+        vo.setId(id);
+
+        DateTime dateTime = new DateTime();
+        DateTime trimTime = dateTime.withMinuteOfHour(0);
+        trimTime = trimTime.withSecondOfMinute(0);
+        trimTime = trimTime.withMillisOfSecond(0);
+
+        vo.setMatchTime(dateTime.toDate());
+        vo.setMatchTimeTrim(trimTime.toDate());
+
+        TransportClient client = EsUtil.getClient();
+        BulkRequestBuilder bulk = client.prepareBulk();
+
+        IndexRequest ir = new IndexRequest(index, type, id);
+        ir.source(JsonUtil.fromJson(vo), XContentType.JSON);
+        UpdateRequest ur = new UpdateRequest(index, type, id).upsert(ir);
+        Script script = new Script(ScriptType.INLINE, "painless", "ctx.op = 'none'", Maps.newHashMap());
+        ur.script(script);
+        bulk.add(ur);
+
+        BulkResponse resp = bulk.get();
+        System.out.println("Has failure: " + resp.hasFailures());
     }
 }

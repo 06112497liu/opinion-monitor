@@ -24,7 +24,7 @@ public class OpinionVO {
 
     private String     summary;
 
-    private Integer    hot;
+    private Float      hot;
 
     private String     content;
 
@@ -36,7 +36,7 @@ public class OpinionVO {
 
     private Integer    commentCount;
 
-    private Integer    emotion;
+    private Float      emotion;
 
     private String     keyword;
 
@@ -83,10 +83,14 @@ public class OpinionVO {
     }
 
     public Integer getHot() {
-        return hot;
+        //return hot;
+        if (hot < 0) {
+            return 0;
+        }
+        return Float.valueOf(hot).intValue();
     }
 
-    public void setHot(Integer hot) {
+    public void setHot(Float hot) {
         this.hot = hot;
     }
 
@@ -131,10 +135,10 @@ public class OpinionVO {
     }
 
     public Integer getEmotion() {
-        return emotion;
+        return emotion == 0 ? 0 : emotion > 0 ? 1 : -1;
     }
 
-    public void setEmotion(Integer emotion) {
+    public void setEmotion(Float emotion) {
         this.emotion = emotion;
     }
 

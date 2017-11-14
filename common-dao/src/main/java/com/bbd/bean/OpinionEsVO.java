@@ -19,78 +19,80 @@ public class OpinionEsVO implements EsBase {
 
     /** 1.舆情基本信息 */
 
-    private String    uuid;
+    private String          uuid;
 
-    private String    title;
+    private String          title;
 
-    private String    summary;
+    private String          summary;
 
-    private String    content;
+    private String          content;
 
-    private Integer   hot;
+    private Integer         hot;
 
-    private String    link;
+    private String          link;
 
-    private Integer   similiarCount;
+    private Integer         similiarCount;
 
-    private Integer   commentCount;
+    private Integer         commentCount;
 
-    private Integer   emotion;
+    private Integer         emotion;
 
     /**
      * 关键词
      */
-    private String[]  keyword;
+    private String[]        keyword;
 
     /**
      * 词云
      */
-    private String[]  keys;
+    private String[]        keys;
 
-    private String    website;
+    private String          website;
 
     /**
      * 1.新闻；2.微博；3.微信；4.政务；5.网站；6.论坛；7.其他
      */
-    private Integer   mediaType;
+    private Integer         mediaType;
 
     /**
      * 来源
      */
-    private String    source;
+    private String          source;
 
     /**
      * 所属事件
      */
-    private Integer[] events;
+    private Integer[]       events;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date      publishTime;
+    private Date            publishTime;
 
     /** 2.操作信息 */
 
     /**
      *  0. 未操作；1. 转发；2. 已解除； 3. 已监控
      */
-    private Integer   opStatus;
+    private Integer         opStatus;
 
     /**
      * 待操作者
      */
-    private Long      opOwner;
+    private Long            opOwner;
 
     /**
      * 操作者
      */
-    private Long[]    operators;
+    private Long[]          operators;
 
     /**
      * 转发类型
      */
-    private Integer   transferType;
+    private Integer         transferType;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date      firstWarnTime;
+    /**
+     * 预警时间
+     */
+    private OpinionWarnTime warnTime;
 
     @JsonIgnore
     @Override
@@ -258,11 +260,11 @@ public class OpinionEsVO implements EsBase {
         this.transferType = transferType;
     }
 
-    public Date getFirstWarnTime() {
-        return firstWarnTime;
+    public OpinionWarnTime getWarnTime() {
+        return warnTime;
     }
 
-    public void setFirstWarnTime(Date firstWarnTime) {
-        this.firstWarnTime = firstWarnTime;
+    public void setWarnTime(OpinionWarnTime warnTime) {
+        this.warnTime = warnTime;
     }
 }

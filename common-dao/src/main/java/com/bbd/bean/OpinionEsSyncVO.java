@@ -19,56 +19,55 @@ public class OpinionEsSyncVO implements EsBase {
 
     /** 1.舆情基本信息 */
 
-    private String       uuid;
+    private String          uuid;
 
-    private String       title;
+    private String          title;
 
-    private String       summary;
+    private String          summary;
 
-    private String       content;
+    private String          content;
 
-    private Integer      hot;
+    private Integer         hot;
 
-    private String       link;
+    private String          link;
 
-    private Integer      similiarCount;
+    private Integer         similiarCount;
 
-    private Integer      commentCount;
+    private Integer         commentCount;
 
-    private Integer      emotion;
+    private Integer         emotion;
 
     /**
      * 关键词
      */
-    private List<String> keyword;
+    private List<String>    keyword;
 
     /**
      * 词云
      */
-    private List<String> keys;
+    private List<String>    keys;
 
-    private String       website;
+    private String          website;
 
     /**
      * 1.新闻；2.微博；3.微信；4.政务；5.网站；6.论坛；7.其他
      */
-    private Integer      mediaType;
+    private Integer         mediaType;
 
     /**
      * 来源
      */
-    private String       source;
+    private String          source;
 
     /**
      * 所属事件
      */
-    private List<Long>   events;
+    private List<Long>      events;
 
     @JSONField(format = "yyyy-MM-dd")
-    private Date         publishTime;
+    private Date            publishTime;
 
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    private Date         firstWarnTime;
+    private OpinionWarnTime warnTime;
 
     @Override
     @JSONField(serialize = false)
@@ -204,11 +203,11 @@ public class OpinionEsSyncVO implements EsBase {
         this.publishTime = publishTime;
     }
 
-    public Date getFirstWarnTime() {
-        return firstWarnTime;
+    public OpinionWarnTime getWarnTime() {
+        return warnTime;
     }
 
-    public void setFirstWarnTime(Date firstWarnTime) {
-        this.firstWarnTime = firstWarnTime;
+    public void setWarnTime(OpinionWarnTime warnTime) {
+        this.warnTime = warnTime;
     }
 }

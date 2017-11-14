@@ -5,7 +5,9 @@
 package com.bbd.listener;
 
 import com.bbd.bean.OpinionEsSyncVO;
+import com.bbd.bean.OpinionEventRecordVO;
 import com.bbd.bean.OpinionHotEsVO;
+import com.bbd.bean.OpinionWarnTime;
 import com.bbd.constant.EsConstant;
 import com.bbd.dao.WarnSettingDao;
 import com.bbd.domain.WarnSetting;
@@ -24,8 +26,12 @@ import org.elasticsearch.action.get.MultiGetRequestBuilder;
 import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -52,6 +58,10 @@ public class OpinionListener {
 
     @KafkaListener(topics = "bbd_opinion", containerFactory = "kafkaListenerContainerFactory")
     public void Listen(List<ConsumerRecord<String, String>> records) {
+        processRecords(records);
+    }
+
+    private void processRecords(List<ConsumerRecord<String, String>> records) {
         if (records.size() == 0) {
             return;
         }
@@ -71,31 +81,35 @@ public class OpinionListener {
         List<OpinionHotEsVO> hotVos = Lists.newArrayList();
         List<OpinionEsSyncVO> updateVos = Lists.newArrayList();
         List<OpinionEsSyncVO> indexVos = Lists.newArrayList();
+        List<OpinionEventRecordVO> oerVos = Lists.newArrayList();
+        List<OpinionEventRecordVO> oerWarnVos = Lists.newArrayList();
 
         Map<String, OpinionEsSyncVO> existMap = getExistsOpinions(vos);
         for (OpinionVO vo : vos) {
+            addOpinionEventRecords(vo, oerVos);
+
             String uuid = vo.getUuid();
 
             OpinionEsSyncVO nvo = new OpinionEsSyncVO();
             BeanUtils.copyProperties(vo, nvo);
 
             boolean warn = matchWarnLevel(vo.getHot(), settings);
+            OpinionEsSyncVO esVo = existMap.get(uuid);
             if (warn) {
+                addOpinionEventRecords(vo, oerWarnVos);
                 addHotRecord(vo, hotVos);
 
-                if (existMap.keySet().contains(uuid)) {
-                    OpinionEsSyncVO esVo = existMap.get(vo.getUuid());
-                    if (!hasMatchHotLevel(esVo)) {
-                        nvo.setFirstWarnTime(now);
-                    }
+                setWarnTime(nvo, esVo, settings);
+
+                if (esVo != null) {
                     updateVos.add(nvo);
-                    addWarnVos(vo, esVo, warnVos, settings);
                 } else {
-                    nvo.setFirstWarnTime(now);
                     indexVos.add(nvo);
                 }
+
+                addWarnVos(vo, esVo, warnVos, settings);
             } else {
-                if (existMap.keySet().contains(uuid)) {
+                if (esVo != null) {
                     updateVos.add(nvo);
                 } else {
                     indexVos.add(nvo);
@@ -106,9 +120,104 @@ public class OpinionListener {
         syncOpinionIndex(updateVos, indexVos);
         saveOpinionHotVos(hotVos);
         sendWarnMessage(warnVos);
+        saveOpinionEventRecords(oerVos);
+        saveOpinionEvenWarnRecords(oerWarnVos);
 
         long end = System.currentTimeMillis();
         logger.info("Process {} opinions success, time used: {}", records.size(), (end - start));
+    }
+
+    //    private void processRecords(List<ConsumerRecord<String, String>> records) {
+    //        if (records.size() == 0) {
+    //            return;
+    //        }
+    //        long start = System.currentTimeMillis();
+    //
+    //        Date now = new Date();
+    //        List<WarnSetting> settings = getWarnSetting();
+    //
+    //        List<OpinionVO> vos = Lists.newArrayList();
+    //        for (ConsumerRecord<String, String> record : records) {
+    //            System.out.printf("offset = %d, key = %s, value = %s\n", record.offset(), record.key(), record.value());
+    //            OpinionVO vo = JsonUtil.parseObject(record.value(), OpinionVO.class);
+    //            vos.add(vo);
+    //        }
+    //
+    //        List<OpinionVO> warnVos = Lists.newArrayList();
+    //        List<OpinionHotEsVO> hotVos = Lists.newArrayList();
+    //        List<OpinionEsSyncVO> updateVos = Lists.newArrayList();
+    //        List<OpinionEsSyncVO> indexVos = Lists.newArrayList();
+    //
+    //        Map<String, OpinionEsSyncVO> existMap = getExistsOpinions(vos);
+    //        for (OpinionVO vo : vos) {
+    //            String uuid = vo.getUuid();
+    //
+    //            OpinionEsSyncVO nvo = new OpinionEsSyncVO();
+    //            BeanUtils.copyProperties(vo, nvo);
+    //
+    //            boolean warn = matchWarnLevel(vo.getHot(), settings);
+    //            if (warn) {
+    //                addHotRecord(vo, hotVos);
+    //
+    //                if (existMap.keySet().contains(uuid)) {
+    //                    OpinionEsSyncVO esVo = existMap.get(vo.getUuid());
+    //                    if (!hasMatchHotLevel(esVo)) {
+    //                        nvo.setFirstWarnTime(now);
+    //                    }
+    //                    updateVos.add(nvo);
+    //                    addWarnVos(vo, esVo, warnVos, settings);
+    //                } else {
+    //                    nvo.setFirstWarnTime(now);
+    //                    indexVos.add(nvo);
+    //                    addWarnVos(vo, null, warnVos, settings);
+    //                }
+    //            } else {
+    //                if (existMap.keySet().contains(uuid)) {
+    //                    updateVos.add(nvo);
+    //                } else {
+    //                    indexVos.add(nvo);
+    //                }
+    //            }
+    //        }
+    //
+    //        syncOpinionIndex(updateVos, indexVos);
+    //        saveOpinionHotVos(hotVos);
+    //        sendWarnMessage(warnVos);
+    //
+    //        long end = System.currentTimeMillis();
+    //        logger.info("Process {} opinions success, time used: {}", records.size(), (end - start));
+    //    }
+
+    /**
+     * 获取事件和舆情关联记录
+     * @param vo
+     * @return
+     */
+    private void addOpinionEventRecords(OpinionVO vo, List<OpinionEventRecordVO> vos) {
+
+        List<Long> events = vo.getEvents();
+        if (events == null || events.size() == 0) {
+            return;
+        }
+
+        List<OpinionEventRecordVO> result = Lists.newArrayList();
+
+        String opinionId = vo.getUuid();
+        DateTime dateTime = new DateTime();
+        DateTime trimTime = dateTime.withMinuteOfHour(0);
+        trimTime = trimTime.withSecondOfMinute(0);
+        trimTime = trimTime.withMillisOfSecond(0);
+
+        for (Long eventId : events) {
+            OpinionEventRecordVO ovo = new OpinionEventRecordVO();
+            ovo.setEventId(eventId);
+            ovo.setOpinionId(opinionId);
+            ovo.setMatchTime(dateTime.toDate());
+            ovo.setMatchTimeTrim(trimTime.toDate());
+            result.add(ovo);
+        }
+
+        vos.addAll(result);
     }
 
     /**
@@ -196,22 +305,16 @@ public class OpinionListener {
      * @param vo
      */
     private void addWarnVos(OpinionVO vo, OpinionEsSyncVO old, List<OpinionVO> warnVos, List<WarnSetting> settings) {
+        if (old == null) {
+            warnVos.add(vo);
+            return;
+        }
         Integer newLevel = getWarnLevel(vo.getHot(), settings);
         Integer oldLevel = getWarnLevel(old.getHot(), settings);
         // 新舆情达到预警级别，且与旧舆情级别不同
         if (newLevel > 0 && (newLevel != oldLevel)) {
             warnVos.add(vo);
         }
-    }
-
-    /**
-     * 舆情是否到达过预警级别
-     *
-     * @param vo
-     * @return
-     */
-    private boolean hasMatchHotLevel(OpinionEsSyncVO vo) {
-        return vo.getFirstWarnTime() != null;
     }
 
     /**
@@ -228,6 +331,63 @@ public class OpinionListener {
         hotVo.setHot(hot);
         hotVos.add(hotVo);
         hotVo.setHotTime(hotTime);
+    }
+
+    /**
+     * 设置预警时间
+     * @param vo：新舆情
+     * @param old： 旧舆情
+     * @param settings： 舆情预警设置
+     */
+    private void setWarnTime(OpinionEsSyncVO vo, OpinionEsSyncVO old, List<WarnSetting> settings) {
+        OpinionWarnTime warnTime = new OpinionWarnTime();
+
+        Integer newHot = vo.getHot();
+        Date now = new Date();
+
+        Integer level = getWarnLevel(newHot, settings);
+        if (old == null) {
+            warnTime.setFirstWarnTime(now);
+            switch (level) {
+                case 1:
+                    warnTime.setFirstWarnTimeOne(now);
+                    break;
+                case 2:
+                    warnTime.setFirstWarnTimeTwo(now);
+                    break;
+                case 3:
+                    warnTime.setFirstWarnTimeThree(now);
+                    break;
+            }
+        } else {
+            OpinionWarnTime oldWarnTime = old.getWarnTime();
+            if (oldWarnTime != null) {
+                BeanUtils.copyProperties(oldWarnTime, warnTime);
+            }
+
+            if (warnTime.getFirstWarnTime() == null) {
+                warnTime.setFirstWarnTime(now);
+            }
+            switch (level) {
+                case 1:
+                    if (warnTime.getFirstWarnTimeOne() == null) {
+                        warnTime.setFirstWarnTimeOne(now);
+                    }
+                    break;
+                case 2:
+                    if (warnTime.getFirstWarnTimeTwo() == null) {
+                        warnTime.setFirstWarnTimeTwo(now);
+                    }
+                    break;
+                case 3:
+                    if (warnTime.getFirstWarnTimeThree() == null) {
+                        warnTime.setFirstWarnTimeThree(now);
+                    }
+                    break;
+            }
+        }
+
+        vo.setWarnTime(warnTime);
     }
 
     /**
@@ -290,6 +450,52 @@ public class OpinionListener {
         } catch (ExecutionException e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    /**
+     * 保存舆情、事件关联记录
+     */
+    private void saveOpinionEventRecords(List<OpinionEventRecordVO> vos) {
+        doSaveOpinionEventRecords(EsConstant.OPINION_EVENT_RECORD_TYPE, vos);
+    }
+
+    /**
+     * 保存预警舆情、事件关联记录
+     */
+    private void saveOpinionEvenWarnRecords(List<OpinionEventRecordVO> vos) {
+        doSaveOpinionEventRecords(EsConstant.OPINION_EVENT_RECORD_WARN_TYPE, vos);
+    }
+
+    /**
+     * 保存记录
+     * @param type：索引类型
+     * @param vos：数据
+     */
+    private void doSaveOpinionEventRecords(String type, List<OpinionEventRecordVO> vos) {
+        if (vos == null || vos.size() == 0) {
+            return;
+        }
+        long start = System.currentTimeMillis();
+
+        TransportClient client = EsUtil.getClient();
+        BulkRequestBuilder bulk = client.prepareBulk();
+
+        String index = EsConstant.IDX_OPINION_EVENT_RECORD;
+
+        for (OpinionEventRecordVO vo : vos) {
+            String id = String.valueOf(vo.hashCode());
+            IndexRequest ir = new IndexRequest(index, type, id);
+            ir.source(JsonUtil.fromJson(vo), XContentType.JSON);
+            UpdateRequest ur = new UpdateRequest(index, type, id).upsert(ir);
+            Script script = new Script(ScriptType.INLINE, "painless", "ctx.op = 'none'", Maps.newHashMap());
+            ur.script(script);
+            bulk.add(ur);
+        }
+        BulkResponse resp = bulk.get();
+        System.out.println("doSaveOpinionEventRecords Has failure: " + resp.hasFailures());
+
+        long end = System.currentTimeMillis();
+        logger.info("SaveOpinionEventRecords save {} records, time used : {}", vos.size(), (end - start));
     }
 
     /**
