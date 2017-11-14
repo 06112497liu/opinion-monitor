@@ -47,6 +47,8 @@ import com.bbd.enums.WebsiteEnum;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionEsSearchVO;
 import com.bbd.service.vo.OpinionOpRecordVO;
+import com.bbd.service.vo.OpinionVO;
+import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.UserContext;
 import com.mybatis.domain.PageBounds;
 
@@ -334,26 +336,30 @@ public class EventService{
      * @param pageSize
      * @return 
      */
-    public  HashMap<String, Object> getEventInfoList(Long id, Integer cycle, Integer emotion, String source, Integer pageNo, Integer pageSize) {
+    public  HashMap<String, Object> getEventInfoList(Long id, Integer cycle, Integer emotion, Integer source, Integer pageNo, Integer pageSize) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         PageBounds pb = new PageBounds(pageNo, pageSize);
         OpinionEsSearchVO esResult = esQueryService.queryEventOpinions(id, buildTimeSpan(cycle), emotion, 
-            source != null ? Integer.valueOf(source) : null, pb);
-        List<KeyValueVO> mediaTypeSta = esResult.getMediaTypeStats();
-        transToChinese(mediaTypeSta, "F");
-        map.put("opinions", esResult.getOpinions());
+            source, pb);
+        //List<KeyValueVO> mediaTypeSta = esResult.getMediaTypeStats();
+        //transToChinese(mediaTypeSta, "F");
+        List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
+        opinions.forEach(o -> {
+            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+        });
+        map.put("opinions", opinions);
         map.put("total", esResult.getTotal());
-        map.put("eventHot", opinionEventDao.selectByPrimaryKey(id).getHot());
-        mediaTypeSta.add(0, calTotal(mediaTypeSta));
-        map.put("mediaTypes", mediaTypeSta);
+        //map.put("eventHot", opinionEventDao.selectByPrimaryKey(id).getHot());
+       // mediaTypeSta.add(0, calTotal(mediaTypeSta));
+        //map.put("mediaTypes", mediaTypeSta);
         return map;
         
     }
     
     public KeyValueVO calTotal(List<KeyValueVO> mediaTypeSta) {
-        int total = 0;
+        long total = 0;
         for (KeyValueVO vo : mediaTypeSta) {
-            total = total + (int)vo.getValue();
+            total = total + (long)vo.getValue();
         }
         KeyValueVO tmp = new KeyValueVO();
         tmp.setName("全部");
@@ -382,8 +388,26 @@ public class EventService{
         PageBounds pb = new PageBounds(1, 10);
         OpinionEsSearchVO esResult = esQueryService.queryEventOpinions(id, buildTimeSpan(cycle), emotion, null, pb);
         List<KeyValueVO> mediaTypeSta = esResult.getMediaTypeStats();
-        transToChinese(mediaTypeSta, "F");
-        return mediaTypeSta;
+        List<KeyValueVO> allMediaType =  new ArrayList<KeyValueVO>();
+        List<OpinionDictionary> opinionDictionaryList = getDictionary("F");
+        for (OpinionDictionary e : opinionDictionaryList) {
+            for (KeyValueVO f : mediaTypeSta) {
+                if (e.getCode().equals(String.valueOf(f.getKey()))) {
+                    f.setName(e.getName());
+                    allMediaType.add(f);
+                } else {
+                    KeyValueVO vo = new KeyValueVO();
+                    vo.setKey(e.getCode());
+                    vo.setName(e.getName());
+                    vo.setValue(0l);
+                    allMediaType.add(vo);
+                }
+            }
+        }
+        KeyValueVO tmp = calTotal(allMediaType);
+        allMediaType.add(0, tmp);
+       // transToChinese(mediaTypeSta, "F");
+        return allMediaType;
     }
     
     
@@ -590,7 +614,9 @@ public class EventService{
             example.createCriteria().andEventIdEqualTo(id);
             map.put("opinions", opinionEventTrendStatisticDao.selectByExampleWithPageBounds(example, new PageBounds(pageNo, pageSize)));
         }
-        map.put("eventTime", opinionEventDao.selectByPrimaryKey(id).getGmtCreate());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateString = formatter.format(opinionEventDao.selectByPrimaryKey(id).getGmtCreate());
+        map.put("eventTime", dateString);
         return map;
     }
     
@@ -688,7 +714,8 @@ public class EventService{
         }
         criteria.andGmtCreateGreaterThanOrEqualTo(startTime)
         .andGmtCreateLessThanOrEqualTo(endTime)
-        .andIsDeleteEqualTo((byte)0);
+        .andIsDeleteEqualTo((byte)0)
+        .andFileReasonIsNotNull();
         List<OpinionEvent> eventList = opinionEventDao.selectByExampleWithPageBounds(example, new PageBounds(pageNo, pageSize));
         transToChinese(eventList);
         return eventList;
