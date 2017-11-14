@@ -178,6 +178,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         Map<String, Object> map = Maps.newHashMap();
         map.put(EsConstant.removeNoteField, removeNote);
         map.put(EsConstant.opStatusField, 2);
+        map.put(EsConstant.opOwnerField, -1); // 解除之后，就没有目标操作者了
         esModifyService.updateOpinion(operator, uuid, map);
 
         // step-3：记录解除记录
@@ -211,12 +212,15 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(map, 10000);
         OpinionOpRecordVO v = null;
         if (!records.isEmpty()) {
-            if (type == 1)
-                v = records.stream().findFirst().get();
-            else if (type == 2)
-                v = records.stream().filter(p -> p.getOperator().equals(UserContext.getUser().getUsername())).findFirst().get();
+            java.util.Optional<OpinionOpRecordVO> op = null;
+            if (type == 1){
+                op = records.stream().findFirst();
+            } else if (type == 2) {
+                op = records.stream().filter(p -> p.getOperator().equals(UserContext.getUser().getUsername())).findFirst();
+            }
+            if (op != null && op.isPresent()) v = op.get();
         }
-        records.add(0, v);
+        if(v != null) records.add(0, v);
         result.setRecords(records);
         return result;
     }

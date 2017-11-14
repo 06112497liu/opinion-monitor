@@ -122,7 +122,7 @@ public class OpinionServiceImpl implements OpinionService {
             pb.setPage(1);
         }
         List<OpinionVO> opinions = allOpinions.subList(firstIndex, toIndex);
-        Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), esResult.getTotal().intValue());
+        Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), allOpinions.size());
         PageList p = PageListHelper.create(opinions, paginator);
 
         return p;

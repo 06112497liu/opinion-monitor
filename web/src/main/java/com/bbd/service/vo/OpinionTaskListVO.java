@@ -12,6 +12,11 @@ import java.util.List;
 public class OpinionTaskListVO extends OpinionVO {
 
     /**
+     * 舆情详情
+     */
+    private String content;
+
+    /**
      * 舆情操作记录
      */
     private List<OpinionOpRecordVO> records;
@@ -50,6 +55,16 @@ public class OpinionTaskListVO extends OpinionVO {
     public void setMonitorTime(Date monitorTime) {
         this.monitorTime = monitorTime;
     }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+
 }
     
     

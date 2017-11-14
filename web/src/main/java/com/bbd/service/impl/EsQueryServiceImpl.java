@@ -27,10 +27,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -646,9 +643,9 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        //query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(EsConstant.hotField).lt(threeClass));
-        query.must(QueryBuilders.termQuery(EsConstant.opStatusField, 0)); // 必须是未处于舆情任务中的热点舆情
+        query.mustNot(QueryBuilders.existsQuery(EsConstant.opStatusField)); // 必须是未处于舆情任务中的热点舆情
         if (emotion != null)
             query.must(QueryBuilders.termQuery(EsConstant.emotionField, emotion));
 
@@ -892,8 +889,10 @@ public class EsQueryServiceImpl implements EsQueryService {
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         // 判断当前用户是否是超级管理员(如果是管理员的话，就能看到所有的数据)
         UserInfo user = UserContext.getUser();
-        if (!UserContext.isAdmin())
+        if (!UserContext.isAdmin()) {
             query.must(QueryBuilders.matchQuery(EsConstant.operatorsField, user.getId())); // 操作者字段必须包含当前用户
+            query.mustNot(QueryBuilders.termQuery(EsConstant.opOwnerField, user.getId())); // 舆情下一步需要操作的人不是当前用户
+        }
         if (opStatus != null) {
             query.must(QueryBuilders.termQuery(EsConstant.opStatusField, opStatus));
         }
