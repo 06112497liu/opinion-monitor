@@ -38,9 +38,6 @@ public class OpinionVO {
     private Integer mediaType;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date calcTime;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date publishTime;
     
     private Integer level;
@@ -115,14 +112,6 @@ public class OpinionVO {
 
     public void setMediaType(Integer mediaType) {
         this.mediaType = mediaType;
-    }
-
-    public Date getCalcTime() {
-        return calcTime;
-    }
-
-    public void setCalcTime(Date calcTime) {
-        this.calcTime = calcTime;
     }
 
     public Date getPublishTime() {
