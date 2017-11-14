@@ -120,7 +120,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-2：构建es查询条件
         TransportClient client = EsUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.rangeQuery(EsConstant.firstWarnTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(EsConstant.warnTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         if(state != null) {
             if(state == 0) query.must(QueryBuilders.termQuery(EsConstant.opStatusField, 0));
             else query.mustNot(QueryBuilders.termQuery(EsConstant.opStatusField, 0));
@@ -288,7 +288,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         String aggsName = "calc_aggs";
         DateTime now = DateTime.now();
         DateTime startTime;
-        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.firstWarnTimeField).keyed(true);
+        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.warnTimeField).keyed(true);
         if(timeSpan == 1) {
             startTime = now.withTimeAtStartOfDay();
             dateRange.format("yyyy-MM-dd HH");
@@ -346,7 +346,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public List<KeyValueVO> getKeywordsTopTen() {
         String aggName = "top_kws";
         TransportClient client = EsUtil.getClient();
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT)
                 .setQuery(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(DateTime.now().withDayOfMonth(1).withTimeAtStartOfDay().toString("yyyy-MM-dd HH:mm:ss")))
                 .addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.keywordField).size(10))
                 .setSize(0).execute().actionGet();
@@ -830,7 +830,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         query.must(QueryBuilders.termQuery(EsConstant.opOwnerField, userId));
         if(transferType != null) {
             if(transferType <= 3) query.must(QueryBuilders.termsQuery(EsConstant.transferTypeField, new Integer[]{1,2,3}));
-            else query.must(QueryBuilders.termsQuery(EsConstant.transferTypeField, new Integer[]{4,5,5}));
+            else query.must(QueryBuilders.termsQuery(EsConstant.transferTypeField, new Integer[]{4,5,6}));
         }
 
         // step-2：查询
