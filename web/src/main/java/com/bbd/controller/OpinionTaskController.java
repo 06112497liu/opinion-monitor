@@ -54,6 +54,7 @@ public class OpinionTaskController extends AbstractController{
     })
     @RequestMapping(value = "processed/list", method = RequestMethod.GET)
     public RestResult getProcessedList(Integer opStatus) {
+        ValidateUtil.checkNull(opStatus, CommonErrorCode.PARAM_ERROR, "opStatus不能为null");
         PageList<OpinionTaskListVO> result = opinionTaskService.getProcessedList(opStatus, getPageBounds());
         return RestResult.ok(result);
     }

@@ -30,10 +30,12 @@ public class OpinionVO {
     
     private String website;
 
-    /**
-     * 舆情来源
-     */
     private String source;
+
+    /**
+     * 网站链接
+     */
+    private String link;
 
     private Integer mediaType;
 
@@ -128,6 +130,14 @@ public class OpinionVO {
 
     public void setLevel(Integer level) {
         this.level = level;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 }
 
