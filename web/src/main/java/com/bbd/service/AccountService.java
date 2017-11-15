@@ -7,10 +7,12 @@ package com.bbd.service;
 import com.bbd.dao.AccountDao;
 import com.bbd.domain.Account;
 import com.bbd.domain.AccountExample;
+import com.bbd.service.param.AccountCreateVO;
 import com.bbd.service.param.AccountUpdateVo;
 import com.bbd.util.BeanMapperUtil;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,5 +54,22 @@ public class AccountService {
         account.setGmtModified(now);
 
         accountDao.updateByPrimaryKeySelective(account);
+    }
+
+    /**
+     * 创建账户
+     * @param vo
+     */
+    public void createAccount(AccountCreateVO vo) {
+        Preconditions.checkNotNull(vo, "创建账户参数不能为空");
+
+        vo.validate();
+
+        Date now = new Date();
+        Account account = new Account();
+        account.setGmtCreate(now);
+        BeanUtils.copyProperties(vo, account);
+
+        accountDao.insertSelective(account);
     }
 }

@@ -9,15 +9,21 @@ import com.bbd.domain.User;
 import com.bbd.domain.UserExample;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
+import com.bbd.service.param.AccountCreateVO;
+import com.bbd.service.param.UserCreateParam;
+import com.bbd.service.param.UserCreateVO;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.mybatis.domain.PageBounds;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,7 +36,10 @@ import java.util.Objects;
 public class UserService {
 
     @Autowired
-    private UserDao userDao;
+    private UserDao        userDao;
+
+    @Autowired
+    private AccountService accountService;
 
     /**
      * 查询用户列表
@@ -69,6 +78,42 @@ public class UserService {
         if (Objects.isNull(u))
             throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登陆");
         return u.getId();
+    }
+
+    /**
+     * 创建用户和账户
+     * @param param
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void createUserAndAccount(UserCreateParam param) {
+        UserCreateVO userVo = new UserCreateVO();
+        BeanUtils.copyProperties(param, userVo);
+        Long userId = createUser(userVo);
+
+        AccountCreateVO accountVO = new AccountCreateVO();
+        BeanUtils.copyProperties(param, accountVO);
+        accountVO.setUserId(userId);
+        accountService.createAccount(accountVO);
+
+    }
+
+    /**
+     * 创建用户
+     * @param userCreateVO
+     * @return
+     */
+    public Long createUser(UserCreateVO userCreateVO) {
+        Preconditions.checkNotNull(userCreateVO, "创建用户参数不能为空");
+
+        userCreateVO.validate();
+
+        User user = new User();
+        BeanUtils.copyProperties(userCreateVO, user);
+        user.setGmtCreate(new Date());
+
+        userDao.insertSelective(user);
+
+        return user.getId();
     }
 
 }
