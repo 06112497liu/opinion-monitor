@@ -3,6 +3,7 @@ package com.bbd.service.impl;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.constant.EsConstant;
 import com.bbd.dao.OpinionEventDao;
+import com.bbd.domain.Account;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.domain.OpinionEventExample;
 import com.bbd.domain.User;
@@ -22,6 +23,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +55,9 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
     @Autowired
     private OpinionEventDao opinionEventDao;
+
+    @Autowired
+    private AccountService accountService;
 
     /**
      * 当前用户待处理舆情列表
@@ -126,25 +131,31 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     @Override
     public void transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
 
-        // step-1：校验当前用户是否有操作资格
+        // step-1：校验当前用户是否有操作权限
         checkPermission(param.getUuid());
 
-        // step-2：修改舆情的状态
+        // step-2：如果是普通用户，是不能转发给管理员
+        Optional<User> userOpt = userService.queryUserByUserame(param.getUsername());
+        if (!userOpt.isPresent())
+            throw new ApplicationException(UserErrorCode.USERNAME_NOT_EXIST, "操作对象用户名不存在");
+        User opOwner = userOpt.get();
+        checkOpinionTranferConfine(opOwner);
+
+        // step-3：舆情转发次数不能大于50次
+        checkOpinionTranCount(param.getUuid());
+
+        // step-3：修改舆情的状态
         UserInfo operator = UserContext.getUser();
         if (Objects.isNull(operator))
             throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
-        Optional<User> userOpt = userService.queryUserByUserame(param.getUsername());
-        if (!userOpt.isPresent()) {
-            throw new ApplicationException(UserErrorCode.USERNAME_NOT_EXIST, "操作对象用户名不存在");
-        }
-        User opOwner = userOpt.get();
+
         Map<String, Object> map = Maps.newHashMap();
         map.put(EsConstant.opStatusField, 1);
         map.put(EsConstant.opOwnerField, opOwner.getId());
         map.put(EsConstant.transferTypeField, param.getTransferType());
         esModifyService.updateOpinion(operator, param.getUuid(), map);
 
-        // step-3：记录转发记录
+        // step-4：记录转发记录
             // 构建转发记录对象
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
         recordVO.setUuid(param.getUuid());
@@ -158,6 +169,29 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
             // 向es中添加转发记录
         esModifyService.recordOpinionOp(recordVO);
+    }
+
+    // 舆情转发次数上限为50
+    private void checkOpinionTranCount(String uuid) {
+        Map<String, Object> keyMap = Maps.newHashMap();
+        keyMap.put(EsConstant.uuidField, uuid);
+        keyMap.put(EsConstant.opTypeField, 1);
+        List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 50);
+        if(list.size() >= 50) {
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "舆情转发次数不能超过50次");
+        }
+    }
+
+    // 普通用户不能转发给管理员
+    private void checkOpinionTranferConfine(User opOwner) {
+        Optional<Account> op = accountService.loadByUserId(opOwner.getId());
+        if(op.isPresent()) {
+            Account a = op.get();
+            boolean isAdmin = a.getAdmin();
+            if(!UserContext.isAdmin() && isAdmin) {
+                throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "普通用户不能转发给管理员");
+            }
+        }
     }
 
     /**
@@ -235,8 +269,10 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                 throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
             }
             Long ownerId = opinion.getOpOwner();
-            if(!Objects.equals(user.getId(), ownerId)) {
-                throw new ApplicationException(CommonErrorCode.PERMISSION_ERROR);
+            if(Objects.nonNull(ownerId)) {
+                if(!Objects.equals(user.getId(), ownerId)) {
+                    throw new ApplicationException(CommonErrorCode.PERMISSION_ERROR);
+                }
             }
         }
     }
