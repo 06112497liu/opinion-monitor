@@ -295,6 +295,63 @@ public class EsQueryServiceImpl implements EsQueryService {
         }
         return ls;
     }
+    
+    
+    @Override
+    public OpinionEsVO queryEventMaxOpinion(Long eventId) {
+        // step-1：构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
+        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setFrom(0).setSize(1)
+                .setQuery(query)
+                .addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC))
+                .addSort(SortBuilders.fieldSort(EsConstant.publishTimeField).order(SortOrder.DESC))
+                .addSort(SortBuilders.fieldSort(EsConstant.uuidField).order(SortOrder.DESC));
+
+        // step-2：查询并返回结果
+        SearchResponse resp = builder.execute().actionGet();
+        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
+        if (opList != null && opList.size() > 0) {
+            return opList.get(0);
+        } else {
+            return new OpinionEsVO();
+        }
+    }
+    
+    /**
+     * 获取事件数量折线统计图 - 图表跟踪分析
+     * @param eventId
+     * @param sourceType
+     * @param isInfo
+     * @return
+     */
+    @Override
+    public KeyValueVO getEventMediaStatisticBySource(Long eventId, String sourceType){
+        // step-1：构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
+        if (sourceType != null) {
+            query.must(QueryBuilders.termQuery(EsConstant.mediaTypeField, Integer.valueOf(sourceType)));
+        }
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setQuery(query)
+                .setSize(0).execute().actionGet();
+        // step-2：构建返回结果
+        List<InternalDateRange.Bucket> dateList = ((InternalDateRange) (resp.getAggregations().get("event_calc_aggs"))).getBuckets();
+        KeyValueVO v = new KeyValueVO();
+        v.setKey(sourceType);
+        v.setValue(0l);
+        for(InternalDateRange.Bucket d : dateList) {
+            v.setKey(d.getKey());
+            v.setValue(d.getDocCount());
+            break;
+        }
+        return v;
+    }
+
 
     public DateRangeAggregationBuilder buildEventDayeRange(int cycle) {
         String aggsName = "event_calc_aggs";
