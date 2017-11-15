@@ -50,6 +50,10 @@ public class PermissionService {
         Preconditions.checkNotNull(userId, "用户ID不能为空");
 
         List<UserPermission> ups = queryPermissions(userId);
+        if (ups.size() == 0) {
+            return Lists.newArrayList();
+        }
+
         List<Long> pids = Lists.newArrayList();
         for (UserPermission up : ups) {
             pids.add(up.getPermissionId());

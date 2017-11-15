@@ -4,19 +4,23 @@
  */
 package com.bbd.service.param;
 
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
 
 /**
  * 创建用户前端参数
  * @author tjwang
  * @version $Id: UserCreateParam.java, v 0.1 2017/11/15 0015 17:12 tjwang Exp $
  */
-public class UserCreateParam {
+@ApiModel(value = "user", description = "用户创建参数")
+public class UserCreateParam implements Serializable {
 
     /**
      * 账户名（登录账户）
      */
-    @ApiParam(name = "username", value = "用户名（用于登录）", required = true)
+    @ApiModelProperty(name = "username", value = "用户名（用于登录）", required = true)
     private String username;
 
     /**

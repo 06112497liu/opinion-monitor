@@ -10,7 +10,9 @@ import com.bbd.service.UserService;
 import com.bbd.service.param.UserCreateParam;
 import com.mybatis.domain.PageBounds;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +41,7 @@ public class UserController extends AbstractController {
 
     @ApiOperation(value = "创建用户", httpMethod = "POST")
     @RequestMapping(value = "create", method = RequestMethod.POST)
-    public RestResult createUser(@Valid UserCreateParam param) {
+    public RestResult createUser(@RequestBody @Valid @ApiParam(name = "用户对象", value = "传入JSON") UserCreateParam param) {
         userService.createUserAndAccount(param);
         return RestResult.ok();
     }
