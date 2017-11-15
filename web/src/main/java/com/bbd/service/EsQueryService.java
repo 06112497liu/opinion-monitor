@@ -63,6 +63,21 @@ public interface EsQueryService {
      * @return
      */
     List<KeyValueVO> getEventStatisticInfoBySourceAndCycle(Long eventId, String sourceType, String isInfo, Integer cycle);
+    /**
+     * 查询舆情事件走势
+     * @param eventId: 事件ID
+     * @return
+     */
+    OpinionEsVO queryEventMaxOpinion(Long eventId);
+    /**
+     * 获取事件媒体信息量分布折线统计图 
+     * @param eventId
+     * @param sourceType
+     * @param isInfo
+     * @param cycle
+     * @return
+     */
+    KeyValueVO getEventMediaStatisticBySource(Long eventId, String sourceType);
 
     /**
      * 关键词排行TOP10 - 首页
