@@ -32,18 +32,11 @@ public interface EsQueryService {
 
     /**
      * 获取舆情数量 - 首页
-     * @param state
      * @param startTime
+     * @param endTime
      * @return
      */
-    OpinionCountStatVO getOpinionCountStatistic(Integer state, DateTime startTime);
-
-    /**
-     * 获取舆情数量折线统计图 - 首页
-     * @param timeSpan
-     * @return
-     */
-    Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer timeSpan);
+    OpinionCountStatVO getOpinionCountStatistic(DateTime startTime, DateTime endTime) throws NoSuchFieldException, IllegalAccessException;
 
     /**
      * 获取舆情数量折线统计图 - 首页
@@ -249,8 +242,7 @@ public interface EsQueryService {
 
     /**
      * 实时统计预警舆情数量
-     * @param eventId
      * @return
      */
-    List<KeyValueVO> opinionInstant(Long eventId);
+    List<KeyValueVO> opinionInstant();
 }
