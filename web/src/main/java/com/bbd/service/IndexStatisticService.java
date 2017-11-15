@@ -19,11 +19,10 @@ public interface IndexStatisticService {
 
     /**
      * 首页预警舆情数量统计
-     * @param state
      * @param timeSpan
      * @return
      */
-    OpinionCountStatVO getOpinionCountStatistic(Integer state, Integer timeSpan);
+    OpinionCountStatVO getOpinionCountStatistic(Integer timeSpan) throws NoSuchFieldException, IllegalAccessException;
 
     /**
      * 预警舆情数量统计坐标轴

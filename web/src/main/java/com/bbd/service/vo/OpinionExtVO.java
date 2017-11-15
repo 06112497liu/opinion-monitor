@@ -18,9 +18,14 @@ public class OpinionExtVO extends OpinionVO {
     private String content;
 
     /**
-     * 词云
+     * 关键词：满足爬虫搜索的词
      */
     private String[] keys;
+
+    /**
+     * 词云
+     */
+    private String[] keyword;
 
 
     public Integer getCommentCount() {
@@ -45,6 +50,14 @@ public class OpinionExtVO extends OpinionVO {
 
     public void setKeys(String[] keys) {
         this.keys = keys;
+    }
+
+    public String[] getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String[] keyword) {
+        this.keyword = keyword;
     }
 }
     

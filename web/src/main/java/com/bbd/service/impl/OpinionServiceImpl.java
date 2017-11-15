@@ -216,7 +216,7 @@ public class OpinionServiceImpl implements OpinionService {
         UserInfo user = UserContext.getUser();
         if(Objects.isNull(user)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
         List list = listOperation.range("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), 0, 9);
-        if(!list.contains(keyword))
+        if(!StringUtils.isEmpty(keyword) && !list.contains(keyword))
             listOperation.leftPush("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), keyword);
         list = listOperation.range("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), 0, 9);
         return list;
@@ -248,9 +248,7 @@ public class OpinionServiceImpl implements OpinionService {
         set.addAll(result);
         List<OpinionHotEsVO> list = new ArrayList<>();
         list.addAll(set);
-        list.sort((o1, o2) -> {
-            return -(o1.getHotTime().compareTo(o2.getHotTime()));
-        });
+        list.sort((o1, o2) -> -(o1.getHotTime().compareTo(o2.getHotTime())));
         return list;
     }
 }

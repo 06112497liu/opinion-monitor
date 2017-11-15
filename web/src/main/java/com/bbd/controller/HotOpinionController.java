@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,7 +23,7 @@ import java.util.Map;
  * @version Id: HotOpinionController.java, v0.1 2017/11/1 Liuweibo Exp $$
  */
 @RestController
-@RequestMapping(value = "/hot/opinion/")
+@RequestMapping(value = "/api/hot/opinion/")
 @Api(description = "热点舆情控制器")
 public class HotOpinionController extends AbstractController {
 
@@ -70,12 +71,12 @@ public class HotOpinionController extends AbstractController {
 
     @ApiOperation(value = "历史关键词搜索", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "搜索关键词", name = "keyWord", dataType = "String", paramType = "query", required = true)
+            @ApiImplicitParam(value = "搜索关键词", name = "keyword", dataType = "String", paramType = "query", required = false)
     })
     @RequestMapping(value = "history/keywords", method = RequestMethod.GET)
-    public RestResult getHistoryWordSearch(String keyWord) {
-        ValidateUtil.checkNull(keyWord, CommonErrorCode.PARAM_ERROR, "keyWord不能为空");
-        return RestResult.ok(opinionService.getHistoryWordSearch(keyWord));
+    public RestResult getHistoryWordSearch(String keyword) {
+        List<String> result = opinionService.getHistoryWordSearch(keyword);
+        return RestResult.ok(result);
     }
 
 }

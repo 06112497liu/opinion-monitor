@@ -14,62 +14,52 @@ public class OpinionCountStatVO {
     /**
      * 预警总量
      */
-    private Integer total      = 0;
+    private Long total      = 0L;
 
     /**
      * 一级预警量
      */
-    private Integer levelOne   = 0;
+    private Long levelOne   = 0L;
 
     /**
      * 二级预警量
      */
-    private Integer levelTwo   = 0;
+    private Long levelTwo   = 0L;
 
     /**
      * 三级预警量
      */
-    private Integer levelThree = 0;
+    private Long levelThree = 0L;
 
-    public OpinionCountStatVO() {
-    }
-
-    public OpinionCountStatVO(Integer total, Integer levelOne, Integer levelTwo, Integer levelThree) {
-        this.total = total;
-        this.levelOne = levelOne;
-        this.levelTwo = levelTwo;
-        this.levelThree = levelThree;
-    }
-
-    public Integer getTotal() {
+    public Long getTotal() {
         return total;
     }
 
-    public void setTotal(Integer total) {
+    public void setTotal(Long total) {
         this.total = total;
     }
 
-    public Integer getLevelOne() {
+    public Long getLevelOne() {
         return levelOne;
     }
 
-    public void setLevelOne(Integer levelOne) {
+    public void setLevelOne(Long levelOne) {
         this.levelOne = levelOne;
     }
 
-    public Integer getLevelTwo() {
+    public Long getLevelTwo() {
         return levelTwo;
     }
 
-    public void setLevelTwo(Integer levelTwo) {
+    public void setLevelTwo(Long levelTwo) {
         this.levelTwo = levelTwo;
     }
 
-    public Integer getLevelThree() {
+    public Long getLevelThree() {
         return levelThree;
     }
 
-    public void setLevelThree(Integer levelThree) {
+    public void setLevelThree(Long levelThree) {
         this.levelThree = levelThree;
     }
 }

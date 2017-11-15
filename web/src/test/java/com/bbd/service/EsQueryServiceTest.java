@@ -26,10 +26,10 @@ public class EsQueryServiceTest extends BaseServiceTest {
     private EsQueryService esQueryService;
 
     @Test
-    public void testGetOpinionCountStatistic() {
+    public void testGetOpinionCountStatistic() throws NoSuchFieldException, IllegalAccessException {
         DateTime now = new DateTime();
         now = now.plusMonths(-3);
-        esQueryService.getOpinionCountStatistic(1, now);
+        esQueryService.getOpinionCountStatistic(now, now);
     }
 
     @Test
