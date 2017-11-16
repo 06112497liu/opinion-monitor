@@ -977,7 +977,6 @@ public class EsQueryServiceImpl implements EsQueryService {
         int eventNewMin = eventNewWarnList.get(0).getMin();
         // step-1：获取预警热度分界
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.mustNot(QueryBuilders.existsQuery(EsConstant.opStatusField));
         DateTime dayOneMonthBefore = new DateTime().minusDays(30);
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(dayOneMonthBefore.toString(EsConstant.LONG_TIME_FORMAT)));
         SearchResponse resp = client
