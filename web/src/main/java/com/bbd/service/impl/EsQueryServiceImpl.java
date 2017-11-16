@@ -11,6 +11,7 @@ import com.bbd.domain.OpinionEvent;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
 import com.bbd.service.SystemSettingService;
+import com.bbd.service.param.WarnSettingVo;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
 import com.bbd.util.EsUtil;
@@ -961,6 +962,41 @@ public class EsQueryServiceImpl implements EsQueryService {
                     .addRange(levelOne, oneClass, 101)).execute().actionGet();
         List<KeyValueVO> list = buildHotLevelLists(resp, hotAgg);
         return list;
+    }
+    
+    /**
+     * 实时统计预警舆情数量
+     * @return
+     */
+    @Override
+    public Integer opinionInstantByEvent(Long eventId) {
+        String eventHotAgg = "eventHotAgg";
+        TransportClient client = EsUtil.getClient();
+        
+        List<WarnSettingVo> eventNewWarnList = settingService.getWarnSettingList(1, eventId);
+        int eventNewMin = eventNewWarnList.get(0).getMin();
+        // step-1：获取预警热度分界
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.mustNot(QueryBuilders.existsQuery(EsConstant.opStatusField));
+        DateTime dayOneMonthBefore = new DateTime().minusDays(30);
+        query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(dayOneMonthBefore.toString(EsConstant.LONG_TIME_FORMAT)));
+        SearchResponse resp = client
+            .prepareSearch(EsConstant.IDX_OPINION)
+            .setTypes(EsConstant.OPINION_TYPE)
+            .setSearchType(SearchType.DEFAULT)
+            .setSize(0)
+            .setQuery(query)
+            .addAggregation(
+                AggregationBuilders.range(eventHotAgg).field(EsConstant.hotField).keyed(true)
+                .addUnboundedFrom("eventNewOpinion", eventNewMin))
+                .execute().actionGet();
+        List<KeyValueVO> list = buildHotLevelLists(resp, eventHotAgg);
+        if (list != null && list.size() > 0) {
+            return (int)list.get(0).getValue();
+        } else {
+            return 0;
+        }
+       
     }
 
     /**

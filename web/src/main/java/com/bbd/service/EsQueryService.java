@@ -253,4 +253,10 @@ public interface EsQueryService {
      * @return
      */
     List<KeyValueVO> opinionInstant();
+    
+    /**
+     * 实时统计事件新增观点舆情数量
+     * @return
+     */
+    Integer opinionInstantByEvent(Long eventId);
 }
