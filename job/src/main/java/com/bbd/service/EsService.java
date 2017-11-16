@@ -43,6 +43,9 @@ public class EsService {
     @Autowired
     private OpinionService      opinionService;
 
+    @Autowired
+    private EsUtil              esUtil;
+
     /**
      * 同步数到新的索引。创建新索引，将新索引与别名关联，删除就索引。
      *
@@ -57,7 +60,7 @@ public class EsService {
     }
 
     public void changeOpinionAlias(String newIndex, String oldIndex, String indexAlias) {
-        IndicesAliasesRequestBuilder builder = EsUtil.getClient().admin().indices().prepareAliases().addAlias(newIndex, indexAlias);
+        IndicesAliasesRequestBuilder builder = esUtil.getClient().admin().indices().prepareAliases().addAlias(newIndex, indexAlias);
         if (checkIndexExists(oldIndex)) {
             builder.removeAlias(oldIndex, indexAlias);
         }
@@ -71,7 +74,7 @@ public class EsService {
         if (checkIndexExists(index)) {
             deleteIndex(index);
         }
-        EsUtil.getClient().admin().indices().prepareCreate(index).setSettings(Settings.builder().put("number_of_shards", 1).put("number_of_replicas", 1)).get();
+        esUtil.getClient().admin().indices().prepareCreate(index).setSettings(Settings.builder().put("number_of_shards", 1).put("number_of_replicas", 1)).get();
     }
 
     /**
@@ -83,7 +86,7 @@ public class EsService {
             deleteIndex(index);
         }
         String mapping = "{\"opinion\": {  \"properties\": {\"esId\": {  \"type\": \"keyword\"},\"source\": {  \"type\": \"keyword\"},\"uuid\": {  \"type\": \"keyword\"},\"startTime\": {  \"type\": \"date\",  \"format\": \"yyyy-MM-dd HH:mm:ss\"},\"gmtCreate\": {  \"type\": \"date\",  \"format\": \"yyyy-MM-dd HH:mm:ss\"},\"gmtModified\": {  \"type\": \"date\",  \"format\": \"yyyy-MM-dd HH:mm:ss\"}  }}  }";
-        EsUtil.getClient().admin().indices().prepareCreate(index).setSettings(Settings.builder().put("number_of_shards", 1).put("number_of_replicas", 1)).addMapping(type, mapping, XContentType.JSON)
+        esUtil.getClient().admin().indices().prepareCreate(index).setSettings(Settings.builder().put("number_of_shards", 1).put("number_of_replicas", 1)).addMapping(type, mapping, XContentType.JSON)
             .get();
     }
 
@@ -95,7 +98,7 @@ public class EsService {
      */
     private boolean checkIndexExists(String index) {
         IndicesExistsRequest req = new IndicesExistsRequest(index);
-        IndicesExistsResponse resp = EsUtil.getClient().admin().indices().exists(req).actionGet();
+        IndicesExistsResponse resp = esUtil.getClient().admin().indices().exists(req).actionGet();
         return resp.isExists();
     }
 
@@ -107,7 +110,7 @@ public class EsService {
     public void deleteIndex(String index) {
         if (checkIndexExists(index)) {
             DeleteIndexRequest req = new DeleteIndexRequest(index);
-            EsUtil.getClient().admin().indices().delete(req).actionGet();
+            esUtil.getClient().admin().indices().delete(req).actionGet();
         }
     }
 
@@ -119,18 +122,18 @@ public class EsService {
         if (ds.size() == 0) {
             return;
         }
-        EsUtil.create(index, OPINION_TYPE, ds);
+        esUtil.create(index, OPINION_TYPE, ds);
     }
 
     public List<OpinionEsVO> searchOpinions() {
         PageBounds pb = new PageBounds(1, 20);
-        List<OpinionEsVO> rs = EsUtil.search(INDEX_ALIAS, OPINION_TYPE, QueryBuilders.matchAllQuery(), pb, OpinionEsVO.class);
+        List<OpinionEsVO> rs = esUtil.search(INDEX_ALIAS, OPINION_TYPE, QueryBuilders.matchAllQuery(), pb, OpinionEsVO.class);
 
         return rs;
     }
 
     public void searchOpinionAggs() {
-        SearchResponse resp = EsUtil.getClient().prepareSearch(INDEX_ALIAS).addAggregation(AggregationBuilders.terms("agg").field("emotion")).setSize(0).execute().actionGet();
+        SearchResponse resp = esUtil.getClient().prepareSearch(INDEX_ALIAS).addAggregation(AggregationBuilders.terms("agg").field("emotion")).setSize(0).execute().actionGet();
         Aggregations aggs = resp.getAggregations();
         Terms agg = aggs.get("agg");
         List<? extends Terms.Bucket> buckets = agg.getBuckets();
@@ -145,7 +148,7 @@ public class EsService {
      * @return
      */
     public String getCurrentAlias() {
-        GetAliasesResponse resp = EsUtil.getClient().admin().indices().prepareGetAliases("bbd_opinion").execute().actionGet();
+        GetAliasesResponse resp = esUtil.getClient().admin().indices().prepareGetAliases("bbd_opinion").execute().actionGet();
         if (resp.getAliases().isEmpty()) {
             return null;
         }

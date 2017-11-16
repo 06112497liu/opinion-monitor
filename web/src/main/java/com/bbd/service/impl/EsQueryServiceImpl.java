@@ -26,12 +26,14 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
-
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -50,10 +52,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilde
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.Months;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -71,14 +70,18 @@ import java.util.Objects;
 @Service
 public class EsQueryServiceImpl implements EsQueryService {
 
-    private final String total = "total";
+    private final String         total      = "total";
     private final String         levelThree = "levelThree";
     private final String         levelTwo   = "levelTwo";
     private final String         levelOne   = "levelOne";
     @Autowired
     private SystemSettingService settingService;
     @Autowired
-    private EventService eventService;
+    private EventService         eventService;
+
+    @Autowired
+    private EsUtil               esUtil;
+
     /**
      * 获取预警舆情top10（排除在舆情任务中的预警舆情，以及热点舆情）
      * @return
@@ -91,7 +94,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         DateTime dateTime = DateTime.now().plusDays(-30);
 
         // step-2：构建es查询条件
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(dateTime.toString(EsConstant.LONG_TIME_FORMAT)));
@@ -124,7 +127,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         String start = startTime.toString(EsConstant.LONG_TIME_FORMAT);
         String end = endTime.toString(EsConstant.LONG_TIME_FORMAT);
 
-        SearchRequestBuilder builder = EsUtil.getClient().prepareSearch(EsConstant.IDX_OPINION);
+        SearchRequestBuilder builder = esUtil.getClient().prepareSearch(EsConstant.IDX_OPINION);
         final String countAggs = "count_aggs";
 
         FilterAggregationBuilder warnAggsBuilder = AggregationBuilders.filter(total, QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(start).lte(end));
@@ -145,7 +148,7 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         OpinionCountStatVO result = new OpinionCountStatVO();
         Map<String, Aggregation> map = resp.getAggregations().getAsMap();
-        for (Map.Entry<String, Aggregation> m: map.entrySet()) {
+        for (Map.Entry<String, Aggregation> m : map.entrySet()) {
             String k = m.getKey();
             InternalFilter v = (InternalFilter) m.getValue();
             Field f = result.getClass().getDeclaredField(k);
@@ -168,7 +171,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         String start = startTime.toString(EsConstant.LONG_TIME_FORMAT);
         String end = endTime.toString(EsConstant.LONG_TIME_FORMAT);
 
-        SearchRequestBuilder builder = EsUtil.getClient().prepareSearch(EsConstant.IDX_OPINION);
+        SearchRequestBuilder builder = esUtil.getClient().prepareSearch(EsConstant.IDX_OPINION);
 
         final String countAggs = "count_aggs";
 
@@ -212,19 +215,14 @@ public class EsQueryServiceImpl implements EsQueryService {
         return result;
     }
 
-    
     @Override
     public OpinionEsVO queryEventMaxOpinion(Long eventId) {
         // step-1：构建es查询条件
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
-        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
-                .setFrom(0).setSize(1)
-                .setQuery(query)
-                .addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC))
-                .addSort(SortBuilders.fieldSort(EsConstant.publishTimeField).order(SortOrder.DESC))
-                .addSort(SortBuilders.fieldSort(EsConstant.uuidField).order(SortOrder.DESC));
+        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(0).setSize(1).setQuery(query).addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC))
+            .addSort(SortBuilders.fieldSort(EsConstant.publishTimeField).order(SortOrder.DESC)).addSort(SortBuilders.fieldSort(EsConstant.uuidField).order(SortOrder.DESC));
 
         // step-2：查询并返回结果
         SearchResponse resp = builder.execute().actionGet();
@@ -235,57 +233,50 @@ public class EsQueryServiceImpl implements EsQueryService {
             return new OpinionEsVO();
         }
     }
-    
+
     /**
      * 获取事件数量折线统计图 - 图表跟踪分析
      * @param eventId
      * @param sourceType
-     * @param isInfo
      * @return
      */
     @Override
-    public KeyValueVO getEventMediaStatisticBySource(Long eventId, String sourceType){
+    public KeyValueVO getEventMediaStatisticBySource(Long eventId, String sourceType) {
         // step-1：构建es查询条件
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
         if (sourceType != null) {
             query.must(QueryBuilders.termQuery(EsConstant.mediaTypeField, Integer.valueOf(sourceType)));
         }
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
-                .setQuery(query)
-                .setSize(0).execute().actionGet();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).setSize(0).execute().actionGet();
         // step-2：构建返回结果
         List<InternalDateRange.Bucket> dateList = ((InternalDateRange) (resp.getAggregations().get("event_media_calc_aggs"))).getBuckets();
-       
+
         KeyValueVO v = new KeyValueVO();
         v.setKey(sourceType);
         v.setValue(0l);
-        for(InternalDateRange.Bucket d : dateList) {
+        for (InternalDateRange.Bucket d : dateList) {
             v.setKey(d.getKey());
             v.setValue(d.getDocCount());
             break;
         }
         return v;
     }
-    
-    public List<KeyValueVO> queryEventInfoTotal(OpinionEvent opinionEvent, boolean isWarn, Integer cycle){
+
+    public List<KeyValueVO> queryEventInfoTotal(OpinionEvent opinionEvent, boolean isWarn, Integer cycle) {
 
         // step-1：构建es查询条件
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.termQuery(EsConstant.eventIdField, opinionEvent.getId()));
-        SearchResponse resp ;
+        SearchResponse resp;
         if (isWarn == false) {
-            resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query)
-                    .addAggregation(buildEventDayeRange(cycle, opinionEvent))
-                    .setTypes(EsConstant.OPINION_EVENT_RECORD_TYPE).setSearchType(SearchType.DEFAULT)
-                    .setSize(0).execute().actionGet();
+            resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).addAggregation(buildEventDayeRange(cycle, opinionEvent)).setTypes(EsConstant.OPINION_EVENT_RECORD_TYPE)
+                .setSearchType(SearchType.DEFAULT).setSize(0).execute().actionGet();
         } else {
-            resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query)
-                    .addAggregation(buildEventDayeRange(cycle, opinionEvent))
-                    .setTypes(EsConstant.OPINION_EVENT_RECORD_WARN_TYPE).setSearchType(SearchType.DEFAULT)
-                    .setSize(0).execute().actionGet();
+            resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).addAggregation(buildEventDayeRange(cycle, opinionEvent)).setTypes(EsConstant.OPINION_EVENT_RECORD_WARN_TYPE)
+                .setSearchType(SearchType.DEFAULT).setSize(0).execute().actionGet();
         }
         // step-2：构建返回结果
         List<InternalDateRange.Bucket> dateList = ((InternalDateRange) (resp.getAggregations().get("event_calc_aggs"))).getBuckets();
@@ -299,10 +290,9 @@ public class EsQueryServiceImpl implements EsQueryService {
         return ls;
     }
 
-
     public DateRangeAggregationBuilder buildEventDayeRange(int cycle, OpinionEvent opinionEvent) {
         String aggsName = "event_calc_aggs";
-        
+
         DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.publishTimeField).keyed(true);
         List<Date> dates = eventService.getDates(cycle, opinionEvent);
         for (Date date : dates) {
@@ -311,7 +301,6 @@ public class EsQueryServiceImpl implements EsQueryService {
         }
         return dateRange;
     }
-    
 
     /**
      * 关键词排行TOP10 - 首页
@@ -319,7 +308,7 @@ public class EsQueryServiceImpl implements EsQueryService {
      */
     public List<KeyValueVO> getKeywordsTopTen() {
         String aggName = "top_kws";
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT)
             .setQuery(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(DateTime.now().withDayOfMonth(1).withTimeAtStartOfDay().toString("yyyy-MM-dd HH:mm:ss")))
             .addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.keywordField).size(10)).setSize(0).execute().actionGet();
@@ -343,7 +332,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public DBStaVO getOpinionDBSta() throws NoSuchFieldException, IllegalAccessException {
         String aggName = "calc_aggs";
         DateTime now = DateTime.now();
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         SearchResponse resp = client
             .prepareSearch(EsConstant.IDX_OPINION)
             .addAggregation(
@@ -368,7 +357,7 @@ public class EsQueryServiceImpl implements EsQueryService {
      */
     public List<KeyValueVO> getOpinionMediaSpread() {
         String aggName = "media_aggs";
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.mediaTypeField).size(10)).setSize(0).execute()
             .actionGet();
         return buildLongTermLists(resp, aggName);
@@ -392,7 +381,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         Integer oneClass = map.get(1);
 
         // step-2：构建es查询条件（这里差一个条件：舆情未存在舆情任务流程中）
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
@@ -437,7 +426,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         Integer oneClass = map.get(1);
 
         // step-2：构建es查询条件
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
@@ -460,7 +449,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         OpinionEsSearchVO result = new OpinionEsSearchVO();
         SearchResponse resp = builder.execute().actionGet();
         result.setTotal(resp.getHits().getTotalHits());
-        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
+        List<OpinionEsVO> opList = esUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
         List<KeyValueVO> mediaList = buildLongTermLists(resp, mediaAggName);
@@ -479,7 +468,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     @Override
     public OpinionEsSearchVO queryEventTrendOpinions(Long eventId, DateTime startTime, DateTime endTime, PageBounds pb) {
         // step-1：构建es查询条件
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         if (endTime != null) {
@@ -494,11 +483,12 @@ public class EsQueryServiceImpl implements EsQueryService {
         OpinionEsSearchVO result = new OpinionEsSearchVO();
         SearchResponse resp = builder.execute().actionGet();
         result.setTotal(resp.getHits().getTotalHits());
-        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
+        List<OpinionEsVO> opList = esUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
         return result;
     }
+
     /**
      * 获取事件相关信息总量
      * @param eventId
@@ -507,9 +497,9 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     @Override
-    public Long queryEventInfoTotal(Long eventId, DateTime startTime, DateTime endTime){
+    public Long queryEventInfoTotal(Long eventId, DateTime startTime, DateTime endTime) {
         // step-1：构建es查询条件
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         if (endTime != null) {
@@ -542,7 +532,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         Integer oneClass = map.get(1);
 
         // step-2：构建es查询条件
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass)); // 预警等级必须达到3
@@ -564,7 +554,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-4：构建返回结果
         OpinionEsSearchVO result = new OpinionEsSearchVO();
         result.setTotal(resp.getHits().getTotalHits());
-        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
+        List<OpinionEsVO> opList = esUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
         // 舆情来源类型统计
@@ -589,7 +579,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         Integer threeClass = map.get(3);
 
         // step-2：构建es查询条件
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(EsConstant.hotField).lt(threeClass));
@@ -605,7 +595,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchResponse resp = builder.execute().actionGet();
         result.setTotal(resp.getHits().getTotalHits());
         // 列表结果
-        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
+        List<OpinionEsVO> opList = esUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
         return result;
@@ -626,7 +616,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         Integer threeClass = map.get(3);
 
         // step-2：构建es查询条件
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         if (StringUtils.isNotBlank(keyword)) {
             query.must(QueryBuilders.multiMatchQuery(keyword, EsConstant.titleField, EsConstant.contentField));
@@ -646,7 +636,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchResponse resp = builder.execute().actionGet();
         result.setTotal(resp.getHits().getTotalHits());
         // 列表结果
-        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
+        List<OpinionEsVO> opList = esUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
         return result;
     }
@@ -698,7 +688,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public List<KeyValueVO> getEventOpinionCounts() {
         String eventsAgg = "events_agg";
 
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setSize(0).addAggregation(AggregationBuilders.terms(eventsAgg).field(EsConstant.eventsField).size(100)).execute()
             .actionGet();
 
@@ -709,7 +699,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public List<KeyValueVO> getEventOpinionMediaSpread(Long eventId, DateTime startTime, DateTime endTime) {
         String aggName = "media_aggs";
 
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
         booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         if (endTime != null) {
@@ -726,7 +716,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public List<KeyValueVO> getEventWebsiteSpread(Long eventId, DateTime startTime, DateTime endTime) {
         String aggName = "website_aggs";
 
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
         booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         if (endTime != null) {
@@ -743,7 +733,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public List<KeyValueVO> getEventEmotionSpread(Long eventId, DateTime startTime, DateTime endTime) {
         String aggName = "emotion_aggs";
 
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
         booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         if (endTime != null) {
@@ -763,12 +753,12 @@ public class EsQueryServiceImpl implements EsQueryService {
     @Override
     public OpinionEsVO getOpinionByUUID(String uuid) {
         String uuidField = "uuid";
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         TermQueryBuilder query = QueryBuilders.termQuery(uuidField, uuid);
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT).setQuery(query).setFrom(0).setSize(1).execute()
             .actionGet();
 
-        List<OpinionEsVO> list = EsUtil.buildResult(resp, OpinionEsVO.class);
+        List<OpinionEsVO> list = esUtil.buildResult(resp, OpinionEsVO.class);
         if (list.isEmpty())
             return null;
         return list.get(0);
@@ -799,7 +789,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public PageList<OpinionTaskListVO> getUnProcessedList(Long userId, Integer transferType, PageBounds pb) {
 
         // step-1：构建es查询条件
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.termQuery(EsConstant.opStatusField, 1));
         query.must(QueryBuilders.termQuery(EsConstant.opOwnerField, userId));
@@ -816,7 +806,7 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();
-        List<OpinionTaskListVO> list = EsUtil.buildResult(resp, OpinionTaskListVO.class);
+        List<OpinionTaskListVO> list = esUtil.buildResult(resp, OpinionTaskListVO.class);
         // 查询转发记录
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);
@@ -833,7 +823,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public PageList<OpinionTaskListVO> getProcessedList(Integer opStatus, PageBounds pb) {
 
         // step-1：构建es查询条件
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         // 判断当前用户是否是超级管理员(如果是管理员的话，就能看到所有的数据)
         UserInfo user = UserContext.getUser();
@@ -851,7 +841,7 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();
-        List<OpinionTaskListVO> list = EsUtil.buildResult(resp, OpinionTaskListVO.class);
+        List<OpinionTaskListVO> list = esUtil.buildResult(resp, OpinionTaskListVO.class);
         // 查询转发记录
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);
@@ -866,10 +856,10 @@ public class EsQueryServiceImpl implements EsQueryService {
      */
     @Override
     public List<OpinionOpRecordVO> getOpinionOpRecordByUUID(Map<String, Object> keyMap, Integer szie) {
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_OP_RECORD).setTypes(EsConstant.OPINION_OP_RECORD_TYPE).setSearchType(SearchType.DEFAULT).setSize(szie)
             .setQuery(buildSearchRequest(null, keyMap)).addSort(EsConstant.opTimeField, SortOrder.DESC).execute().actionGet();
-        List<OpinionOpRecordVO> list = EsUtil.buildResult(resp, OpinionOpRecordVO.class);
+        List<OpinionOpRecordVO> list = esUtil.buildResult(resp, OpinionOpRecordVO.class);
         return list;
     }
 
@@ -881,12 +871,11 @@ public class EsQueryServiceImpl implements EsQueryService {
      */
     @Override
     public List<OpinionHotEsVO> getOpinionHotTrend(String uuid, DateTime startTime) {
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_HOT).setTypes(EsConstant.OPINION_HOT_TYPE).setSearchType(SearchType.DEFAULT)
-            .setQuery(QueryBuilders.rangeQuery(EsConstant.hotTimeField).gte(startTime.toString("yyyy-MM-dd HH:mm:ss")))
-            .setQuery(QueryBuilders.termQuery(EsConstant.uuidField, uuid))
-            .setSize(10000).execute().actionGet();
-        List<OpinionHotEsVO> result = EsUtil.buildResult(resp, OpinionHotEsVO.class);
+            .setQuery(QueryBuilders.rangeQuery(EsConstant.hotTimeField).gte(startTime.toString("yyyy-MM-dd HH:mm:ss"))).setQuery(QueryBuilders.termQuery(EsConstant.uuidField, uuid)).setSize(10000)
+            .execute().actionGet();
+        List<OpinionHotEsVO> result = esUtil.buildResult(resp, OpinionHotEsVO.class);
         return result;
     }
 
@@ -902,7 +891,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         Integer threeClass = map.get(3);
 
         // 查询
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT)
             .addAggregation(AggregationBuilders.range("opinon_group_sta").field(EsConstant.hotField).keyed(true).addRange("opinionCount", 0, 101).addRange("warnCount", threeClass, 101)).setSize(0)
             .execute().actionGet();
@@ -918,7 +907,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public Map<String, List<KeyValueVO>> getOpinionStaLine() {
         String monthAgg = "month_agg";
         String countAgg = "count_agg";
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         SearchRequestBuilder requestBuilder = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT).setSize(0);
 
         DateRangeAggregationBuilder monthRange = AggregationBuilders.dateRange(monthAgg).field(EsConstant.publishTimeField).keyed(true);
@@ -942,7 +931,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     @Override
     public List<KeyValueVO> opinionInstant() {
         String hotAgg = "hotAgg";
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         // step-1：获取预警热度分界
         Map<Integer, Integer> map = settingService.getWarnClass();
         Integer threeClass = map.get(3);
@@ -963,7 +952,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         List<KeyValueVO> list = buildHotLevelLists(resp, hotAgg);
         return list;
     }
-    
+
     /**
      * 实时统计预警舆情数量
      * @return
@@ -971,31 +960,23 @@ public class EsQueryServiceImpl implements EsQueryService {
     @Override
     public Integer opinionInstantByEvent(Long eventId) {
         String eventHotAgg = "eventHotAgg";
-        TransportClient client = EsUtil.getClient();
-        
+        TransportClient client = esUtil.getClient();
+
         List<WarnSettingVo> eventNewWarnList = settingService.getWarnSettingList(1, eventId);
         int eventNewMin = eventNewWarnList.get(0).getMin();
         // step-1：获取预警热度分界
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         DateTime dayOneMonthBefore = new DateTime().minusDays(30);
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(dayOneMonthBefore.toString(EsConstant.LONG_TIME_FORMAT)));
-        SearchResponse resp = client
-            .prepareSearch(EsConstant.IDX_OPINION)
-            .setTypes(EsConstant.OPINION_TYPE)
-            .setSearchType(SearchType.DEFAULT)
-            .setSize(0)
-            .setQuery(query)
-            .addAggregation(
-                AggregationBuilders.range(eventHotAgg).field(EsConstant.hotField).keyed(true)
-                .addUnboundedFrom("eventNewOpinion", eventNewMin))
-                .execute().actionGet();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT).setSize(0).setQuery(query)
+            .addAggregation(AggregationBuilders.range(eventHotAgg).field(EsConstant.hotField).keyed(true).addUnboundedFrom("eventNewOpinion", eventNewMin)).execute().actionGet();
         List<KeyValueVO> list = buildHotLevelLists(resp, eventHotAgg);
         if (list != null && list.size() > 0) {
-            return (int)list.get(0).getValue();
+            return (int) list.get(0).getValue();
         } else {
             return 0;
         }
-       
+
     }
 
     /**

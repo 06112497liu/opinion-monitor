@@ -32,6 +32,8 @@ public class EsModifyServiceImpl implements EsModifyService {
     @Autowired
     private EsQueryService esQueryService;
 
+    @Autowired
+    private EsUtil         esUtil;
 
     /**
      * 转发舆情
@@ -47,12 +49,12 @@ public class EsModifyServiceImpl implements EsModifyService {
         Long[] original = opinion.getOperators();
         boolean flag = ArrayUtils.contains(original, operatorId);
         Long[] newArr = original;
-        if(!flag) {
+        if (!flag) {
             newArr = ArrayUtils.add(original, operatorId);
         }
         fieldMap.put(EsConstant.operatorsField, newArr);
 
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         UpdateRequest request = new UpdateRequest();
         request.index(EsConstant.IDX_OPINION);
         request.type(EsConstant.OPINION_TYPE);
@@ -64,8 +66,8 @@ public class EsModifyServiceImpl implements EsModifyService {
 
     private XContentBuilder buildXContentBuilder(Map<String, Object> map) throws IOException {
         XContentBuilder result = XContentFactory.jsonBuilder().startObject();
-        if(map != null) {
-            for(String key : map.keySet()) {
+        if (map != null) {
+            for (String key : map.keySet()) {
                 result.field(key, map.get(key));
             }
         }
@@ -80,15 +82,11 @@ public class EsModifyServiceImpl implements EsModifyService {
     @Override
     public void recordOpinionOp(OpinionOpRecordVO recordVO) {
 
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BulkRequestBuilder bulkRequest = client.prepareBulk();
-        bulkRequest.add(
-                client.prepareIndex(EsConstant.IDX_OPINION_OP_RECORD, EsConstant.OPINION_OP_RECORD_TYPE)
-                        .setSource(JsonUtil.fromJson(recordVO), XContentType.JSON)
-        );
+        bulkRequest.add(client.prepareIndex(EsConstant.IDX_OPINION_OP_RECORD, EsConstant.OPINION_OP_RECORD_TYPE).setSource(JsonUtil.fromJson(recordVO), XContentType.JSON));
         // 插入数据
         bulkRequest.get();
     }
 
 }
-

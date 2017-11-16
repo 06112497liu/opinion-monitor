@@ -53,6 +53,9 @@ public class OpinionEsDataSyncTaskExecutor extends AbstractTaskExecutor<String, 
     @Autowired
     private EsService        esService;
 
+    @Autowired
+    private EsUtil           esUtil;
+
     public OpinionEsDataSyncTaskExecutor() {
         this.taskId = 1L;
         this.newIndex = "bbd_opinion_a";
@@ -89,7 +92,7 @@ public class OpinionEsDataSyncTaskExecutor extends AbstractTaskExecutor<String, 
 
     @Override
     public void doWork(List<OpinionEsVO> datas) {
-        EsUtil.create(newIndex, type, datas);
+        esUtil.create(newIndex, type, datas);
     }
 
     @Override
@@ -123,7 +126,7 @@ public class OpinionEsDataSyncTaskExecutor extends AbstractTaskExecutor<String, 
         QueryBuilders.rangeQuery("uuid").lte(curItem);
         PageBounds pb = new PageBounds(1, 1);
         pb.setOrders(Lists.newArrayList(SortBy.create("uuid.keyword", SortBy.Direction.ASC.toString())));
-        PageList<OpinionEsVO> list = EsUtil.search(newIndex, type, QueryBuilders.matchAllQuery(), pb, OpinionEsVO.class);
+        PageList<OpinionEsVO> list = esUtil.search(newIndex, type, QueryBuilders.matchAllQuery(), pb, OpinionEsVO.class);
         return Optional.of(list.get(0));
     }
 
