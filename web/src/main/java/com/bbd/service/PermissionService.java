@@ -9,7 +9,8 @@ import com.bbd.dao.UserPermissionDao;
 import com.bbd.domain.*;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
-import com.bbd.service.param.PermissionView;
+import com.bbd.service.param.AccountUpdateVo;
+import com.bbd.vo.PermissionView;
 import com.bbd.util.BeanMapperUtil;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -79,14 +80,36 @@ public class PermissionService {
      * @param pIds 权限ID列表
      */
     @Transactional(rollbackFor = Exception.class)
-    public void setUserPermission(Long userId, List<Long> pIds) {
+    public void setUserPermission(boolean isAdmin, Long userId, List<Long> pIds) {
         Preconditions.checkNotNull(userId);
-
+        // 校验操作对象是否存在
         checkAccountExists(userId);
 
-        deleteUserPermission(userId);
+        // 修改账户级别
+        updateAccountGrade(userId, isAdmin);
 
+        // 删除操作对象的所有权限，之后在添加
+        deleteUserPermission(userId);
         addUserPermission(userId, pIds);
+    }
+
+    // 修改账户级别
+    private void updateAccountGrade(Long userId, boolean isAdmin) {
+        AccountUpdateVo v = new AccountUpdateVo();
+        v.setAdmin(isAdmin);
+        v.setId(userId);
+        accountService.updateAccount(v);
+    }
+
+    /**
+     * 查询权限列表
+     * @return
+     */
+    public List<PermissionView> queryPermissionViewList() {
+        PermissionExample example = new PermissionExample();
+        List<Permission> list = permissionDao.selectByExample(example);
+        List<PermissionView> result = BeanMapperUtil.mapList(list, PermissionView.class);
+        return result;
     }
 
     private void checkAccountExists(Long userId) {

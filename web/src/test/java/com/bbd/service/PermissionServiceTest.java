@@ -4,7 +4,7 @@
  */
 package com.bbd.service;
 
-import com.bbd.service.param.PermissionView;
+import com.bbd.vo.PermissionView;
 import com.google.common.collect.Lists;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class PermissionServiceTest extends BaseServiceTest {
         Long userId = 2L;
         List<Long> pIds = Lists.newArrayList(1L, 2L, 3L, 4L, 5L, 6L);
 
-        permissionService.setUserPermission(userId, pIds);
+        permissionService.setUserPermission(true, userId, pIds);
 
         List<PermissionView> ps = permissionService.queryUserPermissions(userId);
         assertTrue(ps.size() > 0);

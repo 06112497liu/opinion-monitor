@@ -18,9 +18,14 @@ import java.util.List;
 @ApiModel
 public class UserPermmisionVo {
 
-    @ApiModelProperty(value = "用户名")
-    @NotNull(message = "用户不能为空")
+    @ApiModelProperty(value = "用户id")
+    @NotNull(message = "用户id")
     private Long       userId;
+
+    /**
+     * 账号类型，0-普通用户；1-管理员
+     */
+    private boolean isAdmin;
 
     /**
      * 权限ID
@@ -34,6 +39,14 @@ public class UserPermmisionVo {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 
     public List<Long> getPermissionIds() {

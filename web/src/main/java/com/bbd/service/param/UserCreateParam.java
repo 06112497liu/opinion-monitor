@@ -18,7 +18,19 @@ import java.io.Serializable;
 public class UserCreateParam implements Serializable {
 
     /**
-     * 账户名（登录账户）
+     * 区域
+     */
+    @ApiModelProperty(name = "region", value = "区域", required = true)
+    private String region;
+
+    /**
+     * 姓名
+     */
+    @ApiModelProperty(name = "name", value = "账户名", required = true)
+    private String name;
+
+    /**
+     * 用户名
      */
     @ApiModelProperty(name = "username", value = "用户名（用于登录）", required = true)
     private String username;
@@ -29,11 +41,6 @@ public class UserCreateParam implements Serializable {
     @ApiModelProperty(name = "password", value = "密码", required = true)
     private String password;
 
-    /**
-     * 用户名
-     */
-    @ApiModelProperty(name = "name", value = "账户名", required = true)
-    private String name;
 
     /**
      * 联系方式
@@ -47,11 +54,6 @@ public class UserCreateParam implements Serializable {
     @ApiModelProperty(name = "email", value = "邮箱")
     private String email;
 
-    /**
-     * 区域
-     */
-    @ApiModelProperty(name = "region", value = "区域", required = true)
-    private String region;
 
     /**
      * 部门备注

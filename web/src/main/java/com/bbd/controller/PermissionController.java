@@ -8,8 +8,10 @@ import com.bbd.RestResult;
 import com.bbd.controller.param.UserPermmisionVo;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.PermissionService;
+import com.bbd.vo.PermissionView;
 import com.bbd.util.ValidateUtil;
 import com.google.common.collect.Lists;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +31,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/permission")
+@Api(description = "权限模块")
 public class PermissionController {
 
     @Autowired
@@ -36,15 +39,15 @@ public class PermissionController {
 
     @ApiOperation(value = "查询用户权限", httpMethod = "GET")
     @ApiImplicitParams({ @ApiImplicitParam(value = "用户ID", name = "userId", dataType = "Long", paramType = "query", required = false) })
-    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
     public RestResult queryUserPermission(Long userId) {
         ValidateUtil.checkNull(userId, CommonErrorCode.PARAM_ERROR, "用户不能为空");
-
-        return RestResult.ok(permissionService.queryUserPermissions(userId));
+        List<PermissionView> result = permissionService.queryUserPermissions(userId);
+        return RestResult.ok(result);
     }
 
     @ApiOperation(value = "设置用户权限", httpMethod = "POST")
-    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    @RequestMapping(value = "/set", method = RequestMethod.POST)
     public RestResult setUserPermissions(@RequestBody @Valid UserPermmisionVo vo) {
         Long userId = vo.getUserId();
         List<Long> pIds = vo.getPermissionIds();
@@ -52,8 +55,15 @@ public class PermissionController {
         if (pIds == null) {
             pIds = Lists.newArrayList();
         }
-        permissionService.setUserPermission(userId, pIds);
+        permissionService.setUserPermission(vo.isAdmin(), userId, pIds);
         return RestResult.ok();
+    }
+
+    @ApiOperation(value = "查询权限列表", httpMethod = "GET")
+    @RequestMapping(value = "/search/list", method = RequestMethod.GET)
+    public RestResult queryPermissionList() {
+        List<PermissionView> result = permissionService.queryPermissionViewList();
+        return RestResult.ok(result);
     }
 
 }

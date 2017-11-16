@@ -9,6 +9,8 @@ public class User {
 
     private String password;
 
+    private Integer flag;
+
     private Date gmtCreate;
 
     private Date gmtModified;
@@ -35,6 +37,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Integer getFlag() {
+        return flag;
+    }
+
+    public void setFlag(Integer flag) {
+        this.flag = flag;
     }
 
     public Date getGmtCreate() {

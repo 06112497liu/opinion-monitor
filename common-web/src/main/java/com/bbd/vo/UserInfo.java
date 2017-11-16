@@ -35,7 +35,7 @@ public class UserInfo {
 
     private List<String> roles;
 
-    private List<String> permissions;
+    private List<PermissionView> permissions;
 
     public Long getId() {
         return id;
@@ -77,11 +77,11 @@ public class UserInfo {
         this.roles = roles;
     }
 
-    public List<String> getPermissions() {
+    public List<PermissionView> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(List<String> permissions) {
+    public void setPermissions(List<PermissionView> permissions) {
         this.permissions = permissions;
     }
 }

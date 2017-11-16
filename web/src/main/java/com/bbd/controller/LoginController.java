@@ -15,11 +15,10 @@ import com.bbd.exception.UserErrorCode;
 import com.bbd.service.AccountService;
 import com.bbd.service.PermissionService;
 import com.bbd.service.UserService;
-import com.bbd.service.param.PermissionView;
+import com.bbd.vo.PermissionView;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -92,7 +92,7 @@ public class LoginController extends AbstractController {
 
         UserContext.setUser(info);
 
-        return RestResult.ok();
+        return RestResult.ok(info);
     }
 
     /**
@@ -102,11 +102,7 @@ public class LoginController extends AbstractController {
      */
     private void setUserPermissions(Long userId, UserInfo user) {
         List<PermissionView> ps = permissionService.queryUserPermissions(userId);
-        List<String> codes = Lists.newArrayList();
-        for (PermissionView p : ps) {
-            codes.add(p.getCode());
-        }
-        user.setPermissions(codes);
+        user.setPermissions(ps);
     }
 
     @RequestMapping(value = "logout", method = RequestMethod.GET)

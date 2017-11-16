@@ -2,7 +2,7 @@
  * BBD Service Inc
  * All Rights Reserved @2016
  */
-package com.bbd.service.param;
+package com.bbd.vo;
 
 /**
  *
@@ -11,10 +11,19 @@ package com.bbd.service.param;
  */
 public class PermissionView {
 
+    /**
+     * 权限id
+     */
     private Long   id;
 
+    /**
+     * 权限编码
+     */
     private String code;
 
+    /**
+     * 权限名称
+     */
     private String name;
 
     public Long getId() {

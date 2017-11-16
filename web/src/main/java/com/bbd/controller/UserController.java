@@ -6,9 +6,13 @@ package com.bbd.controller;
 
 import com.bbd.RestResult;
 import com.bbd.domain.User;
+import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.UserService;
 import com.bbd.service.param.UserCreateParam;
+import com.bbd.util.ValidateUtil;
 import com.mybatis.domain.PageBounds;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +47,17 @@ public class UserController extends AbstractController {
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public RestResult createUser(@RequestBody @Valid @ApiParam(name = "用户对象", value = "传入JSON") UserCreateParam param) {
         userService.createUserAndAccount(param);
+        return RestResult.ok();
+    }
+
+    @ApiOperation(value = "删除用户", httpMethod = "GET")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "用户id", name = "userId", dataType = "int", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "del", method = RequestMethod.GET)
+    public RestResult delUser(Long userId) {
+        ValidateUtil.checkNull(userId, CommonErrorCode.PARAM_ERROR, "userId不能为空");
+        userService.delUser(userId);
         return RestResult.ok();
     }
 

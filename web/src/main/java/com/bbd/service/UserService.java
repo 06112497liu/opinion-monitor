@@ -16,6 +16,7 @@ import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.mybatis.domain.PageBounds;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -48,7 +50,10 @@ public class UserService {
      */
     public List<User> queryUsers(PageBounds pb) {
         UserExample exam = new UserExample();
-        return userDao.selectByExampleWithPageBounds(exam, pb);
+        exam.createCriteria().andFlagEqualTo(0); // 未删除的用户
+        List<User> list = userDao.selectByExampleWithPageBounds(exam, pb);
+        list.sort((u1, u2) -> u2.getGmtCreate().compareTo(u1.getGmtCreate()));
+        return list;
     }
 
     /**
@@ -114,6 +119,21 @@ public class UserService {
         userDao.insertSelective(user);
 
         return user.getId();
+    }
+
+    /**
+     * 删除用户
+     * @param usderId
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void delUser(Long usderId) {
+        UserExample example = new UserExample();
+        example.createCriteria().andIdEqualTo(usderId);
+        User record = new User();
+        record.setFlag(1); // 删除标记
+        int num = userDao.updateByExampleSelective(record, example);
+        if(num == 0)
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
     }
 
 }

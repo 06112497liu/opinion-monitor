@@ -176,8 +176,8 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         Map<String, Object> keyMap = Maps.newHashMap();
         keyMap.put(EsConstant.uuidField, uuid);
         keyMap.put(EsConstant.opTypeField, 1);
-        List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 50);
-        if(list.size() >= 50) {
+        List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 49);
+        if(list.size() >= 49) {
             throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "舆情转发次数不能超过50次");
         }
     }
