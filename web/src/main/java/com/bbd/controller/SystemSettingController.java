@@ -7,18 +7,13 @@ import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
+import com.bbd.service.param.WarnNotifierParam;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.util.ValidateUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -72,37 +67,14 @@ public class SystemSettingController {
         return RestResult.ok(settingService.modifyHeat(eventId, type, first, second, third));
     }
 
-    @ApiOperation(value = "添加预警通知人", httpMethod = "GET")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "所属预警配置id", name = "settingId", dataType = "Long", paramType = "query", required = true),
-            @ApiImplicitParam(value = "通知人", name = "notifier", dataType = "String", paramType = "query", required = false),
-            @ApiImplicitParam(value = "邮件通知（0-否，1-是）", name = "emailNotify", dataType = "Integer", paramType = "query", required = false),
-            @ApiImplicitParam(value = "邮件", name = "email", dataType = "String", paramType = "query", required = false),
-            @ApiImplicitParam(value = "短信通知（0-否，1-是）", name = "smsNotify", dataType = "Integer", paramType = "query", required = false),
-            @ApiImplicitParam(value = "电话", name = "phone", dataType = "String", paramType = "query", required = false)
-    })
-    @RequestMapping(value = "notifier/add", method = RequestMethod.GET)
-    public RestResult addNotifier(WarnNotifier w) {
-        ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, w.getSettingId(), w.getNotifier());
-        ValidateUtil.checkNotAllNull(CommonErrorCode.PARAM_ERROR, w.getEmail(), w.getPhone());
-        Integer result = settingService.addNotifier(w);
+    @ApiOperation(value = "创建或修改通知人信息", httpMethod = "POST")
+    @RequestMapping(value = "notifier/operate", method = RequestMethod.POST)
+    public RestResult operateNotifier(@RequestBody @ApiParam(name = "通知人信息", value = "传入JSON")  List<WarnNotifierParam> list) {
+        for (WarnNotifierParam w : list) {
+            w.validate();
+        }
+        Integer result = settingService.operateNotifier(list);
         return RestResult.ok(result);
-    }
-
-    @ApiOperation(value = "修改预警通知人信息", httpMethod = "GET")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "id", name = "id", dataType = "Long", paramType = "query", required = true),
-            @ApiImplicitParam(value = "通知人", name = "notifier", dataType = "String", paramType = "query", required = true),
-            @ApiImplicitParam(value = "邮件通知（0-否，1-是）", name = "emailNotify", dataType = "Integer", paramType = "query", required = false),
-            @ApiImplicitParam(value = "邮件", name = "email", dataType = "String", paramType = "query", required = false),
-            @ApiImplicitParam(value = "短信通知（0-否，1-是）", name = "smsNotify", dataType = "Integer", paramType = "query", required = false),
-            @ApiImplicitParam(value = "电话", name = "phone", dataType = "String", paramType = "query", required = false)
-    })
-    @RequestMapping(value = "notifier/modify", method = RequestMethod.GET)
-    public RestResult ModifyNotifier(WarnNotifier w) {
-        ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, w.getId(), w.getNotifier());
-        ValidateUtil.checkNotAllNull(CommonErrorCode.PARAM_ERROR, w.getEmail(), w.getPhone());
-        return RestResult.ok(settingService.modifyNotifier(w));
     }
 
     @ApiOperation(value = "删除预警通知人信息", httpMethod = "GET")

@@ -1,15 +1,13 @@
 package com.bbd.service.impl;
 
-import com.bbd.dao.MonitorKeywordsDao;
-import com.bbd.dao.MonitorKeywordsExtDao;
-import com.bbd.dao.WarnNotifierDao;
-import com.bbd.dao.WarnSettingDao;
+import com.bbd.dao.*;
 import com.bbd.domain.*;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.BizErrorCode;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.UserService;
+import com.bbd.service.param.WarnNotifierParam;
 import com.bbd.service.param.WarnSettingVo;
 import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.StringUtils;
@@ -41,6 +39,9 @@ public class SystemSettingServiceImpl implements SystemSettingService {
 
     @Autowired
     private WarnNotifierDao notifierDao;
+
+    @Autowired
+    private WarnNotifierExtDao notifierExtDao;
 
     @Autowired
     private MonitorKeywordsDao keywordsDao;
@@ -83,40 +84,17 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     }
 
     @Override
-    public Integer addNotifier(WarnNotifier notifier) {
+    public Integer operateNotifier(List<WarnNotifierParam> list) {
+        if(list == null || list.isEmpty())
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "通知人没有数据");
+        // step-1：先删除指定配置下的通知人
+        Long settingId = list.get(0).getSettingId();
+        notifierExtDao.delNotifierBySettingId(settingId);
 
-        Long settingId = notifier.getSettingId();
-        // step-1：校验通知人是否已经达到20人
-        WarnNotifierExample example = new WarnNotifierExample();
-        example.createCriteria().andSettingIdEqualTo(settingId);
-        int size = notifierDao.selectByExample(example).size();
-        if(size >= 20) throw new ApplicationException(BizErrorCode.NOTIFIER_OUT_TWENTY);
-
-        // step-2：校验settingId是否存在
-        Preconditions.checkNotNull(settingId);
-        boolean flag = Objects.nonNull(settingDao.selectByPrimaryKey(settingId));
-        if(!flag) throw new ApplicationException(BizErrorCode.NOTIFIER_SETTINGID_NOT_EXIST);
-
-        // step-3：添加预警通知人
-        notifier.setCreateBy(userService.getUserId());
-        notifier.setGmtCreate(new Date());
-        return notifierDao.insertSelective(notifier);
-    }
-
-    @Override
-    public Integer modifyNotifier(WarnNotifier notifier) {
-        // step-1：校验id是否为null
-        Long id = notifier.getId();
-        Preconditions.checkNotNull(id);
-
-        // step-2：校验操作对象是否存在
-        boolean flag = Objects.nonNull(notifierDao.selectByPrimaryKey(id));
-        if(flag == false) throw new ApplicationException(BizErrorCode.OBJECT_NOT_EXIST);
-
-        // step-3：执行修改操作
-        notifier.setModifiedBy(userService.getUserId());
-        notifier.setGmtModified(new Date());
-        return notifierDao.updateByPrimaryKeySelective(notifier);
+        // step-2：批量添加预警通知人
+        List<WarnNotifier> insertList = BeanMapperUtil.mapList(list, WarnNotifier.class);
+        int result = notifierExtDao.batchInsertNotifier(insertList);
+        return result;
     }
 
     @Override

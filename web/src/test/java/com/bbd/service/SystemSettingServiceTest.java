@@ -25,7 +25,6 @@ public class SystemSettingServiceTest extends BaseServiceTest{
         w.setSettingId(7L);
         w.setEmail("804912547@qq.com");
         w.setEmailNotify(1);
-        settingService.addNotifier(w);
     }
 
     @Test
@@ -33,7 +32,6 @@ public class SystemSettingServiceTest extends BaseServiceTest{
         WarnNotifier w = new WarnNotifier();
         w.setNotifier("张三");
         w.setId(1L);
-        settingService.modifyNotifier(w);
     }
 
     @Test

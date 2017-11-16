@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbd.dao.WarnNotifierExtDao">
+  <resultMap id="BaseResultMap" type="com.bbd.domain.WarnNotifier">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="setting_id" jdbcType="BIGINT" property="settingId" />
+    <result column="notifier" jdbcType="VARCHAR" property="notifier" />
+    <result column="email_notify" jdbcType="BIT" property="emailNotify" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="sms_notify" jdbcType="BIT" property="smsNotify" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="create_by" jdbcType="BIGINT" property="createBy" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="modified_by" jdbcType="BIGINT" property="modifiedBy" />
+    <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+  </resultMap>
+
+  <sql id="batchInsertNotifier_sql">
+    (
+	`setting_id`,
+	`notifier`,
+	`email_notify`,
+	`email`,
+	`sms_notify`,
+	`phone`
+	)
+  </sql>
+
+  <delete id="delNotifierBySettingId" parameterType="java.lang.Long">
+    DELETE FROM bbd_warn_notifier WHERE setting_id = #{settingId}
+  </delete>
+
+  <insert id="batchInsertNotifier" parameterType="java.util.List">
+    INSERT INTO
+      bbd_warn_notifier
+      <include refid="batchInsertNotifier_sql"/>
+    VALUES
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.settingId}, #{item.notifier}, #{item.emailNotify}, #{item.email}, #{item.smsNotify}, #{item.phone})
+    </foreach>
+  </insert>
+
+
+</mapper>

@@ -19,10 +19,9 @@ import com.bbd.vo.PermissionView;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Optional;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,6 +37,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/login")
+@Api(description = "登陆模块")
 public class LoginController extends AbstractController {
 
     @Autowired
@@ -51,12 +51,8 @@ public class LoginController extends AbstractController {
 
     @TimeUsed(threshold = 10)
     @ApiOperation(value = "登录", httpMethod = "POST")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "用户名", name = "username", dataType = "String", paramType = "query", required = false),
-            @ApiImplicitParam(value = "密码", name = "password", dataType = "String", paramType = "query", required = false)
-    })
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public RestResult doLogin(@Valid LoginUser param) {
+    public RestResult doLogin(@RequestBody @Valid @ApiParam(name = "用户登陆对象", value = "传入JSON") LoginUser param) {
         if (UserContext.getUser() != null) {
             return RestResult.ok();
         }

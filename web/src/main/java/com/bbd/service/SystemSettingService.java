@@ -2,6 +2,7 @@ package com.bbd.service;
 
 import com.bbd.domain.MonitorKeywords;
 import com.bbd.domain.WarnNotifier;
+import com.bbd.service.param.WarnNotifierParam;
 import com.bbd.service.param.WarnSettingVo;
 
 import java.util.List;
@@ -23,18 +24,11 @@ public interface SystemSettingService {
     Integer modifyHeat(Long eventId, Integer type, Integer first, Integer second, Integer third);
 
     /**
-     * 新增预警通知人
-     * @param notifier 预警通知人
+     * 添加或修改预警通知人
+     * @param list
      * @return
      */
-    Integer addNotifier(WarnNotifier notifier);
-
-    /**
-     * 修改预警通知人信息
-     * @param notifier 预警通知人
-     * @return
-     */
-    Integer modifyNotifier(WarnNotifier notifier);
+    Integer operateNotifier(List<WarnNotifierParam> list);
 
     /**
      * 删除预警通知人
