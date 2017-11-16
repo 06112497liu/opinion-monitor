@@ -131,7 +131,8 @@ public class EsTest {
         String index = EsUtil.INDEX;
         String type = EsUtil.TYPE;
 
-        BulkRequestBuilder bulk = EsUtil.getClient().prepareBulk();
+        //        BulkRequestBuilder bulk = EsUtil.getClient().prepareBulk();
+        BulkRequestBuilder bulk = null;
         bulk.add(new IndexRequest(index, type, one.getUuid()).source(JsonUtil.fromJson(one), XContentType.JSON));
         bulk.add(new IndexRequest(index, type, two.getUuid()).source(JsonUtil.fromJson(two), XContentType.JSON));
         bulk.add(new IndexRequest(index, type, three.getUuid()).source(JsonUtil.fromJson(three), XContentType.JSON));
@@ -162,7 +163,7 @@ public class EsTest {
         vo.setMatchTime(dateTime.toDate());
         vo.setMatchTimeTrim(trimTime.toDate());
 
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = null;
         BulkRequestBuilder bulk = client.prepareBulk();
 
         IndexRequest ir = new IndexRequest(index, type, id);

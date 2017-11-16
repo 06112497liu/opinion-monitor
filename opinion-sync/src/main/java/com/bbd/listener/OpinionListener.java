@@ -54,6 +54,9 @@ public class OpinionListener {
     private static final Logger logger = LoggerFactory.getLogger(OpinionListener.class);
 
     @Autowired
+    private EsUtil              esUtil;
+
+    @Autowired
     private WarnSettingDao      warnSettingDao;
 
     @KafkaListener(topics = "bbd_opinion", containerFactory = "kafkaListenerContainerFactory")
@@ -127,67 +130,6 @@ public class OpinionListener {
         logger.info("Process {} opinions success, time used: {}", records.size(), (end - start));
     }
 
-    //    private void processRecords(List<ConsumerRecord<String, String>> records) {
-    //        if (records.size() == 0) {
-    //            return;
-    //        }
-    //        long start = System.currentTimeMillis();
-    //
-    //        Date now = new Date();
-    //        List<WarnSetting> settings = getWarnSetting();
-    //
-    //        List<OpinionVO> vos = Lists.newArrayList();
-    //        for (ConsumerRecord<String, String> record : records) {
-    //            System.out.printf("offset = %d, key = %s, value = %s\n", record.offset(), record.key(), record.value());
-    //            OpinionVO vo = JsonUtil.parseObject(record.value(), OpinionVO.class);
-    //            vos.add(vo);
-    //        }
-    //
-    //        List<OpinionVO> warnVos = Lists.newArrayList();
-    //        List<OpinionHotEsVO> hotVos = Lists.newArrayList();
-    //        List<OpinionEsSyncVO> updateVos = Lists.newArrayList();
-    //        List<OpinionEsSyncVO> indexVos = Lists.newArrayList();
-    //
-    //        Map<String, OpinionEsSyncVO> existMap = getExistsOpinions(vos);
-    //        for (OpinionVO vo : vos) {
-    //            String uuid = vo.getUuid();
-    //
-    //            OpinionEsSyncVO nvo = new OpinionEsSyncVO();
-    //            BeanUtils.copyProperties(vo, nvo);
-    //
-    //            boolean warn = matchWarnLevel(vo.getHot(), settings);
-    //            if (warn) {
-    //                addHotRecord(vo, hotVos);
-    //
-    //                if (existMap.keySet().contains(uuid)) {
-    //                    OpinionEsSyncVO esVo = existMap.get(vo.getUuid());
-    //                    if (!hasMatchHotLevel(esVo)) {
-    //                        nvo.setFirstWarnTime(now);
-    //                    }
-    //                    updateVos.add(nvo);
-    //                    addWarnVos(vo, esVo, warnVos, settings);
-    //                } else {
-    //                    nvo.setFirstWarnTime(now);
-    //                    indexVos.add(nvo);
-    //                    addWarnVos(vo, null, warnVos, settings);
-    //                }
-    //            } else {
-    //                if (existMap.keySet().contains(uuid)) {
-    //                    updateVos.add(nvo);
-    //                } else {
-    //                    indexVos.add(nvo);
-    //                }
-    //            }
-    //        }
-    //
-    //        syncOpinionIndex(updateVos, indexVos);
-    //        saveOpinionHotVos(hotVos);
-    //        sendWarnMessage(warnVos);
-    //
-    //        long end = System.currentTimeMillis();
-    //        logger.info("Process {} opinions success, time used: {}", records.size(), (end - start));
-    //    }
-
     /**
      * 获取事件和舆情关联记录
      * @param vo
@@ -243,7 +185,7 @@ public class OpinionListener {
 
         long start = System.currentTimeMillis();
 
-        MultiGetRequestBuilder builder = EsUtil.getClient().prepareMultiGet();
+        MultiGetRequestBuilder builder = esUtil.getClient().prepareMultiGet();
         String[] includeFields = { EsConstant.OPINION_UUID, EsConstant.OPINION_HOT_PROP, EsConstant.OPINION_FIRST_WARN_TIME };
         String[] excludeFields = {};
         FetchSourceContext sourceContext = new FetchSourceContext(true, includeFields, excludeFields);
@@ -402,7 +344,7 @@ public class OpinionListener {
         String index = EsUtil.HOT_INDEX;
         String type = EsUtil.HOT_TYPE;
 
-        BulkRequestBuilder bulkBuilder = EsUtil.getClient().prepareBulk();
+        BulkRequestBuilder bulkBuilder = esUtil.getClient().prepareBulk();
         for (OpinionHotEsVO vo : vos) {
             IndexRequest ir = new IndexRequest(index, type);
             ir.source(JsonUtil.fromJson(vo), XContentType.JSON);
@@ -429,7 +371,7 @@ public class OpinionListener {
         String index = EsUtil.INDEX;
         String type = EsUtil.TYPE;
 
-        BulkRequestBuilder bulkBuilder = EsUtil.getClient().prepareBulk();
+        BulkRequestBuilder bulkBuilder = esUtil.getClient().prepareBulk();
         for (OpinionEsSyncVO vo : updateVos) {
             UpdateRequest ur = new UpdateRequest(index, type, vo.getUuid()).doc(JsonUtil.fromJson(vo), XContentType.JSON);
             bulkBuilder.add(ur);
@@ -477,7 +419,7 @@ public class OpinionListener {
         }
         long start = System.currentTimeMillis();
 
-        TransportClient client = EsUtil.getClient();
+        TransportClient client = esUtil.getClient();
         BulkRequestBuilder bulk = client.prepareBulk();
 
         String index = EsConstant.IDX_OPINION_EVENT_RECORD;
