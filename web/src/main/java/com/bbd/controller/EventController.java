@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bbd.RestResult;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.domain.OpinionEvent;
+import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
 import com.bbd.util.UserContext;
 
@@ -35,6 +37,8 @@ public class EventController extends AbstractController {
 
     @Autowired
     EventService eventService;
+    @Autowired
+    EsQueryService esQueryService;
     
     @ApiOperation(value = "创建事件", httpMethod = "POST")
     @ApiImplicitParams({ 
@@ -146,6 +150,25 @@ public class EventController extends AbstractController {
     @RequestMapping(value = "eventList", method = RequestMethod.GET)
     public RestResult eventList(OpinionEvent opinionEvent, Integer pageNo, Integer pageSize) {
         return RestResult.ok(eventService.eventList(opinionEvent, pageNo, pageSize));
+    }
+    
+    @ApiOperation(value = "最新事件", httpMethod = "GET")
+    @RequestMapping(value = "eventIdLatest", method = RequestMethod.GET)
+    public RestResult eventIdLatest() {
+        List<OpinionEvent> eventList = eventService.eventList(new OpinionEvent(), 1, 1);
+        if (eventList != null && eventList.size() > 0) {
+            return RestResult.ok(eventList.get(0).getId());
+        } else {
+            return RestResult.ok(null);
+        }
+    }
+    
+    @ApiOperation(value = "事件预警配置/实时预警舆情", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true)})
+    @RequestMapping(value = "eventNewOpinionCount", method = RequestMethod.GET)
+    public RestResult eventNewOpinionCount(Long id) {
+        return RestResult.ok(esQueryService.opinionInstantByEvent(id));
     }
     
     @ApiOperation(value = "事件分组、监管主体、事发区域、事件级别下拉列表", httpMethod = "GET")

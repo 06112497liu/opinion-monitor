@@ -11,6 +11,7 @@ import com.bbd.enums.WebsiteEnum;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.IndexStatisticService;
 import com.bbd.service.param.OpinionCountStatQueryParam;
+import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.utils.PercentUtil;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
@@ -18,6 +19,7 @@ import com.google.common.collect.Lists;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.util.PageListHelper;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Days;
@@ -49,36 +51,21 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     private OpinionEventDao eventDao;
 
     @Override
-    public OpinionCountStatVO getOpinionCountStatistic(Integer state, Integer timeSpan) {
+    public OpinionCountStatVO getOpinionCountStatistic(Integer timeSpan) throws NoSuchFieldException, IllegalAccessException {
 
-        // step-1：组装条件
         DateTime now = DateTime.now();
-        DateTime startTime = null;
-        if(timeSpan == 1) startTime = now.withTimeAtStartOfDay();
-        else if(timeSpan == 2) startTime = now.withDayOfWeek(DateTimeConstants.MONDAY).withTimeAtStartOfDay();
-        else if(timeSpan == 3) startTime = now.withDayOfMonth(1).withTimeAtStartOfDay();
-        else if(timeSpan == 4) startTime = now.withDayOfYear(1).withTimeAtStartOfDay();
-        else startTime = now.plusYears(-6);
+        DateTime startTime = BusinessUtils.getDateTimeWithStartTime(timeSpan);
 
-        // step-2：执行查询
-        OpinionCountStatVO result = esQueryService.getOpinionCountStatistic(state, startTime);
+        OpinionCountStatVO result = esQueryService.getOpinionCountStatistic(startTime, now);
         return result;
     }
 
     @Override
     public Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer timeSpan) {
-        Map<String, List<KeyValueVO>> map = esQueryService.getOpinionCountStatisticGroupTime(timeSpan);
-        List<KeyValueVO> levleOneList = map.get("levelOne");
-        List<KeyValueVO> levleTwoList = map.get("levelTwo");
-        List<KeyValueVO> levleThreeList = map.get("levelThree");
-        List<KeyValueVO> allList = Lists.newLinkedList();
-        for (int i=0; i<levleOneList.size(); i++) {
-            KeyValueVO v = new KeyValueVO();
-            v.setKey(levleOneList.get(i).getKey());
-            v.setValue((long)(levleOneList.get(i).getValue()) + (long)(levleTwoList.get(i).getValue()) + (long)(levleThreeList.get(i).getValue()));
-            allList.add(v);
-        }
-        map.put("all", allList);
+        DateTime start;
+        start = BusinessUtils.getDateTimeWithStartTime(timeSpan);
+        DateHistogramInterval interval = BusinessUtils.getDateHistogramInterval(timeSpan);
+        Map<String, List<KeyValueVO>> map = esQueryService.getOpinionCountStatisticGroupTime(start, DateTime.now(), interval);
         return map;
     }
 

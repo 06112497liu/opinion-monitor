@@ -1,5 +1,6 @@
 package com.bbd.service.utils;
 
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 
 /**
@@ -22,6 +23,50 @@ public class BusinessUtils {
         else if(1 == timeSpan)startTime = now.plusHours(-24);
         return startTime;
     }
+
+    public static DateTime getDateTimeWithStartTime(Integer timeSpan) {
+        DateTime now = DateTime.now();
+        DateTime result;
+        switch (timeSpan) {
+            case 1:
+                result = now.withTimeAtStartOfDay();
+                break;
+            case 2:
+                result = now.withDayOfWeek(1).withTimeAtStartOfDay();
+                break;
+            case 3:
+                result = now.withDayOfMonth(1).withTimeAtStartOfDay();
+                break;
+            case 4:
+                result = now.withDayOfYear(1).withTimeAtStartOfDay();
+                break;
+            default:
+                result = now.plusYears(-8);
+                break;
+        }
+        return result;
+    }
+
+    public static DateHistogramInterval getDateHistogramInterval(Integer timeSpan) {
+        DateHistogramInterval d = null;
+        switch (timeSpan) {
+            case 1:
+                d = DateHistogramInterval.HOUR;
+                break;
+            case 2:
+            case 3:
+                d = DateHistogramInterval.DAY;
+                break;
+            case 4:
+                d = DateHistogramInterval.MONTH;
+                break;
+            default:
+                d = DateHistogramInterval.YEAR;
+                break;
+        }
+        return d;
+    }
+
 
 }
     

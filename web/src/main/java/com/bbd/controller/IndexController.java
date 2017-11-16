@@ -12,6 +12,7 @@ import com.bbd.service.OpinionService;
 import com.bbd.service.param.OpinionCountStatQueryParam;
 import com.bbd.service.vo.DBStaVO;
 import com.bbd.service.vo.KeyValueVO;
+import com.bbd.service.vo.OpinionCountStatVO;
 import com.bbd.service.vo.SystemStaVO;
 import com.bbd.util.ValidateUtil;
 import io.swagger.annotations.Api;
@@ -54,12 +55,12 @@ public class IndexController extends AbstractController {
 
     @ApiOperation(value = "预警舆情统计", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "状态：0. 未处理; 1. 已处理", name = "state", dataType = "Integer", paramType = "query", required = true),
             @ApiImplicitParam(value = "时间跨度：1. 本日；2. 本周； 3. 本月； 4. 本年； 5. 全部。", name = "timeSpan", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "/stat/opinion/count", method = RequestMethod.GET)
-    public RestResult getOpinionCountStatistic(Integer state, @RequestParam(value = "timeSpan", defaultValue = "3") Integer timeSpan) {
-        return RestResult.ok(indexStatisticService.getOpinionCountStatistic(state, timeSpan));
+    public RestResult getOpinionCountStatistic(@RequestParam(value = "timeSpan", defaultValue = "3") Integer timeSpan) throws NoSuchFieldException, IllegalAccessException {
+        OpinionCountStatVO result = indexStatisticService.getOpinionCountStatistic(timeSpan);
+        return RestResult.ok(result);
     }
 
     @ApiOperation(value = "预警舆情统计坐标轴", httpMethod = "GET")

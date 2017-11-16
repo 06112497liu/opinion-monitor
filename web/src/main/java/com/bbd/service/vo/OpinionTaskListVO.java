@@ -27,6 +27,16 @@ public class OpinionTaskListVO extends OpinionVO {
     private String eventName;
 
     /**
+     * 词云
+     */
+    private String[] keyword;
+
+    /**
+     * 关键词
+     */
+    private String[] keys;
+
+    /**
      * 添加监测时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
@@ -64,7 +74,21 @@ public class OpinionTaskListVO extends OpinionVO {
         this.content = content;
     }
 
+    public String[] getKeyword() {
+        return keyword;
+    }
 
+    public void setKeyword(String[] keyword) {
+        this.keyword = keyword;
+    }
+
+    public String[] getKeys() {
+        return keys;
+    }
+
+    public void setKeys(String[] keys) {
+        this.keys = keys;
+    }
 }
     
     

@@ -82,11 +82,11 @@ public class SystemSettingController {
             @ApiImplicitParam(value = "电话", name = "phone", dataType = "String", paramType = "query", required = false)
     })
     @RequestMapping(value = "notifier/add", method = RequestMethod.GET)
-    public RestResult addNotifier(@Valid WarnNotifier w, Errors errorss) {
-        errorss.hasErrors();
+    public RestResult addNotifier(WarnNotifier w) {
         ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, w.getSettingId(), w.getNotifier());
         ValidateUtil.checkNotAllNull(CommonErrorCode.PARAM_ERROR, w.getEmail(), w.getPhone());
-        return RestResult.ok(settingService.addNotifier(w));
+        Integer result = settingService.addNotifier(w);
+        return RestResult.ok(result);
     }
 
     @ApiOperation(value = "修改预警通知人信息", httpMethod = "GET")
@@ -148,7 +148,7 @@ public class SystemSettingController {
     @ApiOperation(value = "实时预警数量统计", httpMethod = "GET")
     @RequestMapping(value = "ins/warn/sta", method = RequestMethod.GET)
     public RestResult getInsWarnSta() {
-        List<KeyValueVO> result = esQueryService.opinionInstant(null);
+        List<KeyValueVO> result = esQueryService.opinionInstant();
         return RestResult.ok(result);
     }
 

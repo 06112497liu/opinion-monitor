@@ -4,17 +4,24 @@
  */
 package com.bbd.service;
 
-import com.bbd.bean.OpinionEsVO;
-import com.bbd.bean.OpinionHotEsVO;
-import com.bbd.service.vo.*;
-import com.mybatis.domain.PageBounds;
-import com.mybatis.domain.PageList;
+import java.util.List;
+import java.util.Map;
+
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import com.bbd.bean.OpinionEsVO;
+import com.bbd.bean.OpinionHotEsVO;
+import com.bbd.domain.OpinionEvent;
+import com.bbd.service.vo.DBStaVO;
+import com.bbd.service.vo.KeyValueVO;
+import com.bbd.service.vo.OpinionCountStatVO;
+import com.bbd.service.vo.OpinionEsSearchVO;
+import com.bbd.service.vo.OpinionOpRecordVO;
+import com.bbd.service.vo.OpinionTaskListVO;
+import com.mybatis.domain.PageBounds;
+import com.mybatis.domain.PageList;
 
 /**
  * ES查询服务
@@ -32,18 +39,11 @@ public interface EsQueryService {
 
     /**
      * 获取舆情数量 - 首页
-     * @param state
      * @param startTime
+     * @param endTime
      * @return
      */
-    OpinionCountStatVO getOpinionCountStatistic(Integer state, DateTime startTime);
-
-    /**
-     * 获取舆情数量折线统计图 - 首页
-     * @param timeSpan
-     * @return
-     */
-    Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(Integer timeSpan);
+    OpinionCountStatVO getOpinionCountStatistic(DateTime startTime, DateTime endTime) throws NoSuchFieldException, IllegalAccessException;
 
     /**
      * 获取舆情数量折线统计图 - 首页
@@ -54,15 +54,6 @@ public interface EsQueryService {
      */
     Map<String, List<KeyValueVO>> getOpinionCountStatisticGroupTime(DateTime startTime, DateTime endTime, DateHistogramInterval interval);
 
-    /**
-     * 获取舆情数量折线统计图 - 首页
-     * @param eventId
-     * @param sourceType
-     * @param isInfo
-     * @param cycle
-     * @return
-     */
-    List<KeyValueVO> getEventStatisticInfoBySourceAndCycle(Long eventId, String sourceType, String isInfo, Integer cycle);
     /**
      * 查询舆情事件走势
      * @param eventId: 事件ID
@@ -78,6 +69,16 @@ public interface EsQueryService {
      * @return
      */
     KeyValueVO getEventMediaStatisticBySource(Long eventId, String sourceType);
+    /**
+     * 获取事件相关信息总量
+     * @param eventId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    Long queryEventInfoTotal(Long eventId, DateTime startTime, DateTime endTime);
+    
+    List<KeyValueVO> queryEventInfoTotal(OpinionEvent opinionEvent, boolean isWarn, Integer cycle);
 
     /**
      * 关键词排行TOP10 - 首页
@@ -249,8 +250,13 @@ public interface EsQueryService {
 
     /**
      * 实时统计预警舆情数量
-     * @param eventId
      * @return
      */
-    List<KeyValueVO> opinionInstant(Long eventId);
+    List<KeyValueVO> opinionInstant();
+    
+    /**
+     * 实时统计事件新增观点舆情数量
+     * @return
+     */
+    Integer opinionInstantByEvent(Long eventId);
 }
