@@ -16,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.dao.OpinionEventDao;
@@ -34,6 +36,7 @@ import com.mybatis.domain.PageBounds;
  * @author daijinlong 
  * @version $Id: EventStatisticService.java, v 0.1 2017年11月14日 上午10:23:47 daijinlong Exp $ 
  */
+@Service
 public class EventStatisticService {
     @Autowired
     OpinionEventDao opinionEventDao;
@@ -46,6 +49,7 @@ public class EventStatisticService {
     @Autowired
     OpinionEventMediaStatisticDao opinionEventMediaStatisticDao;
     
+    @Scheduled(cron="0 30 * * * ?")
     public void eventTrendStatistic() {
         OpinionEventExample example = new OpinionEventExample();
         example.createCriteria().andIsDeleteEqualTo((byte)0).andFileReasonIsNull();
@@ -74,7 +78,7 @@ public class EventStatisticService {
         opinionEventTrendStatisticDao.insertBatch(records);
     }
     
-    
+    @Scheduled(cron="0 30 * * * ?")
     public void eventMediaStatistic() throws ParseException {
         OpinionEventExample example = new OpinionEventExample();
         example.createCriteria().andIsDeleteEqualTo((byte)0).andFileReasonIsNull();
