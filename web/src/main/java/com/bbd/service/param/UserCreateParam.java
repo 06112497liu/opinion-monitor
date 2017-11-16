@@ -18,6 +18,12 @@ import java.io.Serializable;
 public class UserCreateParam implements Serializable {
 
     /**
+     * 用户id
+     */
+    @ApiModelProperty(name = "userId", value = "用户id")
+    private Long userId;
+
+    /**
      * 区域
      */
     @ApiModelProperty(name = "region", value = "区域", required = true)
@@ -60,6 +66,14 @@ public class UserCreateParam implements Serializable {
      */
     @ApiModelProperty(name = "depNote", value = "部门备注")
     private String depNote;
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
     public String getUsername() {
         return username;

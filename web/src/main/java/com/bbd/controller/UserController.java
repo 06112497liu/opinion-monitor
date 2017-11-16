@@ -11,10 +11,7 @@ import com.bbd.service.UserService;
 import com.bbd.service.param.UserCreateParam;
 import com.bbd.util.ValidateUtil;
 import com.mybatis.domain.PageBounds;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/user")
+@Api(description = "用户模块")
 public class UserController extends AbstractController {
 
     @Autowired
@@ -47,6 +45,14 @@ public class UserController extends AbstractController {
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public RestResult createUser(@RequestBody @Valid @ApiParam(name = "用户对象", value = "传入JSON") UserCreateParam param) {
         userService.createUserAndAccount(param);
+        return RestResult.ok();
+    }
+
+    @ApiOperation(value = "修改用户信息", httpMethod = "POST")
+    @RequestMapping(value = "update", method = RequestMethod.POST)
+    public RestResult updateUser(@RequestBody @Valid @ApiParam(name = "用户对象", value = "传入JSON") UserCreateParam param) {
+        ValidateUtil.checkNull(param.getUserId(), CommonErrorCode.BIZ_ERROR, "修改用户id不能为空");
+        userService.updateUserAndAccount(param);
         return RestResult.ok();
     }
 

@@ -72,4 +72,22 @@ public class AccountService {
 
         accountDao.insertSelective(account);
     }
+
+    /**
+     * 修改账户信息
+     * @param vo
+     */
+    public void updateAccout(AccountCreateVO vo) {
+        Preconditions.checkNotNull(vo, "创建账户参数不能为空");
+        vo.validate();
+
+        Date now = new Date();
+        Account account = new Account();
+        account.setGmtModified(now);
+        BeanUtils.copyProperties(vo, account);
+
+        AccountExample example = new AccountExample();
+        example.createCriteria().andUserIdEqualTo(vo.getUserId());
+        accountDao.updateByExampleSelective(account, example);
+    }
 }

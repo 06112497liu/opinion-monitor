@@ -12,6 +12,7 @@ import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.param.AccountCreateVO;
 import com.bbd.service.param.UserCreateParam;
 import com.bbd.service.param.UserCreateVO;
+import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Optional;
@@ -119,6 +120,41 @@ public class UserService {
         userDao.insertSelective(user);
 
         return user.getId();
+    }
+
+    /**
+     * 修改用户和账户
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserAndAccount(UserCreateParam param) {
+
+        // step-1：修改用户信息
+        UserCreateVO userVo = new UserCreateVO();
+        BeanUtils.copyProperties(param, userVo);
+        updateUser(param.getUserId(), userVo);
+
+        // step-2：修改账户信息
+        AccountCreateVO accountVO = new AccountCreateVO();
+        BeanUtils.copyProperties(param, accountVO);
+        accountService.updateAccout(accountVO);
+
+    }
+
+
+    // 更新舆情用户信息
+    private void updateUser(Long userId, UserCreateVO userCreateVO) {
+        Preconditions.checkNotNull(userCreateVO, "修改用户参数不能为空");
+
+        userCreateVO.validate();
+        UserExample example = new UserExample();
+        example.createCriteria().andIdEqualTo(userId);
+
+        User user = new User();
+        BeanUtils.copyProperties(userCreateVO, user);
+        user.setGmtModified(new Date());
+
+        userDao.updateByExampleSelective(user, example);
     }
 
     /**
