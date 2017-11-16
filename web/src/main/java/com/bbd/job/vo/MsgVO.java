@@ -18,6 +18,8 @@ public class MsgVO {
 
     private MsgModel     model;
 
+    private String       subject;
+
     private Integer      retry;
 
     private String       template;
@@ -50,6 +52,14 @@ public class MsgVO {
 
     public void setModel(MsgModel model) {
         this.model = model;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public Integer getRetry() {
