@@ -58,5 +58,8 @@ public class EsConstant {
     public static final String IDX_OPINION_EVENT_RECORD       = "bbd_opinion_event_record";
     public static final String OPINION_EVENT_RECORD_TYPE      = "opinion_event_record";
     public static final String OPINION_EVENT_RECORD_WARN_TYPE = "opinion_event_warn_record";
-
+    public static final String eventIdField                   = "eventId";
+    public static final String matchTimeField                 = "matchTime";
+    public static final String matchTimeTrimField             = "matchTimeTrim";
+    public static final String opinionIdField                 = "opinionId";
 }

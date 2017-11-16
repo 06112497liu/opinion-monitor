@@ -7,7 +7,9 @@ package com.bbd.service.impl;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.constant.EsConstant;
+import com.bbd.domain.OpinionEvent;
 import com.bbd.service.EsQueryService;
+import com.bbd.service.EventService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
@@ -23,6 +25,7 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
+
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -54,6 +57,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -72,7 +76,8 @@ public class EsQueryServiceImpl implements EsQueryService {
     private final String         levelOne   = "levelOne";
     @Autowired
     private SystemSettingService settingService;
-
+    @Autowired
+    private EventService eventService;
     /**
      * 获取预警舆情top10（排除在舆情任务中的预警舆情，以及热点舆情）
      * @return
@@ -206,40 +211,6 @@ public class EsQueryServiceImpl implements EsQueryService {
         return result;
     }
 
-    /**
-     * 获取事件数量折线统计图 - 图表跟踪分析
-     * @param eventId
-     * @param sourceType
-     * @param isInfo
-     * @return
-     */
-    @Override
-    public List<KeyValueVO> getEventStatisticInfoBySourceAndCycle(Long eventId, String sourceType, String isInfo, Integer cycle) {
-
-        // step-1：构建es查询条件
-        TransportClient client = EsUtil.getClient();
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
-        if (sourceType != null) {
-            query.must(QueryBuilders.termQuery(EsConstant.mediaTypeField, Integer.valueOf(sourceType)));
-        }
-        if (isInfo != null) {
-            query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(settingService.getWarnClass().get(3)));
-        }
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).addAggregation(buildEventDayeRange(cycle)).setSize(0).execute().actionGet();
-
-        // step-2：构建返回结果
-        List<InternalDateRange.Bucket> dateList = ((InternalDateRange) (resp.getAggregations().get("event_calc_aggs"))).getBuckets();
-        List<KeyValueVO> ls = Lists.newLinkedList();
-        for (InternalDateRange.Bucket d : dateList) {
-            KeyValueVO v = new KeyValueVO();
-            v.setKey(d.getKey());
-            v.setValue(d.getDocCount());
-            ls.add(v);
-        }
-        return ls;
-    }
-    
     
     @Override
     public OpinionEsVO queryEventMaxOpinion(Long eventId) {
@@ -284,7 +255,8 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .setQuery(query)
                 .setSize(0).execute().actionGet();
         // step-2：构建返回结果
-        List<InternalDateRange.Bucket> dateList = ((InternalDateRange) (resp.getAggregations().get("event_calc_aggs"))).getBuckets();
+        List<InternalDateRange.Bucket> dateList = ((InternalDateRange) (resp.getAggregations().get("event_media_calc_aggs"))).getBuckets();
+       
         KeyValueVO v = new KeyValueVO();
         v.setKey(sourceType);
         v.setValue(0l);
@@ -295,42 +267,50 @@ public class EsQueryServiceImpl implements EsQueryService {
         }
         return v;
     }
+    
+    public List<KeyValueVO> queryEventInfoTotal(OpinionEvent opinionEvent, boolean isWarn, Integer cycle){
 
-
-    public DateRangeAggregationBuilder buildEventDayeRange(int cycle) {
-        String aggsName = "event_calc_aggs";
-        DateTime endTime = null;
-        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.publishTimeField).keyed(true);
-        DateTime now = DateTime.now();
-        DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-        if (cycle == 1) {
-            DateTime latestEvenHour = DateTime.parse(
-                now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " + (now.getHourOfDay() % 2 == 0 ? now.getHourOfDay() : now.getHourOfDay() - 1) + ":00:00", format);
-            for (int i = 0; i <= 11; i++) {
-                endTime = latestEvenHour.minusHours(i * 2);
-                dateRange.addUnboundedTo(endTime.toString("yyyy-MM-dd HH:mm"), endTime);
-            }
-        } else if (cycle == 2) {
-            DateTime latest12Hour = DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " + (now.getHourOfDay() / 12 == 0 ? 0 : 12 + ":00:00"), format);
-            for (int i = 0; i <= 13; i++) {
-                endTime = latest12Hour.minusHours(i * 12);
-                dateRange.addUnboundedTo(endTime.toString("yyyy-MM-dd HH:mm"), endTime);
-            }
-        } else if (cycle == 3) {
-            DateTime latestDay = DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " + "00:00:00", format);
-            for (int i = 0; i <= 29; i++) {
-                endTime = latestDay.minusDays(i);
-                dateRange.addUnboundedTo(endTime.toString("yyyy-MM-dd HH:mm"), endTime);
-            }
+        // step-1：构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.termQuery(EsConstant.eventIdField, opinionEvent.getId()));
+        SearchResponse resp ;
+        if (isWarn == false) {
+            resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query)
+                    .addAggregation(buildEventDayeRange(cycle, opinionEvent))
+                    .setTypes(EsConstant.OPINION_EVENT_RECORD_TYPE).setSearchType(SearchType.DEFAULT)
+                    .setSize(0).execute().actionGet();
         } else {
-            DateTime latestDay = DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " + "00:00:00", format);
-            for (int i = 0; i <= 364; i++) {
-                endTime = latestDay.minusDays(i);
-                dateRange.addUnboundedTo(endTime.toString("yyyy-MM-dd HH:mm"), endTime);
-            }
+            resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query)
+                    .addAggregation(buildEventDayeRange(cycle, opinionEvent))
+                    .setTypes(EsConstant.OPINION_EVENT_RECORD_WARN_TYPE).setSearchType(SearchType.DEFAULT)
+                    .setSize(0).execute().actionGet();
+        }
+        // step-2：构建返回结果
+        List<InternalDateRange.Bucket> dateList = ((InternalDateRange) (resp.getAggregations().get("event_calc_aggs"))).getBuckets();
+        List<KeyValueVO> ls = Lists.newLinkedList();
+        for (InternalDateRange.Bucket d : dateList) {
+            KeyValueVO v = new KeyValueVO();
+            v.setKey(d.getKey());
+            v.setValue(d.getDocCount());
+            ls.add(v);
+        }
+        return ls;
+    }
+
+
+    public DateRangeAggregationBuilder buildEventDayeRange(int cycle, OpinionEvent opinionEvent) {
+        String aggsName = "event_calc_aggs";
+        
+        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.publishTimeField).keyed(true);
+        List<Date> dates = eventService.getDates(cycle, opinionEvent);
+        for (Date date : dates) {
+            DateTime dateTime = new DateTime(date);
+            dateRange.addUnboundedTo(dateTime.toString("yyyy-MM-dd HH:mm"), dateTime);
         }
         return dateRange;
     }
+    
 
     /**
      * 关键词排行TOP10 - 首页
@@ -517,6 +497,28 @@ public class EsQueryServiceImpl implements EsQueryService {
         result.setOpinions(opList);
 
         return result;
+    }
+    /**
+     * 获取事件相关信息总量
+     * @param eventId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @Override
+    public Long queryEventInfoTotal(Long eventId, DateTime startTime, DateTime endTime){
+        // step-1：构建es查询条件
+        TransportClient client = EsUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        if (endTime != null) {
+            query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        }
+        query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
+        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(0).setSize(1).setQuery(query);
+        // step-2：查询并返回结果
+        SearchResponse resp = builder.execute().actionGet();
+        return resp.getHits().getTotalHits();
     }
 
     /**
