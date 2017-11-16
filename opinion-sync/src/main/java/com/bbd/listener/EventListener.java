@@ -37,31 +37,27 @@ public class EventListener {
     @KafkaListener(topics = "bbd_event_words", containerFactory = "kafkaListenerContainerFactory")
     public void ListenWords(String record) {
         long start = System.currentTimeMillis();
-        List<OpinionEventWords> opinionEventWords = JSON.parseArray(record, OpinionEventWords.class);
-        for (OpinionEventWords opinionEventWord : opinionEventWords) {
-            OpinionEventWordsExample example = new OpinionEventWordsExample();
-            example.createCriteria().andEventIdEqualTo(opinionEventWord.getEventId()).andCycleEqualTo(opinionEventWord.getCycle());
-            List<OpinionEventWords>  opinionEventWordsList= opinionEventWordsDao.selectByExample(example);
-            if (opinionEventWordsList != null && opinionEventWordsList.size() > 0) {
-                opinionEventWord.setGmtModified(new Date());
-                opinionEventWordsDao.updateByPrimaryKeySelective(opinionEventWord);
-            } else {
-                opinionEventWord.setGmtCreate(new Date());
-                opinionEventWordsDao.insert(opinionEventWord);
-            }
+        OpinionEventWords opinionEventWord = JSON.parseObject(record,OpinionEventWords.class);
+        OpinionEventWordsExample example = new OpinionEventWordsExample();
+        example.createCriteria().andEventIdEqualTo(opinionEventWord.getEventId()).andCycleEqualTo(opinionEventWord.getCycle());
+        List<OpinionEventWords>  opinionEventWordsList= opinionEventWordsDao.selectByExample(example);
+        if (opinionEventWordsList != null && opinionEventWordsList.size() > 0) {
+            opinionEventWord.setGmtModified(new Date());
+            opinionEventWordsDao.updateByPrimaryKeySelective(opinionEventWord);
+        } else {
+            opinionEventWord.setGmtCreate(new Date());
+            opinionEventWordsDao.insert(opinionEventWord);
         }
         long end = System.currentTimeMillis();
-        logger.info("Process {} wors success, time used: {}", opinionEventWords.size(), end - start);
+        logger.info("Process {} success, time used: {}", record, end - start);
     }
     @KafkaListener(topics = "bbd_event_hot", containerFactory = "kafkaListenerContainerFactory")
     public void ListenHot(String record) {
         long start = System.currentTimeMillis();
-        List<OpinionEvent> opinionEvents = JSON.parseArray(record, OpinionEvent.class);
-        for (OpinionEvent opinionEvent : opinionEvents) {
-            opinionEvent.setGmtCreate(new Date());
-            opinionEventDao.updateByPrimaryKeySelective(opinionEvent);
-        }
+        OpinionEvent opinionEvent = JSON.parseObject(record, OpinionEvent.class);
+        opinionEvent.setGmtCreate(new Date());
+        opinionEventDao.updateByPrimaryKeySelective(opinionEvent);
         long end = System.currentTimeMillis();
-        logger.info("Process {} eventHot success, time used: {}", opinionEvents.size(), end - start);
+        logger.info("Process {}  success, time used: {}", record, end - start);
     }
 }
