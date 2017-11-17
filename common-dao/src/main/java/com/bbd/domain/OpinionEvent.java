@@ -58,6 +58,16 @@ public class OpinionEvent {
     private String excludeWords;
 
     private String remark;
+    
+    private String product;
+    
+    public String getProduct() {
+        return product;
+    }
+
+    public void setProduct(String product) {
+        this.product = product;
+    }
 
     public Long getId() {
         return id;

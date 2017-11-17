@@ -24,6 +24,7 @@
     <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
     <result column="file_by" jdbcType="BIGINT" property="fileBy" />
     <result column="gmt_file" jdbcType="TIMESTAMP" property="gmtFile" />
+    <result column="product" jdbcType="VARCHAR" property="product" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.bbd.domain.OpinionEvent">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
@@ -91,9 +92,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, uuid, event_name, event_group, monitor, region, event_level, merchant, brand,
-    address, merchant_tel, consumer, consumer_tel, hot, file_reason, is_delete, create_by,
-    gmt_create, modified_by, gmt_modified, file_by, gmt_file
+    id, uuid, event_name, event_group, monitor, region, event_level, merchant, brand, 
+    address, merchant_tel, consumer, consumer_tel, hot, file_reason, is_delete, create_by, 
+    gmt_create, modified_by, gmt_modified, file_by, gmt_file, product
   </sql>
   <sql id="Blob_Column_List">
     description, include_words, keywords, exclude_words, remark
@@ -146,24 +147,26 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into bbd_opinion_event (uuid, event_name, event_group,
-      monitor, region, event_level,
-      merchant, brand, address,
-      merchant_tel, consumer, consumer_tel,
-      hot, file_reason, is_delete,
-      create_by, gmt_create, modified_by,
-      gmt_modified, file_by, gmt_file,
-      description, include_words, keywords,
-      exclude_words, remark)
-    values (#{uuid,jdbcType=VARCHAR}, #{eventName,jdbcType=VARCHAR}, #{eventGroup,jdbcType=VARCHAR},
-      #{monitor,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR}, #{eventLevel,jdbcType=VARCHAR},
-      #{merchant,jdbcType=VARCHAR}, #{brand,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR},
-      #{merchantTel,jdbcType=VARCHAR}, #{consumer,jdbcType=VARCHAR}, #{consumerTel,jdbcType=VARCHAR},
-      #{hot,jdbcType=INTEGER}, #{fileReason,jdbcType=VARCHAR}, #{isDelete,jdbcType=TINYINT},
-      #{createBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{modifiedBy,jdbcType=BIGINT},
-      #{gmtModified,jdbcType=TIMESTAMP}, #{fileBy,jdbcType=BIGINT}, #{gmtFile,jdbcType=TIMESTAMP},
-      #{description,jdbcType=LONGVARCHAR}, #{includeWords,jdbcType=LONGVARCHAR}, #{keywords,jdbcType=LONGVARCHAR},
-      #{excludeWords,jdbcType=LONGVARCHAR}, #{remark,jdbcType=LONGVARCHAR})
+    insert into bbd_opinion_event (uuid, event_name, event_group, 
+      monitor, region, event_level, 
+      merchant, brand, address, 
+      merchant_tel, consumer, consumer_tel, 
+      hot, file_reason, is_delete, 
+      create_by, gmt_create, modified_by, 
+      gmt_modified, file_by, gmt_file, 
+      product, description, include_words, 
+      keywords, exclude_words, remark
+      )
+    values (#{uuid,jdbcType=VARCHAR}, #{eventName,jdbcType=VARCHAR}, #{eventGroup,jdbcType=VARCHAR}, 
+      #{monitor,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR}, #{eventLevel,jdbcType=VARCHAR}, 
+      #{merchant,jdbcType=VARCHAR}, #{brand,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
+      #{merchantTel,jdbcType=VARCHAR}, #{consumer,jdbcType=VARCHAR}, #{consumerTel,jdbcType=VARCHAR}, 
+      #{hot,jdbcType=INTEGER}, #{fileReason,jdbcType=VARCHAR}, #{isDelete,jdbcType=TINYINT}, 
+      #{createBy,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{modifiedBy,jdbcType=BIGINT}, 
+      #{gmtModified,jdbcType=TIMESTAMP}, #{fileBy,jdbcType=BIGINT}, #{gmtFile,jdbcType=TIMESTAMP}, 
+      #{product,jdbcType=VARCHAR}, #{description,jdbcType=LONGVARCHAR}, #{includeWords,jdbcType=LONGVARCHAR}, 
+      #{keywords,jdbcType=LONGVARCHAR}, #{excludeWords,jdbcType=LONGVARCHAR}, #{remark,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.bbd.domain.OpinionEvent">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -233,6 +236,9 @@
       </if>
       <if test="gmtFile != null">
         gmt_file,
+      </if>
+      <if test="product != null">
+        product,
       </if>
       <if test="description != null">
         description,
@@ -313,6 +319,9 @@
       </if>
       <if test="gmtFile != null">
         #{gmtFile,jdbcType=TIMESTAMP},
+      </if>
+      <if test="product != null">
+        #{product,jdbcType=VARCHAR},
       </if>
       <if test="description != null">
         #{description,jdbcType=LONGVARCHAR},
@@ -400,6 +409,9 @@
       <if test="record.gmtFile != null">
         gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.product != null">
+        product = #{record.product,jdbcType=VARCHAR},
+      </if>
       <if test="record.description != null">
         description = #{record.description,jdbcType=LONGVARCHAR},
       </if>
@@ -444,6 +456,7 @@
       gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
       file_by = #{record.fileBy,jdbcType=BIGINT},
       gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP},
+      product = #{record.product,jdbcType=VARCHAR},
       description = #{record.description,jdbcType=LONGVARCHAR},
       include_words = #{record.includeWords,jdbcType=LONGVARCHAR},
       keywords = #{record.keywords,jdbcType=LONGVARCHAR},
@@ -476,7 +489,8 @@
       modified_by = #{record.modifiedBy,jdbcType=BIGINT},
       gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
       file_by = #{record.fileBy,jdbcType=BIGINT},
-      gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP}
+      gmt_file = #{record.gmtFile,jdbcType=TIMESTAMP},
+      product = #{record.product,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -547,6 +561,9 @@
       <if test="gmtFile != null">
         gmt_file = #{gmtFile,jdbcType=TIMESTAMP},
       </if>
+      <if test="product != null">
+        product = #{product,jdbcType=VARCHAR},
+      </if>
       <if test="description != null">
         description = #{description,jdbcType=LONGVARCHAR},
       </if>
@@ -588,6 +605,7 @@
       gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
       file_by = #{fileBy,jdbcType=BIGINT},
       gmt_file = #{gmtFile,jdbcType=TIMESTAMP},
+      product = #{product,jdbcType=VARCHAR},
       description = #{description,jdbcType=LONGVARCHAR},
       include_words = #{includeWords,jdbcType=LONGVARCHAR},
       keywords = #{keywords,jdbcType=LONGVARCHAR},
@@ -617,7 +635,8 @@
       modified_by = #{modifiedBy,jdbcType=BIGINT},
       gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
       file_by = #{fileBy,jdbcType=BIGINT},
-      gmt_file = #{gmtFile,jdbcType=TIMESTAMP}
+      gmt_file = #{gmtFile,jdbcType=TIMESTAMP},
+      product = #{product,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
   <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.OpinionEventExample" resultMap="BaseResultMap">
