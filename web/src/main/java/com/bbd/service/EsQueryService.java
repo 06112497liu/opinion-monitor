@@ -7,6 +7,7 @@ package com.bbd.service;
 import java.util.List;
 import java.util.Map;
 
+import com.bbd.service.vo.*;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,6 @@ import org.springframework.stereotype.Service;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.domain.OpinionEvent;
-import com.bbd.service.vo.DBStaVO;
-import com.bbd.service.vo.KeyValueVO;
-import com.bbd.service.vo.OpinionCountStatVO;
-import com.bbd.service.vo.OpinionEsSearchVO;
-import com.bbd.service.vo.OpinionOpRecordVO;
-import com.bbd.service.vo.OpinionTaskListVO;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 
@@ -64,8 +59,6 @@ public interface EsQueryService {
      * 获取事件媒体信息量分布折线统计图 
      * @param eventId
      * @param sourceType
-     * @param isInfo
-     * @param cycle
      * @return
      */
     KeyValueVO getEventMediaStatisticBySource(Long eventId, String sourceType);
@@ -259,4 +252,25 @@ public interface EsQueryService {
      * @return
      */
     Integer opinionInstantByEvent(Long eventId);
+
+    /**
+     * 查询管理员用户待处理、已转发、已解除、已监测数量
+     * @return
+     */
+    List<KeyValueVO> queryCoutGroupOpStatus();
+
+    /**
+     * 查询普通用户待处理、已转发、已解除、已监测数量
+     * @param userId
+     * @return
+     */
+    List<KeyValueVO> queryCoutGroupOpStatus(Long userId);
+
+    /**
+     * 查询舆情相同文章信息
+     * @param uuid
+     * @param pb
+     * @return
+     */
+    List<SimiliarNewsVO> querySimiliarNews(String uuid, PageBounds pb);
 }

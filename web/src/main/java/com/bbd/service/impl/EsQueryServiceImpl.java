@@ -26,14 +26,12 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
+import org.apache.commons.lang3.ArrayUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -57,10 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * ES查询服务
@@ -783,6 +778,7 @@ public class EsQueryServiceImpl implements EsQueryService {
      * 当前用户待处理舆情列表
      * @param userId
      * @param transferType
+     * @param pb
      * @return
      */
     @Override
@@ -977,6 +973,65 @@ public class EsQueryServiceImpl implements EsQueryService {
             return 0;
         }
 
+    }
+
+    /**
+     * 查询管理员用户已介入、已解除、已监测数量
+     * @return
+     */
+    @Override
+    public List<KeyValueVO> queryCoutGroupOpStatus() {
+        String aggsName = "task_sta";
+        TransportClient client = esUtil.getClient();
+        TermsAggregationBuilder agg = AggregationBuilders.terms(aggsName).field(EsConstant.opStatusField);
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .addAggregation(agg)
+                .setSize(0).execute().actionGet();
+        List<KeyValueVO> result = buildLongTermLists(resp, aggsName);
+        return result;
+    }
+
+    /**
+     * 查询普通用户待处理、已转发、已解除、已监测数量
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<KeyValueVO> queryCoutGroupOpStatus(Long userId) {
+        PageBounds pb = new PageBounds(0,0);
+        int unOp = getUnProcessedList(userId, null, pb).getPaginator().getTotalCount(); //待处理数量
+        int transfer = getProcessedList(1, pb).getPaginator().getTotalCount(); // 已转发数量
+        int remove = getProcessedList(2, pb).getPaginator().getTotalCount(); // 已解除数量
+        int monitor = getProcessedList(3, pb).getPaginator().getTotalCount(); // 已监测数量
+        List<Integer> list = Arrays.asList(unOp, transfer, remove, monitor);
+        List<KeyValueVO> result = Lists.newLinkedList();
+        for(int i=0; i<list.size(); i++) {
+            KeyValueVO v = new KeyValueVO();
+            Integer l = list.get(i);
+            v.setKey(i);
+            v.setValue(l);
+            result.add(v);
+        }
+        return result;
+    }
+
+    /**
+     * 查询舆情相同文章信息
+     * @param uuid
+     * @return
+     */
+    @Override
+    public List<SimiliarNewsVO> querySimiliarNews(String uuid, PageBounds pb) {
+        TransportClient client = esUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_SIMILAR_ARTICLE)
+                .setQuery(QueryBuilders.termQuery(EsConstant.opinionIDField, uuid))
+                .setFrom(pb.getOffset()).setSize(pb.getLimit())
+                .execute().actionGet();
+        List<SimiliarNewsVO> list = EsUtil.buildResult(resp, SimiliarNewsVO.class);
+        Long total = resp.getHits().getTotalHits();
+        Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
+        PageList<SimiliarNewsVO> result = PageListHelper.create(list, paginator);
+        return result;
     }
 
     /**

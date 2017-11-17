@@ -1,12 +1,14 @@
 package com.bbd.service;
 
 import com.bbd.service.param.TransferParam;
+import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionTaskListVO;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import org.elasticsearch.action.support.replication.ReplicationResponse;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -52,6 +54,12 @@ public interface OpinionTaskService {
      * @return
      */
     OpinionTaskListVO getTransferDetail(String uuid, Integer type);
+
+    /**
+     * 当前用户任务列表统计
+     * @return
+     */
+    List<KeyValueVO> getTaskSta();
 
 }
     

@@ -4,6 +4,7 @@ import com.bbd.RestResult;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionTaskService;
 import com.bbd.service.param.TransferParam;
+import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionTaskListVO;
 import com.bbd.util.ValidateUtil;
 import com.mybatis.domain.PageList;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -27,7 +29,7 @@ import java.util.concurrent.ExecutionException;
  * @version Id: OpinionTaskController.java, v0.1 2017/11/7 Liuweibo Exp $$
  */
 @RestController
-@RequestMapping(value = "api/opinion/task")
+@RequestMapping(value = "api/opinion/task/")
 @Api(description = "舆情任务模块")
 public class OpinionTaskController extends AbstractController{
 
@@ -56,6 +58,14 @@ public class OpinionTaskController extends AbstractController{
     public RestResult getProcessedList(Integer opStatus) {
         ValidateUtil.checkNull(opStatus, CommonErrorCode.PARAM_ERROR, "opStatus不能为null");
         PageList<OpinionTaskListVO> result = opinionTaskService.getProcessedList(opStatus, getPageBounds());
+        return RestResult.ok(result);
+    }
+
+    @ApiOperation(value = "当前用户任务列表统计", httpMethod = "GET")
+
+    @RequestMapping(value = "sta", method = RequestMethod.GET)
+    public RestResult getTaskSta() {
+        List<KeyValueVO> result = opinionTaskService.getTaskSta();
         return RestResult.ok(result);
     }
 

@@ -223,8 +223,9 @@ public class OpinionServiceImpl implements OpinionService {
     }
 
     @Override
-    public PageList<SimiliarNewsVO> getOpinionSimiliarNewsList(String uuid, PageBounds pageBounds) {
-        return null;
+    public List<SimiliarNewsVO> getOpinionSimiliarNewsList(String uuid, PageBounds pb) {
+        List<SimiliarNewsVO> result = esQueryService.querySimiliarNews(uuid, pb);
+        return result;
     }
 
     /**

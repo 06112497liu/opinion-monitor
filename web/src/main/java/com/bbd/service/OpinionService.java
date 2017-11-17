@@ -76,10 +76,10 @@ public interface OpinionService {
     /**
      * 舆情相同文章数信息
      * @param uuid
-     * @param pageBounds
+     * @param pb
      * @return
      */
-    PageList<SimiliarNewsVO> getOpinionSimiliarNewsList(String uuid, PageBounds pageBounds);
+    List<SimiliarNewsVO> getOpinionSimiliarNewsList(String uuid, PageBounds pb);
 
     /**
      * 获取舆情热度走势

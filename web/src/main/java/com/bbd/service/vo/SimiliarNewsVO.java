@@ -6,6 +6,7 @@ package com.bbd.service.vo;
  * @version Id: SameArticleVO.java, v0.1 2017/11/1 Liuweibo Exp $$
  */
 public class SimiliarNewsVO {
+
     /**
      * 标题
      */
@@ -20,6 +21,11 @@ public class SimiliarNewsVO {
      * 热度
      */
     private Integer hot;
+
+    /**
+     * 链接
+     */
+    private String link;
 
     public SimiliarNewsVO() {
     }
@@ -54,13 +60,12 @@ public class SimiliarNewsVO {
         this.hot = hot;
     }
 
-    @Override
-    public String toString() {
-        return "SameArticleVO{" +
-                "title='" + title + '\'' +
-                ", source='" + source + '\'' +
-                ", hot=" + hot +
-                '}';
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 }
     

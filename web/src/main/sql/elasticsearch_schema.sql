@@ -243,3 +243,37 @@ PUT bbd_opinion_event_record
     }
   }
  }
+
+# 相同文章信息索引
+DELETE /bbd_article
+PUT /bbd_article
+{
+  "settings": {
+    "number_of_replicas": 0,
+    "number_of_shards": 1
+  },
+  "mappings": {
+    "article": {
+      "properties": {
+        "opinion_id": {
+          "type": "keyword"
+        },
+        "hot": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "keyword"
+        },
+        "title": {
+          "type": "text"
+        },
+        "source": {
+          "type": "keyword"
+        },
+        "link": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}

@@ -14,6 +14,7 @@ import com.bbd.exception.CommonErrorCode;
 import com.bbd.exception.UserErrorCode;
 import com.bbd.service.*;
 import com.bbd.service.param.TransferParam;
+import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.service.vo.OpinionTaskListVO;
 import com.bbd.util.BeanMapperUtil;
@@ -256,6 +257,23 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         }
         if(v != null) records.add(0, v);
         result.setRecords(records);
+        return result;
+    }
+
+    /**
+     * 当前用户任务列表统计
+     * @return
+     */
+    @Override
+    public List<KeyValueVO> getTaskSta() {
+        List<KeyValueVO> result = null;
+        UserInfo user = UserContext.getUser();
+
+        if(user.getAdmin()) {
+            result = esQueryService.queryCoutGroupOpStatus();
+        } else {
+            result = esQueryService.queryCoutGroupOpStatus(user.getId());
+        }
         return result;
     }
 
