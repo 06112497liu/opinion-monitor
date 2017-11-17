@@ -8,16 +8,19 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -100,29 +103,20 @@ public class EventController extends AbstractController {
     })
     @RequestMapping(value = "getEvent", method = RequestMethod.GET)
     public RestResult getEvent(OpinionEvent opinionEvent) {
-        HashMap map= new HashMap();
         OpinionEvent event = eventService.getEvent(opinionEvent.getId()); 
+        Map map= eventService.getEventUser(opinionEvent.getId());
         map.put("event", event);
-        map.put("user", UserContext.getUser());
         return RestResult.ok(map);
     }
     
-    @ApiOperation(value = "获取事件创建账号、归档账号", httpMethod = "GET")
-    @ApiImplicitParams({ 
-        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true)
-    })
-    @RequestMapping(value = "getEventUser", method = RequestMethod.GET)
-    public RestResult getEventUser(Long id) {
-        return RestResult.ok(eventService.getEventUser(id));
-    }
     @ApiOperation(value = "显示事件", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true)
     })
     @RequestMapping(value = "getEventChinese", method = RequestMethod.GET)
     public RestResult getEventChinese(OpinionEvent opinionEvent) {
-        HashMap map= new HashMap();
         OpinionEvent event = eventService.getEventChinese(opinionEvent.getId()); 
+        Map map= eventService.getEventUser(opinionEvent.getId());
         map.put("event", event);
         return RestResult.ok(map);
     }
