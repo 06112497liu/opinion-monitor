@@ -12,7 +12,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.elasticsearch.search.aggregations.bucket.range.date.DateRangeAggregationBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -20,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bbd.constant.EsConstant;
+import com.bbd.dao.AccountDao;
 import com.bbd.dao.OpinionDictionaryDao;
 import com.bbd.dao.OpinionEventDao;
 import com.bbd.dao.OpinionEventMediaStatisticDao;
@@ -29,6 +29,8 @@ import com.bbd.dao.OpinionEventTrendStatisticDao;
 import com.bbd.dao.OpinionEventWholeTrendStatisticDao;
 import com.bbd.dao.OpinionEventWordsDao;
 import com.bbd.dao.WarnSettingDao;
+import com.bbd.domain.Account;
+import com.bbd.domain.AccountExample;
 import com.bbd.domain.Graph;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.domain.OpinionDictionaryExample;
@@ -61,6 +63,8 @@ public class EventService{
 
     @Autowired
     OpinionEventDao opinionEventDao;
+    @Autowired
+    AccountDao accountDao;
     @Autowired
     OpinionDictionaryDao opinionDictionaryDao;
     @Autowired
@@ -184,6 +188,19 @@ public class EventService{
     public void modifyEvent(OpinionEvent opinionEvent) {
         opinionEvent.setGmtModified(new Date());
         opinionEventDao.updateByPrimaryKeySelective(opinionEvent);
+    }
+    
+    public Map getEventUser(Long id) {
+        HashMap map = new HashMap();
+        OpinionEvent evt = opinionEventDao.selectByPrimaryKey(id);
+        AccountExample example = new AccountExample();
+        example.createCriteria().andUserIdEqualTo(evt.getCreateBy());
+        Account createUser = accountDao.selectByExample(example).get(0);
+        example.createCriteria().andUserIdEqualTo(evt.getFileBy());
+        Account fileUser = accountDao.selectByExample(example).get(0);
+        map.put("createUser", createUser);
+        map.put("fileUser", fileUser);
+        return map;
     }
     
     /**  

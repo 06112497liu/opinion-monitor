@@ -106,6 +106,15 @@ public class EventController extends AbstractController {
         map.put("user", UserContext.getUser());
         return RestResult.ok(map);
     }
+    
+    @ApiOperation(value = "获取事件创建账号、归档账号", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "getEventUser", method = RequestMethod.GET)
+    public RestResult getEventUser(Long id) {
+        return RestResult.ok(eventService.getEventUser(id));
+    }
     @ApiOperation(value = "显示事件", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true)
