@@ -2,9 +2,6 @@ package com.bbd.service.param;
 
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.util.ValidateUtil;
-import org.hibernate.validator.constraints.NotEmpty;
-
-import java.util.Date;
 
 /**
  * @author Liuweibo
