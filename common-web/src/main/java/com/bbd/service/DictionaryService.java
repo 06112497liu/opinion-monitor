@@ -59,12 +59,11 @@ public class DictionaryService {
      * @param type A-(奶粉、食品等项里列表); B-(工商局，其他列表查询); C-(区域查询); D-(级别查询); E-(时间状态查询); F-(媒体类型查询); G-(转发内容查询); H-(情感查询); I-(工商局列表)
      * @return
      */
-    public Map<String, String> queryDictionary(String type) {
+    public List<OpinionDictionary>  queryDictionary(String type) {
         OpinionDictionaryExample example = new OpinionDictionaryExample();
         example.createCriteria().andParentEqualTo(type);
         List<OpinionDictionary> list = dictionaryDao.selectByExample(example);
-        Map<String, String> map = list.stream().collect(Collectors.toMap(OpinionDictionary::getCode, OpinionDictionary::getName));
-        return map;
+        return list;
     }
 
 }

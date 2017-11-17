@@ -13,6 +13,7 @@ import com.bbd.service.param.AccountCreateVO;
 import com.bbd.service.param.UserCreateParam;
 import com.bbd.service.param.UserCreateVO;
 import com.bbd.util.BeanMapperUtil;
+import com.bbd.util.MD5Util;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Optional;

@@ -15,6 +15,7 @@ import com.bbd.exception.UserErrorCode;
 import com.bbd.service.AccountService;
 import com.bbd.service.PermissionService;
 import com.bbd.service.UserService;
+import com.bbd.util.MD5Util;
 import com.bbd.vo.PermissionView;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
@@ -58,7 +59,7 @@ public class LoginController extends AbstractController {
         }
 
         String username = param.getUsername();
-        String password = param.getPassword();
+        String password = MD5Util.md5(param.getPassword());
         Optional<User> opt = userService.queryUserByUserame(username);
         if (!opt.isPresent()) {
             logger.debug(String.format("用户名为 %s 的用户不存在", username));

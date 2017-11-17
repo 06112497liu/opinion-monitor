@@ -1,6 +1,7 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
+import com.bbd.domain.OpinionDictionary;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.DictionaryService;
 import com.bbd.util.ValidateUtil;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,8 +38,8 @@ public class DictionaryController {
     @RequestMapping(value = "search", method = RequestMethod.GET)
     public RestResult deleteEvent(String type) {
         ValidateUtil.checkNull(type, CommonErrorCode.PARAM_ERROR, "type不能为空");
-        Map<String, String> map = dictionaryService.queryDictionary(type);
-        return RestResult.ok(map);
+        List<OpinionDictionary> list = dictionaryService.queryDictionary(type);
+        return RestResult.ok(list);
     }
 }
     
