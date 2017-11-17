@@ -212,27 +212,27 @@ public class EventService{
         opinionEvent.setGmtFile(new Date());
         opinionEventDao.updateByPrimaryKeySelective(opinionEvent);
         OpinionEvent tmp =  opinionEventDao.selectByPrimaryKey(opinionEvent.getId());
-        DateTime startTime = new DateTime(tmp.getGmtCreate());
+        //DateTime startTime = new DateTime(tmp.getGmtCreate());
         DateTime endTime = DateTime.now();
-        DateTime oneYearBefore = endTime.plusYears(-1);
+       /* DateTime oneYearBefore = endTime.plusYears(-1);
         if (oneYearBefore.getMillis() > startTime.getMillis()) {
             startTime = oneYearBefore;
-        }
+        }*/
         
-        long infototal = esQueryService.queryEventInfoTotal(opinionEvent.getId(), startTime, endTime);
+        long infototal = esQueryService.queryEventInfoTotal(opinionEvent.getId(), null, endTime);
         
         //归档事件媒体分布、媒体活跃度、媒体来源、数据情感信息
-        List<KeyValueVO> mediaSpreadList = esQueryService.getEventOpinionMediaSpread(opinionEvent.getId(), startTime, endTime);
+        List<KeyValueVO> mediaSpreadList = esQueryService.getEventOpinionMediaSpread(opinionEvent.getId(), null, endTime);
         StringBuilder mediaSpread = new StringBuilder();
         for (KeyValueVO e : mediaSpreadList) {
             mediaSpread.append(e.getKey()).append(",").append(e.getValue()).append("#");
         }
-        List<KeyValueVO> websiteSpreadList = esQueryService.getEventWebsiteSpread(opinionEvent.getId(), startTime, endTime);
+        List<KeyValueVO> websiteSpreadList = esQueryService.getEventWebsiteSpread(opinionEvent.getId(), null, endTime);
         StringBuilder websiteSpread = new StringBuilder();
         for (KeyValueVO e : websiteSpreadList) {
             websiteSpread.append(e.getKey()).append(",").append(e.getValue()).append("#");
         }
-        List<KeyValueVO> emotionSpreadList = esQueryService.getEventEmotionSpread(opinionEvent.getId(), startTime, endTime);
+        List<KeyValueVO> emotionSpreadList = esQueryService.getEventEmotionSpread(opinionEvent.getId(), null, endTime);
         StringBuilder emotionSpread = new StringBuilder();
         for (KeyValueVO e : emotionSpreadList) {
             emotionSpread.append(e.getKey()).append(",").append(e.getValue()).append("#");
@@ -358,19 +358,25 @@ public class EventService{
     public List<KeyValueVO> calAllMedia(List<KeyValueVO> mediaTypeSta) {
         List<KeyValueVO> allMediaType =  new ArrayList<KeyValueVO>();
         List<OpinionDictionary> opinionDictionaryList = getDictionary("F");
+        boolean flag = false;
         for (OpinionDictionary e : opinionDictionaryList) {
             for (KeyValueVO f : mediaTypeSta) {
                 if (e.getCode().equals(String.valueOf(f.getKey()))) {
                     f.setName(e.getName());
                     allMediaType.add(f);
-                } else {
-                    KeyValueVO vo = new KeyValueVO();
-                    vo.setKey(e.getCode());
-                    vo.setName(e.getName());
-                    vo.setValue(0l);
-                    allMediaType.add(vo);
+                    flag = true;
+                    break;
                 }
             }
+            if (flag == false) {
+                KeyValueVO vo = new KeyValueVO();
+                vo.setKey(e.getCode());
+                vo.setName(e.getName());
+                vo.setValue(0l);
+                allMediaType.add(vo);
+            }
+            flag = false;
+            
         }
         KeyValueVO tmp = calTotal(allMediaType);
         allMediaType.add(0, tmp);
@@ -461,21 +467,24 @@ public class EventService{
         //Date startDate = getStartDate(cycle);
         OpinionEventMediaStatisticExample example = new OpinionEventMediaStatisticExample();
         example.setOrderByClause("pick_time ASC");
-        com.bbd.domain.OpinionEventMediaStatisticExample.Criteria criteria =  example.createCriteria();
-        criteria.andEventIdEqualTo(id).andPickTimeIn(getDates(cycle, opinionEventDao.selectByPrimaryKey(id)));
+        OpinionEvent opinionEvent = opinionEventDao.selectByPrimaryKey(id);
         List<List<KeyValueVO>> list = new ArrayList<List<KeyValueVO>>();
+        SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         for (OpinionDictionary e : opinionDictionaryList) {
-            criteria.andMediaCodeEqualTo(e.getCode());
+            com.bbd.domain.OpinionEventMediaStatisticExample.Criteria criteria =  example.createCriteria();
+            criteria.andEventIdEqualTo(id).andPickTimeIn(getDates(cycle, opinionEvent))
+            .andMediaCodeEqualTo(e.getCode());
             List<OpinionEventMediaStatistic> evtMediaStaList = opinionEventMediaStatisticDao.selectByExample(example);
             List<KeyValueVO> listSub = new ArrayList<KeyValueVO>();
             for (OpinionEventMediaStatistic f : evtMediaStaList) {
                 KeyValueVO vo = new KeyValueVO();
-                vo.setKey(f.getPickTime());
+                vo.setKey(dateFormater.format(f.getPickTime()));
                 vo.setName(e.getName());
                 vo.setValue(f.getMediaCount());
                 listSub.add(vo);
             }
             list.add(listSub);
+            example.clear();
         }
       return list;
        
@@ -698,7 +707,7 @@ public class EventService{
         List<OpinionDictionary> mediaList = getDictionary(type);
         for (KeyValueVO e : list) {
             for (OpinionDictionary f : mediaList) {
-                if (e.getKey().equals(f.getCode())) {
+                if (String.valueOf(e.getKey()).equals(f.getCode())) {
                     e.setName(f.getName());
                     break;
                 }

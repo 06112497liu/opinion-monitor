@@ -255,10 +255,12 @@ public class EsQueryServiceImpl implements EsQueryService {
         query.must(QueryBuilders.termQuery(EsConstant.eventIdField, opinionEvent.getId()));
         SearchResponse resp;
         if (isWarn == false) {
-            resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).addAggregation(buildEventDayeRange(cycle, opinionEvent)).setTypes(EsConstant.OPINION_EVENT_RECORD_TYPE)
+            resp = client.prepareSearch(EsConstant.IDX_OPINION_EVENT_RECORD).setTypes(EsConstant.OPINION_EVENT_RECORD_TYPE)
+                    .setQuery(query).addAggregation(buildEventDayeRange(cycle, opinionEvent))
                 .setSearchType(SearchType.DEFAULT).setSize(0).execute().actionGet();
         } else {
-            resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).addAggregation(buildEventDayeRange(cycle, opinionEvent)).setTypes(EsConstant.OPINION_EVENT_RECORD_WARN_TYPE)
+            resp = client.prepareSearch(EsConstant.IDX_OPINION_EVENT_RECORD).setTypes(EsConstant.OPINION_EVENT_RECORD_WARN_TYPE)
+                    .setQuery(query).addAggregation(buildEventDayeRange(cycle, opinionEvent))
                 .setSearchType(SearchType.DEFAULT).setSize(0).execute().actionGet();
         }
         // step-2：构建返回结果
@@ -276,7 +278,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public DateRangeAggregationBuilder buildEventDayeRange(int cycle, OpinionEvent opinionEvent) {
         String aggsName = "event_calc_aggs";
 
-        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.publishTimeField).keyed(true);
+        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.matchTimeTrimField).keyed(true);
         List<Date> dates = eventService.getDates(cycle, opinionEvent);
         for (Date date : dates) {
             DateTime dateTime = new DateTime(date);
@@ -484,7 +486,9 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-1：构建es查询条件
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        if (startTime != null) {
+            query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        }
         if (endTime != null) {
             query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
         }
@@ -684,7 +688,9 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
-        booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        if (startTime != null) {
+            booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        }
         if (endTime != null) {
             booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
         }
@@ -701,7 +707,9 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
-        booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        if (startTime != null) {
+            booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        }
         if (endTime != null) {
             booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
         }
@@ -718,7 +726,9 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
-        booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        if (startTime != null) {
+            booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        }
         if (endTime != null) {
             booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
         }
