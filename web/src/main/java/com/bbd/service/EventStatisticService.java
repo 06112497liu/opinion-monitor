@@ -93,7 +93,7 @@ public class EventStatisticService {
         String pickTime = now.toString("yyyy-MM-dd HH") + ":00:00";
         Date date = format.parse(pickTime);
         for (OpinionEvent e : opinionEvents) {
-            List<KeyValueVO> evtMediaList = esQueryService.getEventMediaStatisticBySource(e.getId());
+            List<KeyValueVO> evtMediaList = esQueryService.getEventMediaStatisticBySource(e.getId(), new DateTime(date));
             int total = 0;
             OpinionEventMediaStatistic all = new OpinionEventMediaStatistic();
             for (OpinionDictionary f : opinionDictionaryList) {

@@ -236,11 +236,12 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     @Override
-    public List<KeyValueVO> getEventMediaStatisticBySource(Long eventId) {
+    public List<KeyValueVO> getEventMediaStatisticBySource(Long eventId, DateTime endTime) {
         String aggName = "event_media_calc_aggs";
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
+        query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query)
                 .addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.mediaTypeField)).setSize(0).execute()
             .actionGet();

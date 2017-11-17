@@ -61,7 +61,7 @@ public interface EsQueryService {
      * @param sourceType
      * @return
      */
-    List<KeyValueVO> getEventMediaStatisticBySource(Long eventId);
+    List<KeyValueVO> getEventMediaStatisticBySource(Long eventId, DateTime endTime);
     /**
      * 获取事件相关信息总量
      * @param eventId
