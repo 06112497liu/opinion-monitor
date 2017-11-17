@@ -15,7 +15,7 @@ public class OpinionEventMediaStatistic {
 
     private Date gmtCreate;
 
-    private Date gmtModify;
+    private Date gmtModified;
 
     public Long getId() {
         return id;
@@ -65,11 +65,11 @@ public class OpinionEventMediaStatistic {
         this.gmtCreate = gmtCreate;
     }
 
-    public Date getGmtModify() {
-        return gmtModify;
+    public Date getGmtModified() {
+        return gmtModified;
     }
 
-    public void setGmtModify(Date gmtModify) {
-        this.gmtModify = gmtModify;
+    public void setGmtModified(Date gmtModified) {
+        this.gmtModified = gmtModified;
     }
 }

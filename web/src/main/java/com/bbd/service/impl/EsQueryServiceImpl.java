@@ -236,27 +236,15 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     @Override
-    public KeyValueVO getEventMediaStatisticBySource(Long eventId, String sourceType) {
-        // step-1：构建es查询条件
+    public List<KeyValueVO> getEventMediaStatisticBySource(Long eventId) {
+        String aggName = "event_media_calc_aggs";
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
-        if (sourceType != null) {
-            query.must(QueryBuilders.termQuery(EsConstant.mediaTypeField, Integer.valueOf(sourceType)));
-        }
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).setSize(0).execute().actionGet();
-        // step-2：构建返回结果
-        List<InternalDateRange.Bucket> dateList = ((InternalDateRange) (resp.getAggregations().get("event_media_calc_aggs"))).getBuckets();
-
-        KeyValueVO v = new KeyValueVO();
-        v.setKey(sourceType);
-        v.setValue(0l);
-        for (InternalDateRange.Bucket d : dateList) {
-            v.setKey(d.getKey());
-            v.setValue(d.getDocCount());
-            break;
-        }
-        return v;
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query)
+                .addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.mediaTypeField)).setSize(0).execute()
+            .actionGet();
+        return buildLongTermLists(resp, aggName);
     }
 
     public List<KeyValueVO> queryEventInfoTotal(OpinionEvent opinionEvent, boolean isWarn, Integer cycle) {

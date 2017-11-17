@@ -75,10 +75,12 @@ public class EventStatisticService {
                 records.add(evtTrend);
             }
         }
-        opinionEventTrendStatisticDao.insertBatch(records);
+        if (records!=null && records.size() > 0) {
+            opinionEventTrendStatisticDao.insertBatch(records);
+        }
     }
     
-    @Scheduled(cron="0 30 * * * ?")
+    @Scheduled(cron="0 * * * * ?")
     public void eventMediaStatistic() throws ParseException {
         OpinionEventExample example = new OpinionEventExample();
         example.createCriteria().andIsDeleteEqualTo((byte)0).andFileReasonIsNull();
@@ -91,10 +93,11 @@ public class EventStatisticService {
         String pickTime = now.toString("yyyy-MM-dd HH") + ":00:00";
         Date date = format.parse(pickTime);
         for (OpinionEvent e : opinionEvents) {
+            List<KeyValueVO> evtMediaList = esQueryService.getEventMediaStatisticBySource(e.getId());
             int total = 0;
             OpinionEventMediaStatistic all = new OpinionEventMediaStatistic();
             for (OpinionDictionary f : opinionDictionaryList) {
-                KeyValueVO tmp = esQueryService.getEventMediaStatisticBySource(e.getId(), f.getCode());
+                KeyValueVO tmp = buidlKeyValueVO(f, evtMediaList);
                 OpinionEventMediaStatistic evtMedia = new OpinionEventMediaStatistic();
                 evtMedia.setEventId(e.getId());
                 evtMedia.setMediaCode(f.getCode());
@@ -110,7 +113,22 @@ public class EventStatisticService {
             records.add(all);
             total = 0;
         }
-        opinionEventMediaStatisticDao.insertBatch(records);
+        if (records!=null && records.size() > 0) {
+            opinionEventMediaStatisticDao.insertBatch(records);
+        }
+        
+    }
+    
+    public KeyValueVO buidlKeyValueVO(OpinionDictionary pinionDictionary, List<KeyValueVO> mediaList) {
+        for (KeyValueVO vo : mediaList) {
+            if (pinionDictionary.getCode().equals(vo.getKey().toString())) {
+                return vo;
+            }
+        }
+        KeyValueVO vo = new KeyValueVO();
+        vo.setKey(pinionDictionary.getCode());
+        vo.setValue(0);
+        return vo;
     }
     
     
