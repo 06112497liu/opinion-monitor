@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -105,5 +106,12 @@ public class EsQueryServiceTest extends BaseServiceTest {
 
         Map<String, List<KeyValueVO>> map = esQueryService.getOpinionCountStatisticGroupTime(startTime, endTime, interval);
         System.out.println("size: " + map.size());
+    }
+
+    @Test
+    public void testQueryAddWarnCount() {
+        DateTime lastSendTime = DateTime.now().plusMonths(-1);
+        Map<Object, Object> map = esQueryService.queryAddWarnCount(lastSendTime);
+        System.out.println(map);
     }
 }

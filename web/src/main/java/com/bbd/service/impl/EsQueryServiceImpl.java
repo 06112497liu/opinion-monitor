@@ -56,6 +56,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * ES查询服务
@@ -232,7 +233,6 @@ public class EsQueryServiceImpl implements EsQueryService {
     /**
      * 获取事件数量折线统计图 - 图表跟踪分析
      * @param eventId
-     * @param sourceType
      * @return
      */
     @Override
@@ -1031,6 +1031,33 @@ public class EsQueryServiceImpl implements EsQueryService {
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<SimiliarNewsVO> result = PageListHelper.create(list, paginator);
         return result;
+    }
+
+    /**
+     * 新增一级、二级、三级预警舆情数量
+     * @param lastSendTime
+     * @return
+     */
+    @Override
+    public Map<Object, Object> queryAddWarnCount(DateTime lastSendTime) {
+        TransportClient client = esUtil.getClient();
+        DateRangeAggregationBuilder aggOne = AggregationBuilders.dateRange(levelOne).field(EsConstant.OPINION_FIRST_WARN_TIME_ONE).addUnboundedFrom(levelOne, lastSendTime);
+        DateRangeAggregationBuilder aggTwo = AggregationBuilders.dateRange(levelTwo).field(EsConstant.OPINION_FIRST_WARN_TIME_TWO).addUnboundedFrom(levelTwo, lastSendTime);
+        DateRangeAggregationBuilder aggThree = AggregationBuilders.dateRange(levelThree).field(EsConstant.OPINION_FIRST_WARN_TIME_THREE).addUnboundedFrom(levelThree, lastSendTime);
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .addAggregation(aggOne)
+                .addAggregation(aggTwo)
+                .addAggregation(aggThree)
+                .setSize(0).execute().actionGet();
+        List<KeyValueVO> one = buildHotLevelLists(resp, levelOne);
+        List<KeyValueVO> two = buildHotLevelLists(resp, levelTwo);
+        List<KeyValueVO> three = buildHotLevelLists(resp, levelThree);
+        List<KeyValueVO> result = Lists.newLinkedList();
+        result.addAll(one);
+        result.addAll(two);
+        result.addAll(three);
+        Map<Object, Object> map = result.stream().collect(Collectors.toMap(KeyValueVO::getKey, KeyValueVO::getValue));
+        return map;
     }
 
     /**

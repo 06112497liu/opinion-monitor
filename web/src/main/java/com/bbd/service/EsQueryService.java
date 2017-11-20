@@ -58,7 +58,6 @@ public interface EsQueryService {
     /**
      * 获取事件媒体信息量分布折线统计图 
      * @param eventId
-     * @param sourceType
      * @return
      */
     List<KeyValueVO> getEventMediaStatisticBySource(Long eventId, DateTime endTime);
@@ -273,4 +272,11 @@ public interface EsQueryService {
      * @return
      */
     List<SimiliarNewsVO> querySimiliarNews(String uuid, PageBounds pb);
+
+    /**
+     * 新增一级、二级、三级预警舆情数量
+     * @param lastSendTime
+     * @return
+     */
+    Map<Object, Object> queryAddWarnCount(DateTime lastSendTime);
 }
