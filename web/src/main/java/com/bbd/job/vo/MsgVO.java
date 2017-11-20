@@ -24,7 +24,7 @@ public class MsgVO {
 
     private String       template;
 
-    private List<String> to;
+    private String to;
 
     public static void main(String[] args) {
         MsgVO vo = new MsgVO();
@@ -40,7 +40,7 @@ public class MsgVO {
         vo.setModel(model);
         vo.setRetry(3);
         vo.setTemplate("classify_opinion_warnning");
-        vo.setTo(Lists.newArrayList("12313@qq.com", "456456@qq.com"));
+        vo.setTo("12313@qq.com");
 
         System.out.println(JsonUtil.fromJson(vo));
 
@@ -78,11 +78,11 @@ public class MsgVO {
         this.template = template;
     }
 
-    public List<String> getTo() {
+    public String getTo() {
         return to;
     }
 
-    public void setTo(List<String> to) {
+    public void setTo(String to) {
         this.to = to;
     }
 

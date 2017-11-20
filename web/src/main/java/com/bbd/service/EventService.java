@@ -196,10 +196,13 @@ public class EventService{
         AccountExample example = new AccountExample();
         example.createCriteria().andUserIdEqualTo(evt.getCreateBy());
         Account createUser = accountDao.selectByExample(example).get(0);
-        example.createCriteria().andUserIdEqualTo(evt.getFileBy());
-        Account fileUser = accountDao.selectByExample(example).get(0);
         map.put("createUser", createUser);
-        map.put("fileUser", fileUser);
+        if (evt.getFileBy() != null) {
+            example.clear();
+            example.createCriteria().andUserIdEqualTo(evt.getFileBy());
+            Account fileUser = accountDao.selectByExample(example).get(0);
+            map.put("fileUser", fileUser);
+        }
         return map;
     }
     
@@ -314,17 +317,14 @@ public class EventService{
         PageBounds pb = new PageBounds(pageNo, pageSize);
         OpinionEsSearchVO esResult = esQueryService.queryEventOpinions(id, new DateTime(getStartDate(cycle)), emotion, 
             source, pb);
-        //List<KeyValueVO> mediaTypeSta = esResult.getMediaTypeStats();
-        //transToChinese(mediaTypeSta, "F");
+       
         List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
         opinions.forEach(o -> {
             o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
         });
         map.put("opinions", opinions);
         map.put("total", esResult.getTotal());
-        //map.put("eventHot", opinionEventDao.selectByPrimaryKey(id).getHot());
-       // mediaTypeSta.add(0, calTotal(mediaTypeSta));
-        //map.put("mediaTypes", mediaTypeSta);
+        map.put("mediaTypes",  calAllMedia(esResult.getMediaTypeStats()));
         return map;
         
     }

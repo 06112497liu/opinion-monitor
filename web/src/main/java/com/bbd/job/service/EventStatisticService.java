@@ -4,7 +4,7 @@
  * BBD Service Inc
  * All Rights Reserved @2017
  */
- package com.bbd.service; 
+ package com.bbd.job.service; 
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,6 +30,8 @@ import com.bbd.domain.OpinionEventExample;
 import com.bbd.domain.OpinionEventMediaStatistic;
 import com.bbd.domain.OpinionEventTrendStatistic;
 import com.bbd.domain.OpinionEventTrendStatisticExample;
+import com.bbd.service.EsQueryService;
+import com.bbd.service.EventService;
 import com.bbd.service.vo.KeyValueVO;
 import com.mybatis.domain.PageBounds;
 
