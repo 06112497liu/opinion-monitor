@@ -2,20 +2,16 @@ package com.bbd.controller;
 
 import com.bbd.RestResult;
 import com.bbd.domain.MonitorKeywords;
-import com.bbd.domain.WarnNotifier;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.EsQueryService;
-import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.param.WarnNotifierParam;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.util.ValidateUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 

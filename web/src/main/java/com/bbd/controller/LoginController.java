@@ -16,11 +16,13 @@ import com.bbd.service.AccountService;
 import com.bbd.service.PermissionService;
 import com.bbd.service.UserService;
 import com.bbd.util.MD5Util;
-import com.bbd.vo.PermissionView;
 import com.bbd.util.UserContext;
+import com.bbd.vo.PermissionView;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Optional;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  *
