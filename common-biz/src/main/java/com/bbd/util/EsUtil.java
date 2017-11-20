@@ -409,10 +409,10 @@ public class EsUtil {
         try {
             Settings settings = Settings.builder().put("cluster.name", esCluster).build();
             client = new PreBuiltTransportClient(settings).addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), esPort));
-            List<DiscoveryNode> nodes = client.listedNodes();
-            for (DiscoveryNode node : nodes) {
-                logger.info("Discovered node: " + node.getHostAddress());
-            }
+//            List<DiscoveryNode> nodes = client.listedNodes();
+//            for (DiscoveryNode node : nodes) {
+//                logger.info("Discovered node: " + node.getHostAddress());
+//            }
         } catch (UnknownHostException e) {
             logger.error(e.getMessage(), e);
         }
