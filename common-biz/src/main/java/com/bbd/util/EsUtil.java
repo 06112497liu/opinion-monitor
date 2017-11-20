@@ -26,6 +26,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.cluster.node.DiscoveryNode;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
@@ -408,7 +409,10 @@ public class EsUtil {
         try {
             Settings settings = Settings.builder().put("cluster.name", esCluster).build();
             client = new PreBuiltTransportClient(settings).addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), esPort));
-
+            List<DiscoveryNode> nodes = client.listedNodes();
+            for (DiscoveryNode node : nodes) {
+                logger.info("Discovered node: " + node.getHostAddress());
+            }
         } catch (UnknownHostException e) {
             logger.error(e.getMessage(), e);
         }
