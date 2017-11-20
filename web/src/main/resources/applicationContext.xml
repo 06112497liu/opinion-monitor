@@ -7,5 +7,5 @@
     <import resource="classpath*:biz.xml"/>
     <import resource="redis.xml"/>
     <import resource="dao.xml"/>
-
+	<import resource="kafka-producer.xml"/>
 </beans>

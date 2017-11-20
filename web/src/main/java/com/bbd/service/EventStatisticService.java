@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +49,13 @@ public class EventStatisticService {
     OpinionEventTrendStatisticDao opinionEventTrendStatisticDao;
     @Autowired
     OpinionEventMediaStatisticDao opinionEventMediaStatisticDao;
+    @Autowired  
+    private KafkaTemplate<Integer, String> kafkaTemplate;  
+    
+    @Scheduled(cron="0 * * * * ?")
+    public void eventKafka() {
+        kafkaTemplate.sendDefault("haha111");  
+    }
     
     @Scheduled(cron="0 30 * * * ?")
     public void eventTrendStatistic() {
