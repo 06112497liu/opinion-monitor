@@ -279,4 +279,11 @@ public interface EsQueryService {
      * @return
      */
     Map<Object, Object> queryAddWarnCount(DateTime lastSendTime);
+
+    /**
+     * 查询新增预警舆情热度最高的
+     * @param lastSendTime
+     * @return
+     */
+    Integer getMaxHot(DateTime lastSendTime);
 }

@@ -1061,6 +1061,29 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     /**
+     * 查询新增预警舆情热度最高的
+     * @param lastSendTime
+     * @return
+     */
+    @Override
+    public Integer getMaxHot(DateTime lastSendTime) {
+        TransportClient client = esUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.should(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_ONE).gt(lastSendTime.toString("yyyy-MM-dd HH:mm:ss")))
+                    .should(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_TWO).gt(lastSendTime.toString("yyyy-MM-dd HH:mm:ss")))
+                    .should(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_THREE).gt(lastSendTime.toString("yyyy-MM-dd HH:mm:ss")));
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setFetchSource(EsConstant.hotField, null)
+                .setQuery(query)
+                .addSort(EsConstant.hotField, SortOrder.DESC)
+                .setSize(1).execute().actionGet();
+        List<OpinionVO> opinion = EsUtil.buildResult(resp, OpinionVO.class);
+        if(opinion.isEmpty()) return null;
+        Integer hot = opinion.get(0).getHot();
+        return hot;
+    }
+
+    /**
      * 添加范围查询
      * @param dateRange
      * @param state 1-累积总量；2-当月数量
