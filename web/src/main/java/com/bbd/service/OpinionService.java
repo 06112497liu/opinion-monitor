@@ -71,7 +71,7 @@ public interface OpinionService {
      * @param keyword
      * @return
      */
-    List<String> getHistoryWordSearch(String keyword);
+    List<String> getHistoryWordSearch();
 
     /**
      * 舆情相同文章数信息

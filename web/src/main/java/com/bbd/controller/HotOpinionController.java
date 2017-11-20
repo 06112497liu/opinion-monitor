@@ -71,12 +71,9 @@ public class HotOpinionController extends AbstractController {
     }
 
     @ApiOperation(value = "历史关键词搜索", httpMethod = "GET")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "搜索关键词", name = "keyword", dataType = "String", paramType = "query", required = false)
-    })
     @RequestMapping(value = "history/keywords", method = RequestMethod.GET)
-    public RestResult getHistoryWordSearch(String keyword) {
-        List<String> result = opinionService.getHistoryWordSearch(keyword);
+    public RestResult getHistoryWordSearch() {
+        List<String> result = opinionService.getHistoryWordSearch();
         return RestResult.ok(result);
     }
 

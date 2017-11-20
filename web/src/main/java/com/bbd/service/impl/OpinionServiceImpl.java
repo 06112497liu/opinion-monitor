@@ -135,6 +135,9 @@ public class OpinionServiceImpl implements OpinionService {
      */
     @Override
     public PageList<OpinionVO> getHotOpinionList(String keyword, Integer timeSpan, Integer emotion, PageBounds pb) {
+        // 保存关键词
+        saveKeyword(keyword);
+
         DateTime startTime = BusinessUtils.getDateByTimeSpan(timeSpan);
 
         OpinionEsSearchVO esResult = esQueryService.getHotOpinionList(keyword, startTime, emotion, pb);
@@ -207,19 +210,25 @@ public class OpinionServiceImpl implements OpinionService {
 
     /**
      * 历史关键词搜索查询
-     * @param keyword
      * @return
      */
     @Override
-    public List<String> getHistoryWordSearch(String keyword) {
+    public List<String> getHistoryWordSearch() {
+        ListOperations listOperation = redisTemplate.opsForList();
+        UserInfo user = UserContext.getUser();
+        if(Objects.isNull(user)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
+        List list = listOperation.range("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), 0, 9);
+        return list;
+    }
+
+    // 保存历史搜索关键词
+    private void saveKeyword(String keyword) {
         ListOperations listOperation = redisTemplate.opsForList();
         UserInfo user = UserContext.getUser();
         if(Objects.isNull(user)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
         List list = listOperation.range("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), 0, 9);
         if(!StringUtils.isEmpty(keyword) && !list.contains(keyword))
             listOperation.leftPush("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), keyword);
-        list = listOperation.range("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), 0, 9);
-        return list;
     }
 
     @Override
