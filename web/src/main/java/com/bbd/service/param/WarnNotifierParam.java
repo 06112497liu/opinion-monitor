@@ -2,11 +2,13 @@ package com.bbd.service.param;
 
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.util.ValidateUtil;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @author Liuweibo
  * @version Id: WarnNotifierParam.java, v0.1 2017/11/16 Liuweibo Exp $$
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class WarnNotifierParam {
 
     /**
