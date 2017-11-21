@@ -73,6 +73,7 @@ public class OpinionServiceImpl implements OpinionService {
      * @return
      */
     @Override
+    @TimeUsed
     public Map<String, Object> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb) {
 
         // step-1：查询es
@@ -111,9 +112,6 @@ public class OpinionServiceImpl implements OpinionService {
 
         // step-2：代码分页
         List<OpinionVO> allOpinions = BeanMapperUtil.mapList(esOpinons, OpinionVO.class);
-        allOpinions.forEach(o -> {
-            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
-        });
 
         int firstIndex = pb.getOffset(); int toIndex = pb.getLimit() * pb.getPage();
         if(toIndex > allOpinions.size()) {
@@ -124,6 +122,9 @@ public class OpinionServiceImpl implements OpinionService {
             pb.setPage(1);
         }
         List<OpinionVO> opinions = allOpinions.subList(firstIndex, toIndex);
+        opinions.forEach(o -> {
+            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+        });
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), allOpinions.size());
         PageList p = PageListHelper.create(opinions, paginator);
 

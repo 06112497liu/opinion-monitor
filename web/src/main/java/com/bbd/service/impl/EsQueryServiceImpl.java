@@ -359,6 +359,8 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @param pb: 分页
      * @return
      */
+    @Override
+    @TimeUsed
     public OpinionEsSearchVO queryWarningOpinion(DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb) {
         String hotLevelAggName = "hot_level_agg";
         String mediaAggName = "media_agg";

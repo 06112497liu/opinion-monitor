@@ -171,7 +171,6 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     }
 
     @Override
-    @TimeUsed
     public Integer judgeOpinionSettingClass(Integer hot) {
         WarnSettingExample example = new WarnSettingExample();
         example.createCriteria().andTypeEqualTo(3);
