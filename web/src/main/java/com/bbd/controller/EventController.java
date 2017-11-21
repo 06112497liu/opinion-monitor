@@ -317,8 +317,8 @@ public class EventController extends AbstractController {
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件级别,1表示一级事件，2表示二级事件，3表示三级事件", name = "eventLevel", dataType = "String", paramType = "query", required = false),
         @ApiImplicitParam(value = "地区,空表示全市", name = "region", dataType = "String", paramType = "query", required = false),
-        @ApiImplicitParam(value = "开始时间", name = "startTime", dataType = "Date", paramType = "query", required = true),
-        @ApiImplicitParam(value = "结束时间", name = "endTime", dataType = "Date", paramType = "query", required = true),
+        @ApiImplicitParam(value = "开始时间", name = "startTime", dataType = "Date", paramType = "query", required = false),
+        @ApiImplicitParam(value = "结束时间", name = "endTime", dataType = "Date", paramType = "query", required = false),
         @ApiImplicitParam(value = "起始页号", name = "pageNo", dataType = "Integer", paramType = "query", required = true),
         @ApiImplicitParam(value = "每页大小", name = "pageSize", dataType = "Integer", paramType = "query", required = true)
     })

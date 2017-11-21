@@ -420,8 +420,16 @@ public class EventService{
     public Map<String, List<KeyValueVO>> eventWholeTrend(Long id, Integer cycle) {
         Map<String, List<KeyValueVO>> map = new HashMap<String, List<KeyValueVO>>();
         OpinionEvent opinionEvent = opinionEventDao.selectByPrimaryKey(id);
-        List<KeyValueVO> infoList = esQueryService.queryEventInfoTotal(opinionEvent, false, cycle);
-        List<KeyValueVO> warnList = esQueryService.queryEventInfoTotal(opinionEvent, true, cycle);
+        List<Date> dates = getDates(cycle, opinionEvent);
+        List<KeyValueVO> infoList;
+        List<KeyValueVO> warnList;
+        if (dates == null || dates.size() == 0) {
+            infoList = new ArrayList<KeyValueVO>();
+            warnList = new ArrayList<KeyValueVO>();
+        } else {
+            infoList = esQueryService.queryEventInfoTotal(opinionEvent, false, cycle);
+            warnList = esQueryService.queryEventInfoTotal(opinionEvent, true, cycle);
+        }
         map.put("infoList", infoList);
         map.put("warnList", warnList);
         return map;
@@ -473,7 +481,11 @@ public class EventService{
         SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         for (OpinionDictionary e : opinionDictionaryList) {
             com.bbd.domain.OpinionEventMediaStatisticExample.Criteria criteria =  example.createCriteria();
-            criteria.andEventIdEqualTo(id).andPickTimeIn(getDates(cycle, opinionEvent))
+            List<Date> dates = getDates(cycle, opinionEvent);
+            if (dates == null || dates.size() == 0) {
+                continue;
+            }
+            criteria.andEventIdEqualTo(id).andPickTimeIn(dates)
             .andMediaCodeEqualTo(e.getCode());
             List<OpinionEventMediaStatistic> evtMediaStaList = opinionEventMediaStatisticDao.selectByExample(example);
             List<KeyValueVO> listSub = new ArrayList<KeyValueVO>();
@@ -694,7 +706,13 @@ public class EventService{
         if (region != null){
             criteria.andRegionEqualTo(region);
         }
-        criteria.andGmtCreateGreaterThanOrEqualTo(startTime)
+        if (startTime != null){
+            criteria.andGmtCreateGreaterThanOrEqualTo(startTime);
+        }
+        if (endTime != null){
+            criteria.andGmtCreateLessThanOrEqualTo(endTime);
+        }
+        criteria
         .andGmtCreateLessThanOrEqualTo(endTime)
         .andIsDeleteEqualTo((byte)0)
         .andFileReasonIsNotNull();
