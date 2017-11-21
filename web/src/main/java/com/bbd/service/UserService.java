@@ -4,21 +4,21 @@
  */
 package com.bbd.service;
 
+import com.bbd.bean.UserListVO;
 import com.bbd.dao.UserDao;
+import com.bbd.dao.UserExtDao;
 import com.bbd.domain.User;
 import com.bbd.domain.UserExample;
+import com.bbd.enums.DistrictExtEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.param.AccountCreateVO;
 import com.bbd.service.param.UserCreateParam;
 import com.bbd.service.param.UserCreateVO;
-import com.bbd.util.BeanMapperUtil;
-import com.bbd.util.MD5Util;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.mybatis.domain.PageBounds;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -45,16 +45,20 @@ public class UserService {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private UserExtDao userExtDao;
+
     /**
      * 查询用户列表
      * @param pb
      * @return
      */
-    public List<User> queryUsers(PageBounds pb) {
-        UserExample exam = new UserExample();
-        exam.createCriteria().andFlagEqualTo(0); // 未删除的用户
-        List<User> list = userDao.selectByExampleWithPageBounds(exam, pb);
-        list.sort((u1, u2) -> u2.getGmtCreate().compareTo(u1.getGmtCreate()));
+    public List<UserListVO> queryUsers(PageBounds pb) {
+        List<UserListVO> list = userExtDao.queryUserList(pb);
+        list.forEach(p -> {
+            p.setReginDesc(DistrictExtEnum.getDescByCode(p.getRegion()));
+        });
+        list.sort((p1, p2) -> - p1.getGmtCreate().compareTo(p2.getGmtCreate()));
         return list;
     }
 

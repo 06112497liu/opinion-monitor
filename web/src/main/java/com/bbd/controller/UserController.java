@@ -5,6 +5,7 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
+import com.bbd.bean.UserListVO;
 import com.bbd.domain.User;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.UserService;
@@ -35,10 +36,15 @@ public class UserController extends AbstractController {
     @Autowired
     private UserService userService;
 
-    @ApiOperation(value = "查询用户", httpMethod = "GET")
+    @ApiOperation(value = "查询用户列表", httpMethod = "GET")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "起始页号", name = "page", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
+    })
+    @RequestMapping(value = "list", method = RequestMethod.GET)
     public RestResult query() {
         PageBounds pb = getPageBounds();
-        List<User> rs = userService.queryUsers(pb);
+        List<UserListVO> rs = userService.queryUsers(pb);
         return RestResult.ok(rs);
     }
 
