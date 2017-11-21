@@ -4,12 +4,14 @@
  */
 package com.bbd.job.vo;
 
+import java.io.Serializable;
+
 /**
  *
  * @author tjwang
  * @version $Id: MsgModel.java, v 0.1 2017/11/16 0016 16:32 tjwang Exp $
  */
-public class MsgModel {
+public class MsgModel implements Serializable{
 
     private String  username;
 

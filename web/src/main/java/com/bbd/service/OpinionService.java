@@ -5,6 +5,7 @@ import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
+import org.joda.time.DateTime;
 import org.springframework.data.domain.Page;
 
 import java.util.Date;
@@ -68,7 +69,6 @@ public interface OpinionService {
 
     /**
      * 历史关键词搜索查询
-     * @param keyword
      * @return
      */
     List<String> getHistoryWordSearch();
@@ -88,4 +88,10 @@ public interface OpinionService {
      * @return
      */
     List<OpinionHotEsVO> getOpinionHotTrend(String uuid, Integer timeSpan);
+
+    /**
+     * 获取短信或邮件提醒的json字符串
+     * @param lastSendTime
+     */
+    String getWarnRemindJson(DateTime lastSendTime) throws NoSuchFieldException;
 }

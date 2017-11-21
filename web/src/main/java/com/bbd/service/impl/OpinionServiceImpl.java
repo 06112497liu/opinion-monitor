@@ -1,5 +1,6 @@
 package com.bbd.service.impl;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
@@ -8,12 +9,16 @@ import com.bbd.domain.WarnSetting;
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
+import com.bbd.job.vo.MsgModel;
+import com.bbd.job.vo.MsgVO;
+import com.bbd.job.vo.OpinionMsgModel;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
+import com.bbd.util.JsonUtil;
 import com.bbd.util.StringUtils;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
@@ -25,12 +30,15 @@ import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,6 +57,8 @@ public class OpinionServiceImpl implements OpinionService {
 
     @Resource
     public RedisTemplate redisTemplate;
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public List<WarnOpinionTopTenVO> getWarnOpinionTopTen() {
@@ -269,6 +279,35 @@ public class OpinionServiceImpl implements OpinionService {
         list.addAll(set);
         list.sort((o1, o2) -> -(o1.getHotTime().compareTo(o2.getHotTime())));
         return list;
+    }
+
+    /**
+     * 获取短信或邮件提醒的json字符串
+     * @param lastSendTime
+     */
+    @Override
+    public String getWarnRemindJson(DateTime lastSendTime) {
+        MsgVO msgVO = new MsgVO();
+        msgVO.setRetry(0);
+        msgVO.setTemplate("classify_opinion_warnning");
+        msgVO.setSubject("分级舆情预警");
+        OpinionMsgModel model = new OpinionMsgModel();
+        Map<Object, Object> map = esQueryService.queryAddWarnCount(lastSendTime);
+        for (Object key : map.keySet()) {
+            Field field;
+            try {
+                field = model.getClass().getDeclaredField(key.toString());
+                field.setAccessible(true);
+                field.set(model, map.get(key));
+            } catch (NoSuchFieldException e) {
+                logger.info("反射出错", e);
+            } catch (IllegalAccessException e) {
+                logger.info("非法字符", e);
+            }
+        }
+        msgVO.setModel(model);
+        String str = JsonUtil.fromJson(msgVO);
+        return str;
     }
 }
 
