@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.joda.time.DateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -60,6 +61,8 @@ public class WarnOpinionController extends AbstractController {
     public RestResult getHistoryWarnOpinionList(@DateTimeFormat(pattern="yyyy-MM") Date startTime,
                                                 @DateTimeFormat(pattern="yyyy-MM") Date endTime,
                                                 Integer emotion, Integer mediaType) {
+        if(startTime == null) startTime = DateTime.now().plusYears(-100).toDate();
+        if(endTime == null) endTime = DateTime.now().toDate();
         Map<String, Object> result = opinionService.getHistoryWarnOpinionList(startTime, endTime, emotion, mediaType, getPageBounds());
         return RestResult.ok(result);
     }

@@ -111,13 +111,13 @@ public class EsQueryServiceTest extends BaseServiceTest {
     @Test
     public void testQueryAddWarnCount() {
         DateTime lastSendTime = DateTime.now().plusMonths(-1);
-        Map<Object, Object> map = esQueryService.queryAddWarnCount(lastSendTime);
+        Map<Integer, Integer> map = esQueryService.queryAddWarnCount(lastSendTime);
         System.out.println(map);
     }
 
     @Test
     public void testGetMaxHot() {
         DateTime lastSendTime = DateTime.now().plusMonths(-1);
-        esQueryService.getMaxHot(lastSendTime, 1);
+        esQueryService.queryMaxHot(lastSendTime, 1);
     }
 }

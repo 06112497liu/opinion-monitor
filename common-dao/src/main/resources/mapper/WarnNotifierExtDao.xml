@@ -30,7 +30,25 @@
     DELETE FROM bbd_warn_notifier WHERE setting_id = #{settingId}
   </delete>
 
-  <insert id="batchInsertNotifier" parameterType="java.util.List">
+    <select id="queryNotifierList" resultType="com.bbd.bean.WarnNotifierVO">
+      SELECT
+          a.setting_id settingId,
+          a.notifier notifier,
+          a.email_notify emailNotify,
+          a.email,
+          a.sms_notify smsNotify,
+          a.phone,
+          b.type,
+          b.`level`
+      FROM
+          bbd_warn_notifier a LEFT JOIN bbd_warn_setting b
+      ON
+          a.setting_id = b.id
+      WHERE
+        b.id IS NOT NULL AND b.type = #{type};
+    </select>
+
+    <insert id="batchInsertNotifier" parameterType="java.util.List">
     INSERT INTO
       bbd_warn_notifier
       <include refid="batchInsertNotifier_sql"/>
@@ -39,6 +57,5 @@
       (#{item.settingId}, #{item.notifier}, #{item.emailNotify}, #{item.email}, #{item.smsNotify}, #{item.phone})
     </foreach>
   </insert>
-
 
 </mapper>

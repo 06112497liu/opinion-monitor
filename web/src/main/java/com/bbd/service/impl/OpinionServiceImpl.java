@@ -3,18 +3,22 @@ package com.bbd.service.impl;
 import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
-import com.bbd.dao.WarnNotifierDao;
-import com.bbd.domain.WarnNotifierExample;
+import com.bbd.bean.WarnNotifierVO;
+import com.bbd.dao.WarnNotifierExtDao;
+import com.bbd.domain.WarnNotifier;
 import com.bbd.domain.WarnSetting;
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
+import com.bbd.job.vo.MsgVO;
+import com.bbd.job.vo.OpinionMsgModel;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
+import com.bbd.util.JsonUtil;
 import com.bbd.util.StringUtils;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
@@ -35,6 +39,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Liuweibo
@@ -53,7 +58,7 @@ public class OpinionServiceImpl implements OpinionService {
     private RedisTemplate redisTemplate;
 
     @Autowired
-    private WarnNotifierDao notifierDao;
+    private WarnNotifierExtDao notifierExtDao;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -284,9 +289,59 @@ public class OpinionServiceImpl implements OpinionService {
      */
     @Override
     public String getWarnRemindJson(DateTime lastSendTime) {
-        WarnNotifierExample example = new WarnNotifierExample();
-        example.createCriteria();
-        return null;
+
+        List<MsgVO> result = Lists.newLinkedList();
+
+        // step-1：获取该时间段内分级预警增加量，一级每个预警的热度最大值，一级预警通知人
+        Integer oneMax = esQueryService.queryMaxHot(lastSendTime, 1);
+        Integer twoMax = esQueryService.queryMaxHot(lastSendTime, 2);
+        Integer threeMax = esQueryService.queryMaxHot(lastSendTime, 3);
+        Map<Integer, Integer> maxMap = Maps.newHashMap();
+        maxMap.put(1, oneMax); maxMap.put(2, twoMax); maxMap.put(1, threeMax);
+        Map<Integer, Integer> mapAdd = esQueryService.queryAddWarnCount(lastSendTime);
+        List<WarnNotifierVO> notifies = notifierExtDao.queryNotifierList(3);
+
+        // step-2：邮件发送
+        Map<String, List<WarnNotifierVO>> emailNotifier = notifies.stream()
+                .filter(p -> p.getEmailNotify() == 1) // 过滤出需要通过邮件发送的
+                .collect(Collectors.groupingBy(WarnNotifierVO::getEmail)); // 以邮箱分组
+        List<MsgVO> emailResult = buidMsgVO(maxMap, mapAdd, emailNotifier);
+        // step-2：短信发送
+        Map<String, List<WarnNotifierVO>> smsNotifier = notifies.stream()
+                .filter(p -> p.getSmsNotify() == 1) // 过滤出需要通过短信发送的
+                .collect(Collectors.groupingBy(WarnNotifierVO::getPhone)); // 以电话分组
+        List<MsgVO> smsResult = buidMsgVO(maxMap, mapAdd, smsNotifier);
+        result.addAll(emailResult);
+        result.addAll(smsResult);
+        String str = JsonUtil.fromJson(result);
+        return str;
+    }
+
+    List<MsgVO> buidMsgVO(Map<Integer, Integer> maxMap, Map<Integer, Integer> mapAdd, Map<String, List<WarnNotifierVO>> notifies) {
+        List<MsgVO> result = Lists.newLinkedList();
+        for (String k : notifies.keySet()) {
+            MsgVO vo = new MsgVO();
+            OpinionMsgModel model = new OpinionMsgModel();
+            vo.setSubject("分级舆情预警"); vo.setSubject("classify_opinion_warnning"); vo.setRetry(0); vo.setTo(k); vo.setModel(model);
+            List<WarnNotifierVO> list = notifies.get(k);
+            Integer max = 0;
+            for (WarnNotifierVO p : list) {
+                Integer level = p.getLevel();
+                Integer value = mapAdd.get(level);
+                if(level > max)
+                    max = level;
+                if(level == 1)
+                    model.setLevelOne(value);
+                else if(level == 2)
+                    model.setLevelTwo(value);
+                else if(level == 3)
+                    model.setLevelThree(value);
+                model.setUsername(p.getNotifier());
+            }
+            model.setScore(maxMap.get(max));
+            result.add(vo);
+        }
+        return result;
     }
 }
 

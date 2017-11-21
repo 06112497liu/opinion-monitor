@@ -1054,24 +1054,26 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     @Override
-    public Map<Object, Object> queryAddWarnCount(DateTime lastSendTime) {
+    public Map<Integer, Integer> queryAddWarnCount(DateTime lastSendTime) {
         TransportClient client = esUtil.getClient();
-        DateRangeAggregationBuilder aggOne = AggregationBuilders.dateRange(levelOne).field(EsConstant.OPINION_FIRST_WARN_TIME_ONE).addUnboundedFrom(levelOne, lastSendTime);
-        DateRangeAggregationBuilder aggTwo = AggregationBuilders.dateRange(levelTwo).field(EsConstant.OPINION_FIRST_WARN_TIME_TWO).addUnboundedFrom(levelTwo, lastSendTime);
-        DateRangeAggregationBuilder aggThree = AggregationBuilders.dateRange(levelThree).field(EsConstant.OPINION_FIRST_WARN_TIME_THREE).addUnboundedFrom(levelThree, lastSendTime);
+        DateRangeAggregationBuilder aggOne = AggregationBuilders.dateRange("1").field(EsConstant.OPINION_FIRST_WARN_TIME_ONE).addUnboundedFrom(levelOne, lastSendTime);
+        DateRangeAggregationBuilder aggTwo = AggregationBuilders.dateRange("2").field(EsConstant.OPINION_FIRST_WARN_TIME_TWO).addUnboundedFrom(levelTwo, lastSendTime);
+        DateRangeAggregationBuilder aggThree = AggregationBuilders.dateRange("3").field(EsConstant.OPINION_FIRST_WARN_TIME_THREE).addUnboundedFrom(levelThree, lastSendTime);
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
                 .addAggregation(aggOne)
                 .addAggregation(aggTwo)
                 .addAggregation(aggThree)
                 .setSize(0).execute().actionGet();
-        List<KeyValueVO> one = buildHotLevelLists(resp, levelOne);
-        List<KeyValueVO> two = buildHotLevelLists(resp, levelTwo);
-        List<KeyValueVO> three = buildHotLevelLists(resp, levelThree);
+        List<KeyValueVO> one = buildHotLevelLists(resp, "1");
+        List<KeyValueVO> two = buildHotLevelLists(resp, "2");
+        List<KeyValueVO> three = buildHotLevelLists(resp, "3");
         List<KeyValueVO> result = Lists.newLinkedList();
         result.addAll(one);
         result.addAll(two);
         result.addAll(three);
-        Map<Object, Object> map = result.stream().collect(Collectors.toMap(KeyValueVO::getKey, KeyValueVO::getValue));
+        Map<Integer, Integer> map = result.stream().collect(
+                Collectors.toMap(p -> Integer.parseInt(p.getKey().toString()), p -> Integer.parseInt(p.getValue().toString()))
+        );
         return map;
     }
 
@@ -1082,7 +1084,7 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     @Override
-    public Integer getMaxHot(DateTime lastSendTime, Integer type) {
+    public Integer queryMaxHot(DateTime lastSendTime, Integer type) {
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         if(type == 1)
