@@ -1,5 +1,6 @@
 package com.bbd.service.impl;
 
+import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.constant.EsConstant;
@@ -101,6 +102,7 @@ public class OpinionServiceImpl implements OpinionService {
      * @return
      */
     @Override
+    @TimeUsed
     public PageList<OpinionVO> getHotOpinionListTop100(Integer timeSpan, Integer emotion, PageBounds pb) {
 
         // step-1：查询es

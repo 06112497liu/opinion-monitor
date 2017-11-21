@@ -1,5 +1,6 @@
 package com.bbd.service.impl;
 
+import com.bbd.annotation.TimeUsed;
 import com.bbd.dao.*;
 import com.bbd.domain.*;
 import com.bbd.exception.ApplicationException;
@@ -64,7 +65,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
             WarnSettingExample ex = new WarnSettingExample();
             ex.createCriteria().andEventIdEqualTo(eventId);
             List<WarnSetting> list = settingDao.selectByExample(ex);
-            if(list.isEmpty()) throw new ApplicationException(BizErrorCode.OBJECT_NOT_EXIST, "本事件没有预警配置");
+            if(list.isEmpty()) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "本事件没有预警配置");
         }
 
         // step-2：热度值配置
@@ -100,7 +101,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     @Override
     public Integer delNotifier(Long id) {
         boolean flag = Objects.nonNull(notifierDao.selectByPrimaryKey(id));
-        if(flag == false) throw new ApplicationException(BizErrorCode.OBJECT_NOT_EXIST);
+        if(flag == false) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
         return notifierDao.deleteByPrimaryKey(id);
     }
 
@@ -120,7 +121,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
         try {
             rs = keywordsExtDao.batchInsertKeywords(list);
         } catch (Exception e) {
-            throw new ApplicationException(BizErrorCode.KEY_WORD_EXIST);
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "舆情关键词重复");
         }
         return rs;
     }
@@ -140,7 +141,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     @Override
     public Integer delKeyWords(Long id) {
         boolean flag = Objects.nonNull(keywordsDao.selectByPrimaryKey(id));
-        if(flag == false) throw new ApplicationException(BizErrorCode.OBJECT_NOT_EXIST);
+        if(flag == false) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
         return keywordsDao.deleteByPrimaryKey(id);
     }
 
@@ -170,6 +171,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     }
 
     @Override
+    @TimeUsed
     public Integer judgeOpinionSettingClass(Integer hot) {
         WarnSettingExample example = new WarnSettingExample();
         example.createCriteria().andTypeEqualTo(3);

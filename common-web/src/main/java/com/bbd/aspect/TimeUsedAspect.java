@@ -43,7 +43,7 @@ public class TimeUsedAspect {
             String methodName = pjp.getSignature().getDeclaringTypeName() + "." + pjp.getSignature().getName();
             long used = (end - start);
             if (used >= timeUsed.threshold()) {
-                logger.info(String.format("Execute %s used: %d millis", methodName, used));
+                logger.info(String.format("执行方法 %s 耗时: %d millis", methodName, used));
             }
         }
         return result;
