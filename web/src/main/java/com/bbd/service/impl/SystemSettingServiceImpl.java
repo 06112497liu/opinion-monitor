@@ -171,10 +171,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     }
 
     @Override
-    public Integer judgeOpinionSettingClass(Integer hot) {
-        WarnSettingExample example = new WarnSettingExample();
-        example.createCriteria().andTypeEqualTo(3);
-        List<WarnSetting> setting = settingDao.selectByExample(example);
+    public Integer judgeOpinionSettingClass(Integer hot, List<WarnSetting> setting) {
         for(WarnSetting s : setting) {
             int min = s.getMin(); int max = s.getMax();
             boolean isContain = Range.closed(min, max).contains(hot);
@@ -182,6 +179,20 @@ public class SystemSettingServiceImpl implements SystemSettingService {
         }
         return -1;
     }
+
+    /**
+     * 查询预警配置
+     * @param type
+     * @return
+     */
+    @Override
+    public List<WarnSetting> queryWarnSetting(Integer type) {
+        WarnSettingExample example = new WarnSettingExample();
+        example.createCriteria().andTypeEqualTo(type);
+        List<WarnSetting> setting = settingDao.selectByExample(example);
+        return setting;
+    }
+
 
     @Override
     public Map<Integer, Integer> getWarnClass() {

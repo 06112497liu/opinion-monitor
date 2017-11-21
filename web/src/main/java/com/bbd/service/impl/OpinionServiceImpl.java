@@ -4,6 +4,7 @@ import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.constant.EsConstant;
+import com.bbd.domain.WarnSetting;
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
@@ -53,11 +54,12 @@ public class OpinionServiceImpl implements OpinionService {
     public List<WarnOpinionTopTenVO> getWarnOpinionTopTen() {
         List<WarnOpinionTopTenVO> result = Lists.newLinkedList();
         List<OpinionEsVO> esList = esQueryService.getWarnOpinionTopTen();
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         esList.forEach(o -> {
             WarnOpinionTopTenVO v = new WarnOpinionTopTenVO();
             v.setTime(o.getPublishTime());
             v.setHot(o.getHot());
-            v.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+            v.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot(), setting));
             v.setTitle(o.getTitle());
             result.add(v);
         });
@@ -79,8 +81,9 @@ public class OpinionServiceImpl implements OpinionService {
         // step-1：查询es
         OpinionEsSearchVO esResult = esQueryService.queryWarningOpinion(BusinessUtils.getDateByTimeSpan(timeSpan), emotion, sourceType, pb);
         List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         opinions.forEach(o -> {
-            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot(), setting));
         });
 
         // step-2：分页并返回结果
@@ -122,8 +125,9 @@ public class OpinionServiceImpl implements OpinionService {
             pb.setPage(1);
         }
         List<OpinionVO> opinions = allOpinions.subList(firstIndex, toIndex);
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         opinions.forEach(o -> {
-            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot(), setting));
         });
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), allOpinions.size());
         PageList p = PageListHelper.create(opinions, paginator);
@@ -178,8 +182,9 @@ public class OpinionServiceImpl implements OpinionService {
         // step-1：查询es
         OpinionEsSearchVO esResult = esQueryService.queryHistoryOpinions(start, end, emotion, mediaType, pb);
         List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         opinions.forEach(o -> {
-            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot(), setting));
         });
 
         // step-2：分页并返回结果
@@ -206,7 +211,8 @@ public class OpinionServiceImpl implements OpinionService {
         OpinionEsVO o = esQueryService.getOpinionByUUID(uuid);
         OpinionExtVO result = BeanMapperUtil.map(o, OpinionExtVO.class);
         // 判断预警级别
-        Integer level = systemSettingService.judgeOpinionSettingClass(result.getHot());
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
+        Integer level = systemSettingService.judgeOpinionSettingClass(result.getHot(), setting);
         result.setLevel(level);
         return result;
     }

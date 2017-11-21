@@ -3,10 +3,7 @@ package com.bbd.service.impl;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.constant.EsConstant;
 import com.bbd.dao.OpinionEventDao;
-import com.bbd.domain.Account;
-import com.bbd.domain.OpinionEvent;
-import com.bbd.domain.OpinionEventExample;
-import com.bbd.domain.User;
+import com.bbd.domain.*;
 import com.bbd.enums.TransferEnum;
 import com.bbd.enums.WarnReasonEnum;
 import com.bbd.exception.ApplicationException;
@@ -60,6 +57,9 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private SystemSettingService systemSettingService;
+
     /**
      * 当前用户待处理舆情列表
      *
@@ -70,8 +70,9 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     public PageList<OpinionTaskListVO> getUnProcessedList(Integer transferType, PageBounds pb) {
         Long userId = UserContext.getUser().getId();
         PageList<OpinionTaskListVO> result = esQueryService.getUnProcessedList(userId, transferType, pb);
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         result.forEach(o -> {
-            o.setLevel(settingService.judgeOpinionSettingClass(o.getHot()));
+            o.setLevel(settingService.judgeOpinionSettingClass(o.getHot(), setting));
             String uuid = o.getUuid();
             String username = UserContext.getUser().getUsername();
             Map<String, Object> keyMap = Maps.newHashMap();

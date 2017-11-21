@@ -319,8 +319,9 @@ public class EventService{
             source, pb);
        
         List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         opinions.forEach(o -> {
-            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot(), setting));
         });
         map.put("opinions", opinions);
         map.put("total", esResult.getTotal());
