@@ -130,13 +130,30 @@ public class MsgService {
         return msgVOList;
     }
     
+    public void updateMsgRecord(int sendType, int msgType) {
+        MsgSendRecordExample msgExample = new MsgSendRecordExample();
+        msgExample.createCriteria().andSendTypeEqualTo(sendType).andMsgTypeEqualTo(msgType);
+        List<MsgSendRecord> mgsList = msgSendRecordDao.selectByExample(msgExample);
+        if (mgsList != null && mgsList.size() > 0) {
+            mgsList.get(0).setSendTime(new Date());
+            msgSendRecordDao.updateByPrimaryKeySelective(mgsList.get(0));
+        } else {
+            MsgSendRecord record = new MsgSendRecord();
+            record.setSendType(sendType);
+            record.setMsgType(msgType);
+            record.setGmtCreate(new Date());
+            record.setSendTime(new Date());
+            msgSendRecordDao.insert(record);
+        }
+    }
+    
     @Scheduled(cron="0 0 * * * ?")
     public void eventKafka() {
         
+        //事件总体热度级别变化发送至kafka
         OpinionEventExample example = new OpinionEventExample();
         example.createCriteria().andIsDeleteEqualTo((byte)0).andFileReasonIsNull();
         List<OpinionEvent> opinionEventList = opinionEventDao.selectByExample(example);
-        
         Integer level;
         Date now = new Date();
         for (OpinionEvent e : opinionEventList) {
@@ -148,48 +165,13 @@ public class MsgService {
             boolean change = changeLevel(e, level, now);
             if (change == true) {
                 List<WarnNotifier> warnNotifierList= getNotifiers(warnSetting);
-                kafkaTemplate.sendDefault(JsonUtil.fromJson(buildMsg(e, level, warnNotifierList, true)));
+                kafkaTemplate.sendDefault(JsonUtil.fromJson(buildMsg(e, level, warnNotifierList, true)));//发送邮件
+                //发送
+                //
             }
         }
-        
-        
-        
-        MsgSendRecordExample msgExample = new MsgSendRecordExample();
-        msgExample.createCriteria().andSendTypeEqualTo(3).andMsgTypeEqualTo(2);
-        List<MsgSendRecord> mgsList = msgSendRecordDao.selectByExample(msgExample);
-        
-        
-        
-        
-        
-        
-        if (mgsList == null || mgsList.size() == 0) {
-            MsgSendRecord msgSendRecord = new MsgSendRecord();
-            msgSendRecord.setSendType(3);
-            msgSendRecord.setMsgType(2);
-            msgSendRecord.setSendTime(new Date());
-            msgSendRecordDao.insert(msgSendRecord);
-            kafkaTemplate.sendDefault("haha111");//发送所有事件消息
-        } else {//发送级别变化的消息
-            OpinionEventLevelChangeExample  levelChangeExample = new OpinionEventLevelChangeExample();
-            //List<OpinionEventLevelChange> opinionEventLevelChangeList = opinionEventLevelChangeDao.selectByExample(levelChangeExample);
-            levelChangeExample.createCriteria().andGmtLevelChangeGreaterThan(mgsList.get(0).getSendTime());
-            List<OpinionEventLevelChange> opinionEventLevelChangeList = opinionEventLevelChangeDao.selectByExample(levelChangeExample);
-        }
-        if (mgsList == null || mgsList.size() == 0 || 
-                new DateTime(mgsList.get(0).getSendTime()).getHourOfDay() ==  new DateTime(now).getHourOfDay() ) {
-            kafkaTemplate.sendDefault("haha111");
-           // mgsList.get(0).setSendTime(sendTime);
-           // msgSendRecordDao.updateByPrimaryKeySelective(record);
-        }
-        
-         
-        
-        
+        updateMsgRecord(3, 2); 
     }
-    
-
-    
     
     
 
