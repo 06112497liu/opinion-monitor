@@ -713,7 +713,6 @@ public class EventService{
             criteria.andGmtCreateLessThanOrEqualTo(endTime);
         }
         criteria
-        .andGmtCreateLessThanOrEqualTo(endTime)
         .andIsDeleteEqualTo((byte)0)
         .andFileReasonIsNotNull();
         List<OpinionEvent> eventList = opinionEventDao.selectByExampleWithPageBounds(example, new PageBounds(pageNo, pageSize));
