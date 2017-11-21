@@ -54,13 +54,13 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     private UserService userService;
 
     @Override
-    public Integer modifyHeat(Long eventId, Integer type, Integer first, Integer second, Integer third) {
+    public Integer modifyHeat(Long eventId, Integer type, Integer popup, Integer first, Integer second, Integer third) {
 
         // step-1：校验热度值是否符合规范
         boolean flag = checkThresholdValue(type, first, second, third);
         if(flag == false) throw new ApplicationException(CommonErrorCode.PARAM_ERROR);
 
-        // step-2：如果是针对事件，校验操作时间配置是否存在
+        // step-2：如果是针对事件，校验操作事件配置是否存在
         if(type != 3) {
             WarnSettingExample ex = new WarnSettingExample();
             ex.createCriteria().andEventIdEqualTo(eventId);
@@ -71,15 +71,15 @@ public class SystemSettingServiceImpl implements SystemSettingService {
         // step-2：热度值配置
         int result;
         if(1 == type) {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(2, eventId, type, 1));
+            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first, popup), buildWarnSettingExample(2, eventId, type, 1));
         } else if(2 == type) {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(2, eventId, type, 1))
-            + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second), buildWarnSettingExample(2, eventId, type, 2))
-            + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third), buildWarnSettingExample(2, eventId, type, 3));
+            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first, popup), buildWarnSettingExample(2, eventId, type, 1))
+            + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second, popup), buildWarnSettingExample(2, eventId, type, 2))
+            + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third, popup), buildWarnSettingExample(2, eventId, type, 3));
         } else {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(1, eventId, type, 1))
-                    + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second), buildWarnSettingExample(1, eventId, type, 2))
-                    + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third), buildWarnSettingExample(1, eventId, type, 3));
+            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first, popup), buildWarnSettingExample(1, eventId, type, 1))
+                    + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second, popup), buildWarnSettingExample(1, eventId, type, 2))
+                    + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third, popup), buildWarnSettingExample(1, eventId, type, 3));
         }
         return result;
     }
@@ -216,12 +216,13 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     }
 
     // 构建WarnSetting类
-    private WarnSetting buildWarnSetting(Integer max, Integer min) {
+    private WarnSetting buildWarnSetting(Integer max, Integer min, Integer popup) {
         WarnSetting set = new WarnSetting();
         set.setMax(max);
         set.setMin(min);
         set.setGmtModified(new Date());
         set.setModifiedBy(userService.getUserId());
+        set.setPopup(popup);
         return set;
     }
 

@@ -46,6 +46,7 @@ public class SystemSettingController {
     @ApiImplicitParams({
             @ApiImplicitParam(value = "预警类型（1. 事件新增观点预警；2.事件总体热度预警；3.舆情预警。）", name = "type", dataType = "Integer", paramType = "query", required = true),
             @ApiImplicitParam(value = "配置所属事件id（预警类型为1或2，才设置这个参数）", name = "eventId", dataType = "Long", paramType = "query", required = false),
+            @ApiImplicitParam(value = "是否启用弹窗（0-不启用；1-启用）", name = "popup", dataType = "Long", paramType = "query", required = false),
             @ApiImplicitParam(value = "1级预警下限", name = "first", dataType = "Integer", paramType = "query", required = true),
             @ApiImplicitParam(value = "2级预警下限", name = "second", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "3级预警下限", name = "third", dataType = "Integer", paramType = "query", required = false)
@@ -54,13 +55,14 @@ public class SystemSettingController {
     public RestResult modifyHeatValue(Long eventId,
                                       Integer type,
                                       Integer first,
+                                      Integer popup,
                                       @RequestParam(value = "second", defaultValue = "0") Integer second,
                                       @RequestParam(value = "third", defaultValue = "0") Integer third) {
         ValidateUtil.checkNull(type, CommonErrorCode.PARAM_ERROR, "预警类型不能为空");
         if(type != 1) ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, first, second, third);
         else ValidateUtil.checkNull(first, CommonErrorCode.PARAM_ERROR);
         if(type != 3) ValidateUtil.checkNull(eventId, CommonErrorCode.BIZ_ERROR, "配置所属事件id不能为空");
-        return RestResult.ok(settingService.modifyHeat(eventId, type, first, second, third));
+        return RestResult.ok(settingService.modifyHeat(eventId, type, popup, first, second, third));
     }
 
     @ApiOperation(value = "创建或修改通知人信息", httpMethod = "POST")

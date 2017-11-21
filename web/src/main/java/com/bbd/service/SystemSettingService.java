@@ -22,7 +22,7 @@ public interface SystemSettingService {
      * @param third  3级舆情预警热度阈值下限
      * @return
      */
-    Integer modifyHeat(Long eventId, Integer type, Integer first, Integer second, Integer third);
+    Integer modifyHeat(Long eventId, Integer type, Integer popup, Integer first, Integer second, Integer third);
 
     /**
      * 添加或修改预警通知人
