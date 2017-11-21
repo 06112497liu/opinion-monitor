@@ -90,6 +90,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
             throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "通知人没有数据");
         // step-1：先删除指定配置下的通知人
         Long settingId = list.get(0).getSettingId();
+
         notifierExtDao.delNotifierBySettingId(settingId);
 
         // step-2：批量添加预警通知人

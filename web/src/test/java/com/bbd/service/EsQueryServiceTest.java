@@ -118,6 +118,6 @@ public class EsQueryServiceTest extends BaseServiceTest {
     @Test
     public void testGetMaxHot() {
         DateTime lastSendTime = DateTime.now().plusMonths(-1);
-        esQueryService.getMaxHot(lastSendTime);
+        esQueryService.getMaxHot(lastSendTime, 1);
     }
 }

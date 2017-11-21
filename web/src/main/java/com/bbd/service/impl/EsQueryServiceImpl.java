@@ -97,7 +97,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(dateTime.toString(EsConstant.LONG_TIME_FORMAT)));
-        query.must(QueryBuilders.termQuery(EsConstant.opStatusField, 0));
+        query.mustNot(QueryBuilders.existsQuery(EsConstant.opStatusField));
 
         // step-3：执行查询并返回结果
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setSize(10).setQuery(query).addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC)).execute().actionGet();
@@ -1078,15 +1078,19 @@ public class EsQueryServiceImpl implements EsQueryService {
     /**
      * 查询新增预警舆情热度最高的
      * @param lastSendTime
+     * @param type
      * @return
      */
     @Override
-    public Integer getMaxHot(DateTime lastSendTime) {
+    public Integer getMaxHot(DateTime lastSendTime, Integer type) {
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.should(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_ONE).gt(lastSendTime.toString("yyyy-MM-dd HH:mm:ss")))
-                .should(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_TWO).gt(lastSendTime.toString("yyyy-MM-dd HH:mm:ss")))
-                .should(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_THREE).gt(lastSendTime.toString("yyyy-MM-dd HH:mm:ss")));
+        if(type == 1)
+            query.must(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_ONE).gt(lastSendTime.toString("yyyy-MM-dd HH:mm:ss")));
+        else if(type == 2)
+            query.must(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_TWO).gt(lastSendTime.toString("yyyy-MM-dd HH:mm:ss")));
+        else
+            query.must(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_THREE).gt(lastSendTime.toString("yyyy-MM-dd HH:mm:ss")));
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
                 .setFetchSource(EsConstant.hotField, null)
                 .setQuery(query)

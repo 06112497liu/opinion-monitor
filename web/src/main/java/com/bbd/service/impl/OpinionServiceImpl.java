@@ -1,24 +1,20 @@
 package com.bbd.service.impl;
 
-import com.alibaba.druid.support.json.JSONUtils;
 import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
-import com.bbd.constant.EsConstant;
+import com.bbd.dao.WarnNotifierDao;
+import com.bbd.domain.WarnNotifierExample;
 import com.bbd.domain.WarnSetting;
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
-import com.bbd.job.vo.MsgModel;
-import com.bbd.job.vo.MsgVO;
-import com.bbd.job.vo.OpinionMsgModel;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
-import com.bbd.util.JsonUtil;
 import com.bbd.util.StringUtils;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
@@ -38,9 +34,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Liuweibo
@@ -56,7 +50,10 @@ public class OpinionServiceImpl implements OpinionService {
     private SystemSettingService systemSettingService;
 
     @Resource
-    public RedisTemplate redisTemplate;
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private WarnNotifierDao notifierDao;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -287,27 +284,9 @@ public class OpinionServiceImpl implements OpinionService {
      */
     @Override
     public String getWarnRemindJson(DateTime lastSendTime) {
-        MsgVO msgVO = new MsgVO();
-        msgVO.setRetry(0);
-        msgVO.setTemplate("classify_opinion_warnning");
-        msgVO.setSubject("分级舆情预警");
-        OpinionMsgModel model = new OpinionMsgModel();
-        Map<Object, Object> map = esQueryService.queryAddWarnCount(lastSendTime);
-        for (Object key : map.keySet()) {
-            Field field;
-            try {
-                field = model.getClass().getDeclaredField(key.toString());
-                field.setAccessible(true);
-                field.set(model, map.get(key));
-            } catch (NoSuchFieldException e) {
-                logger.info("反射出错", e);
-            } catch (IllegalAccessException e) {
-                logger.info("非法字符", e);
-            }
-        }
-        msgVO.setModel(model);
-        String str = JsonUtil.fromJson(msgVO);
-        return str;
+        WarnNotifierExample example = new WarnNotifierExample();
+        example.createCriteria();
+        return null;
     }
 }
 
