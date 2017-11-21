@@ -6,10 +6,10 @@
  */
  package com.bbd.job.service; 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -66,7 +66,8 @@ public class MsgService {
         }
     }
     
-    public void changeLevel(OpinionEvent e, int level, Date now) {
+    public void changeLevel(OpinionEvent e, int level, Date now, 
+                            List<OpinionEvent> needProEvtList, List<OpinionEventLevelChange> levelChangeList) {
         OpinionEventLevelChangeExample  levelChangeExample = new OpinionEventLevelChangeExample();
         levelChangeExample.createCriteria().andEventIdEqualTo(e.getId());
         List<OpinionEventLevelChange> opinionEventLevelChangeList = opinionEventLevelChangeDao.selectByExample(levelChangeExample);
@@ -80,6 +81,8 @@ public class MsgService {
             opinionEventLevelChange.setGmtLevelChange(now);
             opinionEventLevelChange.setGmtCreate(now);
             opinionEventLevelChangeDao.insert(opinionEventLevelChange);
+            needProEvtList.add(e);
+            levelChangeList.add(opinionEventLevelChange);
             return;
         } 
         opinionEventLevelChange = opinionEventLevelChangeList.get(0);
@@ -88,6 +91,8 @@ public class MsgService {
             opinionEventLevelChange.setGmtLevelChange(now);
             opinionEventLevelChange.setGmtModified(now);
             opinionEventLevelChangeDao.updateByPrimaryKeySelective(opinionEventLevelChange);
+            needProEvtList.add(e);
+            levelChangeList.add(opinionEventLevelChange);
         }
     }
     
@@ -100,12 +105,15 @@ public class MsgService {
         
         int level;
         Date now = new Date();
+        List<OpinionEvent> needProEvtList = new ArrayList<OpinionEvent>();
+        List<OpinionEventLevelChange> levelChangeList = new ArrayList<OpinionEventLevelChange>();
+        
         for (OpinionEvent e : opinionEventList) {
             level = getLevel(e);
             if (level == 0) {
                 continue;
             }
-            changeLevel(e, level, now);
+            changeLevel(e, level, now, needProEvtList, levelChangeList);
         }
         
         MsgSendRecordExample msgExample = new MsgSendRecordExample();
