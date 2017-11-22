@@ -87,7 +87,7 @@ public interface OpinionService {
      * @param timeSpan
      * @return
      */
-    List<OpinionHotEsVO> getOpinionHotTrend(String uuid, Integer timeSpan);
+    List<KeyValueVO> getOpinionHotTrend(String uuid, Integer timeSpan);
 
     /**
      * 获取短信或邮件提醒的json字符串

@@ -4,6 +4,7 @@ import com.bbd.RestResult;
 import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionService;
+import com.bbd.service.vo.KeyValueVO;
 import com.bbd.util.ValidateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -97,7 +98,7 @@ public class WarnOpinionController extends AbstractController {
     @RequestMapping(value = "hot/trend", method = RequestMethod.GET)
     public RestResult getOpinionHotTrend(String uuid, @RequestParam(name = "timeSpan", defaultValue = "1") Integer timeSpan) {
         ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
-        List<OpinionHotEsVO> result = opinionService.getOpinionHotTrend(uuid, timeSpan);
+        List<KeyValueVO> result = opinionService.getOpinionHotTrend(uuid, timeSpan);
         return RestResult.ok(result);
     }
 

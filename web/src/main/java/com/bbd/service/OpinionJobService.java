@@ -26,7 +26,7 @@ public class OpinionJobService {
      * 每天凌晨1点向爬虫推送关键词（全量）
      */
     @TimeUsed
-    @Scheduled(cron = "* * 1 * * ?")
+    @Scheduled(cron = "0 0 1 * * ?")
     public void pushKeyWords() {
         MonitorKeywordsExample example = new MonitorKeywordsExample();
         List<MonitorKeywords> list = keywordsDao.selectByExample(example);

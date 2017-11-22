@@ -17,10 +17,7 @@ import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
-import com.bbd.util.BeanMapperUtil;
-import com.bbd.util.JsonUtil;
-import com.bbd.util.StringUtils;
-import com.bbd.util.UserContext;
+import com.bbd.util.*;
 import com.bbd.vo.UserInfo;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
@@ -265,7 +262,7 @@ public class OpinionServiceImpl implements OpinionService {
      * @return
      */
     @Override
-    public List<OpinionHotEsVO> getOpinionHotTrend(String uuid, Integer timeSpan) {
+    public List<KeyValueVO> getOpinionHotTrend(String uuid, Integer timeSpan) {
         DateTime startTime = BusinessUtils.getDateByTimeSpan(timeSpan);
         List<OpinionHotEsVO> result = esQueryService.getOpinionHotTrend(uuid, startTime);
 
@@ -280,7 +277,15 @@ public class OpinionServiceImpl implements OpinionService {
         List<OpinionHotEsVO> list = new ArrayList<>();
         list.addAll(set);
         list.sort((o1, o2) -> -(o1.getHotTime().compareTo(o2.getHotTime())));
-        return list;
+        List<KeyValueVO> keyValueVOList = Lists.newLinkedList();
+        for (OpinionHotEsVO v : list) {
+            KeyValueVO vo = new KeyValueVO();
+            String time = DateUtil.formatDateByPatten(v.getHotTime(), "yyyy-MM-dd HH:mm");
+            vo.setKey(time);
+            vo.setValue(v.getHot());
+            keyValueVOList.add(vo);
+        }
+        return keyValueVOList;
     }
 
     /**
