@@ -38,13 +38,14 @@ public class UserController extends AbstractController {
 
     @ApiOperation(value = "查询用户列表", httpMethod = "GET")
     @ApiImplicitParams({
+            @ApiImplicitParam(value = "区域", name = "region", dataType = "String", paramType = "query", required = false),
             @ApiImplicitParam(value = "起始页号", name = "page", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "list", method = RequestMethod.GET)
-    public RestResult query() {
+    public RestResult query(String region) {
         PageBounds pb = getPageBounds();
-        List<UserListVO> rs = userService.queryUsers(pb);
+        List<UserListVO> rs = userService.queryUsers(region, pb);
         return RestResult.ok(rs);
     }
 

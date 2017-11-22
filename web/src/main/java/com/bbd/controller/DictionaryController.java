@@ -4,6 +4,7 @@ import com.bbd.RestResult;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.DictionaryService;
+import com.bbd.service.UserService;
 import com.bbd.util.ValidateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -28,6 +29,9 @@ public class DictionaryController {
     @Autowired
     private DictionaryService dictionaryService;
 
+    @Autowired
+    private UserService userService;
+
 
     @ApiOperation(value = "字典列表查询", httpMethod = "GET")
     @ApiImplicitParams({
@@ -39,6 +43,11 @@ public class DictionaryController {
         List<OpinionDictionary> list = dictionaryService.queryDictionary(type);
         return RestResult.ok(list);
     }
+
+    @ApiOperation(value = "转发用户列表", httpMethod = "GET")
+    @RequestMapping(value = "transfer/list", method = RequestMethod.GET)
+    public RestResult getTransferUsers() {
+        List<String> rs = userService.getTransferUsers();
+        return RestResult.ok(rs);
+    }
 }
-    
-    

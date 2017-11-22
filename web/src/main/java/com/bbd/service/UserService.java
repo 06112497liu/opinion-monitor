@@ -17,6 +17,7 @@ import com.bbd.service.param.UserCreateParam;
 import com.bbd.service.param.UserCreateVO;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.mybatis.domain.PageBounds;
@@ -30,6 +31,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -50,16 +52,33 @@ public class UserService {
 
     /**
      * 查询用户列表
+     * @param region
      * @param pb
      * @return
      */
-    public List<UserListVO> queryUsers(PageBounds pb) {
-        List<UserListVO> list = userExtDao.queryUserList(pb);
+    public List<UserListVO> queryUsers(String region, PageBounds pb) {
+        List<UserListVO> list = userExtDao.queryUserList(region, pb);
         list.forEach(p -> {
             p.setReginDesc(DistrictExtEnum.getDescByCode(p.getRegion()));
         });
         list.sort((p1, p2) -> - p1.getGmtCreate().compareTo(p2.getGmtCreate()));
         return list;
+    }
+
+    /**
+     * 转发用户列表
+     * @return
+     */
+    public List<String> getTransferUsers() {
+        List<UserListVO> list = userExtDao.queryTransUserList();
+        Joiner joiner = Joiner.on("-").skipNulls();
+        List<String> result = list.stream().map(p -> {
+            String name = p.getName();
+            String dep = p.getDepNote();
+            String username = p.getUsername();
+            return joiner.join(name, dep, username);
+        }).collect(Collectors.toList());
+        return result;
     }
 
     /**

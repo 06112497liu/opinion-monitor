@@ -13,5 +13,13 @@ public interface UserExtDao {
      * 用户列表
      * @return
      */
-    List<UserListVO> queryUserList(PageBounds pb);
+    List<UserListVO> queryUserList(String region, PageBounds pb);
+
+    /**
+     * 转发用户列表
+     * @return
+     */
+    List<UserListVO> queryTransUserList();
+
+
 }

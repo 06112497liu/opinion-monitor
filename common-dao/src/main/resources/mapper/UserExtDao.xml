@@ -9,5 +9,17 @@
             bbd_user a LEFT JOIN bbd_account b
         ON
             a.id = b.user_id
+        WHERE
+            b.region = #{0} AND a.flag = 0
+    </select>
+    <select id="queryTransUserList" resultType="com.bbd.bean.UserListVO">
+        SELECT
+            a.username, b.user_id userId, b.region, b.admin, b.name, b.phone, b.email, b.dep_note depNote, a.gmt_create gmtCreate
+        FROM
+            bbd_user a LEFT JOIN bbd_account b
+        ON
+            a.id = b.user_id
+        WHERE
+            a.flag = 0
     </select>
 </mapper>
