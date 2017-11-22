@@ -323,8 +323,8 @@ public class EventController extends AbstractController {
         @ApiImplicitParam(value = "每页大小", name = "pageSize", dataType = "Integer", paramType = "query", required = true)
     })
     @RequestMapping(value = "hisEventList", method = RequestMethod.GET)
-    public RestResult hisEventList(String eventLevel, String region, @DateTimeFormat(pattern="yyyy-MM-dd")Date startTime, 
-                                   @DateTimeFormat(pattern="yyyy-MM-dd")Date endTime, Integer pageNo, Integer pageSize) {
+    public RestResult hisEventList(String eventLevel, String region, @DateTimeFormat(pattern="yyyy-MM")Date startTime, 
+                                   @DateTimeFormat(pattern="yyyy-MM")Date endTime, Integer pageNo, Integer pageSize) {
         return RestResult.ok(eventService.getHisEventList(eventLevel, region, startTime, endTime, pageNo, pageSize));
     }
     
