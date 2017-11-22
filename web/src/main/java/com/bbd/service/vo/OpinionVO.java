@@ -15,7 +15,7 @@ import java.util.Date;
  * @version $Id: OpinionVO.java, v 0.1 2017年10月31日 下午3:07:22 daijinlong Exp $ 
  */
 public class OpinionVO {
-    
+
     private String uuid;
     
     private String title;
@@ -25,6 +25,8 @@ public class OpinionVO {
     private Integer hot;
     
     private Integer similiarCount;
+
+    private Integer commentCount;
     
     private Integer emotion;
     
@@ -82,6 +84,14 @@ public class OpinionVO {
 
     public void setSimiliarCount(Integer similiarCount) {
         this.similiarCount = similiarCount;
+    }
+
+    public Integer getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(Integer commentCount) {
+        this.commentCount = commentCount;
     }
 
     public Integer getEmotion() {

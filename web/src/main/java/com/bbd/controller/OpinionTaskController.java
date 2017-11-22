@@ -1,6 +1,7 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
+import com.bbd.controller.param.RemoveWarnParam;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionTaskService;
 import com.bbd.service.param.TransferParam;
@@ -8,15 +9,11 @@ import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionTaskListVO;
 import com.bbd.util.ValidateUtil;
 import com.mybatis.domain.PageList;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -68,16 +65,8 @@ public class OpinionTaskController extends AbstractController{
     }
 
     @ApiOperation(value = "转发舆情", httpMethod = "POST")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String", paramType = "query", required = true),
-            @ApiImplicitParam(value = "区域", name = "district", dataType = "String", paramType = "query", required = true),
-            @ApiImplicitParam(value = "用户名", name = "username", dataType = "String", paramType = "query", required = true),
-            @ApiImplicitParam(value = "转发类型: 1/2/3：请示，4/5/6：回复", name = "transferType", dataType = "Integer", paramType = "query", required = true),
-            @ApiImplicitParam(value = "转发备注", name = "transferNote", dataType = "String", paramType = "query", required = false)
-    })
     @RequestMapping(value = "transfer", method = RequestMethod.POST)
-    public RestResult transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
-        ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, param.getDistrict(), param.getUuid(), param.getUsername(), param.getTransferType());
+    public RestResult transferOpinion(@RequestBody @Valid @ApiParam(name = "转发对象", value = "传入的json") TransferParam param) throws IOException, ExecutionException, InterruptedException {
         opinionTaskService.transferOpinion(param);
         return RestResult.ok();
     }
@@ -96,13 +85,11 @@ public class OpinionTaskController extends AbstractController{
     }
 
     @ApiOperation(value = "解除舆情预警", httpMethod = "POST")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String", paramType = "query", required = true),
-            @ApiImplicitParam(value = "解除理由（1. 非敏感舆情；2. 非消费舆情； 3. 非职能范围； 4. 已处理同类舆情）", name = "removeReason", dataType = "Integer", paramType = "query", required = true),
-            @ApiImplicitParam(value = "解除备注", name = "removeNote", dataType = "String", paramType = "query", required = false)
-    })
     @RequestMapping(value = "remove", method = RequestMethod.POST)
-    public RestResult removeWarn(String uuid, Integer removeReason, String removeNote) throws InterruptedException, ExecutionException, IOException {
+    public RestResult removeWarn(@RequestBody @Valid @ApiParam(name = "解除对象", value = "传入的json") RemoveWarnParam param) throws InterruptedException, ExecutionException, IOException {
+        String uuid = param.getUuid();
+        Integer removeReason = param.getRemoveReason();
+        String removeNote = param.getRemoveNote();
         ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, uuid, removeReason);
         opinionTaskService.removeWarn(uuid, removeReason, removeNote);
         return RestResult.ok();

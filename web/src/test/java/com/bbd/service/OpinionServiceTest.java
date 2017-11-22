@@ -20,6 +20,11 @@ public class OpinionServiceTest extends BaseServiceTest {
         System.out.println(str);
     }
 
+    @Test
+    public void testgetWarnRemindJson() throws NoSuchFieldException {
+        String str = opinionService.getWarnRemindJson(DateTime.now().plusYears(-1));
+        System.out.println(str);
+    }
 
 }
     
