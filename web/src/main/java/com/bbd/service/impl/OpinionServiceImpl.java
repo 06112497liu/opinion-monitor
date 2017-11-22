@@ -1,17 +1,24 @@
 package com.bbd.service.impl;
 
+import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
-import com.bbd.constant.EsConstant;
+import com.bbd.bean.WarnNotifierVO;
+import com.bbd.dao.WarnNotifierExtDao;
+import com.bbd.domain.WarnNotifier;
+import com.bbd.domain.WarnSetting;
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
+import com.bbd.job.vo.MsgVO;
+import com.bbd.job.vo.OpinionMsgModel;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
+import com.bbd.util.JsonUtil;
 import com.bbd.util.StringUtils;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
@@ -23,6 +30,8 @@ import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -46,17 +55,23 @@ public class OpinionServiceImpl implements OpinionService {
     private SystemSettingService systemSettingService;
 
     @Resource
-    public RedisTemplate redisTemplate;
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private WarnNotifierExtDao notifierExtDao;
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public List<WarnOpinionTopTenVO> getWarnOpinionTopTen() {
         List<WarnOpinionTopTenVO> result = Lists.newLinkedList();
         List<OpinionEsVO> esList = esQueryService.getWarnOpinionTopTen();
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         esList.forEach(o -> {
             WarnOpinionTopTenVO v = new WarnOpinionTopTenVO();
             v.setTime(o.getPublishTime());
             v.setHot(o.getHot());
-            v.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+            v.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot(), setting));
             v.setTitle(o.getTitle());
             result.add(v);
         });
@@ -72,13 +87,15 @@ public class OpinionServiceImpl implements OpinionService {
      * @return
      */
     @Override
+    @TimeUsed
     public Map<String, Object> getWarnOpinionList(Integer timeSpan, Integer emotion, Integer sourceType, PageBounds pb) {
 
         // step-1：查询es
         OpinionEsSearchVO esResult = esQueryService.queryWarningOpinion(BusinessUtils.getDateByTimeSpan(timeSpan), emotion, sourceType, pb);
         List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         opinions.forEach(o -> {
-            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot(), setting));
         });
 
         // step-2：分页并返回结果
@@ -101,6 +118,7 @@ public class OpinionServiceImpl implements OpinionService {
      * @return
      */
     @Override
+    @TimeUsed
     public PageList<OpinionVO> getHotOpinionListTop100(Integer timeSpan, Integer emotion, PageBounds pb) {
 
         // step-1：查询es
@@ -109,9 +127,6 @@ public class OpinionServiceImpl implements OpinionService {
 
         // step-2：代码分页
         List<OpinionVO> allOpinions = BeanMapperUtil.mapList(esOpinons, OpinionVO.class);
-        allOpinions.forEach(o -> {
-            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
-        });
 
         int firstIndex = pb.getOffset(); int toIndex = pb.getLimit() * pb.getPage();
         if(toIndex > allOpinions.size()) {
@@ -122,6 +137,10 @@ public class OpinionServiceImpl implements OpinionService {
             pb.setPage(1);
         }
         List<OpinionVO> opinions = allOpinions.subList(firstIndex, toIndex);
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
+        opinions.forEach(o -> {
+            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot(), setting));
+        });
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), allOpinions.size());
         PageList p = PageListHelper.create(opinions, paginator);
 
@@ -175,8 +194,9 @@ public class OpinionServiceImpl implements OpinionService {
         // step-1：查询es
         OpinionEsSearchVO esResult = esQueryService.queryHistoryOpinions(start, end, emotion, mediaType, pb);
         List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         opinions.forEach(o -> {
-            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot(), setting));
         });
 
         // step-2：分页并返回结果
@@ -203,7 +223,8 @@ public class OpinionServiceImpl implements OpinionService {
         OpinionEsVO o = esQueryService.getOpinionByUUID(uuid);
         OpinionExtVO result = BeanMapperUtil.map(o, OpinionExtVO.class);
         // 判断预警级别
-        Integer level = systemSettingService.judgeOpinionSettingClass(result.getHot());
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
+        Integer level = systemSettingService.judgeOpinionSettingClass(result.getHot(), setting);
         result.setLevel(level);
         return result;
     }
@@ -260,6 +281,67 @@ public class OpinionServiceImpl implements OpinionService {
         list.addAll(set);
         list.sort((o1, o2) -> -(o1.getHotTime().compareTo(o2.getHotTime())));
         return list;
+    }
+
+    /**
+     * 获取短信或邮件提醒的json字符串
+     * @param lastSendTime
+     */
+    @Override
+    public String getWarnRemindJson(DateTime lastSendTime) {
+
+        List<MsgVO> result = Lists.newLinkedList();
+
+        // step-1：获取该时间段内分级预警增加量，一级每个预警的热度最大值，一级预警通知人
+        Integer oneMax = esQueryService.queryMaxHot(lastSendTime, 1);
+        Integer twoMax = esQueryService.queryMaxHot(lastSendTime, 2);
+        Integer threeMax = esQueryService.queryMaxHot(lastSendTime, 3);
+        Map<Integer, Integer> maxMap = Maps.newHashMap();
+        maxMap.put(1, oneMax); maxMap.put(2, twoMax); maxMap.put(1, threeMax);
+        Map<Integer, Integer> mapAdd = esQueryService.queryAddWarnCount(lastSendTime);
+        List<WarnNotifierVO> notifies = notifierExtDao.queryNotifierList(3);
+
+        // step-2：邮件发送
+        Map<String, List<WarnNotifierVO>> emailNotifier = notifies.stream()
+                .filter(p -> p.getEmailNotify() == 1) // 过滤出需要通过邮件发送的
+                .collect(Collectors.groupingBy(WarnNotifierVO::getEmail)); // 以邮箱分组
+        List<MsgVO> emailResult = buidMsgVO(maxMap, mapAdd, emailNotifier);
+        // step-2：短信发送
+        Map<String, List<WarnNotifierVO>> smsNotifier = notifies.stream()
+                .filter(p -> p.getSmsNotify() == 1) // 过滤出需要通过短信发送的
+                .collect(Collectors.groupingBy(WarnNotifierVO::getPhone)); // 以电话分组
+        List<MsgVO> smsResult = buidMsgVO(maxMap, mapAdd, smsNotifier);
+        result.addAll(emailResult);
+        result.addAll(smsResult);
+        String str = JsonUtil.fromJson(result);
+        return str;
+    }
+
+    List<MsgVO> buidMsgVO(Map<Integer, Integer> maxMap, Map<Integer, Integer> mapAdd, Map<String, List<WarnNotifierVO>> notifies) {
+        List<MsgVO> result = Lists.newLinkedList();
+        for (String k : notifies.keySet()) {
+            MsgVO vo = new MsgVO();
+            OpinionMsgModel model = new OpinionMsgModel();
+            vo.setSubject("分级舆情预警"); vo.setSubject("classify_opinion_warnning"); vo.setRetry(0); vo.setTo(k); vo.setModel(model);
+            List<WarnNotifierVO> list = notifies.get(k);
+            Integer max = 0;
+            for (WarnNotifierVO p : list) {
+                Integer level = p.getLevel();
+                Integer value = mapAdd.get(level);
+                if(level > max)
+                    max = level;
+                if(level == 1)
+                    model.setLevelOne(value);
+                else if(level == 2)
+                    model.setLevelTwo(value);
+                else if(level == 3)
+                    model.setLevelThree(value);
+                model.setUsername(p.getNotifier());
+            }
+            model.setScore(maxMap.get(max));
+            result.add(vo);
+        }
+        return result;
     }
 }
 

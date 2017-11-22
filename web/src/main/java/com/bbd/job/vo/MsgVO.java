@@ -7,6 +7,7 @@ package com.bbd.job.vo;
 import com.bbd.util.JsonUtil;
 import com.google.common.collect.Lists;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ import java.util.List;
  * @author tjwang
  * @version $Id: MsgVO.java, v 0.1 2017/11/16 0016 16:26 tjwang Exp $
  */
-public class MsgVO {
+public class MsgVO implements Serializable{
 
     private MsgModel     model;
 

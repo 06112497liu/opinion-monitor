@@ -2,6 +2,7 @@ package com.bbd.service;
 
 import com.bbd.domain.MonitorKeywords;
 import com.bbd.domain.WarnNotifier;
+import com.bbd.domain.WarnSetting;
 import com.bbd.service.param.WarnNotifierParam;
 import com.bbd.service.param.WarnSettingVo;
 
@@ -21,7 +22,7 @@ public interface SystemSettingService {
      * @param third  3级舆情预警热度阈值下限
      * @return
      */
-    Integer modifyHeat(Long eventId, Integer type, Integer first, Integer second, Integer third);
+    Integer modifyHeat(Long eventId, Integer type, Integer popup, Integer first, Integer second, Integer third);
 
     /**
      * 添加或修改预警通知人
@@ -79,7 +80,14 @@ public interface SystemSettingService {
      * @param hot
      * @return
      */
-    Integer judgeOpinionSettingClass(Integer hot);
+    Integer judgeOpinionSettingClass(Integer hot, List<WarnSetting> setting);
+
+    /**
+     * 查询预警配置
+     * @param type
+     * @return
+     */
+    List<WarnSetting> queryWarnSetting(Integer type);
 
     /**
      * 获取预警等级

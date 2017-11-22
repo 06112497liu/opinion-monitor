@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbd.dao.UserExtDao">
+
+    <select id="queryUserList" resultType="com.bbd.bean.UserListVO">
+        SELECT
+            a.username, b.user_id userId, b.region, b.admin, b.name, b.phone, b.email, b.dep_note depNote, a.gmt_create gmtCreate
+        FROM
+            bbd_user a LEFT JOIN bbd_account b
+        ON
+            a.id = b.user_id
+    </select>
+</mapper>

@@ -319,8 +319,9 @@ public class EventService{
             source, pb);
        
         List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         opinions.forEach(o -> {
-            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot()));
+            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot(), setting));
         });
         map.put("opinions", opinions);
         map.put("total", esResult.getTotal());
@@ -419,8 +420,16 @@ public class EventService{
     public Map<String, List<KeyValueVO>> eventWholeTrend(Long id, Integer cycle) {
         Map<String, List<KeyValueVO>> map = new HashMap<String, List<KeyValueVO>>();
         OpinionEvent opinionEvent = opinionEventDao.selectByPrimaryKey(id);
-        List<KeyValueVO> infoList = esQueryService.queryEventInfoTotal(opinionEvent, false, cycle);
-        List<KeyValueVO> warnList = esQueryService.queryEventInfoTotal(opinionEvent, true, cycle);
+        List<Date> dates = getDates(cycle, opinionEvent);
+        List<KeyValueVO> infoList;
+        List<KeyValueVO> warnList;
+        if (dates == null || dates.size() == 0) {
+            infoList = new ArrayList<KeyValueVO>();
+            warnList = new ArrayList<KeyValueVO>();
+        } else {
+            infoList = esQueryService.queryEventInfoTotal(opinionEvent, false, cycle);
+            warnList = esQueryService.queryEventInfoTotal(opinionEvent, true, cycle);
+        }
         map.put("infoList", infoList);
         map.put("warnList", warnList);
         return map;
@@ -472,7 +481,11 @@ public class EventService{
         SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         for (OpinionDictionary e : opinionDictionaryList) {
             com.bbd.domain.OpinionEventMediaStatisticExample.Criteria criteria =  example.createCriteria();
-            criteria.andEventIdEqualTo(id).andPickTimeIn(getDates(cycle, opinionEvent))
+            List<Date> dates = getDates(cycle, opinionEvent);
+            if (dates == null || dates.size() == 0) {
+                continue;
+            }
+            criteria.andEventIdEqualTo(id).andPickTimeIn(dates)
             .andMediaCodeEqualTo(e.getCode());
             List<OpinionEventMediaStatistic> evtMediaStaList = opinionEventMediaStatisticDao.selectByExample(example);
             List<KeyValueVO> listSub = new ArrayList<KeyValueVO>();
@@ -693,8 +706,13 @@ public class EventService{
         if (region != null){
             criteria.andRegionEqualTo(region);
         }
-        criteria.andGmtCreateGreaterThanOrEqualTo(startTime)
-        .andGmtCreateLessThanOrEqualTo(endTime)
+        if (startTime != null){
+            criteria.andGmtCreateGreaterThanOrEqualTo(startTime);
+        }
+        if (endTime != null){
+            criteria.andGmtCreateLessThanOrEqualTo(endTime);
+        }
+        criteria
         .andIsDeleteEqualTo((byte)0)
         .andFileReasonIsNotNull();
         List<OpinionEvent> eventList = opinionEventDao.selectByExampleWithPageBounds(example, new PageBounds(pageNo, pageSize));

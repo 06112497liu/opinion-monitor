@@ -1,5 +1,6 @@
 package com.bbd.dao;
 
+import com.bbd.bean.WarnNotifierVO;
 import com.bbd.domain.WarnNotifier;
 import com.bbd.domain.WarnNotifierExample;
 import com.mybatis.domain.PageBounds;
@@ -22,5 +23,11 @@ public interface WarnNotifierExtDao {
      * @return
      */
     int batchInsertNotifier(List<WarnNotifier> list);
+
+    /**
+     * 根据预警类型查询预警通知人
+     * @param type
+     */
+    List<WarnNotifierVO> queryNotifierList(@Param("type") Integer type);
 
 }

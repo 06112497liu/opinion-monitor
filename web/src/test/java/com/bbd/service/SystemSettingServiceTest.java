@@ -15,7 +15,7 @@ public class SystemSettingServiceTest extends BaseServiceTest{
 
     @Test
     public void testModifyHeat() {
-        settingService.modifyHeat(2L, 3, 74, 60, 50);
+        settingService.modifyHeat(2L, 3, 1, 74, 60, 50);
     }
 
     @Test

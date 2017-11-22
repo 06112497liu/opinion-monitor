@@ -1,6 +1,7 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
+import com.bbd.annotation.TimeUsed;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionService;
 import com.bbd.service.vo.OpinionVO;
@@ -39,6 +40,7 @@ public class HotOpinionController extends AbstractController {
             @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "recommend/list", method = RequestMethod.GET)
+    @TimeUsed
     public RestResult getHotOpinionListTop100(@RequestParam(value = "timeSpan", defaultValue = "1") Integer timeSpan, Integer emotion) {
         PageList<OpinionVO> result = opinionService.getHotOpinionListTop100(timeSpan, emotion, getPageBounds());
         return RestResult.ok(result);

@@ -1,5 +1,6 @@
 package com.bbd.service.impl;
 
+import com.bbd.annotation.TimeUsed;
 import com.bbd.dao.*;
 import com.bbd.domain.*;
 import com.bbd.exception.ApplicationException;
@@ -53,32 +54,32 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     private UserService userService;
 
     @Override
-    public Integer modifyHeat(Long eventId, Integer type, Integer first, Integer second, Integer third) {
+    public Integer modifyHeat(Long eventId, Integer type, Integer popup, Integer first, Integer second, Integer third) {
 
         // step-1：校验热度值是否符合规范
         boolean flag = checkThresholdValue(type, first, second, third);
         if(flag == false) throw new ApplicationException(CommonErrorCode.PARAM_ERROR);
 
-        // step-2：如果是针对事件，校验操作时间配置是否存在
+        // step-2：如果是针对事件，校验操作事件配置是否存在
         if(type != 3) {
             WarnSettingExample ex = new WarnSettingExample();
             ex.createCriteria().andEventIdEqualTo(eventId);
             List<WarnSetting> list = settingDao.selectByExample(ex);
-            if(list.isEmpty()) throw new ApplicationException(BizErrorCode.OBJECT_NOT_EXIST, "本事件没有预警配置");
+            if(list.isEmpty()) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "本事件没有预警配置");
         }
 
         // step-2：热度值配置
         int result;
         if(1 == type) {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(2, eventId, type, 1));
+            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first, popup), buildWarnSettingExample(2, eventId, type, 0));
         } else if(2 == type) {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(2, eventId, type, 1))
-            + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second), buildWarnSettingExample(2, eventId, type, 2))
-            + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third), buildWarnSettingExample(2, eventId, type, 3));
+            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first, popup), buildWarnSettingExample(2, eventId, type, 1))
+            + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second, popup), buildWarnSettingExample(2, eventId, type, 2))
+            + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third, popup), buildWarnSettingExample(2, eventId, type, 3));
         } else {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first), buildWarnSettingExample(1, eventId, type, 1))
-                    + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second), buildWarnSettingExample(1, eventId, type, 2))
-                    + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third), buildWarnSettingExample(1, eventId, type, 3));
+            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first, popup), buildWarnSettingExample(1, eventId, type, 1))
+                    + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second, popup), buildWarnSettingExample(1, eventId, type, 2))
+                    + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third, popup), buildWarnSettingExample(1, eventId, type, 3));
         }
         return result;
     }
@@ -89,6 +90,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
             throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "通知人没有数据");
         // step-1：先删除指定配置下的通知人
         Long settingId = list.get(0).getSettingId();
+
         notifierExtDao.delNotifierBySettingId(settingId);
 
         // step-2：批量添加预警通知人
@@ -100,7 +102,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     @Override
     public Integer delNotifier(Long id) {
         boolean flag = Objects.nonNull(notifierDao.selectByPrimaryKey(id));
-        if(flag == false) throw new ApplicationException(BizErrorCode.OBJECT_NOT_EXIST);
+        if(flag == false) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
         return notifierDao.deleteByPrimaryKey(id);
     }
 
@@ -120,7 +122,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
         try {
             rs = keywordsExtDao.batchInsertKeywords(list);
         } catch (Exception e) {
-            throw new ApplicationException(BizErrorCode.KEY_WORD_EXIST);
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "舆情关键词重复");
         }
         return rs;
     }
@@ -140,7 +142,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     @Override
     public Integer delKeyWords(Long id) {
         boolean flag = Objects.nonNull(keywordsDao.selectByPrimaryKey(id));
-        if(flag == false) throw new ApplicationException(BizErrorCode.OBJECT_NOT_EXIST);
+        if(flag == false) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
         return keywordsDao.deleteByPrimaryKey(id);
     }
 
@@ -170,10 +172,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     }
 
     @Override
-    public Integer judgeOpinionSettingClass(Integer hot) {
-        WarnSettingExample example = new WarnSettingExample();
-        example.createCriteria().andTypeEqualTo(3);
-        List<WarnSetting> setting = settingDao.selectByExample(example);
+    public Integer judgeOpinionSettingClass(Integer hot, List<WarnSetting> setting) {
         for(WarnSetting s : setting) {
             int min = s.getMin(); int max = s.getMax();
             boolean isContain = Range.closed(min, max).contains(hot);
@@ -181,6 +180,20 @@ public class SystemSettingServiceImpl implements SystemSettingService {
         }
         return -1;
     }
+
+    /**
+     * 查询预警配置
+     * @param type
+     * @return
+     */
+    @Override
+    public List<WarnSetting> queryWarnSetting(Integer type) {
+        WarnSettingExample example = new WarnSettingExample();
+        example.createCriteria().andTypeEqualTo(type);
+        List<WarnSetting> setting = settingDao.selectByExample(example);
+        return setting;
+    }
+
 
     @Override
     public Map<Integer, Integer> getWarnClass() {
@@ -204,12 +217,13 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     }
 
     // 构建WarnSetting类
-    private WarnSetting buildWarnSetting(Integer max, Integer min) {
+    private WarnSetting buildWarnSetting(Integer max, Integer min, Integer popup) {
         WarnSetting set = new WarnSetting();
         set.setMax(max);
         set.setMin(min);
         set.setGmtModified(new Date());
         set.setModifiedBy(userService.getUserId());
+        set.setPopup(popup);
         return set;
     }
 

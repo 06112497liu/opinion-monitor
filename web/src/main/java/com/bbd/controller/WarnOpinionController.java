@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.joda.time.DateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -57,9 +58,11 @@ public class WarnOpinionController extends AbstractController {
             @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "history/list", method = RequestMethod.GET)
-    public RestResult getHistoryWarnOpinionList(@DateTimeFormat(pattern="yyyy-MM-dd") Date startTime,
-                                                @DateTimeFormat(pattern="yyyy-MM-dd") Date endTime,
+    public RestResult getHistoryWarnOpinionList(@DateTimeFormat(pattern="yyyy-MM") Date startTime,
+                                                @DateTimeFormat(pattern="yyyy-MM") Date endTime,
                                                 Integer emotion, Integer mediaType) {
+        if(startTime == null) startTime = DateTime.now().plusYears(-100).toDate();
+        if(endTime == null) endTime = DateTime.now().toDate();
         Map<String, Object> result = opinionService.getHistoryWarnOpinionList(startTime, endTime, emotion, mediaType, getPageBounds());
         return RestResult.ok(result);
     }
