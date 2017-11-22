@@ -60,11 +60,21 @@ public class EsConstant {
     public static final String hotTimeField                   = "hotTime";
 
     // =========== 相同文章信息字段 ==========================
-    public static final String opinionIDField                   = "opinion_id";
+    public static final String opinionIDField                 = "opinion_id";
 
     // =========== 舆情、事件关联记录 ========================
     public static final String IDX_OPINION_EVENT_RECORD       = "bbd_opinion_event_record";
+    /**
+     * 舆情与事件首次关联时间
+     */
     public static final String OPINION_EVENT_RECORD_TYPE      = "opinion_event_record";
+    /**
+     * 舆情热度超过事件预警时间
+     */
+    public static final String OPINION_EVENT_RECORD_HOT_TYPE  = "opinion_event_hot_record";
+    /**
+     * 舆情热度超过舆情预警时间
+     */
     public static final String OPINION_EVENT_RECORD_WARN_TYPE = "opinion_event_warn_record";
     public static final String eventIdField                   = "eventId";
     public static final String matchTimeField                 = "matchTime";

@@ -240,6 +240,24 @@ PUT bbd_opinion_event_record
               "format": "yyyy-MM-dd HH:mm:ss"
            }
         }
+    },
+    "opinion_event_warn_record": {
+        "properties": {
+           "opinionId": {
+              "type": "keyword"
+           },
+           "eventId": {
+              "type": "long"
+           },
+           "matchTime": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+           },
+           "matchTimeTrim": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+           }
+        }
     }
   }
  }

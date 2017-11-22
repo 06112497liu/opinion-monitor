@@ -43,6 +43,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * @author tjwang
@@ -70,8 +71,8 @@ public class OpinionListener {
         }
         long start = System.currentTimeMillis();
 
-        Date now = new Date();
         List<WarnSetting> settings = getWarnSetting();
+        Map<Long, WarnSetting> eventWarnSettings = getEventsWarnSettings();
 
         List<OpinionVO> vos = Lists.newArrayList();
         for (ConsumerRecord<String, String> record : records) {
@@ -86,10 +87,12 @@ public class OpinionListener {
         List<OpinionEsSyncVO> indexVos = Lists.newArrayList();
         List<OpinionEventRecordVO> oerVos = Lists.newArrayList();
         List<OpinionEventRecordVO> oerWarnVos = Lists.newArrayList();
+        List<OpinionEventRecordVO> oerHotVos = Lists.newArrayList();
 
         Map<String, OpinionEsSyncVO> existMap = getExistsOpinions(vos);
         for (OpinionVO vo : vos) {
             addOpinionEventRecords(vo, oerVos);
+            addOpinionEventWarnRecord(vo, oerHotVos, eventWarnSettings);
 
             String uuid = vo.getUuid();
 
@@ -125,13 +128,14 @@ public class OpinionListener {
         sendWarnMessage(warnVos);
         saveOpinionEventRecords(oerVos);
         saveOpinionEvenWarnRecords(oerWarnVos);
+        saveOpinionEventHotRecords(oerHotVos);
 
         long end = System.currentTimeMillis();
         logger.info("Process {} opinions success, time used: {}", records.size(), (end - start));
     }
 
     /**
-     * 获取事件和舆情关联记录
+     * 保存事件和舆情关联记录
      * @param vo
      * @return
      */
@@ -171,6 +175,20 @@ public class OpinionListener {
         WarnSettingExample exam = new WarnSettingExample();
         exam.createCriteria().andTypeEqualTo(3);
         return warnSettingDao.selectByExample(exam);
+    }
+
+    /**
+     * 获取时间预警设置
+     * @return
+     */
+    private Map<Long, WarnSetting> getEventsWarnSettings() {
+        WarnSettingExample exam = new WarnSettingExample();
+        exam.createCriteria().andTypeEqualTo(1);
+        List<WarnSetting> ss = warnSettingDao.selectByExample(exam);
+        if (ss.size() == 0) {
+            return Maps.newHashMap();
+        }
+        return ss.stream().collect(Collectors.toMap(WarnSetting::getEventId, s -> s));
     }
 
     /**
@@ -402,10 +420,17 @@ public class OpinionListener {
     }
 
     /**
-     * 保存预警舆情、事件关联记录
+     * 保存与事件关联的舆情热度超过舆情预警记录
      */
     private void saveOpinionEvenWarnRecords(List<OpinionEventRecordVO> vos) {
         doSaveOpinionEventRecords(EsConstant.OPINION_EVENT_RECORD_WARN_TYPE, vos);
+    }
+
+    /**
+     * 保存与事件关联的舆情热度超过事件预警记录
+     */
+    private void saveOpinionEventHotRecords(List<OpinionEventRecordVO> vos) {
+        doSaveOpinionEventRecords(EsConstant.OPINION_EVENT_RECORD_HOT_TYPE, vos);
     }
 
     /**
@@ -449,5 +474,48 @@ public class OpinionListener {
         if (vos.size() == 0) {
             return;
         }
+    }
+
+    /**
+     * 添加与事件关联舆情首次超过事件预警设置时间记录
+     * @param opinion: 舆情
+     * @param oerHotVos: 批量操作记录结果集
+     * @param settingMap: 事件预警配置
+     */
+    private void addOpinionEventWarnRecord(OpinionVO opinion, List<OpinionEventRecordVO> oerHotVos, Map<Long, WarnSetting> settingMap) {
+        List<Long> eventsIds = opinion.getEvents();
+        if (eventsIds == null || eventsIds.size() == 0) {
+            return;
+        }
+        String opinionId = opinion.getUuid();
+        Integer hot = opinion.getHot();
+
+        for (Long eventId : eventsIds) {
+            WarnSetting setting = settingMap.get(eventId);
+            if (setting == null) {
+                continue;
+            }
+            Integer threashold = setting.getMin();
+            threashold = threashold == null ? 0 : threashold;
+            if (hot >= threashold) {
+                OpinionEventRecordVO vo = buildOpinionEventRecordVO(eventId, opinionId);
+                oerHotVos.add(vo);
+            }
+        }
+    }
+
+    private OpinionEventRecordVO buildOpinionEventRecordVO(Long eventId, String opinionId) {
+        DateTime dateTime = new DateTime();
+        DateTime trimTime = dateTime.withMinuteOfHour(0);
+        trimTime = trimTime.withSecondOfMinute(0);
+        trimTime = trimTime.withMillisOfSecond(0);
+
+        OpinionEventRecordVO vo = new OpinionEventRecordVO();
+        vo.setEventId(eventId);
+        vo.setOpinionId(opinionId);
+        vo.setMatchTime(dateTime.toDate());
+        vo.setMatchTimeTrim(trimTime.toDate());
+
+        return vo;
     }
 }
