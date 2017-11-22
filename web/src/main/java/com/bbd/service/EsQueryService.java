@@ -8,10 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.bbd.service.vo.*;
+
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import com.bbd.bean.EventEsVO;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.domain.OpinionEvent;
@@ -70,7 +72,24 @@ public interface EsQueryService {
      */
     Long queryEventInfoTotal(Long eventId, DateTime startTime, DateTime endTime);
     
+    /**  
+     * 查询事件信息总量、预警总量
+     * @param opinionEvent
+     * @param isWarn
+     * @param cycle
+     * @return 
+     */
     List<KeyValueVO> queryEventInfoTotal(OpinionEvent opinionEvent, boolean isWarn, Integer cycle);
+    
+    
+    /**  
+     * 查询事件新增达到新增设置值的舆情
+     * @param opinionEvent
+     * @param startTime
+     * @param endTime
+     * @return 
+     */
+    List<EventEsVO> queryEventNewInfoTotal(OpinionEvent opinionEvent, DateTime startTime, DateTime endTime);
 
     /**
      * 关键词排行TOP10 - 首页
@@ -187,6 +206,12 @@ public interface EsQueryService {
      * @return
      */
     OpinionEsVO getOpinionByUUID(String uuid);
+    /**
+     * 根据舆情uuids查询热度最高的舆情
+     * @param uuid
+     * @return
+     */
+    OpinionEsVO getMaxOpinionByUUIDs(List<String> uuids);
 
     /**
      * 根据舆情uuid查询该条舆情的操作人

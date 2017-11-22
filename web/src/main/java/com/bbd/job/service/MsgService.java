@@ -16,7 +16,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
+import com.bbd.bean.EventEsVO;
+import com.bbd.bean.OpinionEsVO;
 import com.bbd.dao.MsgSendRecordDao;
 import com.bbd.dao.OpinionEventDao;
 import com.bbd.dao.OpinionEventLevelChangeDao;
@@ -32,6 +33,7 @@ import com.bbd.domain.WarnNotifier;
 import com.bbd.domain.WarnNotifierExample;
 import com.bbd.domain.WarnSetting;
 import com.bbd.domain.WarnSettingExample;
+import com.bbd.job.vo.EventIncMsgModel;
 import com.bbd.job.vo.EventMsgModel;
 import com.bbd.job.vo.MsgVO;
 import com.bbd.service.EsQueryService;
@@ -62,17 +64,25 @@ public class MsgService {
     @Autowired  
     private KafkaTemplate<Integer, String> kafkaTemplate;  
     
-    public WarnSetting getLevel(OpinionEvent e){
+    public WarnSetting getLevel(OpinionEvent e, int type){
         WarnSettingExample warnSettingExample = new WarnSettingExample();
-        warnSettingExample.createCriteria().andEventIdEqualTo(e.getId()).andTypeEqualTo(2).andTargetTypeEqualTo(2)
-        .andMinGreaterThanOrEqualTo(e.getHot()).andMaxGreaterThanOrEqualTo(e.getHot());
-        List<WarnSetting> eventWarnList = warnSettingDao.selectByExample(warnSettingExample);
+        List<WarnSetting> eventWarnList = null;
+        if (type == 1) {
+            warnSettingExample.createCriteria().andEventIdEqualTo(e.getId()).andTypeEqualTo(1).andTargetTypeEqualTo(2)
+            .andMinGreaterThanOrEqualTo(e.getHot()).andMaxGreaterThanOrEqualTo(e.getHot());
+             eventWarnList = warnSettingDao.selectByExample(warnSettingExample);
+        } else {
+            warnSettingExample.createCriteria().andEventIdEqualTo(e.getId()).andTypeEqualTo(2).andTargetTypeEqualTo(2)
+            .andMinGreaterThanOrEqualTo(e.getHot()).andMaxGreaterThanOrEqualTo(e.getHot());
+             eventWarnList = warnSettingDao.selectByExample(warnSettingExample);
+        }
         warnSettingExample.clear();
         if (eventWarnList == null || eventWarnList.size() == 0){
             return new WarnSetting();
         } else {
             return  eventWarnList.get(0);
         }
+       
     }
     
     public boolean changeLevel(OpinionEvent e, int level, Date now) {
@@ -108,7 +118,7 @@ public class MsgService {
         return warnNotifierDao.selectByExample(example);
     }
     
-    public List<MsgVO> buildMsg(OpinionEvent e, Integer level, List<WarnNotifier> warnNotifierList, boolean isEmail) {
+    public List<MsgVO> buildEventWholeMsg(OpinionEvent e, Integer level, List<WarnNotifier> warnNotifierList, boolean isEmail) {
         List<MsgVO> msgVOList = new ArrayList<MsgVO>();
         for (WarnNotifier warnNotifier : warnNotifierList) {
             if (isEmail == true && warnNotifier.getEmailNotify() == 1) {
@@ -124,6 +134,28 @@ public class MsgService {
                 msgVO.setSubject("事件总体热度预警");
                 msgVO.setTo(warnNotifier.getEmail());
                 msgVO.setTemplate("event_overall_heatLevel");
+                msgVOList.add(msgVO);
+            }
+        }
+        return msgVOList;
+    }
+    
+    public List<MsgVO> buildEventNewMsg(OpinionEvent e, Integer count, Integer hot, List<WarnNotifier> warnNotifierList, boolean isEmail) {
+        List<MsgVO> msgVOList = new ArrayList<MsgVO>();
+        for (WarnNotifier warnNotifier : warnNotifierList) {
+            if (isEmail == true && warnNotifier.getEmailNotify() == 1) {
+                MsgVO msgVO = new MsgVO();
+                EventIncMsgModel eventIncMsgModel = new EventIncMsgModel();
+                eventIncMsgModel.setEvent(e.getEventName());
+                eventIncMsgModel.setCount(String.valueOf(count));
+                eventIncMsgModel.setScore(hot);
+                eventIncMsgModel.setLink("XXXXXXXX（系统PC端舆情事件信息列表地址，登录后直接跳转到列表页）");
+                eventIncMsgModel.setUsername(warnNotifier.getNotifier());
+                msgVO.setModel(eventIncMsgModel);
+                msgVO.setRetry(3);
+                msgVO.setSubject("事件新增观点预警");
+                msgVO.setTo(warnNotifier.getEmail());
+                msgVO.setTemplate("event_opinion_warnning");
                 msgVOList.add(msgVO);
             }
         }
@@ -147,17 +179,46 @@ public class MsgService {
         }
     }
     
-    @Scheduled(cron="0 0 * * * ?")
-    public void eventKafka() {
-        
-        //事件总体热度级别变化发送至kafka
+    public List<OpinionEvent> getEventList() {
         OpinionEventExample example = new OpinionEventExample();
         example.createCriteria().andIsDeleteEqualTo((byte)0).andFileReasonIsNull();
-        List<OpinionEvent> opinionEventList = opinionEventDao.selectByExample(example);
+        return opinionEventDao.selectByExample(example);
+    }
+    
+    @Scheduled(cron="0 0 * * * ?")
+    public void eventNewOpinionKafka(){
+        //事件热点舆情变化发送至kafka
+        List<OpinionEvent> opinionEventList = getEventList();
+        DateTime startTime = null;
+        DateTime endTime = null;
+        for (OpinionEvent e : opinionEventList) {
+            List<EventEsVO> evtList = esQueryService.queryEventNewInfoTotal(e, startTime, endTime);
+            OpinionEsVO op = esQueryService.getMaxOpinionByUUIDs(buildUids(evtList));
+            WarnSetting warnSetting = getLevel(e, 1);
+            List<WarnNotifier> warnNotifierList= getNotifiers(warnSetting);
+            kafkaTemplate.sendDefault(JsonUtil.fromJson(buildEventNewMsg(e, evtList.size(), op.getHot(), warnNotifierList, true)));//发送邮件
+        }
+        updateMsgRecord(2, 2); 
+    }
+    
+    
+    List<String> buildUids(List<EventEsVO> evtList) {
+        List<String> uids = new ArrayList<String>();
+        for (EventEsVO  e : evtList) {
+            uids.add(e.getOpinionId());
+        }
+        return uids;
+    }
+    
+    @Scheduled(cron="0 0 * * * ?")
+    public void eventWholeHotKafka() {
+        
+        //事件总体热度级别变化发送至kafka
+        List<OpinionEvent> opinionEventList = getEventList();
         Integer level;
         Date now = new Date();
         for (OpinionEvent e : opinionEventList) {
-            WarnSetting warnSetting = getLevel(e);
+            WarnSetting warnSetting = getLevel(e, 2);
             level = warnSetting.getLevel();
             if (level == null) {
                 continue;
@@ -165,7 +226,7 @@ public class MsgService {
             boolean change = changeLevel(e, level, now);
             if (change == true) {
                 List<WarnNotifier> warnNotifierList= getNotifiers(warnSetting);
-                kafkaTemplate.sendDefault(JsonUtil.fromJson(buildMsg(e, level, warnNotifierList, true)));//发送邮件
+                kafkaTemplate.sendDefault(JsonUtil.fromJson(buildEventWholeMsg(e, level, warnNotifierList, true)));//发送邮件
                 //发送
                 //
             }

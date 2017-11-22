@@ -5,6 +5,7 @@
 package com.bbd.service.impl;
 
 import com.bbd.annotation.TimeUsed;
+import com.bbd.bean.EventEsVO;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.constant.EsConstant;
@@ -27,6 +28,7 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
+
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -250,7 +252,37 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .actionGet();
         return buildLongTermLists(resp, aggName);
     }
-
+    /**  
+     * 查询事件新增达到新增设置值的舆情
+     * @param opinionEvent
+     * @param startTime
+     * @param endTime
+     * @return 
+     */
+    @Override
+    public List<EventEsVO> queryEventNewInfoTotal(OpinionEvent opinionEvent, DateTime startTime, DateTime endTime){
+        // step-1：构建es查询条件
+        TransportClient client = esUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.termQuery(EsConstant.eventIdField, opinionEvent.getId()));
+        query.must(QueryBuilders.rangeQuery(EsConstant.matchTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(EsConstant.matchTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        
+        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION_EVENT_RECORD)
+                .setTypes(EsConstant.OPINION_EVENT_RECORD_HOT_TYPE)
+                .setFrom(0).setSize(1).setQuery(query);
+        // step-2：查询并返回结果
+        SearchResponse resp = builder.execute().actionGet();
+        return EsUtil.buildResult(resp, EventEsVO.class);
+    }
+    /**  
+     * 查询事件信息总量、预警总量
+     * @param opinionEvent
+     * @param isWarn
+     * @param cycle
+     * @return 
+     */
+    @Override
     public List<KeyValueVO> queryEventInfoTotal(OpinionEvent opinionEvent, boolean isWarn, Integer cycle) {
 
         // step-1：构建es查询条件
@@ -769,6 +801,29 @@ public class EsQueryServiceImpl implements EsQueryService {
         if (list.isEmpty())
             return null;
         return list.get(0);
+    }
+    /**
+     * 根据舆情uuids查询热度最高的舆情
+     * @param uuid
+     * @return
+     */
+    @Override
+    public OpinionEsVO getMaxOpinionByUUIDs(List<String> uuids){
+     // step-1：构建es查询条件
+        TransportClient client = esUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.termQuery(EsConstant.OPINION_UUID, uuids));
+        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(0).setSize(1).setQuery(query).addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC))
+                .addSort(SortBuilders.fieldSort(EsConstant.publishTimeField).order(SortOrder.DESC)).addSort(SortBuilders.fieldSort(EsConstant.uuidField).order(SortOrder.DESC));
+
+        // step-2：查询并返回结果
+        SearchResponse resp = builder.execute().actionGet();
+        List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
+        if (opList != null && opList.size() > 0) {
+            return opList.get(0);
+        } else {
+            return new OpinionEsVO();
+        }
     }
 
     /**
