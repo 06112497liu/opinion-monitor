@@ -208,7 +208,7 @@ public interface EsQueryService {
     OpinionEsVO getOpinionByUUID(String uuid);
     /**
      * 根据舆情uuids查询热度最高的舆情
-     * @param uuid
+     * @param uuids
      * @return
      */
     OpinionEsVO getMaxOpinionByUUIDs(List<String> uuids);
@@ -312,4 +312,10 @@ public interface EsQueryService {
      * @return
      */
     Integer queryMaxHot(DateTime lastSendTime, Integer type);
+
+    /**
+     * 历史舆情详情
+     * @param uuid
+     */
+    OpinionEsVO queryHistoryWarnDetail(String uuid);
 }

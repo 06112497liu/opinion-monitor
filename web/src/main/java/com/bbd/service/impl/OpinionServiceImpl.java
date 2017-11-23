@@ -3,7 +3,9 @@ package com.bbd.service.impl;
 import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
+import com.bbd.bean.OpinionWarnTime;
 import com.bbd.bean.WarnNotifierVO;
+import com.bbd.constant.EsConstant;
 import com.bbd.dao.WarnNotifierExtDao;
 import com.bbd.domain.WarnNotifier;
 import com.bbd.domain.WarnSetting;
@@ -37,6 +39,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Liuweibo
@@ -293,9 +296,11 @@ public class OpinionServiceImpl implements OpinionService {
      * @param lastSendTime
      */
     @Override
-    public String getWarnRemindJson(DateTime lastSendTime) {
+    public OpinionMsgSend getWarnRemindJson(DateTime lastSendTime) {
 
         List<MsgVO> result = Lists.newLinkedList();
+        Date date = new Date();
+        OpinionMsgSend msgSend = new OpinionMsgSend();
 
         // step-1：获取该时间段内分级预警增加量，一级每个预警的热度最大值，一级预警通知人
         Integer oneMax = esQueryService.queryMaxHot(lastSendTime, 1);
@@ -319,7 +324,9 @@ public class OpinionServiceImpl implements OpinionService {
         result.addAll(emailResult);
         result.addAll(smsResult);
         String str = JsonUtil.fromJson(result);
-        return str;
+        msgSend.setSendMsg(str);
+        msgSend.setClaTime(date);
+        return msgSend;
     }
 
     List<MsgVO> buidMsgVO(Map<Integer, Integer> maxMap, Map<Integer, Integer> mapAdd, Map<String, List<WarnNotifierVO>> notifies) {
@@ -347,6 +354,30 @@ public class OpinionServiceImpl implements OpinionService {
             result.add(vo);
         }
         return result;
+    }
+
+    /**
+     * 历史预警舆情详情
+     * @param uuid
+     */
+    @Override
+    public HistoryOpinionDetailVO getHistoryWarnOpinionDetail(String uuid) {
+        // step-1：舆情详情
+        OpinionEsVO esVO = esQueryService.queryHistoryWarnDetail(uuid);
+        HistoryOpinionDetailVO rs = BeanMapperUtil.map(esVO, HistoryOpinionDetailVO.class);
+        rs.setFirstWarnTime(esVO.getWarnTime().getFirstWarnTime());
+
+        // step-2：操作记录
+        Map<String, Object> keyMap = Maps.newHashMap();
+        keyMap.put(EsConstant.uuidField, uuid);
+        List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(keyMap, 1000);
+        rs.setRecords(records);
+
+        // step-3：舆情等级
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3);
+        rs.setLevel(systemSettingService.judgeOpinionSettingClass(rs.getHot(), setting));
+
+        return rs;
     }
 }
 

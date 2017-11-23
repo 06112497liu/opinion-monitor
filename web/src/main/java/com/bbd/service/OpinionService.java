@@ -93,5 +93,11 @@ public interface OpinionService {
      * 获取短信或邮件提醒的json字符串
      * @param lastSendTime
      */
-    String getWarnRemindJson(DateTime lastSendTime) throws NoSuchFieldException;
+    OpinionMsgSend getWarnRemindJson(DateTime lastSendTime) throws NoSuchFieldException;
+
+    /**
+     * 历史预警舆情详情
+     * @param uuid
+     */
+    HistoryOpinionDetailVO getHistoryWarnOpinionDetail(String uuid);
 }

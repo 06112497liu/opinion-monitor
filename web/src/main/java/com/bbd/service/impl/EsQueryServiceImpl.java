@@ -33,10 +33,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -804,7 +801,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
     /**
      * 根据舆情uuids查询热度最高的舆情
-     * @param uuid
+     * @param uuids
      * @return
      */
     @Override
@@ -1155,6 +1152,23 @@ public class EsQueryServiceImpl implements EsQueryService {
         if(opinion.isEmpty()) return null;
         Integer hot = opinion.get(0).getHot();
         return hot;
+    }
+
+    /**
+     * 历史舆情详情
+     * @param uuid
+     */
+    @Override
+    public OpinionEsVO queryHistoryWarnDetail(String uuid) {
+        TransportClient client = esUtil.getClient();
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        query.must(QueryBuilders.termQuery(EsConstant.uuidField, uuid));
+        query.must(QueryBuilders.termQuery(EsConstant.opStatusField, 2));
+
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).execute().actionGet();
+        List<OpinionEsVO> list = EsUtil.buildResult(resp, OpinionEsVO.class);
+        if(!list.isEmpty()) return list.get(0);
+        return null;
     }
 
     /**

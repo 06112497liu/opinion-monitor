@@ -37,14 +37,8 @@ public class OpinionEsVO implements EsBase {
 
     private Integer         emotion;
 
-    /**
-     * 关键词
-     */
     private String[]        keyword;
 
-    /**
-     * 词云
-     */
     private String[]        keys;
 
     private String          website;
@@ -88,6 +82,11 @@ public class OpinionEsVO implements EsBase {
      * 转发类型
      */
     private Integer         transferType;
+
+    /**
+     * 解除备注
+     */
+    private String removeNote;
 
     /**
      * 预警时间
@@ -266,5 +265,13 @@ public class OpinionEsVO implements EsBase {
 
     public void setWarnTime(OpinionWarnTime warnTime) {
         this.warnTime = warnTime;
+    }
+
+    public String getRemoveNote() {
+        return removeNote;
+    }
+
+    public void setRemoveNote(String removeNote) {
+        this.removeNote = removeNote;
     }
 }

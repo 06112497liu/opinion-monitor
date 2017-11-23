@@ -4,6 +4,7 @@ import com.bbd.RestResult;
 import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionService;
+import com.bbd.service.vo.HistoryOpinionDetailVO;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.util.ValidateUtil;
 import io.swagger.annotations.Api;
@@ -102,6 +103,16 @@ public class WarnOpinionController extends AbstractController {
         return RestResult.ok(result);
     }
 
+    @ApiOperation(value = "历史舆情详情", httpMethod = "GET")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String uuid", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "/history/detail", method = RequestMethod.GET)
+    public RestResult getOpinionHotTrend(String uuid) {
+        ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
+        HistoryOpinionDetailVO result = opinionService.getHistoryWarnOpinionDetail(uuid);
+        return RestResult.ok(result);
+    }
 }
     
     
