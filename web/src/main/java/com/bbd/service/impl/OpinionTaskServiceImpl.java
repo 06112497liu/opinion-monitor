@@ -139,7 +139,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         // step-2：如果是普通用户，是不能转发给管理员
         Optional<User> userOpt = userService.queryUserByUserame(param.getUsername());
         if (!userOpt.isPresent())
-            throw new ApplicationException(UserErrorCode.USERNAME_NOT_EXIST, "操作对象用户名不存在");
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
         User opOwner = userOpt.get();
         checkOpinionTranferConfine(opOwner);
 

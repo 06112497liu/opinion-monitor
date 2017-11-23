@@ -17,6 +17,11 @@ public class AccountUpdateVo {
     private Long    id;
 
     /**
+     * 用户ID
+     */
+    private Long userId;
+
+    /**
      * 是否是管理员
      */
     private Boolean admin;
@@ -52,6 +57,14 @@ public class AccountUpdateVo {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Boolean getAdmin() {

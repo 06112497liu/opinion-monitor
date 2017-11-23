@@ -97,7 +97,7 @@ public class PermissionService {
     private void updateAccountGrade(Long userId, boolean isAdmin) {
         AccountUpdateVo v = new AccountUpdateVo();
         v.setAdmin(isAdmin);
-        v.setId(userId);
+        v.setUserId(userId);
         accountService.updateAccount(v);
     }
 
