@@ -53,7 +53,7 @@ public class OpinionJobService {
         for (String s : prov) {
             logger.info("灌入种子：" + params.get("seeds").replace("%0d%0a", ",") + " ———》 爬虫：" + s);
             params.put("prov", s);
-            HttpUtil.getHttp(full_url, params);
+            //HttpUtil.getHttp(full_url, params);
             params.remove("prov");
         }
     }
