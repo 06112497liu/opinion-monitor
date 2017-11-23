@@ -782,7 +782,7 @@ public class EsQueryServiceImpl implements EsQueryService {
      // step-1：构建es查询条件
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.termQuery(EsConstant.OPINION_UUID, uuids));
+        query.must(QueryBuilders.termsQuery(EsConstant.OPINION_UUID, uuids));
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(0).setSize(1).setQuery(query).addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC))
                 .addSort(SortBuilders.fieldSort(EsConstant.publishTimeField).order(SortOrder.DESC)).addSort(SortBuilders.fieldSort(EsConstant.uuidField).order(SortOrder.DESC));
 

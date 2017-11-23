@@ -72,8 +72,7 @@ public class MsgService {
         WarnSettingExample warnSettingExample = new WarnSettingExample();
         List<WarnSetting> eventWarnList = null;
         if (type == 1) {
-            warnSettingExample.createCriteria().andEventIdEqualTo(e.getId()).andTypeEqualTo(1).andTargetTypeEqualTo(2)
-            .andMinGreaterThanOrEqualTo(e.getHot()).andMaxGreaterThanOrEqualTo(e.getHot());
+            warnSettingExample.createCriteria().andEventIdEqualTo(e.getId()).andTypeEqualTo(1).andTargetTypeEqualTo(2);
              eventWarnList = warnSettingDao.selectByExample(warnSettingExample);
         } else {
             warnSettingExample.createCriteria().andEventIdEqualTo(e.getId()).andTypeEqualTo(2).andTargetTypeEqualTo(2)
@@ -199,7 +198,7 @@ public class MsgService {
         return opinionEventDao.selectByExample(example);
     }
     
-    @Scheduled(cron="0 0 * * * ?")
+    @Scheduled(cron="0 * * * * ?")
     public void eventNewOpinionKafka(){
         //事件热点舆情变化发送至kafka
         List<OpinionEvent> opinionEventList = getEventList();
@@ -214,7 +213,9 @@ public class MsgService {
             OpinionEsVO op = esQueryService.getMaxOpinionByUUIDs(buildUids(evtList));
             WarnSetting warnSetting = getLevel(e, 1);
             List<WarnNotifier> warnNotifierList= getNotifiers(warnSetting);
-            kafkaTemplate.sendDefault(JsonUtil.fromJson(buildEventNewMsg(e, evtList.size(), op.getHot(), warnNotifierList, true)));//发送邮件
+            for (MsgVO msgVO : buildEventNewMsg(e, evtList.size(), op.getHot(), warnNotifierList, true)) {
+                kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件
+            }
         }
         updateMsgRecord(SEND_TYPE_EVENT_NEW, MSG_TYPE_EMAIL, endTime.toDate()); 
     }
@@ -249,7 +250,10 @@ public class MsgService {
             boolean change = changeLevel(e, level, now);
             if (change == true) {
                 List<WarnNotifier> warnNotifierList= getNotifiers(warnSetting);
-                kafkaTemplate.sendDefault(JsonUtil.fromJson(buildEventWholeMsg(e, level, warnNotifierList, true)));//发送邮件
+                for (MsgVO msgVO : buildEventWholeMsg(e, level, warnNotifierList, true)) {
+                    kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件
+                }
+               
                 //发送
                 //
             }

@@ -54,10 +54,10 @@ public class EventStatisticService {
     @Autowired  
     private KafkaTemplate<Integer, String> kafkaTemplate;  
     
-    @Scheduled(cron="0 * * * * ?")
+    /*@Scheduled(cron="0 * * * * ?")
     public void eventKafka() {
         kafkaTemplate.sendDefault("haha111");  
-    }
+    }*/
     
     @Scheduled(cron="0 30 * * * ?")
     public void eventTrendStatistic() {
