@@ -137,15 +137,6 @@ public interface EsQueryService {
     OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb);
 
     /**
-     * 查询舆情事件走势
-     * @param eventId: 事件ID
-     * @param startTime: 开始时间
-     * @param pb: 分页
-     * @return
-     */
-    OpinionEsSearchVO queryEventTrendOpinions(Long eventId, DateTime startTime, DateTime endTime, PageBounds pb);
-
-    /**
      * 查询历史预警舆情
      * @param startTime: 开始时间
      * @param endTime：结束时间

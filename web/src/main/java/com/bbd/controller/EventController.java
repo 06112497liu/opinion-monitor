@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -325,7 +326,7 @@ public class EventController extends AbstractController {
     @RequestMapping(value = "hisEventList", method = RequestMethod.GET)
     public RestResult hisEventList(String eventLevel, String region, @DateTimeFormat(pattern="yyyy-MM")Date startTime, 
                                    @DateTimeFormat(pattern="yyyy-MM")Date endTime, Integer pageNo, Integer pageSize) {
-        return RestResult.ok(eventService.getHisEventList(eventLevel, region, startTime, endTime, pageNo, pageSize));
+        return RestResult.ok(eventService.getHisEventList(eventLevel, region, startTime, DateUtils.addMonths(endTime, 1), pageNo, pageSize));
     }
     
 }

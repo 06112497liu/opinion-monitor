@@ -46,6 +46,11 @@ import com.bbd.util.JsonUtil;
  */
 @Service
 public class MsgService {
+    private static final int SEND_TYPE_OPINION = 1;
+    private static final int SEND_TYPE_EVENT_NEW = 2;
+    private static final int SEND_TYPE_EVENT_HOT = 3;
+    private static final int MSG_TYPE_SMS = 1;
+    private static final int MSG_TYPE_EMAIL = 2;
     @Autowired
     OpinionEventDao opinionEventDao;
     @Autowired
@@ -60,7 +65,6 @@ public class MsgService {
     private EsQueryService esQueryService;
     @Autowired
     private EventService eventService;
-   
     @Autowired  
     private KafkaTemplate<Integer, String> kafkaTemplate;  
     
@@ -162,22 +166,32 @@ public class MsgService {
         return msgVOList;
     }
     
-    public void updateMsgRecord(int sendType, int msgType) {
-        MsgSendRecordExample msgExample = new MsgSendRecordExample();
-        msgExample.createCriteria().andSendTypeEqualTo(sendType).andMsgTypeEqualTo(msgType);
-        List<MsgSendRecord> mgsList = msgSendRecordDao.selectByExample(msgExample);
-        if (mgsList != null && mgsList.size() > 0) {
-            mgsList.get(0).setSendTime(new Date());
-            msgSendRecordDao.updateByPrimaryKeySelective(mgsList.get(0));
+    public void updateMsgRecord(int sendType, int msgType, Date sendTime) {
+        MsgSendRecord msgSendRecord = getMsgSendRecord(sendType, msgType); 
+        if (msgSendRecord != null ) {
+            msgSendRecord.setSendTime(sendTime);
+            msgSendRecordDao.updateByPrimaryKeySelective(msgSendRecord);
         } else {
             MsgSendRecord record = new MsgSendRecord();
             record.setSendType(sendType);
             record.setMsgType(msgType);
             record.setGmtCreate(new Date());
-            record.setSendTime(new Date());
+            record.setSendTime(sendTime);
             msgSendRecordDao.insert(record);
         }
     }
+    
+    public MsgSendRecord getMsgSendRecord(int sendType, int msgType){
+        MsgSendRecordExample msgExample = new MsgSendRecordExample();
+        msgExample.createCriteria().andSendTypeEqualTo(sendType).andMsgTypeEqualTo(msgType);
+        List<MsgSendRecord> mgsList = msgSendRecordDao.selectByExample(msgExample);
+        if (mgsList != null && mgsList.size() > 0) {
+            return mgsList.get(0);
+        } else {
+            return null;
+        }
+    }
+    
     
     public List<OpinionEvent> getEventList() {
         OpinionEventExample example = new OpinionEventExample();
@@ -189,8 +203,12 @@ public class MsgService {
     public void eventNewOpinionKafka(){
         //事件热点舆情变化发送至kafka
         List<OpinionEvent> opinionEventList = getEventList();
+        MsgSendRecord msgSendRecord = getMsgSendRecord(2, 2);
         DateTime startTime = null;
-        DateTime endTime = null;
+        if (msgSendRecord != null) {
+            startTime = new DateTime(getMsgSendRecord(2, 2).getSendTime());
+        }
+        DateTime endTime = new DateTime();
         for (OpinionEvent e : opinionEventList) {
             List<EventEsVO> evtList = esQueryService.queryEventNewInfoTotal(e, startTime, endTime);
             OpinionEsVO op = esQueryService.getMaxOpinionByUUIDs(buildUids(evtList));
@@ -198,7 +216,7 @@ public class MsgService {
             List<WarnNotifier> warnNotifierList= getNotifiers(warnSetting);
             kafkaTemplate.sendDefault(JsonUtil.fromJson(buildEventNewMsg(e, evtList.size(), op.getHot(), warnNotifierList, true)));//发送邮件
         }
-        updateMsgRecord(2, 2); 
+        updateMsgRecord(SEND_TYPE_EVENT_NEW, MSG_TYPE_EMAIL, endTime.toDate()); 
     }
     
     
@@ -208,6 +226,11 @@ public class MsgService {
             uids.add(e.getOpinionId());
         }
         return uids;
+    }
+    
+    @Scheduled(cron="0 0 * * * ?")
+    public void opinionKafka() {
+        
     }
     
     @Scheduled(cron="0 0 * * * ?")
@@ -231,10 +254,7 @@ public class MsgService {
                 //
             }
         }
-        updateMsgRecord(3, 2); 
+        updateMsgRecord(SEND_TYPE_EVENT_HOT, MSG_TYPE_EMAIL, now); 
     }
-    
-    
-
 }
 

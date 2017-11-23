@@ -262,9 +262,12 @@ public class EsQueryServiceImpl implements EsQueryService {
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.termQuery(EsConstant.eventIdField, opinionEvent.getId()));
-        query.must(QueryBuilders.rangeQuery(EsConstant.matchTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
-        query.must(QueryBuilders.rangeQuery(EsConstant.matchTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
-        
+        if (startTime != null) {
+            query.must(QueryBuilders.rangeQuery(EsConstant.matchTimeField).gt(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        }
+        if (endTime != null) {
+            query.must(QueryBuilders.rangeQuery(EsConstant.matchTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        }
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION_EVENT_RECORD)
                 .setTypes(EsConstant.OPINION_EVENT_RECORD_HOT_TYPE)
                 .setFrom(0).setSize(1).setQuery(query);
@@ -480,37 +483,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         return result;
     }
 
-    /**
-     * 查询舆情事件走势
-     * @param eventId: 事件ID
-     * @param startTime: 开始时间
-     * @param pb: 分页
-     * @return
-     */
-    @Override
-    public OpinionEsSearchVO queryEventTrendOpinions(Long eventId, DateTime startTime, DateTime endTime, PageBounds pb) {
-        // step-1：构建es查询条件
-        TransportClient client = esUtil.getClient();
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
-        if (endTime != null) {
-            query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
-        }
-        query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
-
-        SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query)
-                .addSort(SortBuilders.fieldSort(EsConstant.publishTimeField).order(SortOrder.ASC));
-
-        // step-2：查询并返回结果
-        OpinionEsSearchVO result = new OpinionEsSearchVO();
-        SearchResponse resp = builder.execute().actionGet();
-        result.setTotal(resp.getHits().getTotalHits());
-        List<OpinionEsVO> opList = esUtil.buildResult(resp, OpinionEsVO.class);
-        result.setOpinions(opList);
-
-        return result;
-    }
-
+   
     /**
      * 获取事件相关信息总量
      * @param eventId

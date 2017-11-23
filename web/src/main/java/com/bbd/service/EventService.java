@@ -600,14 +600,10 @@ public class EventService{
      */
     public HashMap<String, Object> eventTrend(Long id, Integer cycle, Integer pageNo, Integer pageSize) {
         HashMap<String, Object> map = new HashMap<String, Object>();
-        if (cycle != 4) {
-            OpinionEsSearchVO vo = esQueryService.queryEventTrendOpinions(id, new DateTime(getStartDate(cycle)), null, new PageBounds(pageNo, pageSize));
-            map.put("opinions", vo.getOpinions());
-        } else {
-            OpinionEventTrendStatisticExample example = new OpinionEventTrendStatisticExample();
-            example.createCriteria().andEventIdEqualTo(id);
-            map.put("opinions", opinionEventTrendStatisticDao.selectByExampleWithPageBounds(example, new PageBounds(pageNo, pageSize)));
-        }
+        OpinionEventTrendStatisticExample example = new OpinionEventTrendStatisticExample();
+        example.setOrderByClause("publish_time ASC");
+        example.createCriteria().andEventIdEqualTo(id);
+        map.put("opinions", opinionEventTrendStatisticDao.selectByExampleWithPageBounds(example, new PageBounds(pageNo, pageSize)));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateString = formatter.format(opinionEventDao.selectByPrimaryKey(id).getGmtCreate());
         map.put("eventTime", dateString);
