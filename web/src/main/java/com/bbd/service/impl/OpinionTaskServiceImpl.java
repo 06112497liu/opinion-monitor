@@ -8,6 +8,7 @@ import com.bbd.enums.TransferEnum;
 import com.bbd.enums.WarnReasonEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
+import com.bbd.exception.ErrorCode;
 import com.bbd.exception.UserErrorCode;
 import com.bbd.service.*;
 import com.bbd.service.param.TransferParam;
@@ -149,7 +150,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         // step-3：修改舆情的状态
         UserInfo operator = UserContext.getUser();
         if (Objects.isNull(operator))
-            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
+            throw new ApplicationException(UserErrorCode.USER_NO_LOGIN);
 
         Map<String, Object> map = Maps.newHashMap();
         map.put(EsConstant.opStatusField, 1);
@@ -290,7 +291,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
             Long ownerId = opinion.getOpOwner();
             if(Objects.nonNull(ownerId)) {
                 if(!Objects.equals(user.getId(), ownerId)) {
-                    throw new ApplicationException(CommonErrorCode.PERMISSION_ERROR);
+                    throw new ApplicationException(UserErrorCode.USER_NO_PERMISSION);
                 }
             }
         }

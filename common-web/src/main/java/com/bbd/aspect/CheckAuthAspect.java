@@ -7,6 +7,7 @@ package com.bbd.aspect;
 import com.bbd.annotation.CheckAuth;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
+import com.bbd.exception.UserErrorCode;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +36,7 @@ public class CheckAuthAspect {
         UserInfo user = UserContext.getUser();
 
         if (user == null) {
-            throw new ApplicationException(CommonErrorCode.PERMISSION_ERROR);
+            throw new ApplicationException(UserErrorCode.USER_NO_PERMISSION);
         }
 
         if (user.getAdmin()) {
@@ -44,11 +45,11 @@ public class CheckAuthAspect {
 
         String permission = checkAuth.permission();
         if (StringUtils.isBlank(permission)) {
-            throw new ApplicationException(CommonErrorCode.PERMISSION_ERROR);
+            throw new ApplicationException(UserErrorCode.USER_NO_PERMISSION);
         }
 
         if (!user.getPermissions().contains(permission)) {
-            throw new ApplicationException(CommonErrorCode.PERMISSION_ERROR);
+            throw new ApplicationException(UserErrorCode.USER_NO_PERMISSION);
         }
     }
 }

@@ -55,16 +55,16 @@ public class LoginController extends AbstractController {
     @ApiOperation(value = "登录", httpMethod = "POST")
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public RestResult doLogin(@RequestBody @Valid @ApiParam(name = "用户登陆对象", value = "传入JSON") LoginUser param) {
+        String username = param.getUsername();
         if (UserContext.getUser() != null) {
-            return RestResult.ok();
+            throw new ApplicationException(UserErrorCode.USER_REPEAT_LOGIN);
         }
 
-        String username = param.getUsername();
         String password = MD5Util.md5(param.getPassword());
         Optional<User> opt = userService.queryUserByUserame(username);
         if (!opt.isPresent()) {
             logger.debug(String.format("用户名为 %s 的用户不存在", username));
-            throw new ApplicationException(UserErrorCode.USERNAME_PASSWORD_ERROR);
+            throw new ApplicationException(UserErrorCode.USER_USERNAME_NOT_EXIST);
         }
         User user = opt.get();
         if (!user.getPassword().equals(password)) {

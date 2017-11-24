@@ -12,7 +12,12 @@ package com.bbd.exception;
  */
 public enum UserErrorCode implements ErrorCode {
 
-    USERNAME_NOT_EXIST(2000, "用户名不存在"), USERNAME_PASSWORD_ERROR(2001, "用户名/密码错误"), ;
+    USER_NO_LOGIN(2001, "未登录"),
+    USER_REPEAT_LOGIN(2002, "请登出后再登陆"),
+    USER_USERNAME_NOT_EXIST(2003, "用户名不存在"),
+    USERNAME_PASSWORD_ERROR(2004, "用户名/密码错误"),
+    USER_NO_PERMISSION(2005, "当前用户权限不足"),
+    ;
 
     private int    status;
     private String message;
