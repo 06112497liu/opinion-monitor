@@ -48,6 +48,8 @@ public class OpinionVO {
 
     private List<Long> events;
 
+    private Integer    flag;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date       publishTime;
 
@@ -194,5 +196,13 @@ public class OpinionVO {
 
     public void setPublishTime(Date publishTime) {
         this.publishTime = publishTime;
+    }
+
+    public Integer getFlag() {
+        return flag;
+    }
+
+    public void setFlag(Integer flag) {
+        this.flag = flag;
     }
 }

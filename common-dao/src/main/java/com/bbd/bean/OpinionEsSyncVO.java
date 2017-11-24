@@ -67,6 +67,11 @@ public class OpinionEsSyncVO implements EsBase {
     @JSONField(format = "yyyy-MM-dd")
     private Date            publishTime;
 
+    /**
+     * 标记是否为消费舆情
+     */
+    private Integer         flag;
+
     private OpinionWarnTime warnTime;
 
     @Override
@@ -201,6 +206,14 @@ public class OpinionEsSyncVO implements EsBase {
 
     public void setPublishTime(Date publishTime) {
         this.publishTime = publishTime;
+    }
+
+    public Integer getFlag() {
+        return flag;
+    }
+
+    public void setFlag(Integer flag) {
+        this.flag = flag;
     }
 
     public OpinionWarnTime getWarnTime() {
