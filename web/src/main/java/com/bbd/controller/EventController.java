@@ -326,7 +326,8 @@ public class EventController extends AbstractController {
     @RequestMapping(value = "hisEventList", method = RequestMethod.GET)
     public RestResult hisEventList(String eventLevel, String region, @DateTimeFormat(pattern="yyyy-MM")Date startTime, 
                                    @DateTimeFormat(pattern="yyyy-MM")Date endTime, Integer pageNo, Integer pageSize) {
-        return RestResult.ok(eventService.getHisEventList(eventLevel, region, startTime, DateUtils.addMonths(endTime, 1), pageNo, pageSize));
+        return RestResult.ok(eventService.getHisEventList(eventLevel, region, startTime, 
+            endTime != null ? DateUtils.addMonths(endTime, 1) : endTime, pageNo, pageSize));
     }
     
 }

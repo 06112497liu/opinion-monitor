@@ -198,7 +198,7 @@ public class MsgService {
         return opinionEventDao.selectByExample(example);
     }
     
-    @Scheduled(cron="0 * * * * ?")
+    @Scheduled(cron="0 0 * * * ?")
     public void eventNewOpinionKafka(){
         //事件热点舆情变化发送至kafka
         List<OpinionEvent> opinionEventList = getEventList();
