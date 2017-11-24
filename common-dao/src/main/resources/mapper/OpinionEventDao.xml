@@ -655,16 +655,16 @@
     </if>
   </select>
   
-   <resultMap id="Graph" type="com.bbd.domain.Graph">
+   <resultMap id="KeyValueVO" type="com.bbd.domain.KeyValueVO">
    </resultMap>  
-  <select id="eventTypeDis" resultMap="Graph">
-    SELECT b.`name` AS `category`,COUNT(1) AS `value`
+  <select id="eventTypeDis" resultMap="KeyValueVO">
+    SELECT b.`name` AS `name`,COUNT(1) AS `value`
 	FROM `bbd_opinion_event` a, `bbd_opinion_dictionary` b 
 	WHERE a.`event_group` = b.`code` AND `parent`='A' AND `is_delete`=0
 	GROUP BY b.`name`
   </select>
-  <select id="eventRegionDis" resultMap="Graph">
-    SELECT b.`name` AS `category`,COUNT(1) AS `value`
+  <select id="eventRegionDis" resultMap="KeyValueVO">
+    SELECT b.`name` AS `name`,COUNT(1) AS `value`
 	FROM `bbd_opinion_event` a, `bbd_opinion_dictionary` b 
 	WHERE a.`region` = b.`code` AND `parent`='C' AND `is_delete`=0
 	GROUP BY b.`name`

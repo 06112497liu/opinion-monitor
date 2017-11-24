@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.bbd.domain.Graph;
+import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.domain.OpinionEventExample;
 import com.mybatis.domain.PageBounds;
@@ -36,7 +36,7 @@ public interface OpinionEventDao {
 
     int updateByPrimaryKey(OpinionEvent record);
     
-    List<Graph> eventTypeDis();
+    List<KeyValueVO> eventTypeDis();
     
-    List<Graph> eventRegionDis();
+    List<KeyValueVO> eventRegionDis();
 }
