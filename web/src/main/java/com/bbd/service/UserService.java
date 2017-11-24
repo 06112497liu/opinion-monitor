@@ -117,7 +117,7 @@ public class UserService {
     @Transactional(rollbackFor = Exception.class)
     public void createUserAndAccount(UserCreateParam param) {
         Optional<User> op = queryUserByUserame(param.getUsername());
-        if(!op.isPresent()) {
+        if(op.isPresent()) {
             throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "用户名重复");
         }
         UserCreateVO userVo = new UserCreateVO();

@@ -71,13 +71,13 @@ public class SystemSettingServiceImpl implements SystemSettingService {
         // step-2：热度值配置
         int result;
         if(1 == type) {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first, popup), buildWarnSettingExample(2, eventId, type, 0));
+            result = settingDao.updateByExampleSelective(buildWarnSetting(Integer.MAX_VALUE, first, popup), buildWarnSettingExample(2, eventId, type, 0));
         } else if(2 == type) {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first, popup), buildWarnSettingExample(2, eventId, type, 1))
+            result = settingDao.updateByExampleSelective(buildWarnSetting(Integer.MAX_VALUE, first, popup), buildWarnSettingExample(2, eventId, type, 1))
             + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second, popup), buildWarnSettingExample(2, eventId, type, 2))
             + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third, popup), buildWarnSettingExample(2, eventId, type, 3));
         } else {
-            result = settingDao.updateByExampleSelective(buildWarnSetting(100, first, popup), buildWarnSettingExample(1, eventId, type, 1))
+            result = settingDao.updateByExampleSelective(buildWarnSetting(Integer.MAX_VALUE, first, popup), buildWarnSettingExample(1, eventId, type, 1))
                     + settingDao.updateByExampleSelective(buildWarnSetting(first-1, second, popup), buildWarnSettingExample(1, eventId, type, 2))
                     + settingDao.updateByExampleSelective(buildWarnSetting(second-1, third, popup), buildWarnSettingExample(1, eventId, type, 3));
         }

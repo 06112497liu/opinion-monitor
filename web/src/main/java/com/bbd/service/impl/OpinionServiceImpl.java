@@ -15,6 +15,7 @@ import com.bbd.exception.CommonErrorCode;
 import com.bbd.job.vo.MsgVO;
 import com.bbd.job.vo.OpinionMsgModel;
 import com.bbd.service.EsQueryService;
+import com.bbd.service.EventService;
 import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.utils.BusinessUtils;
@@ -60,6 +61,9 @@ public class OpinionServiceImpl implements OpinionService {
     @Autowired
     private WarnNotifierExtDao notifierExtDao;
 
+    @Autowired
+    private EventService eventService;
+
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
@@ -103,8 +107,9 @@ public class OpinionServiceImpl implements OpinionService {
         PageList p = PageListHelper.create(opinions, paginator);
         Map<String, Object> map = Maps.newHashMap();
         map.put("opinionsList", p);
-        List<KeyValueVO> mediaTypeSta = esResult.getMediaTypeStats(); transMediaTypeToChina(mediaTypeSta);
-        map.put("mediaTypeCount", mediaTypeSta);
+        List<KeyValueVO> mediaTypeSta = esResult.getMediaTypeStats();
+        List<KeyValueVO> fullMediaTypeSta = eventService.calAllMedia(mediaTypeSta);
+        map.put("mediaTypeCount", fullMediaTypeSta);
         map.put("levelCount", esResult.getHotLevelStats());
 
         return map;
@@ -206,8 +211,8 @@ public class OpinionServiceImpl implements OpinionService {
         map.put("opinionsList", p);
             // 媒体类型中文描述转化
         List<KeyValueVO> mediaTypeList = esResult.getMediaTypeStats();
-        transMediaTypeToChina(mediaTypeList);
-        map.put("mediaTypeCount", mediaTypeList);
+        List<KeyValueVO> fullMediaTypeList = eventService.calAllMedia(mediaTypeList);
+        map.put("mediaTypeCount", fullMediaTypeList);
         map.put("levelCount", esResult.getHotLevelStats());
 
         return map;
