@@ -19,8 +19,8 @@ public class EsConstant {
     public static final String IDX_OPINION_HOT                = "bbd_opinion_hot";
     public static final String OPINION_HOT_TYPE               = "hot";
 
-    public static final String IDX_OPINION_SIMILAR_ARTICLE    = "bbd_article";
-    public static final String OPINION_SIMILAR_ARTICLE_TYPE   = "article";
+    public static final String IDX_OPINION_SIMILAR_NEWS       = "bbd_opinion_news";
+    public static final String OPINION_SIMILAR_NEWS_TYPE      = "opinion_news";
 
     public static final String IDX_OPINION_OP_RECORD          = "bbd_opinion_op_record";
     public static final String OPINION_OP_RECORD_TYPE         = "opinion_op_record";
