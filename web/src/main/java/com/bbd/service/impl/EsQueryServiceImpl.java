@@ -306,7 +306,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         List<KeyValueVO> ls = Lists.newLinkedList();
         for (InternalDateRange.Bucket d : dateList) {
             KeyValueVO v = new KeyValueVO();
-            v.setKey(d.getKey());
+            v.setName(d.getKey());
             v.setValue(d.getDocCount());
             ls.add(v);
         }

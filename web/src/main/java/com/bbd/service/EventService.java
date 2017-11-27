@@ -487,8 +487,8 @@ public class EventService{
             List<KeyValueVO> listSub = new ArrayList<KeyValueVO>();
             for (OpinionEventMediaStatistic f : evtMediaStaList) {
                 KeyValueVO vo = new KeyValueVO();
-                vo.setKey(dateFormater.format(f.getPickTime()));
-                vo.setName(e.getName());
+                vo.setKey(e.getName());
+                vo.setName(dateFormater.format(f.getPickTime()));
                 vo.setValue(f.getMediaCount());
                 listSub.add(vo);
             }
