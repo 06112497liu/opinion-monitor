@@ -118,6 +118,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                         event = events.get(0);
                         o.setMonitorTime(event.getGmtCreate());
                         o.setEventName(event.getEventName());
+                        o.setEventID(event.getId());
                     }
                 });
 

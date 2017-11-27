@@ -87,9 +87,8 @@ public class HttpUtil {
         String urlParam = url + paramStr.substring(0, paramStr.length() - 1);
         // 2.创建GetMethod的实例
         GetMethod getMethod = new GetMethod(urlParam);
-        getMethod.setRequestHeader("Accept", "application/json;charset=UTF-8");
-        getMethod.setRequestHeader(HttpMethodParams.HTTP_CONTENT_CHARSET, "UTF-8");
-        // 使用系统系统的默认的恢复策略  
+        getMethod.setRequestHeader("user-agent", "Mozilla/4.0(compatible;MSIE)");
+        // 使用系统系统的默认的恢复策略
         getMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
 
         for (String key : params.keySet()) {
