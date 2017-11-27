@@ -15,7 +15,7 @@ public class MsgModel implements Serializable{
 
     private String  username;
 
-    private Integer score;
+    private String score;
 
     private String  link;
 
@@ -27,11 +27,11 @@ public class MsgModel implements Serializable{
         this.username = username;
     }
 
-    public Integer getScore() {
+    public String getScore() {
         return score;
     }
 
-    public void setScore(Integer score) {
+    public void setScore(String score) {
         this.score = score;
     }
 

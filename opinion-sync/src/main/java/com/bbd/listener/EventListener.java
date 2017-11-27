@@ -64,4 +64,15 @@ public class EventListener {
         long end = System.currentTimeMillis();
         logger.info("Process {}  success, time used: {}", records.toString(), end - start);
     }
+    @KafkaListener(topics = "kafka_test", containerFactory = "kafkaListenerContainerFactory")
+    public void ListenTest(List<String> records) {
+        long start = System.currentTimeMillis();
+        List<OpinionEvent> opinionEventList = JSON.parseArray(records.toString(), OpinionEvent.class);
+        for (OpinionEvent opinionEvent : opinionEventList) {
+            opinionEvent.setGmtCreate(new Date());
+            opinionEventDao.updateByPrimaryKeySelective(opinionEvent);
+        }
+        long end = System.currentTimeMillis();
+        logger.info("Process {}  success, time used: {}", records.toString(), end - start);
+    }
 }

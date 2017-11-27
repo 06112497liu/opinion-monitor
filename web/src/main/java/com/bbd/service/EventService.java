@@ -23,7 +23,6 @@ import com.bbd.dao.AccountDao;
 import com.bbd.dao.OpinionDictionaryDao;
 import com.bbd.dao.OpinionEventDao;
 import com.bbd.dao.OpinionEventMediaStatisticDao;
-import com.bbd.dao.OpinionEventSourceTrendDao;
 import com.bbd.dao.OpinionEventStatisticDao;
 import com.bbd.dao.OpinionEventTrendStatisticDao;
 import com.bbd.dao.OpinionEventWholeTrendStatisticDao;
@@ -31,7 +30,6 @@ import com.bbd.dao.OpinionEventWordsDao;
 import com.bbd.dao.WarnSettingDao;
 import com.bbd.domain.Account;
 import com.bbd.domain.AccountExample;
-import com.bbd.domain.Graph;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.domain.OpinionDictionaryExample;
 import com.bbd.domain.OpinionEvent;
@@ -70,8 +68,6 @@ public class EventService{
     @Autowired
     WarnSettingDao warnSettingDao;
     @Autowired
-    OpinionEventSourceTrendDao opinionEventSourceTrendDao;
-    @Autowired
     OpinionEventWordsDao opinionEventWordsDao;
     @Autowired
     OpinionEventTrendStatisticDao opinionEventTrendStatisticDao;
@@ -106,7 +102,7 @@ public class EventService{
         recordNew.setPopup(1);
         recordNew.setLevel(1);
         recordNew.setMin(60);
-        recordNew.setMax(100);
+        recordNew.setMax(Integer.MAX_VALUE);
         recordNew.setName("事件新增观点预警");
         recordNew.setCreateBy(opinionEvent.getCreateBy());
         warnSettingDao.insert(recordNew);
@@ -118,7 +114,7 @@ public class EventService{
         recordWhole1.setPopup(1);
         recordWhole1.setLevel(1);
         recordWhole1.setMin(80);
-        recordWhole1.setMax(100);
+        recordWhole1.setMax(Integer.MAX_VALUE);
         recordWhole1.setName("事件总体热度预警");
         recordWhole1.setCreateBy(opinionEvent.getCreateBy());
         warnSettingDao.insert(recordWhole1);
@@ -574,6 +570,10 @@ public class EventService{
         List<KeyValueVO> rs = null;
         if (cycle.intValue() != 4) {
             rs = esQueryService.getEventWebsiteSpread(id, new DateTime(getStartDate(cycle)), null);
+            for (KeyValueVO vo : rs) {
+                vo.setName((String)vo.getKey());
+                vo.setKey(null);
+            }
         } else {
             OpinionEventStatisticExample example = new OpinionEventStatisticExample();
             example.createCriteria().andEventIdEqualTo(id);
@@ -581,7 +581,7 @@ public class EventService{
             rs = new ArrayList<KeyValueVO>();
             for (String e : opinionEventStatistic.getSource().split("#")) {
                 KeyValueVO vo = new KeyValueVO();
-                vo.setKey(e.split(",")[0]);
+                vo.setName(e.split(",")[0]);
                 vo.setValue(e.split(",")[1]);
                 rs.add(vo);
             }
@@ -666,7 +666,7 @@ public class EventService{
      * 舆情事件类别分布 
      * @return 
      */
-    public List<Graph> eventTypeDis() {
+    public List<com.bbd.domain.KeyValueVO> eventTypeDis() {
         return opinionEventDao.eventTypeDis();
     }
     /** 
@@ -675,10 +675,10 @@ public class EventService{
      */
     public Map<String, Object> eventRegionDis() {
         Map<String, Object> map = new HashMap<String, Object>();
-        List<Graph> gs = opinionEventDao.eventRegionDis();
+        List<com.bbd.domain.KeyValueVO> gs = opinionEventDao.eventRegionDis();
         long max = 0;
         long min = 0;
-        for (Graph e : gs) {
+        for (com.bbd.domain.KeyValueVO e : gs) {
             if (max < (long)e.getValue()) {
                 max = (long)e.getValue();
             } 

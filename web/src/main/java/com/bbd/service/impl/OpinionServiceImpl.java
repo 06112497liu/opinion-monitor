@@ -12,7 +12,7 @@ import com.bbd.domain.WarnSetting;
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
-import com.bbd.job.vo.MsgVO;
+import com.bbd.job.vo.Content;
 import com.bbd.job.vo.OpinionMsgModel;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
@@ -303,7 +303,7 @@ public class OpinionServiceImpl implements OpinionService {
     @Override
     public OpinionMsgSend getWarnRemindJson(DateTime lastSendTime) {
 
-        List<MsgVO> result = Lists.newLinkedList();
+        List<Content> result = Lists.newLinkedList();
         Date date = new Date();
         OpinionMsgSend msgSend = new OpinionMsgSend();
 
@@ -320,12 +320,12 @@ public class OpinionServiceImpl implements OpinionService {
         Map<String, List<WarnNotifierVO>> emailNotifier = notifies.stream()
                 .filter(p -> p.getEmailNotify() == 1) // 过滤出需要通过邮件发送的
                 .collect(Collectors.groupingBy(WarnNotifierVO::getEmail)); // 以邮箱分组
-        List<MsgVO> emailResult = buidMsgVO(maxMap, mapAdd, emailNotifier);
+        List<Content> emailResult = buidMsgVO(maxMap, mapAdd, emailNotifier);
         // step-2：短信发送
         Map<String, List<WarnNotifierVO>> smsNotifier = notifies.stream()
                 .filter(p -> p.getSmsNotify() == 1) // 过滤出需要通过短信发送的
                 .collect(Collectors.groupingBy(WarnNotifierVO::getPhone)); // 以电话分组
-        List<MsgVO> smsResult = buidMsgVO(maxMap, mapAdd, smsNotifier);
+        List<Content> smsResult = buidMsgVO(maxMap, mapAdd, smsNotifier);
         result.addAll(emailResult);
         result.addAll(smsResult);
         String str = JsonUtil.fromJson(result);
@@ -334,10 +334,10 @@ public class OpinionServiceImpl implements OpinionService {
         return msgSend;
     }
 
-    List<MsgVO> buidMsgVO(Map<Integer, Integer> maxMap, Map<Integer, Integer> mapAdd, Map<String, List<WarnNotifierVO>> notifies) {
-        List<MsgVO> result = Lists.newLinkedList();
+    List<Content> buidMsgVO(Map<Integer, Integer> maxMap, Map<Integer, Integer> mapAdd, Map<String, List<WarnNotifierVO>> notifies) {
+        List<Content> result = Lists.newLinkedList();
         for (String k : notifies.keySet()) {
-            MsgVO vo = new MsgVO();
+            Content vo = new Content();
             OpinionMsgModel model = new OpinionMsgModel();
             vo.setSubject("分级舆情预警"); vo.setSubject("classify_opinion_warnning"); vo.setRetry(0); vo.setTo(k); vo.setModel(model);
             List<WarnNotifierVO> list = notifies.get(k);
@@ -355,7 +355,7 @@ public class OpinionServiceImpl implements OpinionService {
                     model.setLevelThree(value);
                 model.setUsername(p.getNotifier());
             }
-            model.setScore(maxMap.get(max));
+            //model.setScore(maxMap.get(max));
             result.add(vo);
         }
         return result;
