@@ -1053,7 +1053,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     @Override
     public List<SimiliarNewsVO> querySimiliarNews(String uuid, PageBounds pb) {
         TransportClient client = esUtil.getClient();
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_SIMILAR_ARTICLE)
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_SIMILAR_NEWS)
                 .setQuery(QueryBuilders.termQuery(EsConstant.opinionIDField, uuid))
                 .setFrom(pb.getOffset()).setSize(pb.getLimit())
                 .execute().actionGet();
