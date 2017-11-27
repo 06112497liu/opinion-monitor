@@ -263,8 +263,8 @@ PUT bbd_opinion_event_record
  }
 
 # 相同文章信息索引
-DELETE /bbd_article
-PUT /bbd_article
+DELETE /bbd_opinion_news
+PUT /bbd_opinion_news
 {
   "settings": {
     "number_of_replicas": 0,
@@ -273,7 +273,7 @@ PUT /bbd_article
   "mappings": {
     "article": {
       "properties": {
-        "opinion_id": {
+        "opinionId": {
           "type": "keyword"
         },
         "hot": {

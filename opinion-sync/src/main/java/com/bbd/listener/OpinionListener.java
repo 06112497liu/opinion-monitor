@@ -46,6 +46,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
+ * 舆情信息Listener
+ * 
  * @author tjwang
  * @version $Id: OpinionListener.java, v 0.1 2017/11/8 0008 11:38 tjwang Exp $
  */
