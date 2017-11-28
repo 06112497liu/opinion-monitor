@@ -81,6 +81,9 @@ public class MsgService {
             warnSettingExample.createCriteria().andEventIdEqualTo(e.getId()).andTypeEqualTo(1).andTargetTypeEqualTo(2);
              eventWarnList = warnSettingDao.selectByExample(warnSettingExample);
         } else {
+            if (e.getHot() == null) {
+                return null;
+            }
             warnSettingExample.createCriteria().andEventIdEqualTo(e.getId()).andTypeEqualTo(2).andTargetTypeEqualTo(2)
             .andMinLessThanOrEqualTo(e.getHot()).andMaxGreaterThanOrEqualTo(e.getHot());
              eventWarnList = warnSettingDao.selectByExample(warnSettingExample);
@@ -233,7 +236,7 @@ public class MsgService {
         return opinionEventDao.selectByExample(example);
     }
     
-    @Scheduled(cron="0 0 * * * ?")
+    @Scheduled(cron="0 30 * * * ?")
     public void eventNewOpinionKafka(){
         //事件热点舆情变化发送至kafka
         List<OpinionEvent> opinionEventList = getEventList();
@@ -286,7 +289,7 @@ public class MsgService {
         updateMsgRecord(SEND_TYPE_OPINION, MSG_TYPE_EMAIL, opinionMsgSend.getClaTime()); 
     }
     
-    @Scheduled(cron="0 0 * * * ?")
+    @Scheduled(cron="0 30 * * * ?")
     public void eventWholeHotKafka() {
         
         //事件总体热度级别变化发送至kafka
