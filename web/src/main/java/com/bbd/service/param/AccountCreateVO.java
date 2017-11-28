@@ -51,7 +51,6 @@ public class AccountCreateVO {
         ValidateUtil.checkNull(userId, CommonErrorCode.PARAM_ERROR);
         ValidateUtil.checkBlank(region, CommonErrorCode.PARAM_ERROR);
         ValidateUtil.checkBlank(name, CommonErrorCode.PARAM_ERROR);
-        ValidateUtil.checkBlank(phone, CommonErrorCode.PARAM_ERROR);
     }
 
     public Long getUserId() {

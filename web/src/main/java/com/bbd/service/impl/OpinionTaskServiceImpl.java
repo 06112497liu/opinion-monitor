@@ -96,13 +96,14 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     public PageList<OpinionTaskListVO> getProcessedList(Integer opStatus, PageBounds pb) {
         PageList<OpinionTaskListVO> result = esQueryService.getProcessedList(opStatus, pb);
         if (Objects.nonNull(opStatus)) {
-            if (opStatus == 1 && !UserContext.isAdmin()) { // 如果是转发列表，并且不是管理员的话，查询当前用户最近一条转发记录
+            if (opStatus == 1) {
                 result.forEach(o -> {
                     String uuid = o.getUuid();
                     String username = UserContext.getUser().getUsername();
                     Map<String, Object> keyMap = Maps.newHashMap();
                     keyMap.put(EsConstant.uuidField, uuid);
-                    keyMap.put(EsConstant.targeterField, username);
+                    if(!UserContext.isAdmin())
+                        keyMap.put(EsConstant.targeterField, username);
                     List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 1);
                     o.setRecords(list);
                 });

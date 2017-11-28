@@ -10,8 +10,14 @@
         ON
             a.id = b.user_id
         WHERE
-            b.region = #{0} AND a.flag = 0
+            a.flag = 0
+            <if test="region != 5201 and region != null">
+                AND b.region = #{region}
+            </if>
+        ORDER BY
+        a.gmt_create DESC
     </select>
+
     <select id="queryTransUserList" resultType="com.bbd.bean.UserListVO">
         SELECT
             a.username, b.user_id userId, b.region, b.admin, b.name, b.phone, b.email, b.dep_note depNote, a.gmt_create gmtCreate

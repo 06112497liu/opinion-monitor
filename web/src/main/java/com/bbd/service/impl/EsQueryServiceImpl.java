@@ -49,6 +49,7 @@ import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilde
 import org.elasticsearch.search.aggregations.bucket.range.date.DateRangeAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.range.date.InternalDateRange;
 import org.elasticsearch.search.aggregations.bucket.terms.InternalTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
@@ -334,7 +335,8 @@ public class EsQueryServiceImpl implements EsQueryService {
         TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT)
                 .setQuery(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(DateTime.now().withDayOfMonth(1).withTimeAtStartOfDay().toString("yyyy-MM-dd HH:mm:ss")))
-                .addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.keywordField).size(10)).setSize(0).execute().actionGet();
+                .addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.keywordField).size(10).order(Terms.Order.count(false)))
+                .setSize(0).execute().actionGet();
         return buildTermLists(resp, aggName);
     }
 
@@ -381,7 +383,11 @@ public class EsQueryServiceImpl implements EsQueryService {
     public List<KeyValueVO> getOpinionMediaSpread() {
         String aggName = "media_aggs";
         TransportClient client = esUtil.getClient();
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.mediaTypeField).size(10)).setSize(0).execute()
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .addAggregation(
+                        AggregationBuilders.terms(aggName)
+                        .field(EsConstant.mediaTypeField).size(10).order(Terms.Order.count(false))
+                ).setSize(0).execute()
                 .actionGet();
         return buildTermLists(resp, aggName);
     }
@@ -883,8 +889,11 @@ public class EsQueryServiceImpl implements EsQueryService {
     @Override
     public List<OpinionOpRecordVO> getOpinionOpRecordByUUID(Map<String, Object> keyMap, Integer szie) {
         TransportClient client = esUtil.getClient();
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_OP_RECORD).setTypes(EsConstant.OPINION_OP_RECORD_TYPE).setSearchType(SearchType.DEFAULT).setSize(szie)
-                .setQuery(buildSearchRequest(null, keyMap)).addSort(EsConstant.opTimeField, SortOrder.DESC).execute().actionGet();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_OP_RECORD).setTypes(EsConstant.OPINION_OP_RECORD_TYPE).setSearchType(SearchType.DEFAULT)
+                .setQuery(buildSearchRequest(null, keyMap))
+                .addSort(EsConstant.opTimeField, SortOrder.DESC)
+                .setSize(szie).execute().actionGet();
+
         List<OpinionOpRecordVO> list = esUtil.buildResult(resp, OpinionOpRecordVO.class);
         return list;
     }

@@ -116,10 +116,6 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     @Override
     public List<KeyValueVO> getKeywordsTopTen() {
         List<KeyValueVO> list = esQueryService.getKeywordsTopTen();
-        list.sort((k1, k2) -> {
-            long a = (long) k1.getValue(); long b = (long) k2.getValue();
-            return Long.compare(b, a);
-        });
         return list;
     }
 
