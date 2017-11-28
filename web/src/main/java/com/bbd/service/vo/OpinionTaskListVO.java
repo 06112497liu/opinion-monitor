@@ -27,6 +27,11 @@ public class OpinionTaskListVO extends OpinionVO {
     private String eventName;
 
     /**
+     * 所属事件id
+     */
+    private Long eventID;
+
+    /**
      * 词云
      */
     private String[] keyword;
@@ -56,6 +61,14 @@ public class OpinionTaskListVO extends OpinionVO {
 
     public void setEventName(String eventName) {
         this.eventName = eventName;
+    }
+
+    public Long getEventID() {
+        return eventID;
+    }
+
+    public void setEventID(Long eventID) {
+        this.eventID = eventID;
     }
 
     public Date getMonitorTime() {

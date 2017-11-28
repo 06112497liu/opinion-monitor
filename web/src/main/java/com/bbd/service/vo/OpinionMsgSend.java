@@ -1,6 +1,9 @@
 package com.bbd.service.vo;
 
+import com.bbd.job.vo.MsgVO;
+
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Liuweibo
@@ -8,16 +11,16 @@ import java.util.Date;
  */
 public class OpinionMsgSend {
     /** 消息发送json串 */
-    private String sendMsg;
+    private List<MsgVO> sendMsg;
 
     /** 计算时间 */
     private Date claTime;
 
-    public String getSendMsg() {
+    public List<MsgVO> getSendMsg() {
         return sendMsg;
     }
 
-    public void setSendMsg(String sendMsg) {
+    public void setSendMsg(List<MsgVO> sendMsg) {
         this.sendMsg = sendMsg;
     }
 

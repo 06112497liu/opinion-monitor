@@ -3,17 +3,16 @@ package com.bbd.service.impl;
 import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
-import com.bbd.bean.OpinionWarnTime;
 import com.bbd.bean.WarnNotifierVO;
 import com.bbd.constant.EsConstant;
 import com.bbd.dao.WarnNotifierExtDao;
-import com.bbd.domain.WarnNotifier;
 import com.bbd.domain.WarnSetting;
-import com.bbd.enums.WebsiteEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
-import com.bbd.job.vo.Content;
+import com.bbd.job.vo.EmailContent;
+import com.bbd.job.vo.MsgVO;
 import com.bbd.job.vo.OpinionMsgModel;
+import com.bbd.job.vo.SMSContent;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
 import com.bbd.service.OpinionService;
@@ -40,7 +39,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Liuweibo
@@ -171,24 +169,6 @@ public class OpinionServiceImpl implements OpinionService {
         return result;
     }
 
-    // map -> 构建KevyValueVO对象
-    private <K, V> List<KeyValueVO> buildKeyValueVOS(Map<K, V> map) {
-        List<KeyValueVO> list = Lists.newLinkedList();
-        for(Map.Entry<K, V> entry : map.entrySet()) {
-            K k = entry.getKey(); V v = entry.getValue();
-            KeyValueVO vo = new KeyValueVO();
-            vo.setKey(k); vo.setValue(v);
-            list.add(vo);
-        }
-        return list;
-    }
-
-    private void transMediaTypeToChina(List<KeyValueVO> list) {
-        for(KeyValueVO v : list) {
-            v.setName( WebsiteEnum.getDescByCode( v.getKey().toString() ) );
-        }
-    }
-
     @Override
     public Map<String, Object> getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer mediaType, PageBounds pb) {
         DateTime start = new DateTime(startTime);
@@ -290,6 +270,7 @@ public class OpinionServiceImpl implements OpinionService {
             KeyValueVO vo = new KeyValueVO();
             String time = DateUtil.formatDateByPatten(v.getHotTime(), "yyyy-MM-dd HH:mm");
             vo.setKey(time);
+            vo.setName(time);
             vo.setValue(v.getHot());
             keyValueVOList.add(vo);
         }
@@ -303,14 +284,20 @@ public class OpinionServiceImpl implements OpinionService {
     @Override
     public OpinionMsgSend getWarnRemindJson(DateTime lastSendTime) {
 
-        List<Content> result = Lists.newLinkedList();
+        lastSendTime = (lastSendTime == null) ? DateTime.now().plusMonths(-8) : lastSendTime;
+        lastSendTime = DateTime.now().plusMonths(-8);
+        List<MsgVO> result = Lists.newLinkedList();
         Date date = new Date();
         OpinionMsgSend msgSend = new OpinionMsgSend();
+        msgSend.setClaTime(date);
+        msgSend.setSendMsg(result);
 
         // step-1：获取该时间段内分级预警增加量，一级每个预警的热度最大值，一级预警通知人
         Integer oneMax = esQueryService.queryMaxHot(lastSendTime, 1);
         Integer twoMax = esQueryService.queryMaxHot(lastSendTime, 2);
         Integer threeMax = esQueryService.queryMaxHot(lastSendTime, 3);
+        if(oneMax == null && twoMax == null && threeMax == null) return msgSend;
+
         Map<Integer, Integer> maxMap = Maps.newHashMap();
         maxMap.put(1, oneMax); maxMap.put(2, twoMax); maxMap.put(1, threeMax);
         Map<Integer, Integer> mapAdd = esQueryService.queryAddWarnCount(lastSendTime);
@@ -320,45 +307,79 @@ public class OpinionServiceImpl implements OpinionService {
         Map<String, List<WarnNotifierVO>> emailNotifier = notifies.stream()
                 .filter(p -> p.getEmailNotify() == 1) // 过滤出需要通过邮件发送的
                 .collect(Collectors.groupingBy(WarnNotifierVO::getEmail)); // 以邮箱分组
-        List<Content> emailResult = buidMsgVO(maxMap, mapAdd, emailNotifier);
+        List<MsgVO> emailMsg = buidEmailMsgVO(maxMap, mapAdd, emailNotifier);
         // step-2：短信发送
         Map<String, List<WarnNotifierVO>> smsNotifier = notifies.stream()
                 .filter(p -> p.getSmsNotify() == 1) // 过滤出需要通过短信发送的
                 .collect(Collectors.groupingBy(WarnNotifierVO::getPhone)); // 以电话分组
-        List<Content> smsResult = buidMsgVO(maxMap, mapAdd, smsNotifier);
-        result.addAll(emailResult);
-        result.addAll(smsResult);
-        String str = JsonUtil.fromJson(result);
-        msgSend.setSendMsg(str);
-        msgSend.setClaTime(date);
+        List<MsgVO> smsMsg = buidSmsMsgVO(maxMap, mapAdd, smsNotifier);
+        result.addAll(emailMsg);
+        result.addAll(smsMsg);
+        msgSend.setSendMsg(result);
         return msgSend;
     }
 
-    List<Content> buidMsgVO(Map<Integer, Integer> maxMap, Map<Integer, Integer> mapAdd, Map<String, List<WarnNotifierVO>> notifies) {
-        List<Content> result = Lists.newLinkedList();
+    List<MsgVO> buidEmailMsgVO(Map<Integer, Integer> maxMap,
+                               Map<Integer, Integer> mapAdd,
+                               Map<String, List<WarnNotifierVO>> notifies) {
+        List<MsgVO> result = Lists.newLinkedList();
         for (String k : notifies.keySet()) {
-            Content vo = new Content();
+            MsgVO msgVO = new MsgVO();
+            EmailContent content = new EmailContent();
             OpinionMsgModel model = new OpinionMsgModel();
-            vo.setSubject("分级舆情预警"); vo.setSubject("classify_opinion_warnning"); vo.setRetry(0); vo.setTo(k); vo.setModel(model);
+            content.setSubject("分级舆情预警");
+            content.setTemplate("classify_opinion_warnning");
+            content.setRetry(3);
+            content.setTo(k);
+            content.setModel(model);
             List<WarnNotifierVO> list = notifies.get(k);
-            Integer max = 0;
-            for (WarnNotifierVO p : list) {
-                Integer level = p.getLevel();
-                Integer value = mapAdd.get(level);
-                if(level > max)
-                    max = level;
-                if(level == 1)
-                    model.setLevelOne(value);
-                else if(level == 2)
-                    model.setLevelTwo(value);
-                else if(level == 3)
-                    model.setLevelThree(value);
-                model.setUsername(p.getNotifier());
-            }
-            //model.setScore(maxMap.get(max));
-            result.add(vo);
+            buildOpinionMsgModel(model, list, mapAdd, maxMap);
+            msgVO.setType("email");
+            msgVO.setContent(content);
+            result.add(msgVO);
         }
         return result;
+    }
+
+    List<MsgVO> buidSmsMsgVO(Map<Integer, Integer> maxMap,
+                             Map<Integer, Integer> mapAdd,
+                             Map<String, List<WarnNotifierVO>> notifies) {
+        List<MsgVO> result = Lists.newLinkedList();
+        for (String k : notifies.keySet()) {
+            MsgVO msgVO = new MsgVO();
+            SMSContent content = new SMSContent();
+            OpinionMsgModel model = new OpinionMsgModel();
+            content.setTel(k);
+            content.setTemplateCode("SMS_112465642");
+            content.setModel(model);
+            List<WarnNotifierVO> list = notifies.get(k);
+            buildOpinionMsgModel(model, list, mapAdd, maxMap);
+            msgVO.setType("sms");
+            msgVO.setContent(content);
+            result.add(msgVO);
+        }
+        return result;
+    }
+
+    private void buildOpinionMsgModel(OpinionMsgModel model,
+                                      List<WarnNotifierVO> list,
+                                      Map<Integer, Integer> mapAdd,
+                                      Map<Integer, Integer> maxMap) {
+        Integer max = 3;
+        for (WarnNotifierVO p : list) {
+            Integer level = p.getLevel();
+            Integer value = mapAdd.get(level);
+            if(level < max)
+                max = level;
+            if(level == 1)
+                model.setLevelOne(value);
+            else if(level == 2)
+                model.setLevelTwo(value);
+            else if(level == 3)
+                model.setLevelThree(value);
+            model.setUsername(p.getNotifier());
+        }
+        model.setScore(maxMap.get(max).toString());
     }
 
     /**
