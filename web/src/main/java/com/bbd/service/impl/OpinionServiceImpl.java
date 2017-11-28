@@ -283,14 +283,20 @@ public class OpinionServiceImpl implements OpinionService {
     @Override
     public OpinionMsgSend getWarnRemindJson(DateTime lastSendTime) {
 
+        lastSendTime = (lastSendTime == null) ? DateTime.now().plusMonths(-8) : lastSendTime;
+        lastSendTime = DateTime.now().plusMonths(-8);
         List<MsgVO> result = Lists.newLinkedList();
         Date date = new Date();
         OpinionMsgSend msgSend = new OpinionMsgSend();
+        msgSend.setClaTime(date);
+        msgSend.setSendMsg(result);
 
         // step-1：获取该时间段内分级预警增加量，一级每个预警的热度最大值，一级预警通知人
         Integer oneMax = esQueryService.queryMaxHot(lastSendTime, 1);
         Integer twoMax = esQueryService.queryMaxHot(lastSendTime, 2);
         Integer threeMax = esQueryService.queryMaxHot(lastSendTime, 3);
+        if(oneMax == null && twoMax == null && threeMax == null) return msgSend;
+
         Map<Integer, Integer> maxMap = Maps.newHashMap();
         maxMap.put(1, oneMax); maxMap.put(2, twoMax); maxMap.put(1, threeMax);
         Map<Integer, Integer> mapAdd = esQueryService.queryAddWarnCount(lastSendTime);
@@ -309,7 +315,6 @@ public class OpinionServiceImpl implements OpinionService {
         result.addAll(emailMsg);
         result.addAll(smsMsg);
         msgSend.setSendMsg(result);
-        msgSend.setClaTime(date);
         return msgSend;
     }
 
@@ -323,7 +328,7 @@ public class OpinionServiceImpl implements OpinionService {
             EmailContent content = new EmailContent();
             OpinionMsgModel model = new OpinionMsgModel();
             content.setSubject("分级舆情预警");
-            content.setSubject("classify_opinion_warnning");
+            content.setTemplate("classify_opinion_warnning");
             content.setRetry(3);
             content.setTo(k);
             content.setModel(model);
