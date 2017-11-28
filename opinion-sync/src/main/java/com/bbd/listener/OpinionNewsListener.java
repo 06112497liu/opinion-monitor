@@ -16,6 +16,7 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptType;
 import org.slf4j.Logger;
@@ -78,6 +79,7 @@ public class OpinionNewsListener {
         for (OpinionNewsVO vo : vos) {
             String id = vo.getId();
             IndexRequest ir = new IndexRequest(index, type, id);
+            ir.source(JsonUtil.fromJson(vo), XContentType.JSON);
             UpdateRequest ur = new UpdateRequest(index, type, id).upsert(ir);
             Script script = new Script(ScriptType.INLINE, "painless", "ctx.op = 'none'", Maps.newHashMap());
             ur.script(script);

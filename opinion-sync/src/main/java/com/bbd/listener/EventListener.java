@@ -4,21 +4,20 @@
  */
 package com.bbd.listener;
 
-import java.util.Date;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
-
 import com.alibaba.fastjson.JSON;
 import com.bbd.dao.OpinionEventDao;
 import com.bbd.dao.OpinionEventWordsDao;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.domain.OpinionEventWords;
 import com.bbd.domain.OpinionEventWordsExample;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.List;
 
 /** 
  * @author daijinlong 
@@ -27,21 +26,21 @@ import com.bbd.domain.OpinionEventWordsExample;
 @Component
 public class EventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(EventListener.class);
+    private static final Logger  logger = LoggerFactory.getLogger(EventListener.class);
 
     @Autowired
-    private OpinionEventDao opinionEventDao;
+    private OpinionEventDao      opinionEventDao;
     @Autowired
     private OpinionEventWordsDao opinionEventWordsDao;
 
     @KafkaListener(topics = "bbd_event_words", containerFactory = "kafkaListenerContainerFactory")
     public void ListenWords(List<String> records) {
         long start = System.currentTimeMillis();
-        List<OpinionEventWords> opinionEventWordList = JSON.parseArray(records.toString(),OpinionEventWords.class);
+        List<OpinionEventWords> opinionEventWordList = JSON.parseArray(records.toString(), OpinionEventWords.class);
         for (OpinionEventWords opinionEventWord : opinionEventWordList) {
             OpinionEventWordsExample example = new OpinionEventWordsExample();
             example.createCriteria().andEventIdEqualTo(opinionEventWord.getEventId()).andCycleEqualTo(opinionEventWord.getCycle());
-            List<OpinionEventWords>  opinionEventWordsList= opinionEventWordsDao.selectByExample(example);
+            List<OpinionEventWords> opinionEventWordsList = opinionEventWordsDao.selectByExample(example);
             if (opinionEventWordsList != null && opinionEventWordsList.size() > 0) {
                 opinionEventWord.setGmtModified(new Date());
                 opinionEventWordsDao.updateByPrimaryKeySelective(opinionEventWord);
@@ -53,6 +52,7 @@ public class EventListener {
         long end = System.currentTimeMillis();
         logger.info("Process {} success, time used: {}", records.toString(), end - start);
     }
+
     @KafkaListener(topics = "bbd_event_hot", containerFactory = "kafkaListenerContainerFactory")
     public void ListenHot(List<String> records) {
         long start = System.currentTimeMillis();
@@ -64,6 +64,7 @@ public class EventListener {
         long end = System.currentTimeMillis();
         logger.info("Process {}  success, time used: {}", records.toString(), end - start);
     }
+
     @KafkaListener(topics = "kafka_test", containerFactory = "kafkaListenerContainerFactory")
     public void ListenTest(List<String> records) {
         long start = System.currentTimeMillis();

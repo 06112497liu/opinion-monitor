@@ -4,6 +4,8 @@
  */
 package com.bbd.vo;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 /**
  * ES舆情新闻
  * @author tjwang
@@ -11,8 +13,10 @@ package com.bbd.vo;
  */
 public class OpinionNewsVO {
 
+    @JSONField(name = "md5")
     private String  id;
 
+    @JSONField(name = "uuid")
     private String  opinionId;
 
     private String  title;
