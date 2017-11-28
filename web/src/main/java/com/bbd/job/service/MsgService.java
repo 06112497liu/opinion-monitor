@@ -138,9 +138,10 @@ public class MsgService {
             eventMsgModel.setEvent(e.getEventName());
             eventMsgModel.setLevel(String.valueOf(level));
             eventMsgModel.setScore(String.valueOf(e.getHot()));
-            eventMsgModel.setLink("XXXXXXXX（系统PC端舆情事件信息列表地址，登录后直接跳转到列表页");
+            
             eventMsgModel.setUsername(warnNotifier.getNotifier());
             if (isEmail == true && warnNotifier.getEmailNotify() == 1) {
+                eventMsgModel.setLink("XXXXXXXX（系统PC端舆情事件信息列表地址，登录后直接跳转到列表页");
                 EmailContent content = new EmailContent();
                 content.setModel(eventMsgModel);
                 content.setRetry(3);
@@ -150,11 +151,13 @@ public class MsgService {
                 msgVO.setContent(content);
                 msgVO.setType("email");
             } else if (isEmail == false && warnNotifier.getSmsNotify() == 1){
+                eventMsgModel.setLink("XXXXXXXX（系统移动端舆情事件信息列表地址，登录后直接跳转到列表页）");
                 SMSContent content = new SMSContent();
+                content.setModel(eventMsgModel);
                 content.setTel(warnNotifier.getPhone());
                 content.setTemplateCode("SMS_113461205");
                 msgVO.setContent(content);
-                msgVO.setType("email");
+                msgVO.setType("sms");
             }
             msgVOList.add(msgVO);
         }
@@ -167,15 +170,15 @@ public class MsgService {
             if (warnNotifier.getEmailNotify() == 0 && warnNotifier.getSmsNotify() == 0) {
                 continue;
             }
+            MsgVO msgVO = new MsgVO();
+            EventIncMsgModel eventIncMsgModel = new EventIncMsgModel();
+            eventIncMsgModel.setEvent(e.getEventName());
+            eventIncMsgModel.setCount(String.valueOf(count));
+            eventIncMsgModel.setScore(String.valueOf(hot));
+            eventIncMsgModel.setUsername(warnNotifier.getNotifier());
             if (isEmail == true && warnNotifier.getEmailNotify() == 1) {
-                MsgVO msgVO = new MsgVO();
                 EmailContent content = new EmailContent();
-                EventIncMsgModel eventIncMsgModel = new EventIncMsgModel();
-                eventIncMsgModel.setEvent(e.getEventName());
-                eventIncMsgModel.setCount(String.valueOf(count));
-                eventIncMsgModel.setScore(String.valueOf(hot));
                 eventIncMsgModel.setLink("XXXXXXXX（系统PC端舆情事件信息列表地址，登录后直接跳转到列表页）");
-                eventIncMsgModel.setUsername(warnNotifier.getNotifier());
                 content.setModel(eventIncMsgModel);
                 content.setRetry(3);
                 content.setSubject("事件新增观点预警");
@@ -183,10 +186,16 @@ public class MsgService {
                 content.setTemplate("event_opinion_warnning");
                 msgVO.setContent(content);
                 msgVO.setType("email");
-                msgVOList.add(msgVO);
             } else if (isEmail == false && warnNotifier.getSmsNotify() == 1){
-                
+                eventIncMsgModel.setLink("XXXXXXXX（系统移动端舆情事件信息列表地址，登录后直接跳转到列表页）");
+                SMSContent content = new SMSContent();
+                content.setModel(eventIncMsgModel);
+                content.setTel(warnNotifier.getPhone());
+                content.setTemplateCode("SMS_113456211");
+                msgVO.setContent(content);
+                msgVO.setType("sms");
             }
+            msgVOList.add(msgVO);
         }
         return msgVOList;
     }
@@ -249,6 +258,10 @@ public class MsgService {
                 kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件
                 System.out.println("eventNewOpinionKafka......");
             }
+            for (MsgVO msgVO : buildEventNewMsg(e, evtList.size(), op.getHot(), warnNotifierList, false)) {
+                kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送短信
+                System.out.println("eventNewOpinionKafka......");
+            }
         }
         updateMsgRecord(SEND_TYPE_EVENT_NEW, MSG_TYPE_EMAIL, endTime.toDate()); 
         System.out.println("eventNewOpinionKafka over......");
@@ -296,9 +309,10 @@ public class MsgService {
                     kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件
                     System.out.println("eventWholeHotKafka......");
                 }
-               
-                //发送
-                //
+                for (MsgVO msgVO : buildEventWholeMsg(e, level, warnNotifierList, false)) {
+                    kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送短信
+                    System.out.println("eventWholeHotKafka......");
+                }
             }
         }
         updateMsgRecord(SEND_TYPE_EVENT_HOT, MSG_TYPE_EMAIL, now); 
