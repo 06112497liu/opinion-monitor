@@ -35,7 +35,7 @@ import com.bbd.domain.WarnSetting;
 import com.bbd.domain.WarnSettingExample;
 import com.bbd.job.vo.EventIncMsgModel;
 import com.bbd.job.vo.EventMsgModel;
-import com.bbd.job.vo.Content;
+import com.bbd.job.vo.EmailContent;
 import com.bbd.job.vo.MsgVO;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
@@ -134,7 +134,7 @@ public class MsgService {
             }
             if (isEmail == true && warnNotifier.getEmailNotify() == 1) {
                 MsgVO msgVO = new MsgVO();
-                Content content = new Content();
+                EmailContent content = new EmailContent();
                 EventMsgModel eventMsgModel = new EventMsgModel();
                 eventMsgModel.setEvent(e.getEventName());
                 eventMsgModel.setLevel(String.valueOf(level));
@@ -164,7 +164,7 @@ public class MsgService {
             }
             if (isEmail == true && warnNotifier.getEmailNotify() == 1) {
                 MsgVO msgVO = new MsgVO();
-                Content content = new Content();
+                EmailContent content = new EmailContent();
                 EventIncMsgModel eventIncMsgModel = new EventIncMsgModel();
                 eventIncMsgModel.setEvent(e.getEventName());
                 eventIncMsgModel.setCount(String.valueOf(count));

@@ -9,7 +9,7 @@ import com.bbd.dao.WarnNotifierExtDao;
 import com.bbd.domain.WarnSetting;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
-import com.bbd.job.vo.Content;
+import com.bbd.job.vo.EmailContent;
 import com.bbd.job.vo.MsgVO;
 import com.bbd.job.vo.OpinionMsgModel;
 import com.bbd.service.EsQueryService;
@@ -320,7 +320,7 @@ public class OpinionServiceImpl implements OpinionService {
         List<MsgVO> result = Lists.newLinkedList();
         for (String k : notifies.keySet()) {
             MsgVO msgVO = new MsgVO();
-            Content content = new Content();
+            EmailContent content = new EmailContent();
             OpinionMsgModel model = new OpinionMsgModel();
             content.setSubject("分级舆情预警");
             content.setSubject("classify_opinion_warnning");
