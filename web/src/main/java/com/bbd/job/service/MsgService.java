@@ -39,6 +39,8 @@ import com.bbd.job.vo.Content;
 import com.bbd.job.vo.MsgVO;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
+import com.bbd.service.OpinionService;
+import com.bbd.service.vo.OpinionMsgSend;
 import com.bbd.util.JsonUtil;
 
 /** 
@@ -66,6 +68,8 @@ public class MsgService {
     private EsQueryService esQueryService;
     @Autowired
     private EventService eventService;
+    @Autowired
+    private OpinionService opinionService;
     @Autowired  
     private KafkaTemplate<Integer, String> kafkaTemplate;  
     
@@ -255,8 +259,13 @@ public class MsgService {
     }
     
     @Scheduled(cron="0 0 * * * ?")
-    public void opinionKafka() {
-        
+    public void opinionKafka() throws NoSuchFieldException {
+        MsgSendRecord msgSendRecord = getMsgSendRecord(SEND_TYPE_OPINION, MSG_TYPE_EMAIL);
+        OpinionMsgSend opinionMsgSend = opinionService.getWarnRemindJson(new DateTime(msgSendRecord.getSendTime()));
+        for (MsgVO msgVO : opinionMsgSend.getSendMsg()) {
+            kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件
+        }
+        updateMsgRecord(SEND_TYPE_OPINION, MSG_TYPE_EMAIL, opinionMsgSend.getClaTime()); 
     }
     
     @Scheduled(cron="0 0 * * * ?")
