@@ -12,6 +12,7 @@ import com.bbd.exception.CommonErrorCode;
 import com.bbd.job.vo.EmailContent;
 import com.bbd.job.vo.MsgVO;
 import com.bbd.job.vo.OpinionMsgModel;
+import com.bbd.job.vo.SMSContent;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
 import com.bbd.service.OpinionService;
@@ -306,22 +307,21 @@ public class OpinionServiceImpl implements OpinionService {
         Map<String, List<WarnNotifierVO>> emailNotifier = notifies.stream()
                 .filter(p -> p.getEmailNotify() == 1) // 过滤出需要通过邮件发送的
                 .collect(Collectors.groupingBy(WarnNotifierVO::getEmail)); // 以邮箱分组
-        List<MsgVO> emailMsg = buidMsgVO("email", maxMap, mapAdd, emailNotifier);
+        List<MsgVO> emailMsg = buidEmailMsgVO(maxMap, mapAdd, emailNotifier);
         // step-2：短信发送
         Map<String, List<WarnNotifierVO>> smsNotifier = notifies.stream()
                 .filter(p -> p.getSmsNotify() == 1) // 过滤出需要通过短信发送的
                 .collect(Collectors.groupingBy(WarnNotifierVO::getPhone)); // 以电话分组
-        List<MsgVO> smsMsg = buidMsgVO("sms", maxMap, mapAdd, smsNotifier);
+        List<MsgVO> smsMsg = buidSmsMsgVO(maxMap, mapAdd, smsNotifier);
         result.addAll(emailMsg);
         result.addAll(smsMsg);
         msgSend.setSendMsg(result);
         return msgSend;
     }
 
-    List<MsgVO> buidMsgVO(String type,
-                          Map<Integer, Integer> maxMap,
-                          Map<Integer, Integer> mapAdd,
-                          Map<String, List<WarnNotifierVO>> notifies) {
+    List<MsgVO> buidEmailMsgVO(Map<Integer, Integer> maxMap,
+                               Map<Integer, Integer> mapAdd,
+                               Map<String, List<WarnNotifierVO>> notifies) {
         List<MsgVO> result = Lists.newLinkedList();
         for (String k : notifies.keySet()) {
             MsgVO msgVO = new MsgVO();
@@ -333,26 +333,53 @@ public class OpinionServiceImpl implements OpinionService {
             content.setTo(k);
             content.setModel(model);
             List<WarnNotifierVO> list = notifies.get(k);
-            Integer max = 3;
-            for (WarnNotifierVO p : list) {
-                Integer level = p.getLevel();
-                Integer value = mapAdd.get(level);
-                if(level < max)
-                    max = level;
-                if(level == 1)
-                    model.setLevelOne(value);
-                else if(level == 2)
-                    model.setLevelTwo(value);
-                else if(level == 3)
-                    model.setLevelThree(value);
-                model.setUsername(p.getNotifier());
-            }
-            model.setScore(maxMap.get(max).toString());
-            msgVO.setType(type);
+            buildOpinionMsgModel(model, list, mapAdd, maxMap);
+            msgVO.setType("email");
             msgVO.setContent(content);
             result.add(msgVO);
         }
         return result;
+    }
+
+    List<MsgVO> buidSmsMsgVO(Map<Integer, Integer> maxMap,
+                             Map<Integer, Integer> mapAdd,
+                             Map<String, List<WarnNotifierVO>> notifies) {
+        List<MsgVO> result = Lists.newLinkedList();
+        for (String k : notifies.keySet()) {
+            MsgVO msgVO = new MsgVO();
+            SMSContent content = new SMSContent();
+            OpinionMsgModel model = new OpinionMsgModel();
+            content.setTel(k);
+            content.setTemplateCode("SMS_112465642");
+            content.setModel(model);
+            List<WarnNotifierVO> list = notifies.get(k);
+            buildOpinionMsgModel(model, list, mapAdd, maxMap);
+            msgVO.setType("sms");
+            msgVO.setContent(content);
+            result.add(msgVO);
+        }
+        return result;
+    }
+
+    private void buildOpinionMsgModel(OpinionMsgModel model,
+                                      List<WarnNotifierVO> list,
+                                      Map<Integer, Integer> mapAdd,
+                                      Map<Integer, Integer> maxMap) {
+        Integer max = 3;
+        for (WarnNotifierVO p : list) {
+            Integer level = p.getLevel();
+            Integer value = mapAdd.get(level);
+            if(level < max)
+                max = level;
+            if(level == 1)
+                model.setLevelOne(value);
+            else if(level == 2)
+                model.setLevelTwo(value);
+            else if(level == 3)
+                model.setLevelThree(value);
+            model.setUsername(p.getNotifier());
+        }
+        model.setScore(maxMap.get(max).toString());
     }
 
     /**
