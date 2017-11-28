@@ -261,7 +261,7 @@ public class MsgService {
     @Scheduled(cron="0 0 * * * ?")
     public void opinionKafka() throws NoSuchFieldException {
         MsgSendRecord msgSendRecord = getMsgSendRecord(SEND_TYPE_OPINION, MSG_TYPE_EMAIL);
-        OpinionMsgSend opinionMsgSend = opinionService.getWarnRemindJson(new DateTime(msgSendRecord.getSendTime()));
+        OpinionMsgSend opinionMsgSend = opinionService.getWarnRemindJson(msgSendRecord != null ? new DateTime(msgSendRecord.getSendTime()) : null);
         for (MsgVO msgVO : opinionMsgSend.getSendMsg()) {
             kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件
         }
