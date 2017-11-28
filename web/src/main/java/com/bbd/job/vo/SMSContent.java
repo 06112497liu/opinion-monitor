@@ -15,7 +15,7 @@ import java.util.List;
  * @author tjwang
  * @version $Id: MsgVO.java, v 0.1 2017/11/16 0016 16:26 tjwang Exp $
  */
-public class SMSContent implements Serializable{
+public class SMSContent extends Content implements Serializable{
 
     private String templateCode;
 

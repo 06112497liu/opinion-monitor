@@ -37,6 +37,7 @@ import com.bbd.job.vo.EventIncMsgModel;
 import com.bbd.job.vo.EventMsgModel;
 import com.bbd.job.vo.EmailContent;
 import com.bbd.job.vo.MsgVO;
+import com.bbd.job.vo.SMSContent;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
 import com.bbd.service.OpinionService;
@@ -132,15 +133,15 @@ public class MsgService {
             if (warnNotifier.getEmailNotify() == 0 && warnNotifier.getSmsNotify() == 0) {
                 continue;
             }
+            MsgVO msgVO = new MsgVO();
+            EventMsgModel eventMsgModel = new EventMsgModel();
+            eventMsgModel.setEvent(e.getEventName());
+            eventMsgModel.setLevel(String.valueOf(level));
+            eventMsgModel.setScore(String.valueOf(e.getHot()));
+            eventMsgModel.setLink("XXXXXXXX（系统PC端舆情事件信息列表地址，登录后直接跳转到列表页");
+            eventMsgModel.setUsername(warnNotifier.getNotifier());
             if (isEmail == true && warnNotifier.getEmailNotify() == 1) {
-                MsgVO msgVO = new MsgVO();
                 EmailContent content = new EmailContent();
-                EventMsgModel eventMsgModel = new EventMsgModel();
-                eventMsgModel.setEvent(e.getEventName());
-                eventMsgModel.setLevel(String.valueOf(level));
-                eventMsgModel.setScore(String.valueOf(e.getHot()));
-                eventMsgModel.setLink("XXXXXXXX（系统PC端舆情事件信息列表地址，登录后直接跳转到列表页");
-                eventMsgModel.setUsername(warnNotifier.getNotifier());
                 content.setModel(eventMsgModel);
                 content.setRetry(3);
                 content.setSubject("事件总体热度预警");
@@ -148,10 +149,14 @@ public class MsgService {
                 content.setTemplate("event_overall_heatLevel");
                 msgVO.setContent(content);
                 msgVO.setType("email");
-                msgVOList.add(msgVO);
             } else if (isEmail == false && warnNotifier.getSmsNotify() == 1){
-                
+                SMSContent content = new SMSContent();
+                content.setTel(warnNotifier.getPhone());
+                content.setTemplateCode("SMS_113461205");
+                msgVO.setContent(content);
+                msgVO.setType("email");
             }
+            msgVOList.add(msgVO);
         }
         return msgVOList;
     }
