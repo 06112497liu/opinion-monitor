@@ -1,6 +1,5 @@
 package com.bbd.service;
 
-import com.bbd.param.OpinionInfo;
 import com.bbd.service.vo.OpinionMsgSend;
 import org.joda.time.DateTime;
 import org.junit.Test;

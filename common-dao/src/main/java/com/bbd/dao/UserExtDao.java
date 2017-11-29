@@ -11,6 +11,8 @@ import java.util.List;
 public interface UserExtDao {
     /**
      * 用户列表
+     * @param region
+     * @param pb
      * @return
      */
     List<UserListVO> queryUserList(@Param("region") String region, PageBounds pb);

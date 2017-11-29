@@ -18,7 +18,10 @@ import com.bbd.service.vo.OpinionTaskListVO;
 import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
@@ -27,10 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -140,9 +140,14 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         checkPermission(param.getUuid());
 
         // step-2：如果是普通用户，是不能转发给管理员
-        Optional<User> userOpt = userService.queryUserByUserame(param.getUsername());
+        String str = param.getUsername();
+        Splitter s = Splitter.on("-").omitEmptyStrings().trimResults();
+        List<String> list = Lists.newArrayList(s.split(str));
+        String username = list.get(list.size()-1);
+
+        Optional<User> userOpt = userService.queryUserByUserame(username);
         if (!userOpt.isPresent())
-            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "转发用户不存在");
         User opOwner = userOpt.get();
         checkOpinionTranferConfine(opOwner);
 

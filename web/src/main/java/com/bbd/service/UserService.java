@@ -100,6 +100,16 @@ public class UserService {
     }
 
     /**
+     * 通过转发用户名查询用户信息
+     * @param list
+     * @return
+     */
+    public Optional<User> queryUserByTransferUserame(List<String> list) {
+        User user = userExtDao.queryByTransferUsername(list);
+        return Optional.fromNullable(user);
+    }
+
+    /**
      * 获取登陆用户id
      * @return
      */
