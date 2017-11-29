@@ -13,13 +13,13 @@ import com.alibaba.fastjson.annotation.JSONField;
  */
 public class OpinionMsgModel extends MsgModel {
 
-    @JSONField(name = "level_one")
+    @JSONField(name = "levelone")
     private Integer levelOne = 0;
 
-    @JSONField(name = "level_two")
+    @JSONField(name = "leveltwo")
     private Integer levelTwo = 0;
 
-    @JSONField(name = "level_three")
+    @JSONField(name = "levelthree")
     private Integer levelThree = 0;
 
     public Integer getLevelOne() {

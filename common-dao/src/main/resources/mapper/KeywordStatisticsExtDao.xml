@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbd.dao.KeywordStatisticsExtDao">
+  <resultMap id="BaseResultMap" type="com.bbd.domain.KeywordStatistics">
+    <result column="id" jdbcType="BIGINT" property="id" />
+    <result column="keyword" jdbcType="VARCHAR" property="keyword" />
+    <result column="count" jdbcType="BIGINT" property="count" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+  </resultMap>
+
+  <insert id="batchInsert" parameterType="list">
+    INSERT INTO
+      bbd_keyword_statistics (keyword, count, gmt_create, gmt_modified)
+    VALUES
+    <foreach collection="list" item="item" separator=",">
+      (#{item.keyword}, #{item.count}, now(), now())
+    </foreach>
+  </insert>
+  <delete id="batchDel">
+    DELETE FROM bbd_keyword_statistics
+  </delete>
+
+</mapper>

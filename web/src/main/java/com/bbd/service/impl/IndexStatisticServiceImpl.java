@@ -4,7 +4,10 @@
  */
 package com.bbd.service.impl;
 
+import com.bbd.dao.KeywordStatisticsDao;
 import com.bbd.dao.OpinionEventDao;
+import com.bbd.domain.KeywordStatistics;
+import com.bbd.domain.KeywordStatisticsExample;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.domain.OpinionEventExample;
 import com.bbd.enums.WebsiteEnum;
@@ -49,6 +52,9 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
 
     @Autowired
     private OpinionEventDao eventDao;
+
+    @Autowired
+    private KeywordStatisticsDao keywordStatisticsDao;
 
     @Override
     public OpinionCountStatVO getOpinionCountStatistic(Integer timeSpan) throws NoSuchFieldException, IllegalAccessException {
@@ -115,8 +121,18 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
      */
     @Override
     public List<KeyValueVO> getKeywordsTopTen() {
-        List<KeyValueVO> list = esQueryService.getKeywordsTopTen();
-        return list;
+        KeywordStatisticsExample example = new KeywordStatisticsExample();
+        example.setOrderByClause("count desc");
+        List<KeywordStatistics> list = keywordStatisticsDao.selectByExample(example);
+        List<KeyValueVO> rs = Lists.newArrayList();
+        for(KeywordStatistics k : list) {
+            KeyValueVO vo = new KeyValueVO();
+            vo.setName(k.getKeyword());
+            vo.setKey(k.getKeyword());
+            vo.setValue(k.getCount());
+            rs.add(vo);
+        }
+        return rs;
     }
 
     /**

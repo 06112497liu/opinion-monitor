@@ -92,12 +92,6 @@ public interface EsQueryService {
     List<EventEsVO> queryEventNewInfoTotal(OpinionEvent opinionEvent, DateTime startTime, DateTime endTime);
 
     /**
-     * 关键词排行TOP10 - 首页
-     * @return
-     */
-    List<KeyValueVO> getKeywordsTopTen();
-
-    /**
      * 舆情数据库近12个月累计增量
      * @return
      */

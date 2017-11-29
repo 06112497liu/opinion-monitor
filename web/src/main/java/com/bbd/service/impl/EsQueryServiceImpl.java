@@ -327,20 +327,6 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     /**
-     * 关键词排行TOP10 - 首页
-     * @return
-     */
-    public List<KeyValueVO> getKeywordsTopTen() {
-        String aggName = "top_kws";
-        TransportClient client = esUtil.getClient();
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT)
-                .setQuery(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(DateTime.now().withDayOfMonth(1).withTimeAtStartOfDay().toString("yyyy-MM-dd HH:mm:ss")))
-                .addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.keywordField).size(10).order(Terms.Order.count(false)))
-                .setSize(0).execute().actionGet();
-        return buildTermLists(resp, aggName);
-    }
-
-    /**
      * 舆情数据库近12个月累计增量
      * @return
      */

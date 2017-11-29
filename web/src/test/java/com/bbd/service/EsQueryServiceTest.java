@@ -34,12 +34,6 @@ public class EsQueryServiceTest extends BaseServiceTest {
     }
 
     @Test
-    public void testGetKeywordsTopTen() {
-        List<KeyValueVO> r = esQueryService.getKeywordsTopTen();
-        assertTrue(r.size() >= 0);
-    }
-
-    @Test
     public void testGetEventSpreadChannelInfo() {
         List<KeyValueVO> r = esQueryService.getOpinionMediaSpread();
         assertTrue(r.size() >= 0);
