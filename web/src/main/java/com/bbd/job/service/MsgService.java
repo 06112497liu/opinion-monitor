@@ -55,6 +55,11 @@ public class MsgService {
     private static final int SEND_TYPE_EVENT_HOT = 3;
     private static final int MSG_TYPE_SMS = 1;
     private static final int MSG_TYPE_EMAIL = 2;
+    
+    private static final int WARN_EVENT_TYPE_NEW = 1;
+    private static final int WARN_EVENT_TYPE_WHOLE = 2;
+    private static final int WARN_EVENT_TARGET_TYPE = 2;
+    
     @Autowired
     OpinionEventDao opinionEventDao;
     @Autowired
@@ -74,19 +79,27 @@ public class MsgService {
     @Autowired  
     private KafkaTemplate<Integer, String> kafkaTemplate;  
     
+    
+    /** 获取事件预警设置 
+     * @param e
+     * @param type
+     * @return 
+     */
     public WarnSetting getLevel(OpinionEvent e, int type){
         WarnSettingExample warnSettingExample = new WarnSettingExample();
         List<WarnSetting> eventWarnList = null;
-        if (type == 1) {
-            warnSettingExample.createCriteria().andEventIdEqualTo(e.getId()).andTypeEqualTo(1).andTargetTypeEqualTo(2);
+        if (type == WARN_EVENT_TYPE_NEW) {//事件新增
+            warnSettingExample.createCriteria().andEventIdEqualTo(e.getId()).andTypeEqualTo(WARN_EVENT_TYPE_NEW).andTargetTypeEqualTo(WARN_EVENT_TARGET_TYPE);
              eventWarnList = warnSettingDao.selectByExample(warnSettingExample);
-        } else {
+        } else if (type == WARN_EVENT_TYPE_WHOLE){//事件总体
             if (e.getHot() == null) {
                 return null;
             }
-            warnSettingExample.createCriteria().andEventIdEqualTo(e.getId()).andTypeEqualTo(2).andTargetTypeEqualTo(2)
+            warnSettingExample.createCriteria().andEventIdEqualTo(e.getId()).andTypeEqualTo(WARN_EVENT_TYPE_WHOLE).andTargetTypeEqualTo(WARN_EVENT_TARGET_TYPE)
             .andMinLessThanOrEqualTo(e.getHot()).andMaxGreaterThanOrEqualTo(e.getHot());
              eventWarnList = warnSettingDao.selectByExample(warnSettingExample);
+        } else {
+            return null;
         }
         warnSettingExample.clear();
         if (eventWarnList == null || eventWarnList.size() == 0){
@@ -97,6 +110,13 @@ public class MsgService {
        
     }
     
+    
+    /**判断事件总体热度级别是否改变  
+     * @param e
+     * @param level
+     * @param now
+     * @return 
+     */
     public boolean changeLevel(OpinionEvent e, int level, Date now) {
         OpinionEventLevelChangeExample  levelChangeExample = new OpinionEventLevelChangeExample();
         levelChangeExample.createCriteria().andEventIdEqualTo(e.getId());
@@ -124,12 +144,25 @@ public class MsgService {
         return false;
     }
     
+    
+    /**获取通知人  
+     * @param warnSetting
+     * @return 
+     */
     public List<WarnNotifier> getNotifiers (WarnSetting warnSetting) {
         WarnNotifierExample example = new WarnNotifierExample();
         example.createCriteria().andSettingIdEqualTo(warnSetting.getId());
         return warnNotifierDao.selectByExample(example);
     }
     
+    
+    /**构造事件总体热度消息  
+     * @param e
+     * @param level
+     * @param warnNotifierList
+     * @param isEmail
+     * @return 
+     */
     public List<MsgVO> buildEventWholeMsg(OpinionEvent e, Integer level, List<WarnNotifier> warnNotifierList, boolean isEmail) {
         List<MsgVO> msgVOList = new ArrayList<MsgVO>();
         for (WarnNotifier warnNotifier : warnNotifierList) {
@@ -154,7 +187,7 @@ public class MsgService {
                 msgVO.setContent(content);
                 msgVO.setType("email");
             } else if (isEmail == false && warnNotifier.getSmsNotify() == 1){
-                eventMsgModel.setLink("XXXXXXXX（系统移动端舆情事件信息列表地址，登录后直接跳转到列表页）");
+                //eventMsgModel.setLink("XXXXXXXX（系统移动端舆情事件信息列表地址，登录后直接跳转到列表页）");
                 SMSContent content = new SMSContent();
                 content.setModel(eventMsgModel);
                 content.setTel(warnNotifier.getPhone());
@@ -167,6 +200,15 @@ public class MsgService {
         return msgVOList;
     }
     
+    
+    /**构造事件新增舆情消息    
+     * @param e
+     * @param count
+     * @param hot
+     * @param warnNotifierList
+     * @param isEmail
+     * @return 
+     */
     public List<MsgVO> buildEventNewMsg(OpinionEvent e, Integer count, Integer hot, List<WarnNotifier> warnNotifierList, boolean isEmail) {
         List<MsgVO> msgVOList = new ArrayList<MsgVO>();
         for (WarnNotifier warnNotifier : warnNotifierList) {
@@ -190,7 +232,7 @@ public class MsgService {
                 msgVO.setContent(content);
                 msgVO.setType("email");
             } else if (isEmail == false && warnNotifier.getSmsNotify() == 1){
-                eventIncMsgModel.setLink("XXXXXXXX（系统移动端舆情事件信息列表地址，登录后直接跳转到列表页）");
+                //eventIncMsgModel.setLink("XXXXXXXX（系统移动端舆情事件信息列表地址，登录后直接跳转到列表页）");
                 SMSContent content = new SMSContent();
                 content.setModel(eventIncMsgModel);
                 content.setTel(warnNotifier.getPhone());
@@ -203,6 +245,12 @@ public class MsgService {
         return msgVOList;
     }
     
+    
+    /**更新消息发送记录  
+     * @param sendType
+     * @param msgType
+     * @param sendTime 
+     */
     public void updateMsgRecord(int sendType, int msgType, Date sendTime) {
         MsgSendRecord msgSendRecord = getMsgSendRecord(sendType, msgType); 
         if (msgSendRecord != null ) {
@@ -218,6 +266,12 @@ public class MsgService {
         }
     }
     
+    
+    /**获取消息记录  
+     * @param sendType
+     * @param msgType
+     * @return 
+     */
     public MsgSendRecord getMsgSendRecord(int sendType, int msgType){
         MsgSendRecordExample msgExample = new MsgSendRecordExample();
         msgExample.createCriteria().andSendTypeEqualTo(sendType).andMsgTypeEqualTo(msgType);
@@ -229,21 +283,26 @@ public class MsgService {
         }
     }
     
-    
+    /**获取正在监测的事件列表  
+     * @return 
+     */
     public List<OpinionEvent> getEventList() {
         OpinionEventExample example = new OpinionEventExample();
         example.createCriteria().andIsDeleteEqualTo((byte)0).andFileReasonIsNull();
         return opinionEventDao.selectByExample(example);
     }
     
+    
+    /**事件新增舆情定时任务   
+     */
     @Scheduled(cron="0 30 * * * ?")
     public void eventNewOpinionKafka(){
         //事件热点舆情变化发送至kafka
         List<OpinionEvent> opinionEventList = getEventList();
-        MsgSendRecord msgSendRecord = getMsgSendRecord(2, 2);
+        MsgSendRecord msgSendRecord = getMsgSendRecord(SEND_TYPE_EVENT_NEW, MSG_TYPE_EMAIL);
         DateTime startTime = null;
         if (msgSendRecord != null) {
-            startTime = new DateTime(getMsgSendRecord(2, 2).getSendTime());
+            startTime = new DateTime(msgSendRecord.getSendTime());
         }
         DateTime endTime = new DateTime();
         for (OpinionEvent e : opinionEventList) {
@@ -252,22 +311,20 @@ public class MsgService {
                 continue;
             }
             OpinionEsVO op = esQueryService.getMaxOpinionByUUIDs(buildUids(evtList));
-            WarnSetting warnSetting = getLevel(e, 1);
+            WarnSetting warnSetting = getLevel(e, WARN_EVENT_TYPE_NEW);
             if (warnSetting == null) {
                 continue;
             }
             List<WarnNotifier> warnNotifierList= getNotifiers(warnSetting);
             for (MsgVO msgVO : buildEventNewMsg(e, evtList.size(), op.getHot(), warnNotifierList, true)) {
                 kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件
-                System.out.println("eventNewOpinionKafka......");
             }
             for (MsgVO msgVO : buildEventNewMsg(e, evtList.size(), op.getHot(), warnNotifierList, false)) {
                 kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送短信
-                System.out.println("eventNewOpinionKafka......");
             }
         }
+        //由于同一批短信和邮件发送send_time相同，故bbd_msg_send_record区分msg_type没有意义，用同一条记录即可
         updateMsgRecord(SEND_TYPE_EVENT_NEW, MSG_TYPE_EMAIL, endTime.toDate()); 
-        System.out.println("eventNewOpinionKafka over......");
     }
     
     
@@ -279,25 +336,31 @@ public class MsgService {
         return uids;
     }
     
+    
+    /**舆情定时任务  
+     * @throws NoSuchFieldException 
+     */
     @Scheduled(cron="0 0 * * * ?")
     public void opinionKafka() throws NoSuchFieldException {
         MsgSendRecord msgSendRecord = getMsgSendRecord(SEND_TYPE_OPINION, MSG_TYPE_EMAIL);
         OpinionMsgSend opinionMsgSend = opinionService.getWarnRemindJson(msgSendRecord != null ? new DateTime(msgSendRecord.getSendTime()) : null);
         for (MsgVO msgVO : opinionMsgSend.getSendMsg()) {
-            kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件
+            kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件和短信
         }
         updateMsgRecord(SEND_TYPE_OPINION, MSG_TYPE_EMAIL, opinionMsgSend.getClaTime()); 
     }
     
+    
+    /**事件总体热度级别变化定任务   
+     */
     @Scheduled(cron="0 30 * * * ?")
     public void eventWholeHotKafka() {
-        
         //事件总体热度级别变化发送至kafka
         List<OpinionEvent> opinionEventList = getEventList();
         Integer level;
         Date now = new Date();
         for (OpinionEvent e : opinionEventList) {
-            WarnSetting warnSetting = getLevel(e, 2);
+            WarnSetting warnSetting = getLevel(e, WARN_EVENT_TYPE_WHOLE);
             if (warnSetting == null) {
                 continue;
             }
@@ -310,16 +373,14 @@ public class MsgService {
                 List<WarnNotifier> warnNotifierList= getNotifiers(warnSetting);
                 for (MsgVO msgVO : buildEventWholeMsg(e, level, warnNotifierList, true)) {
                     kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件
-                    System.out.println("eventWholeHotKafka......");
                 }
                 for (MsgVO msgVO : buildEventWholeMsg(e, level, warnNotifierList, false)) {
                     kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送短信
-                    System.out.println("eventWholeHotKafka......");
                 }
             }
         }
-        updateMsgRecord(SEND_TYPE_EVENT_HOT, MSG_TYPE_EMAIL, now); 
-        System.out.println("eventWholeHotKafka over......");
+        //由于同一批短信和邮件发送send_time相同，故bbd_msg_send_record区分msg_type没有意义，用同一条记录即可
+        updateMsgRecord(SEND_TYPE_EVENT_HOT, MSG_TYPE_EMAIL, now);
     }
 }
 
