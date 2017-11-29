@@ -1,5 +1,7 @@
 package com.bbd.controller;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.bbd.RestResult;
 import com.bbd.domain.MonitorKeywords;
 import com.bbd.exception.CommonErrorCode;
@@ -67,7 +69,10 @@ public class SystemSettingController {
 
     @ApiOperation(value = "创建或修改通知人信息", httpMethod = "POST")
     @RequestMapping(value = "notifier/operate", method = RequestMethod.POST)
-    public RestResult operateNotifier(@RequestBody @ApiParam(name = "通知人信息", value = "传入JSON")  List<WarnNotifierParam> list) {
+    public RestResult operateNotifier(@ApiParam(name = "通知人信息", value = "传入JSON") @RequestBody String data) {
+        JSONObject obj = (JSONObject) JSONObject.parse(data);
+        String jsonArr = obj.getString("data");
+        List<WarnNotifierParam> list = JSONArray.parseArray(jsonArr, WarnNotifierParam.class);
         for (WarnNotifierParam w : list) {
             w.validate();
         }
