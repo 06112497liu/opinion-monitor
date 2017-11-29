@@ -284,8 +284,7 @@ public class OpinionServiceImpl implements OpinionService {
     @Override
     public OpinionMsgSend getWarnRemindJson(DateTime lastSendTime) {
 
-        lastSendTime = (lastSendTime == null) ? DateTime.now().plusMonths(-8) : lastSendTime;
-        lastSendTime = DateTime.now().plusMonths(-8);
+        lastSendTime = (lastSendTime == null) ? DateTime.now().plusHours(-1) : lastSendTime;
         List<MsgVO> result = Lists.newLinkedList();
         Date date = new Date();
         OpinionMsgSend msgSend = new OpinionMsgSend();

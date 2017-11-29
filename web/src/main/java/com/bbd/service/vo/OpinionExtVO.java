@@ -1,9 +1,5 @@
 package com.bbd.service.vo;
 
-import com.bbd.domain.SimiliarNews;
-
-import java.util.List;
-
 /**
  * @author Liuweibo
  * @version Id: OpinionExtVo.java, v0.1 2017/11/1 Liuweibo Exp $$
