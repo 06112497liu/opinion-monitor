@@ -5,7 +5,10 @@ import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.bean.WarnNotifierVO;
 import com.bbd.constant.EsConstant;
+import com.bbd.dao.SearchHistoryDao;
 import com.bbd.dao.WarnNotifierExtDao;
+import com.bbd.domain.SearchHistory;
+import com.bbd.domain.SearchHistoryExample;
 import com.bbd.domain.WarnSetting;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
@@ -19,7 +22,10 @@ import com.bbd.service.OpinionService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
-import com.bbd.util.*;
+import com.bbd.util.BeanMapperUtil;
+import com.bbd.util.DateUtil;
+import com.bbd.util.StringUtils;
+import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
@@ -32,7 +38,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -62,6 +67,9 @@ public class OpinionServiceImpl implements OpinionService {
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private SearchHistoryDao searchHistoryDao;
+
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
@@ -83,6 +91,7 @@ public class OpinionServiceImpl implements OpinionService {
 
     /**
      * 预警舆情列表
+     *
      * @param timeSpan
      * @param emotion
      * @param sourceType
@@ -115,6 +124,7 @@ public class OpinionServiceImpl implements OpinionService {
 
     /**
      * 热点舆情top100
+     *
      * @param timeSpan
      * @param emotion
      * @param pb
@@ -131,11 +141,12 @@ public class OpinionServiceImpl implements OpinionService {
         // step-2：代码分页
         List<OpinionVO> allOpinions = BeanMapperUtil.mapList(esOpinons, OpinionVO.class);
 
-        int firstIndex = pb.getOffset(); int toIndex = pb.getLimit() * pb.getPage();
-        if(toIndex > allOpinions.size()) {
+        int firstIndex = pb.getOffset();
+        int toIndex = pb.getLimit() * pb.getPage();
+        if (toIndex > allOpinions.size()) {
             toIndex = allOpinions.size();
         }
-        if(firstIndex > toIndex) {
+        if (firstIndex > toIndex) {
             firstIndex = 0;
             pb.setPage(1);
         }
@@ -152,6 +163,7 @@ public class OpinionServiceImpl implements OpinionService {
 
     /**
      * 热点舆情模糊查询
+     *
      * @param keyword
      * @return
      */
@@ -172,9 +184,7 @@ public class OpinionServiceImpl implements OpinionService {
     @Override
     public Map<String, Object> getHistoryWarnOpinionList(Date startTime, Date endTime, Integer emotion, Integer mediaType, PageBounds pb) {
         DateTime start = new DateTime(startTime);
-        DateTime endTemp = new DateTime(endTime);
-        int year = endTemp.getYear(); int month = endTemp.getMonthOfYear(); int day = endTemp.getDayOfMonth();
-        DateTime end = new DateTime(year, month, day, 23, 59, 59);
+        DateTime end = new DateTime(endTime).plusMonths(1).plusMillis(-1);
 
         // step-1：查询es
         OpinionEsSearchVO esResult = esQueryService.queryHistoryOpinions(start, end, emotion, mediaType, pb);
@@ -189,7 +199,7 @@ public class OpinionServiceImpl implements OpinionService {
         PageList p = PageListHelper.create(opinions, paginator);
         Map<String, Object> map = Maps.newHashMap();
         map.put("opinionsList", p);
-            // 媒体类型中文描述转化
+        // 媒体类型中文描述转化
         List<KeyValueVO> mediaTypeList = esResult.getMediaTypeStats();
         List<KeyValueVO> fullMediaTypeList = eventService.calAllMedia(mediaTypeList);
         map.put("mediaTypeCount", fullMediaTypeList);
@@ -200,6 +210,7 @@ public class OpinionServiceImpl implements OpinionService {
 
     /**
      * 舆情详情
+     *
      * @param uuid
      * @return
      */
@@ -216,25 +227,54 @@ public class OpinionServiceImpl implements OpinionService {
 
     /**
      * 历史关键词搜索查询
+     *
      * @return
      */
     @Override
     public List<String> getHistoryWordSearch() {
-        ListOperations listOperation = redisTemplate.opsForList();
         UserInfo user = UserContext.getUser();
-        if(Objects.isNull(user)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
-        List list = listOperation.range("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), 0, 9);
-        return list;
+        if (Objects.isNull(user)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
+        long userId = user.getId();
+        SearchHistoryExample example = new SearchHistoryExample();
+        example.createCriteria().andUserIdEqualTo(userId);
+        List<SearchHistory> list = searchHistoryDao.selectByExample(example);
+        String text = "";
+        if(!list.isEmpty())
+            text = list.get(0).getKeywordStr();
+        List<String> rs = StringUtils.generateList(text, ",");
+        return rs;
     }
 
     // 保存历史搜索关键词
     private void saveKeyword(String keyword) {
-        ListOperations listOperation = redisTemplate.opsForList();
         UserInfo user = UserContext.getUser();
-        if(Objects.isNull(user)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
-        List list = listOperation.range("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), 0, 9);
-        if(!StringUtils.isEmpty(keyword) && !list.contains(keyword))
-            listOperation.leftPush("com.bbd.service.impl.OpinionServiceImpl.getHistoryWordSearch->" + UserContext.getUser().getUsername(), keyword);
+        if (Objects.isNull(user)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "未登录");
+        Long userId = user.getId();
+        SearchHistoryExample example = new SearchHistoryExample();
+        example.createCriteria().andUserIdEqualTo(userId);
+        List<SearchHistory> list = searchHistoryDao.selectByExample(example);
+        String s = "";
+        if(!list.isEmpty())
+            s = list.get(0).getKeywordStr();
+        List<String> keyList = StringUtils.generateList(s, ",");
+        boolean flag = keyList.contains(keyword);
+        int len = keyList.size();
+        if (len>0) {
+            if(!flag) {
+                if(len>9) keyList.remove(len-1);
+            } else {
+                keyList.remove(keyword);
+            }
+            keyList.add(0, keyword);
+            String str = StringUtils.generateStr(keyList, ",");
+            SearchHistory searchHistory = new SearchHistory();
+            searchHistory.setUserId(userId); searchHistory.setKeywordStr(str); searchHistory.setGmtModified(new Date());
+            searchHistoryDao.updateByExampleSelective(searchHistory, example);
+        } else {
+            SearchHistory searchHistory = new SearchHistory();
+            searchHistory.setGmtCreate(new Date()); searchHistory.setUserId(userId); searchHistory.setKeywordStr(keyword);
+            searchHistoryDao.insertSelective(searchHistory);
+        }
     }
 
     @Override
@@ -245,6 +285,7 @@ public class OpinionServiceImpl implements OpinionService {
 
     /**
      * 获取舆情热度走势
+     *
      * @param uuid
      * @param timeSpan
      * @return
@@ -256,7 +297,7 @@ public class OpinionServiceImpl implements OpinionService {
 
         // 根据横坐标去重
         Set<OpinionHotEsVO> set;
-        if(timeSpan == 1)
+        if (timeSpan == 1)
             set = new TreeSet<>(Comparator.comparing(o -> new DateTime(o.getHotTime()).toString("yyyy-MM-dd HH:00:00")));
         else
             set = new TreeSet<>(Comparator.comparing(o -> new DateTime(o.getHotTime()).toString("yyyy-MM-dd")));
@@ -279,6 +320,7 @@ public class OpinionServiceImpl implements OpinionService {
 
     /**
      * 获取短信或邮件提醒的json字符串
+     *
      * @param lastSendTime
      */
     @Override
@@ -295,10 +337,12 @@ public class OpinionServiceImpl implements OpinionService {
         Integer oneMax = esQueryService.queryMaxHot(lastSendTime, 1);
         Integer twoMax = esQueryService.queryMaxHot(lastSendTime, 2);
         Integer threeMax = esQueryService.queryMaxHot(lastSendTime, 3);
-        if(oneMax == null && twoMax == null && threeMax == null) return msgSend;
+        if (oneMax == null && twoMax == null && threeMax == null) return msgSend;
 
         Map<Integer, Integer> maxMap = Maps.newHashMap();
-        maxMap.put(1, oneMax); maxMap.put(2, twoMax); maxMap.put(1, threeMax);
+        maxMap.put(1, oneMax);
+        maxMap.put(2, twoMax);
+        maxMap.put(1, threeMax);
         Map<Integer, Integer> mapAdd = esQueryService.queryAddWarnCount(lastSendTime);
         List<WarnNotifierVO> notifies = notifierExtDao.queryNotifierList(3);
 
@@ -368,13 +412,13 @@ public class OpinionServiceImpl implements OpinionService {
         for (WarnNotifierVO p : list) {
             Integer level = p.getLevel();
             Integer value = mapAdd.get(level);
-            if(level < max)
+            if (level < max)
                 max = level;
-            if(level == 1)
+            if (level == 1)
                 model.setLevelOne(value);
-            else if(level == 2)
+            else if (level == 2)
                 model.setLevelTwo(value);
-            else if(level == 3)
+            else if (level == 3)
                 model.setLevelThree(value);
             model.setUsername(p.getNotifier());
         }
@@ -383,6 +427,7 @@ public class OpinionServiceImpl implements OpinionService {
 
     /**
      * 历史预警舆情详情
+     *
      * @param uuid
      */
     @Override

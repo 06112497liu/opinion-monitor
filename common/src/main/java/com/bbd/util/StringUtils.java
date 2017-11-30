@@ -3,12 +3,12 @@ package com.bbd.util;
 
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import org.elasticsearch.common.inject.internal.Join;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -423,5 +423,30 @@ public class StringUtils {
             }
         }
         return result;
+    }
+
+    /**
+     * 拼凑字符串
+     * @param list string集合
+     * @param separator 分隔符
+     * @return
+     */
+    public static String generateStr(List<String> list, String separator) {
+        Joiner joiner = Joiner.on(separator).skipNulls();
+        String rs = joiner.join(list);
+        return rs;
+    }
+
+    /**
+     * 将字符串分割成集合
+     * @param text
+     * @param separator
+     * @return
+     */
+    public static List<String> generateList(String text, String separator) {
+        Splitter splitter = Splitter.on(separator).omitEmptyStrings().trimResults();
+        Iterable<String> it = splitter.split(text);
+        List<String> rs = Lists.newArrayList(it);
+        return rs;
     }
 }

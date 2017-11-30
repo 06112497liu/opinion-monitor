@@ -400,7 +400,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-2：构建es查询条件
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
         query.mustNot(QueryBuilders.existsQuery(EsConstant.opStatusField)); // 必须是未进入舆情任务中的舆情
         if (emotion != null)
