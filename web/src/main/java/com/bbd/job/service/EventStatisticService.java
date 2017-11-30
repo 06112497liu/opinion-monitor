@@ -68,6 +68,9 @@ public class EventStatisticService {
         List<OpinionEventTrendStatistic>  records = new ArrayList<OpinionEventTrendStatistic>();
         for (OpinionEvent e : opinionEvents) {
             OpinionEsVO vo = esQueryService.queryEventMaxOpinion(e.getId());
+            if (vo == null) {
+                continue;
+            }
             OpinionEventTrendStatisticExample expl = new OpinionEventTrendStatisticExample();
             expl.setOrderByClause("gmt_create DESC");
             expl.createCriteria().andEventIdEqualTo(e.getId());

@@ -231,7 +231,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         if (opList != null && opList.size() > 0) {
             return opList.get(0);
         } else {
-            return new OpinionEsVO();
+            return null;
         }
     }
 
