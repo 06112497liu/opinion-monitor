@@ -27,6 +27,8 @@ public class EsConstant {
 
     public static final String OPINION_UUID                   = "uuid";
     public static final String OPINION_HOT_PROP               = "hot";
+    public static final String OPINION_OPSTATUS_PROP          = "opStatus";
+
     public static final String OPINION_FIRST_WARN_TIME        = "warnTime.firstWarnTime";
     public static final String OPINION_FIRST_WARN_TIME_ONE    = "warnTime.firstWarnTimeOne";
     public static final String OPINION_FIRST_WARN_TIME_TWO    = "warnTime.firstWarnTimeTwo";

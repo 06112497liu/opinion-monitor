@@ -4,10 +4,7 @@
  */
 package com.bbd.listener;
 
-import com.bbd.bean.OpinionEsSyncVO;
-import com.bbd.bean.OpinionEventRecordVO;
-import com.bbd.bean.OpinionHotEsVO;
-import com.bbd.bean.OpinionWarnTime;
+import com.bbd.bean.*;
 import com.bbd.constant.EsConstant;
 import com.bbd.dao.WarnSettingDao;
 import com.bbd.domain.WarnSetting;
@@ -91,8 +88,9 @@ public class OpinionListener {
         List<OpinionEventRecordVO> oerWarnVos = Lists.newArrayList();
         List<OpinionEventRecordVO> oerHotVos = Lists.newArrayList();
 
-        Map<String, OpinionEsSyncVO> existMap = getExistsOpinions(vos);
+        Map<String, OpinionEsQueryVO> existMap = getExistsOpinions(vos);
         for (OpinionVO vo : vos) {
+
             addOpinionEventRecords(vo, oerVos);
             addOpinionEventWarnRecord(vo, oerHotVos, eventWarnSettings);
 
@@ -102,7 +100,12 @@ public class OpinionListener {
             BeanUtils.copyProperties(vo, nvo);
 
             boolean warn = matchWarnLevel(vo.getHot(), settings);
-            OpinionEsSyncVO esVo = existMap.get(uuid);
+            OpinionEsQueryVO esVo = existMap.get(uuid);
+            // 已解除的舆情不处理
+            if (esVo != null && esVo.getOpStatus() != null && esVo.getOpStatus() == 2) {
+                continue;
+            }
+
             if (warn) {
                 addOpinionEventRecords(vo, oerWarnVos);
                 addHotRecord(vo, hotVos);
@@ -199,14 +202,14 @@ public class OpinionListener {
      * @param vos
      * @return
      */
-    private Map<String, OpinionEsSyncVO> getExistsOpinions(List<OpinionVO> vos) {
+    private Map<String, OpinionEsQueryVO> getExistsOpinions(List<OpinionVO> vos) {
         String index = EsUtil.INDEX;
         String type = EsUtil.TYPE;
 
         long start = System.currentTimeMillis();
 
         MultiGetRequestBuilder builder = esUtil.getClient().prepareMultiGet();
-        String[] includeFields = { EsConstant.OPINION_UUID, EsConstant.OPINION_HOT_PROP, EsConstant.OPINION_FIRST_WARN_TIME };
+        String[] includeFields = { EsConstant.OPINION_UUID, EsConstant.OPINION_HOT_PROP, EsConstant.OPINION_FIRST_WARN_TIME, EsConstant.OPINION_OPSTATUS_PROP };
         String[] excludeFields = {};
         FetchSourceContext sourceContext = new FetchSourceContext(true, includeFields, excludeFields);
         for (OpinionVO vo : vos) {
@@ -215,13 +218,13 @@ public class OpinionListener {
             builder.add(item);
         }
 
-        Map<String, OpinionEsSyncVO> map = Maps.newHashMap();
+        Map<String, OpinionEsQueryVO> map = Maps.newHashMap();
         MultiGetResponse multiResp = builder.get();
 
         for (MultiGetItemResponse itemResp : multiResp) {
             if (itemResp.getResponse().isExists()) {
                 String str = itemResp.getResponse().getSourceAsString();
-                OpinionEsSyncVO vo = JsonUtil.parseObject(str, OpinionEsSyncVO.class);
+                OpinionEsQueryVO vo = JsonUtil.parseObject(str, OpinionEsQueryVO.class);
                 map.put(vo.getUuid(), vo);
             }
         }
@@ -266,7 +269,7 @@ public class OpinionListener {
      *
      * @param vo
      */
-    private void addWarnVos(OpinionVO vo, OpinionEsSyncVO old, List<OpinionVO> warnVos, List<WarnSetting> settings) {
+    private void addWarnVos(OpinionVO vo, OpinionEsQueryVO old, List<OpinionVO> warnVos, List<WarnSetting> settings) {
         if (old == null) {
             warnVos.add(vo);
             return;
@@ -301,7 +304,7 @@ public class OpinionListener {
      * @param old： 旧舆情
      * @param settings： 舆情预警设置
      */
-    private void setWarnTime(OpinionEsSyncVO vo, OpinionEsSyncVO old, List<WarnSetting> settings) {
+    private void setWarnTime(OpinionEsSyncVO vo, OpinionEsQueryVO old, List<WarnSetting> settings) {
         OpinionWarnTime warnTime = new OpinionWarnTime();
 
         Integer newHot = vo.getHot();
