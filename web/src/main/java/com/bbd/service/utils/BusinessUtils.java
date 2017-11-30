@@ -1,5 +1,8 @@
 package com.bbd.service.utils;
 
+import com.bbd.domain.Account;
+import com.bbd.domain.User;
+import com.bbd.util.StringUtils;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 
@@ -65,6 +68,17 @@ public class BusinessUtils {
                 break;
         }
         return d;
+    }
+
+    /**
+     * 获取 姓名-部门名称-账号
+     * @param account
+     * @param username
+     * @return
+     */
+    public static String getNameDepAccount(Account account, String username) {
+        String str = StringUtils.generateStr("-", account.getName(), account.getDepNote(), username);
+        return str;
     }
 
 

@@ -12,6 +12,7 @@ import com.bbd.exception.ErrorCode;
 import com.bbd.exception.UserErrorCode;
 import com.bbd.service.*;
 import com.bbd.service.param.TransferParam;
+import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.service.vo.OpinionTaskListVO;
@@ -69,16 +70,17 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
      */
     @Override
     public PageList<OpinionTaskListVO> getUnProcessedList(Integer transferType, PageBounds pb) {
-        Long userId = UserContext.getUser().getId();
-        PageList<OpinionTaskListVO> result = esQueryService.getUnProcessedList(userId, transferType, pb);
+
+        String targeter = getNameDepAccount();
+
+        PageList<OpinionTaskListVO> result = esQueryService.getUnProcessedList(UserContext.getUser().getId(), transferType, pb);
         List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         result.forEach(o -> {
             o.setLevel(settingService.judgeOpinionSettingClass(o.getHot(), setting));
             String uuid = o.getUuid();
-            String username = UserContext.getUser().getUsername();
             Map<String, Object> keyMap = Maps.newHashMap();
             keyMap.put("uuid", uuid);
-            keyMap.put("targeter", username);
+            keyMap.put("targeter", targeter);
             List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 1);
             o.setRecords(list);
         });
@@ -94,16 +96,16 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
      */
     @Override
     public PageList<OpinionTaskListVO> getProcessedList(Integer opStatus, PageBounds pb) {
+        String operator = getNameDepAccount();
         PageList<OpinionTaskListVO> result = esQueryService.getProcessedList(opStatus, pb);
         if (Objects.nonNull(opStatus)) {
             if (opStatus == 1) {
                 result.forEach(o -> {
                     String uuid = o.getUuid();
-                    String username = UserContext.getUser().getUsername();
                     Map<String, Object> keyMap = Maps.newHashMap();
                     keyMap.put(EsConstant.uuidField, uuid);
                     if(!UserContext.isAdmin())
-                        keyMap.put(EsConstant.targeterField, username);
+                        keyMap.put(EsConstant.operatorsField, operator);
                     List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 1);
                     o.setRecords(list);
                 });
@@ -126,6 +128,19 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
             }
         }
         return result;
+    }
+
+    /**
+     * 获取操作者的字符串
+     * @return
+     */
+    private String getNameDepAccount() {
+        UserInfo user = UserContext.getUser();
+        Long userId = user.getId();
+        String username = user.getUsername();
+        Account account = accountService.loadByUserId(userId).get();
+        String targeter = BusinessUtils.getNameDepAccount(account, username);
+        return targeter;
     }
 
     /**
@@ -155,15 +170,15 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         checkOpinionTranCount(param.getUuid());
 
         // step-3：修改舆情的状态
-        UserInfo operator = UserContext.getUser();
-        if (Objects.isNull(operator))
+        UserInfo operatorUser = UserContext.getUser();
+        if (Objects.isNull(operatorUser))
             throw new ApplicationException(UserErrorCode.USER_NO_LOGIN);
 
         Map<String, Object> map = Maps.newHashMap();
         map.put(EsConstant.opStatusField, 1);
         map.put(EsConstant.opOwnerField, opOwner.getId());
         map.put(EsConstant.transferTypeField, param.getTransferType());
-        esModifyService.updateOpinion(operator, param.getUuid(), map);
+        esModifyService.updateOpinion(operatorUser, param.getUuid(), map);
 
         // step-4：记录转发记录
             // 构建转发记录对象
@@ -172,8 +187,8 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         recordVO.setOpType(1);
         recordVO.setTransferType(param.getTransferType());
         recordVO.setTransferNote(param.getTransferNote());
-        recordVO.setOperator(operator.getUsername());
-        recordVO.setTargeter(opOwner.getUsername());
+        recordVO.setOperator(getNameDepAccount());
+        recordVO.setTargeter(param.getUsername());
         recordVO.setOpTime(new Date());
         recordVO.setTransferContent(TransferEnum.getDescByCode(param.getTransferType().toString()));
 

@@ -431,7 +431,7 @@ public class StringUtils {
      * @param separator 分隔符
      * @return
      */
-    public static String generateStr(List<String> list, String separator) {
+    public static String generateStr(String separator, String... list) {
         Joiner joiner = Joiner.on(separator).skipNulls();
         String rs = joiner.join(list);
         return rs;

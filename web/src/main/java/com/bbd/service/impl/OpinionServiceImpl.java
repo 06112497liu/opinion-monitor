@@ -266,7 +266,7 @@ public class OpinionServiceImpl implements OpinionService {
                 keyList.remove(keyword);
             }
             keyList.add(0, keyword);
-            String str = StringUtils.generateStr(keyList, ",");
+            String str = StringUtils.generateStr(",", keyList.toArray(new String[keyList.size()]));
             SearchHistory searchHistory = new SearchHistory();
             searchHistory.setUserId(userId); searchHistory.setKeywordStr(str); searchHistory.setGmtModified(new Date());
             searchHistoryDao.updateByExampleSelective(searchHistory, example);
