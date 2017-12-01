@@ -988,6 +988,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-1：获取预警热度分界
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         DateTime dayOneMonthBefore = new DateTime().minusDays(30);
+        query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(dayOneMonthBefore.toString(EsConstant.LONG_TIME_FORMAT)));
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT).setSize(0).setQuery(query)
                 .addAggregation(AggregationBuilders.range(eventHotAgg).field(EsConstant.hotField).keyed(true).addUnboundedFrom("eventNewOpinion", eventNewMin)).execute().actionGet();
