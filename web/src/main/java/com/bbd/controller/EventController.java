@@ -246,7 +246,7 @@ public class EventController extends AbstractController {
         @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true)
         })
     @RequestMapping(value = "eventSrcDis", method = RequestMethod.GET)
-    public RestResult eventSrcDis(Long id, Integer cycle) {
+    public RestResult eventSrcDis(Long id, Integer cycle) throws Exception {
        return RestResult.ok(eventService.eventSrcDis(id, cycle));
     }
     
@@ -266,7 +266,7 @@ public class EventController extends AbstractController {
         @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true)
         })
     @RequestMapping(value = "eventSrcActive", method = RequestMethod.GET)
-    public RestResult eventSrcActive(Long id, Integer cycle) {
+    public RestResult eventSrcActive(Long id, Integer cycle) throws Exception {
        return RestResult.ok(eventService.eventSrcActive(id, cycle));
     }
     
@@ -298,7 +298,7 @@ public class EventController extends AbstractController {
         @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true)
         })
     @RequestMapping(value = "eventDataType", method = RequestMethod.GET)
-    public RestResult eventDataType(Long id, Integer cycle) {
+    public RestResult eventDataType(Long id, Integer cycle) throws Exception {
        return RestResult.ok(eventService.eventDataType(id, cycle));
     }
     
