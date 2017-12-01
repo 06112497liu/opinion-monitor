@@ -45,6 +45,8 @@ import com.bbd.domain.OpinionEventTrendStatisticExample;
 import com.bbd.domain.OpinionEventWords;
 import com.bbd.domain.OpinionEventWordsExample;
 import com.bbd.domain.WarnSetting;
+import com.bbd.exception.ApplicationException;
+import com.bbd.exception.BizErrorCode;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionEsSearchVO;
 import com.bbd.service.vo.OpinionOpRecordVO;
@@ -60,7 +62,6 @@ import com.mybatis.domain.PageBounds;
  */
 @Service
 public class EventService{
-
     @Autowired
     OpinionEventDao opinionEventDao;
     @Autowired
@@ -92,7 +93,10 @@ public class EventService{
      * @throws ExecutionException 
      * @throws IOException 
      */
-    public void createEvent(OpinionEvent opinionEvent) throws IOException, ExecutionException, InterruptedException {
+    public synchronized void createEvent(OpinionEvent opinionEvent) throws IOException, ExecutionException, InterruptedException {
+        if (eventList(new OpinionEvent(), 1, 1).size() == 50) {
+            throw new ApplicationException(BizErrorCode.EVENT_UPTO_50);
+        }
         opinionEvent.setIsDelete((byte)0);
         opinionEvent.setGmtCreate(new Date());
         opinionEventDao.insert(opinionEvent);
