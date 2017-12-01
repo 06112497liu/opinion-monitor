@@ -54,6 +54,7 @@ import com.bbd.service.vo.OpinionVO;
 import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.UserContext;
 import com.mybatis.domain.PageBounds;
+import com.mybatis.domain.PageList;
 
 
 /** 
@@ -94,7 +95,7 @@ public class EventService{
      * @throws IOException 
      */
     public synchronized void createEvent(OpinionEvent opinionEvent) throws IOException, ExecutionException, InterruptedException {
-        if (eventList(new OpinionEvent(), 1, 1).size() == 50) {
+        if (((PageList)eventList(new OpinionEvent(), 1, 1)).getPaginator().getTotalCount() == 50) {
             throw new ApplicationException(BizErrorCode.EVENT_UPTO_50);
         }
         opinionEvent.setIsDelete((byte)0);
