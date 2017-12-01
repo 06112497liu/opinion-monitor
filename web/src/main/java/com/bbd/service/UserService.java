@@ -118,7 +118,7 @@ public class UserService {
     public void createUserAndAccount(UserCreateParam param) {
         Optional<User> op = queryUserByUserame(param.getUsername());
         if(op.isPresent()) {
-            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "用户名重复");
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "账户名重复");
         }
         UserCreateVO userVo = new UserCreateVO();
         BeanUtils.copyProperties(param, userVo);
