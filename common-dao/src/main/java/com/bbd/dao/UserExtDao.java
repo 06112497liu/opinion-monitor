@@ -15,13 +15,14 @@ public interface UserExtDao {
      * @param pb
      * @return
      */
-    List<UserListVO> queryUserList(@Param("region") String region, PageBounds pb);
+    List<UserListVO> queryUserListLimt(@Param("region") String region, PageBounds pb);
 
     /**
      * 转发用户列表
+     * @param region
      * @return
      */
-    List<UserListVO> queryTransUserList();
+    List<UserListVO> queryUserList(@Param("region") String region);
 
 
 }

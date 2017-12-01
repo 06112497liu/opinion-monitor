@@ -45,9 +45,12 @@ public class DictionaryController {
     }
 
     @ApiOperation(value = "转发用户列表", httpMethod = "GET")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "区域", name = "region", dataType = "String", paramType = "query", required = true)
+    })
     @RequestMapping(value = "transfer/list", method = RequestMethod.GET)
-    public RestResult getTransferUsers() {
-        List<String> rs = userService.getTransferUsers();
+    public RestResult getTransferUsers(String region) {
+        List<String> rs = userService.getTransferUsers(region);
         return RestResult.ok(rs);
     }
 }

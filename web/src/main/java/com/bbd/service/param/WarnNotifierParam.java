@@ -45,9 +45,9 @@ public class WarnNotifierParam {
     public void validate() {
         ValidateUtil.checkNull(settingId, CommonErrorCode.BIZ_ERROR, "所属配置id不能为空");
         ValidateUtil.checkNull(notifier, CommonErrorCode.BIZ_ERROR, "通知人不能为空");
-        if(emailNotify != null)
+        if(emailNotify != null && emailNotify == 1)
             ValidateUtil.checkNull(email, CommonErrorCode.BIZ_ERROR, "邮箱不能为空");
-        if(smsNotify != null)
+        if(smsNotify != null && smsNotify == 1)
             ValidateUtil.checkNull(phone, CommonErrorCode.BIZ_ERROR, "电话不能为空");
     }
 

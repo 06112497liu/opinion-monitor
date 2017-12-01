@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bbd.dao.UserExtDao">
 
-    <select id="queryUserList" resultType="com.bbd.bean.UserListVO">
+    <select id="queryUserListLimt" resultType="com.bbd.bean.UserListVO">
         SELECT
             a.username, b.user_id userId, b.region, b.admin, b.name, b.phone, b.email, b.dep_note depNote, a.gmt_create gmtCreate
         FROM
@@ -18,7 +18,7 @@
         a.gmt_create DESC
     </select>
 
-    <select id="queryTransUserList" resultType="com.bbd.bean.UserListVO">
+    <select id="queryUserList" resultType="com.bbd.bean.UserListVO">
         SELECT
             a.username, b.user_id userId, b.region, b.admin, b.name, b.phone, b.email, b.dep_note depNote, a.gmt_create gmtCreate
         FROM
@@ -27,5 +27,8 @@
             a.id = b.user_id
         WHERE
             a.flag = 0
+        <if test="region != 5201 and region != null">
+            AND b.region = #{region}
+        </if>
     </select>
 </mapper>

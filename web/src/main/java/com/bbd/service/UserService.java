@@ -57,7 +57,7 @@ public class UserService {
      * @return
      */
     public List<UserListVO> queryUsers(String region, PageBounds pb) {
-        List<UserListVO> list = userExtDao.queryUserList(region, pb);
+        List<UserListVO> list = userExtDao.queryUserListLimt(region, pb);
         list.forEach(p -> {
             p.setReginDesc(DistrictExtEnum.getDescByCode(p.getRegion()));
         });
@@ -69,8 +69,8 @@ public class UserService {
      * 转发用户列表
      * @return
      */
-    public List<String> getTransferUsers() {
-        List<UserListVO> list = userExtDao.queryTransUserList();
+    public List<String> getTransferUsers(String region) {
+        List<UserListVO> list = userExtDao.queryUserList(region);
         Joiner joiner = Joiner.on("-").skipNulls();
         List<String> result = list.stream().map(p -> {
             String name = p.getName();
