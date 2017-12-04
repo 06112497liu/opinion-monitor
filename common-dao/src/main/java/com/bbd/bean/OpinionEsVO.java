@@ -4,10 +4,17 @@
  */
 package com.bbd.bean;
 
+import com.alibaba.druid.util.StringUtils;
+import com.alibaba.fastjson.JSONArray;
+import com.bbd.domain.KeyValueVO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Lists;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 保存ES中的全量数据
@@ -37,7 +44,7 @@ public class OpinionEsVO implements EsBase {
 
     private Integer         emotion;
 
-    private String[]        keyword;
+    private String        keywords;
 
     private String[]        keys;
 
@@ -163,12 +170,26 @@ public class OpinionEsVO implements EsBase {
         this.emotion = emotion;
     }
 
-    public String[] getKeyword() {
-        return keyword;
+    public List<KeyValueVO> getKeywords() {
+        ArrayList<KeyValueVO> result = Lists.newArrayList();
+        if (StringUtils.isEmpty(this.keywords)) {
+            return result;
+        }
+        List<List> list = JSONArray.parseArray(this.keywords, List.class);
+        for (List l : list) {
+            String key = (String)l.get(0);
+            Double val = ((BigDecimal)l.get(1)).doubleValue();
+            KeyValueVO vo = new KeyValueVO();
+            vo.setKey(key);
+            vo.setName(key);
+            vo.setValue(val);
+            result.add(vo);
+        }
+        return result;
     }
 
-    public void setKeyword(String[] keyword) {
-        this.keyword = keyword;
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 
     public String getWebsite() {

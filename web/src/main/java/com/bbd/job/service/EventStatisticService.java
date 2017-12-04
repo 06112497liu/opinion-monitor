@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -39,7 +40,7 @@ import com.mybatis.domain.PageBounds;
  * @author daijinlong 
  * @version $Id: EventStatisticService.java, v 0.1 2017年11月14日 上午10:23:47 daijinlong Exp $ 
  */
-@Service
+//@Service
 public class EventStatisticService {
     @Autowired
     OpinionEventDao opinionEventDao;
@@ -83,7 +84,9 @@ public class EventStatisticService {
                 evtTrend.setEventId(e.getId());
                 BeanUtils.copyProperties(vo, evtTrend);
                 evtTrend.setKeys(StringUtils.join(vo.getKeys(), ","));
-                evtTrend.setKeyword(StringUtils.join(vo.getKeyword(), ","));
+                List<com.bbd.domain.KeyValueVO> words = vo.getKeywords();
+                List<Object> wordsList = words.stream().map(com.bbd.domain.KeyValueVO::getValue).collect(Collectors.toList());
+                evtTrend.setKeyword(StringUtils.join(wordsList, ","));
                 evtTrend.setGmtCreate(new Date());
                 records.add(evtTrend);
             }

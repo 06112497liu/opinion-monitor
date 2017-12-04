@@ -47,15 +47,14 @@
       WHERE
         b.id IS NOT NULL AND b.type = #{type};
     </select>
-
-    <insert id="batchInsertNotifier" parameterType="java.util.List">
-    INSERT INTO
-      bbd_warn_notifier
-      <include refid="batchInsertNotifier_sql"/>
-    VALUES
-    <foreach collection="list" item="item" index="index" separator=",">
-      (#{item.settingId}, #{item.notifier}, #{item.emailNotify}, #{item.email}, #{item.smsNotify}, #{item.phone})
-    </foreach>
-  </insert>
+    <insert id="batchInsertNotifier" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+          bbd_warn_notifier
+          <include refid="batchInsertNotifier_sql"/>
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+          (#{item.settingId}, #{item.notifier}, #{item.emailNotify}, #{item.email}, #{item.smsNotify}, #{item.phone})
+        </foreach>
+    </insert>
 
 </mapper>

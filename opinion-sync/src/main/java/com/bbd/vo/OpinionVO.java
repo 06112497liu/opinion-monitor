@@ -4,9 +4,14 @@
  */
 package com.bbd.vo;
 
+import com.alibaba.fastjson.JSONArray;
+import com.bbd.domain.KeyValueVO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.common.collect.Lists;
+import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +43,7 @@ public class OpinionVO {
 
     private Float      emotion;
 
-    private String     keyword;
+    private String     keywords;
 
     private String     keys;
 
@@ -52,13 +57,6 @@ public class OpinionVO {
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date       publishTime;
-
-    @Override
-    public String toString() {
-        return "OpinionVO{" + "uuid='" + uuid + '\'' + ", title='" + title + '\'' + ", summary='" + summary + '\'' + ", hot=" + hot + ", content='" + content + '\'' + ", source='" + source + '\''
-               + ", link='" + link + '\'' + ", similiarCount=" + similiarCount + ", commentCount=" + commentCount + ", emotion=" + emotion + ", keyword=" + keyword + ", keys=" + keys + ", website='"
-               + website + '\'' + ", mediaType=" + mediaType + ", events=" + events + ", publishTime=" + publishTime + '}';
-    }
 
     public String getUuid() {
         return uuid;
@@ -144,15 +142,26 @@ public class OpinionVO {
         this.emotion = emotion;
     }
 
-    public List<String> getKeyword() {
-        if (keyword != null && !keyword.equals("")) {
-            return Arrays.asList(keyword.split(","));
+    public List<KeyValueVO> getKeywords() {
+        ArrayList<KeyValueVO> result = Lists.newArrayList();
+        if (StringUtils.isEmpty(this.keywords)) {
+            return result;
         }
-        return Lists.newArrayList();
+        List<List> list = JSONArray.parseArray(this.keywords, List.class);
+        for (List l : list) {
+            String key = (String)l.get(0);
+            Double val = ((BigDecimal)l.get(1)).doubleValue();
+            KeyValueVO vo = new KeyValueVO();
+            vo.setKey(key);
+            vo.setName(key);
+            vo.setValue(val);
+            result.add(vo);
+        }
+        return result;
     }
 
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 
     public List<String> getKeys() {

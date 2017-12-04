@@ -1,5 +1,7 @@
 package com.bbd.service.vo;
 
+import java.util.List;
+
 /**
  * @author Liuweibo
  * @version Id: OpinionExtVo.java, v0.1 2017/11/1 Liuweibo Exp $$
@@ -19,7 +21,7 @@ public class OpinionExtVO extends OpinionVO {
     /**
      * 词云
      */
-    private String[] keyword;
+    private List<KeyValueVO> keywords;
 
     public String getContent() {
         return content;
@@ -37,12 +39,12 @@ public class OpinionExtVO extends OpinionVO {
         this.keys = keys;
     }
 
-    public String[] getKeyword() {
-        return keyword;
+    public List<KeyValueVO> getKeywords() {
+        return keywords;
     }
 
-    public void setKeyword(String[] keyword) {
-        this.keyword = keyword;
+    public void setKeywords(List<KeyValueVO> keywords) {
+        this.keywords = keywords;
     }
 }
     

@@ -204,7 +204,6 @@ public class OpinionServiceImpl implements OpinionService {
         List<KeyValueVO> fullMediaTypeList = eventService.calAllMedia(mediaTypeList);
         map.put("mediaTypeCount", fullMediaTypeList);
         map.put("levelCount", esResult.getHotLevelStats());
-
         return map;
     }
 
