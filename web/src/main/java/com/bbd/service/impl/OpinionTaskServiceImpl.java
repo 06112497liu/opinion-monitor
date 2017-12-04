@@ -244,7 +244,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
         recordVO.setOpType(2);
         recordVO.setOpTime(new Date());
-        recordVO.setOperator(UserContext.getUser().getUsername());
+        recordVO.setOperator(getNameDepAccount());
         recordVO.setUuid(uuid);
         recordVO.setRemoveReason(removeReason);
         recordVO.setRemoveContent(WarnReasonEnum.getDescByCode(removeReason.toString()));
