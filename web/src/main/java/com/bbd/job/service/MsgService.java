@@ -48,7 +48,7 @@ import com.bbd.util.JsonUtil;
  * @author daijinlong 
  * @version $Id: EventStatisticService.java, v 0.1 2017年11月14日 上午10:23:47 daijinlong Exp $ 
  */
-//@Service
+@Service
 public class MsgService {
     private static final int SEND_TYPE_OPINION = 1;
     private static final int SEND_TYPE_EVENT_NEW = 2;
