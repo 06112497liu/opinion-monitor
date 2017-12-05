@@ -174,6 +174,11 @@ public class UserService {
     private void updateUser(Long userId, UserCreateVO userCreateVO) {
         Preconditions.checkNotNull(userCreateVO, "修改用户参数不能为空");
 
+        Optional<User> op = queryUserByUserame(userCreateVO.getUsername());
+        if(op.isPresent()) {
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "账户名重复");
+        }
+
         userCreateVO.validate();
         UserExample example = new UserExample();
         example.createCriteria().andIdEqualTo(userId);

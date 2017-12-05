@@ -43,7 +43,7 @@ public class OpinionJobService {
      * 定时推送舆情关键词到爬虫种子接口
      * 每天凌晨1点向爬虫推送关键词（全量）
      */
-    //@Scheduled(cron = "0 0 1 * * ?")
+    @Scheduled(cron = "0 0 1 * * ?")
     public void pushKeyWords() throws UnsupportedEncodingException {
         String url = RemoteConfigUtil.get(Reptile.NEWQA_ADD_URL);
         String path = RemoteConfigUtil.get(Reptile.NEWQA_ADD_PATH);
@@ -51,16 +51,15 @@ public class OpinionJobService {
         Map<String, String> params = buildRequestParams(); // 参数
         List<String> prov = buildProv(); // 爬虫名称
         for (String s : prov) {
-            logger.info("灌入种子：" + params.get("seeds").replace("%0d%0a", ",") + " ———》 爬虫：" + s);
+            logger.info("灌入种子：" + params.get("seeds").replace("\n", ",") + " ———》 爬虫：" + s);
             params.put("prov", s);
-            //HttpUtil.getHttp(full_url, params);
+            HttpUtil.postHttp(full_url, params);
             params.remove("prov");
         }
     }
 
     // 获取种子
     private String buildSeeds() {
-//        Joiner joiner = Joiner.on("%0d%0a").skipNulls();
         Joiner joiner = Joiner.on("\n").skipNulls();
         MonitorKeywordsExample example = new MonitorKeywordsExample();
         List<MonitorKeywords> list = keywordsDao.selectByExample(example);

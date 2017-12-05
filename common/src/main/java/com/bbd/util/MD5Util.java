@@ -195,6 +195,8 @@ public class MD5Util {
     public static void main(String[] args) {
         String s = md5("123abc");
         System.out.println(s);
+        String s1 = md5("123abC");
+        System.out.println(s1);
     }
 }
     

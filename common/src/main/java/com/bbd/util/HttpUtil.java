@@ -184,7 +184,7 @@ public class HttpUtil {
      * @param params
      * @return
      */
-    public static String postHttp(String url, Map<String, Object> params) {
+    public static String postHttp(String url, Map<String, String> params) {
         String responseMsg = "";
 
         //1.构造HttpClient的实例  
@@ -194,10 +194,11 @@ public class HttpUtil {
 
         //2.构造PostMethod的实例  
         PostMethod postMethod = new PostMethod(url);
+        postMethod.setRequestHeader("user-agent", "Mozilla/4.0(compatible;MSIE)");
 
         //3.把参数值放入到PostMethod对象中  
         for (String key : params.keySet()) {
-            postMethod.addParameter(key, String.valueOf(params.get(key)));
+            postMethod.addParameter(key, params.get(key));
             System.out.println("key= " + key + " and value= " + params.get(key));
         }
 

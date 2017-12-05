@@ -7,6 +7,8 @@ package com.bbd.service;
 import com.bbd.dao.AccountDao;
 import com.bbd.domain.Account;
 import com.bbd.domain.AccountExample;
+import com.bbd.exception.ApplicationException;
+import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.param.AccountCreateVO;
 import com.bbd.service.param.AccountUpdateVo;
 import com.bbd.util.BeanMapperUtil;
@@ -15,9 +17,11 @@ import com.google.common.base.Preconditions;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.plugin2.applet.Applet2IllegalArgumentException;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -63,6 +67,10 @@ public class AccountService {
     public void createAccount(AccountCreateVO vo) {
         Preconditions.checkNotNull(vo, "创建账户参数不能为空");
 
+        String name = vo.getName();
+        Long userId = vo.getUserId();
+        checkAccountNameExist(name, userId);
+
         vo.validate();
 
         Date now = new Date();
@@ -81,6 +89,10 @@ public class AccountService {
         Preconditions.checkNotNull(vo, "创建账户参数不能为空");
         vo.validate();
 
+        String name = vo.getName();
+        Long userId = vo.getUserId();
+        checkAccountNameExist(name, userId);
+
         Date now = new Date();
         Account account = new Account();
         account.setGmtModified(now);
@@ -90,4 +102,14 @@ public class AccountService {
         example.createCriteria().andUserIdEqualTo(vo.getUserId());
         accountDao.updateByExampleSelective(account, example);
     }
+
+    private void checkAccountNameExist(String name, Long userId) {
+        Optional<Account> op = loadByUserId(userId);
+        if(op.isPresent()) {
+            boolean flag = Objects.equals(name, op.get().getName());
+            if(flag) throw new ApplicationException(CommonErrorCode.PARAM_ERROR, "姓名重复");
+        }
+    }
+
+
 }
