@@ -819,7 +819,8 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();
-        List<OpinionTaskListVO> list = esUtil.buildResult(resp, OpinionTaskListVO.class);
+        List<OpinionEsVO> esList = esUtil.buildResult(resp, OpinionEsVO.class);
+        List<OpinionTaskListVO> list = BeanMapperUtil.mapList(esList, OpinionTaskListVO.class);
         // 查询转发记录
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);
