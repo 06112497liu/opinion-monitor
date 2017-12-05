@@ -369,7 +369,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
                 .addAggregation(
                         AggregationBuilders.terms(aggName)
-                        .field(EsConstant.mediaTypeField).size(10).order(Terms.Order.count(false))
+                        .field(EsConstant.mediaTypeField).size(10).order(Terms.Order.count(true))
                 ).setSize(0).execute()
                 .actionGet();
         return buildTermLists(resp, aggName);

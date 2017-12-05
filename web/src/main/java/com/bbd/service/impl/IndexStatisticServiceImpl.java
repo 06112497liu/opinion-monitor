@@ -122,7 +122,7 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     @Override
     public List<KeyValueVO> getKeywordsTopTen() {
         KeywordStatisticsExample example = new KeywordStatisticsExample();
-        example.setOrderByClause("count desc");
+        example.setOrderByClause("count asc");
         List<KeywordStatistics> list = keywordStatisticsDao.selectByExample(example);
         List<KeyValueVO> rs = Lists.newArrayList();
         for(KeywordStatistics k : list) {
