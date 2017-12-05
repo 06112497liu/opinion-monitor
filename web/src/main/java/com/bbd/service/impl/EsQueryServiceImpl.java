@@ -16,10 +16,7 @@ import com.bbd.service.SystemSettingService;
 import com.bbd.service.param.WarnSettingVo;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
-import com.bbd.util.EsUtil;
-import com.bbd.util.JsonUtil;
-import com.bbd.util.StringUtils;
-import com.bbd.util.UserContext;
+import com.bbd.util.*;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -852,12 +849,17 @@ public class EsQueryServiceImpl implements EsQueryService {
         }
 
         // step-2：查询
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query).addSort(EsConstant.hotField, SortOrder.DESC).execute()
-                .actionGet();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setFrom(pb.getOffset()).setSize(pb.getLimit())
+                .setQuery(query)
+                .setFetchSource(null, new String[]{EsConstant.contentField, EsConstant.keywordField, EsConstant.keysField})
+                .addSort(EsConstant.hotField, SortOrder.DESC)
+                .execute().actionGet();
 
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();
-        List<OpinionTaskListVO> list = esUtil.buildResult(resp, OpinionTaskListVO.class);
+        List<OpinionEsVO> esList = esUtil.buildResult(resp, OpinionEsVO.class);
+        List<OpinionTaskListVO> list = BeanMapperUtil.mapList(esList, OpinionTaskListVO.class);
         // 查询转发记录
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<OpinionTaskListVO> result = PageListHelper.create(list, paginator);

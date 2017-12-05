@@ -56,7 +56,8 @@ public class EsConstant {
     public static final String emotionField                   = "emotion";
     public static final String warnTimeField                  = "warnTime";
     public static final String websiteField                   = "website";
-    public static final String keywordField                   = "keyword";
+    public static final String keywordField                   = "keywords";
+    public static final String keysField                   = "keys";
 
     // =========== 舆情热度记录字段 ==========================
     public static final String hotTimeField                   = "hotTime";
