@@ -18,6 +18,7 @@ import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.utils.PercentUtil;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
+import com.bbd.util.BigDecimalUtil;
 import com.google.common.collect.Lists;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
@@ -31,10 +32,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -140,14 +143,22 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
      * @return
      */
     @Override
-    public List<KeyValuePercentVO> getEventChannelTrend() {
+    public List<KeyValueVO> getEventChannelTrend() {
+
         List<KeyValueVO> list = esQueryService.getOpinionMediaSpread();
-        List<KeyValuePercentVO> rs = BeanMapperUtil.mapList(list, KeyValuePercentVO.class);
-        rs.forEach(k -> {
+
+        long count = list.stream().map(v -> {
+            Object num = v.getValue();
+            return Long.parseLong(num.toString());
+        }).collect(Collectors.toList()).stream().reduce((sum, item) -> sum += item).get();
+
+        list.forEach(k -> {
+            Long num = Long.parseLong(k.getValue().toString());
             k.setName(WebsiteEnum.getDescByCode(k.getKey().toString()));
+            double per = BigDecimalUtil.div(num, count, 4);
+            k.setValue(BigDecimalUtil.mul(per, 100));
         });
-        PercentUtil.calcLongPercents(rs);
-        return rs;
+        return list;
     }
 
     @Override

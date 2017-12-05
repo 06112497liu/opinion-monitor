@@ -808,9 +808,9 @@ public class EsQueryServiceImpl implements EsQueryService {
         query.must(QueryBuilders.termQuery(EsConstant.opOwnerField, userId));
         if (transferType != null) {
             if (transferType <= 3)
-                query.must(QueryBuilders.termsQuery(EsConstant.transferTypeField, new Integer[] { 1, 2, 3 }));
+                query.must(QueryBuilders.termsQuery(EsConstant.transferTypeField, new Integer[] { 1, 2}));
             else
-                query.must(QueryBuilders.termsQuery(EsConstant.transferTypeField, new Integer[] { 4, 5, 6 }));
+                query.must(QueryBuilders.termsQuery(EsConstant.transferTypeField, new Integer[] { 3, 4, 5, 6 }));
         }
 
         // step-2：查询

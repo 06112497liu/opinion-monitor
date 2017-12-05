@@ -61,7 +61,7 @@ public class UserController extends AbstractController {
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public RestResult updateUser(@RequestBody @Valid @ApiParam(name = "用户对象", value = "传入JSON") UserCreateParam param) {
         ValidateUtil.checkNull(param.getUserId(), CommonErrorCode.BIZ_ERROR, "修改用户id不能为空");
-        param.setPassword(MD5Util.md5(param.getPassword()));
+        if(param.getPassword() != null) param.setPassword(MD5Util.md5(param.getPassword()));
         userService.updateUserAndAccount(param);
         return RestResult.ok();
     }

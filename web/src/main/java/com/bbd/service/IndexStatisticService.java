@@ -59,7 +59,7 @@ public interface IndexStatisticService {
      * 舆情传播渠道分布
      * @return
      */
-    List<KeyValuePercentVO> getEventChannelTrend();
+    List<KeyValueVO> getEventChannelTrend();
 
     /**
      * 舆情事件类别分布
