@@ -95,8 +95,14 @@ public class EventService{
      * @throws IOException 
      */
     public synchronized void createEvent(OpinionEvent opinionEvent) throws IOException, ExecutionException, InterruptedException {
-        if (((PageList)eventList(new OpinionEvent(), 1, 1)).getPaginator().getTotalCount() == 50) {
+        List<OpinionEvent> evtList = eventList(new OpinionEvent(), 1, Integer.MAX_VALUE);
+        if (((PageList)evtList).getPaginator().getTotalCount() == 50) {
             throw new ApplicationException(BizErrorCode.EVENT_UPTO_50);
+        }
+        for (OpinionEvent evt : evtList) {
+            if (evt.getEventName().trim().equals(opinionEvent.getEventName().trim())) {
+                throw new ApplicationException(BizErrorCode.EVENT_NAME_EXIST);
+            }
         }
         opinionEvent.setIsDelete((byte)0);
         opinionEvent.setGmtCreate(new Date());
