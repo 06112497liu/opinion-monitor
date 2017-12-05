@@ -85,7 +85,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     }
 
     @Override
-    public Integer operateNotifier(List<WarnNotifierParam> list) {
+    public List<WarnNotifier> operateNotifier(List<WarnNotifierParam> list) {
         if(list == null || list.isEmpty())
             throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "通知人没有数据");
         // step-1：先删除指定配置下的通知人
@@ -95,8 +95,8 @@ public class SystemSettingServiceImpl implements SystemSettingService {
 
         // step-2：批量添加预警通知人
         List<WarnNotifier> insertList = BeanMapperUtil.mapList(list, WarnNotifier.class);
-        int result = notifierExtDao.batchInsertNotifier(insertList);
-        return result;
+        notifierExtDao.batchInsertNotifier(insertList);
+        return insertList;
     }
 
     @Override

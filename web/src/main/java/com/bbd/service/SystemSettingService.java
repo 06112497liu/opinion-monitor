@@ -29,7 +29,7 @@ public interface SystemSettingService {
      * @param list
      * @return
      */
-    Integer operateNotifier(List<WarnNotifierParam> list);
+    List<WarnNotifier> operateNotifier(List<WarnNotifierParam> list);
 
     /**
      * 删除预警通知人

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bbd.RestResult;
 import com.bbd.domain.MonitorKeywords;
+import com.bbd.domain.WarnNotifier;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.SystemSettingService;
@@ -76,7 +77,7 @@ public class SystemSettingController {
         for (WarnNotifierParam w : list) {
             w.validate();
         }
-        Integer result = settingService.operateNotifier(list);
+        List<WarnNotifier> result = settingService.operateNotifier(list);
         return RestResult.ok(result);
     }
 
