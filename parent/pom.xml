@@ -22,6 +22,7 @@
         <httpmime.version>4.5</httpmime.version>
         <httpcore.version>4.4.1</httpcore.version>
         <version.shiro>1.3.2</version.shiro>
+        <report.version>1.0.2</report.version>
         <elasticsearch.version>5.6.3</elasticsearch.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -360,6 +361,12 @@
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch</artifactId>
                 <version>${elasticsearch.version}</version>
+            </dependency>
+            
+            <dependency><!--报告相关 -->
+                <groupId>com.bbd.report</groupId>
+                <artifactId>report</artifactId>
+                <version>${report.version}</version>
             </dependency>
 
             <!-- spring boot -->

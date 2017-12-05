@@ -75,6 +75,11 @@
             <groupId>taglibs</groupId>
             <artifactId>standard</artifactId>
         </dependency>
+        
+        <dependency><!--报告相关 -->
+            <groupId>com.bbd.report</groupId>
+            <artifactId>report</artifactId>
+        </dependency>
 
     </dependencies>
 
