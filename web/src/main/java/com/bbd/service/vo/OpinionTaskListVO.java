@@ -34,7 +34,7 @@ public class OpinionTaskListVO extends OpinionVO {
     /**
      * 词云
      */
-    private String[] keyword;
+    private List<KeyValueVO> keywords;
 
     /**
      * 关键词
@@ -87,12 +87,12 @@ public class OpinionTaskListVO extends OpinionVO {
         this.content = content;
     }
 
-    public String[] getKeyword() {
-        return keyword;
+    public List<KeyValueVO> getKeywords() {
+        return keywords;
     }
 
-    public void setKeyword(String[] keyword) {
-        this.keyword = keyword;
+    public void setKeywords(List<KeyValueVO> keywords) {
+        this.keywords = keywords;
     }
 
     public String[] getKeys() {

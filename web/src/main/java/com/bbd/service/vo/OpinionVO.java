@@ -41,7 +41,7 @@ public class OpinionVO {
 
     private Integer mediaType;
 
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
     private Date publishTime;
     
     private Integer level;

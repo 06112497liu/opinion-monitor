@@ -40,7 +40,7 @@ public class OpinionEsSyncVO implements EsBase {
     /**
      * 关键词
      */
-    private List<String>    keyword;
+    private String    keywords;
 
     /**
      * 词云
@@ -152,12 +152,12 @@ public class OpinionEsSyncVO implements EsBase {
         this.emotion = emotion;
     }
 
-    public List<String> getKeyword() {
-        return keyword;
+    public String getKeywords() {
+        return keywords;
     }
 
-    public void setKeyword(List<String> keyword) {
-        this.keyword = keyword;
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 
     public List<String> getKeys() {

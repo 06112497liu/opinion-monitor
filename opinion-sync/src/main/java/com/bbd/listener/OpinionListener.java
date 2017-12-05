@@ -139,6 +139,14 @@ public class OpinionListener {
         logger.info("Process {} opinions success, time used: {}", records.size(), (end - start));
     }
 
+//    public static void main(String[] args) {
+//        OpinionVO vo = new OpinionVO();
+//        vo.setKeywords("[[\"天窗\",67.67],[\"全景\",46.73],[\"concept\",15.6],[\"陆风\",8.83],[\"蚂蚁\",3.27],[\"最新\",1.99],[\"现代\",1.44],[\"xrv\",1.25],[\"红旗\",1.21],[\"ix\",1.03]]");
+//        OpinionEsSyncVO nvo = new OpinionEsSyncVO();
+//        BeanUtils.copyProperties(vo, nvo);
+//        System.out.println(nvo);
+//    }
+
     /**
      * 保存事件和舆情关联记录
      * @param vo

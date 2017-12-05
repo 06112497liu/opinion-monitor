@@ -84,6 +84,9 @@ public class OpinionVO {
 
     public Integer getHot() {
         //return hot;
+        if (hot == null) {
+            return 0;
+        }
         if (hot < 0) {
             return 0;
         }
@@ -135,6 +138,9 @@ public class OpinionVO {
     }
 
     public Integer getEmotion() {
+        if (emotion == null) {
+            return 0;
+        }
         return emotion == 0 ? 0 : emotion > 0 ? 1 : -1;
     }
 
@@ -142,22 +148,23 @@ public class OpinionVO {
         this.emotion = emotion;
     }
 
-    public List<KeyValueVO> getKeywords() {
-        ArrayList<KeyValueVO> result = Lists.newArrayList();
-        if (StringUtils.isEmpty(this.keywords)) {
-            return result;
-        }
-        List<List> list = JSONArray.parseArray(this.keywords, List.class);
-        for (List l : list) {
-            String key = (String)l.get(0);
-            Double val = ((BigDecimal)l.get(1)).doubleValue();
-            KeyValueVO vo = new KeyValueVO();
-            vo.setKey(key);
-            vo.setName(key);
-            vo.setValue(val);
-            result.add(vo);
-        }
-        return result;
+    public String getKeywords() {
+//        ArrayList<KeyValueVO> result = Lists.newArrayList();
+//        if (StringUtils.isEmpty(this.keywords)) {
+//            return result;
+//        }
+//        List<List> list = JSONArray.parseArray(this.keywords, List.class);
+//        for (List l : list) {
+//            String key = (String)l.get(0);
+//            Double val = ((BigDecimal)l.get(1)).doubleValue();
+//            KeyValueVO vo = new KeyValueVO();
+//            vo.setKey(key);
+//            vo.setName(key);
+//            vo.setValue(val);
+//            result.add(vo);
+//        }
+//        return result;
+        return keywords;
     }
 
     public void setKeywords(String keywords) {

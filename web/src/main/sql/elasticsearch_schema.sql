@@ -43,8 +43,8 @@ PUT bbd_opinion
         "emotion": {
           "type": "integer"
         },
-        "keyword": {
-          "type": "keyword"
+        "keywords": {
+          "type": "text"
         },
         "keys": {
           "type": "keyword"

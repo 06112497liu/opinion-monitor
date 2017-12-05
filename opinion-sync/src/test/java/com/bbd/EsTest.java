@@ -50,7 +50,7 @@ public class EsTest {
         vo.setSimiliarCount(9000);
         vo.setCommentCount(200);
         vo.setEmotion(1);
-        vo.setKeyword(Arrays.asList("川普", "访华"));
+        vo.setKeywords("");
         vo.setWebsite("腾讯");
         vo.setMediaType(2);
         vo.setEvents(Arrays.asList(3L));
@@ -77,7 +77,7 @@ public class EsTest {
         vo.setSimiliarCount(100);
         vo.setCommentCount(20);
         vo.setEmotion(1);
-        vo.setKeyword(Arrays.asList("苹果", "IPhone X"));
+        vo.setKeywords("");
         vo.setWebsite("腾讯");
         vo.setMediaType(2);
         vo.setEvents(Arrays.asList(3L));
@@ -104,7 +104,7 @@ public class EsTest {
         vo.setSimiliarCount(300);
         vo.setCommentCount(30);
         vo.setEmotion(-1);
-        vo.setKeyword(Arrays.asList("成都", "雾霾"));
+        vo.setKeywords("");
         vo.setWebsite("腾讯");
         vo.setMediaType(2);
         vo.setEvents(Arrays.asList(3L));

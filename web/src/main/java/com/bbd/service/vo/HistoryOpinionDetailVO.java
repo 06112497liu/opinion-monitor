@@ -32,7 +32,7 @@ public class HistoryOpinionDetailVO {
     private Integer         emotion;
 
     // 词云
-    private String[]        keyword;
+    private List<KeyValueVO>        keywords;
 
     private String          website;
 
@@ -128,12 +128,12 @@ public class HistoryOpinionDetailVO {
         this.emotion = emotion;
     }
 
-    public String[] getKeyword() {
-        return keyword;
+    public List<KeyValueVO> getKeywords() {
+        return keywords;
     }
 
-    public void setKeyword(String[] keyword) {
-        this.keyword = keyword;
+    public void setKeywords(List<KeyValueVO> keywords) {
+        this.keywords = keywords;
     }
 
     public String getWebsite() {
