@@ -53,30 +53,6 @@ public class WarnNotifierParam {
             ValidateUtil.checkNull(phone, CommonErrorCode.BIZ_ERROR, "电话不能为空");
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        WarnNotifierParam that = (WarnNotifierParam) o;
-
-        if(Objects.equals(notifier, that.notifier)) return true;
-        if(Objects.equals(email, that.notifier)) return true;
-        if(Objects.equals(phone, that.phone)) return true;
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = settingId != null ? settingId.hashCode() : 0;
-        result = 31 * result + (notifier != null ? notifier.hashCode() : 0);
-        result = 31 * result + (emailNotify != null ? emailNotify.hashCode() : 0);
-        result = 31 * result + (email != null ? email.hashCode() : 0);
-        result = 31 * result + (smsNotify != null ? smsNotify.hashCode() : 0);
-        result = 31 * result + (phone != null ? phone.hashCode() : 0);
-        return result;
-    }
-
     public Long getSettingId() {
         return settingId;
     }

@@ -11,6 +11,7 @@ import com.bbd.service.EsQueryService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.param.WarnNotifierParam;
 import com.bbd.service.vo.KeyValueVO;
+import com.bbd.util.StringUtils;
 import com.bbd.util.ValidateUtil;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.*;
@@ -89,12 +90,15 @@ public class SystemSettingController {
 
     // 校验通知人信息是否有重复
     private void checkNotifierInfo(List<WarnNotifierParam> list) {
-        int len = list.size();
-        Set<WarnNotifierParam> set = Sets.newHashSet(list);
-        int newLen = set.size();
-        if(newLen < len) {
-            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "通知人信息重复");
-        }
+        List<String> names = list.stream().filter(w -> StringUtils.isNotEmpty(w.getNotifier())).map(WarnNotifierParam::getNotifier).collect(Collectors.toList());
+        Set<String> namesSet = Sets.newHashSet(names);
+        if(names.size() > namesSet.size()) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "通知人名称重复");
+        List<String> emails = list.stream().filter(w -> StringUtils.isNotEmpty(w.getEmail())).map(WarnNotifierParam::getEmail).collect(Collectors.toList());
+        Set<String> emailsSet = Sets.newHashSet(emails);
+        if(emails.size() > emailsSet.size()) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "通知人邮箱重复");
+        List<String> phones = list.stream().filter(w -> StringUtils.isNotEmpty(w.getPhone())).map(WarnNotifierParam::getPhone).collect(Collectors.toList());
+        Set<String> phonesSet = Sets.newHashSet(phones);
+        if(phones.size() > phonesSet.size()) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "通知人电话重复");
     }
 
     @ApiOperation(value = "删除预警通知人信息", httpMethod = "GET")
