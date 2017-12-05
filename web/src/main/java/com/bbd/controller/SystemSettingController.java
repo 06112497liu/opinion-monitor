@@ -5,18 +5,23 @@ import com.alibaba.fastjson.JSONObject;
 import com.bbd.RestResult;
 import com.bbd.domain.MonitorKeywords;
 import com.bbd.domain.WarnNotifier;
+import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.SystemSettingService;
 import com.bbd.service.param.WarnNotifierParam;
 import com.bbd.service.vo.KeyValueVO;
 import com.bbd.util.ValidateUtil;
+import com.google.common.collect.Sets;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Liuweibo
@@ -74,11 +79,22 @@ public class SystemSettingController {
         JSONObject obj = (JSONObject) JSONObject.parse(data);
         String jsonArr = obj.getString("data");
         List<WarnNotifierParam> list = JSONArray.parseArray(jsonArr, WarnNotifierParam.class);
+        checkNotifierInfo(list);
         for (WarnNotifierParam w : list) {
             w.validate();
         }
         List<WarnNotifier> result = settingService.operateNotifier(list);
         return RestResult.ok(result);
+    }
+
+    // 校验通知人信息是否有重复
+    private void checkNotifierInfo(List<WarnNotifierParam> list) {
+        int len = list.size();
+        Set<WarnNotifierParam> set = Sets.newHashSet(list);
+        int newLen = set.size();
+        if(newLen < len) {
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "通知人信息重复");
+        }
     }
 
     @ApiOperation(value = "删除预警通知人信息", httpMethod = "GET")

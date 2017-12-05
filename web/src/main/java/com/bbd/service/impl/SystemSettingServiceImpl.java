@@ -86,8 +86,10 @@ public class SystemSettingServiceImpl implements SystemSettingService {
 
     @Override
     public List<WarnNotifier> operateNotifier(List<WarnNotifierParam> list) {
+
         if(list == null || list.isEmpty())
             throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "通知人没有数据");
+
         // step-1：先删除指定配置下的通知人
         Long settingId = list.get(0).getSettingId();
 
