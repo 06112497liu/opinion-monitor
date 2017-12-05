@@ -96,7 +96,7 @@ public class EventService{
      */
     public synchronized void createEvent(OpinionEvent opinionEvent) throws IOException, ExecutionException, InterruptedException {
         List<OpinionEvent> evtList = eventList(new OpinionEvent(), 1, Integer.MAX_VALUE);
-        if (((PageList)evtList).getPaginator().getTotalCount() == 50) {
+        if (evtList.size() == 50) {
             throw new ApplicationException(BizErrorCode.EVENT_UPTO_50);
         }
         for (OpinionEvent evt : evtList) {
