@@ -57,7 +57,17 @@ public class EventStatisticService {
     
     /*@Scheduled(cron="0 * * * * ?")
     public void eventKafka() {
-        kafkaTemplate.sendDefault("haha111");  
+        OpinionEsVO vo = new  OpinionEsVO();
+        OpinionEventTrendStatisticExample expl = new OpinionEventTrendStatisticExample();
+        expl.setOrderByClause("gmt_create DESC");
+        expl.createCriteria().andEventIdEqualTo(1l);
+        List<OpinionEventTrendStatistic> eventTrendStaList = opinionEventTrendStatisticDao.selectByExampleWithPageBounds(expl, new PageBounds(1,1));
+        if (eventTrendStaList != null && eventTrendStaList.size() > 0 
+                && eventTrendStaList.get(0).getUuid().equals(vo.getUuid())) {
+            
+        }
+        kafkaTemplate.sendDefault("haha111"); 
+        kafkaTemplate.sendDefault("haha111"); 
     }*/
     
     @Scheduled(cron="0 30 * * * ?")
