@@ -71,7 +71,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     @Override
     public PageList<OpinionTaskListVO> getUnProcessedList(Integer transferType, PageBounds pb) {
 
-        String targeter = getNameDepAccount();
+        String targeter = userService.getNameDepAccount();
 
         PageList<OpinionTaskListVO> result = esQueryService.getUnProcessedList(UserContext.getUser().getId(), transferType, pb);
         List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
@@ -96,7 +96,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
      */
     @Override
     public PageList<OpinionTaskListVO> getProcessedList(Integer opStatus, PageBounds pb) {
-        String operator = getNameDepAccount();
+        String operator = userService.getNameDepAccount();
         PageList<OpinionTaskListVO> result = esQueryService.getProcessedList(opStatus, pb);
         if (Objects.nonNull(opStatus)) {
             if (opStatus == 1) {
@@ -133,19 +133,6 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
             o.setLevel(level);
         });
         return result;
-    }
-
-    /**
-     * 获取操作者的字符串
-     * @return
-     */
-    private String getNameDepAccount() {
-        UserInfo user = UserContext.getUser();
-        Long userId = user.getId();
-        String username = user.getUsername();
-        Account account = accountService.loadByUserId(userId).get();
-        String targeter = BusinessUtils.getNameDepAccount(account, username);
-        return targeter;
     }
 
     /**
@@ -195,7 +182,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         recordVO.setOpType(1);
         recordVO.setTransferType(param.getTransferType());
         recordVO.setTransferNote(param.getTransferNote());
-        recordVO.setOperator(getNameDepAccount());
+        recordVO.setOperator(userService.getNameDepAccount());
         recordVO.setTargeter(param.getUsername());
         recordVO.setOpTime(new Date());
         recordVO.setTransferContent(TransferEnum.getDescByCode(param.getTransferType().toString()));
@@ -253,7 +240,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
         recordVO.setOpType(2);
         recordVO.setOpTime(new Date());
-        recordVO.setOperator(getNameDepAccount());
+        recordVO.setOperator(userService.getNameDepAccount());
         recordVO.setUuid(uuid);
         recordVO.setRemoveReason(removeReason);
         recordVO.setRemoveContent(WarnReasonEnum.getDescByCode(removeReason.toString()));

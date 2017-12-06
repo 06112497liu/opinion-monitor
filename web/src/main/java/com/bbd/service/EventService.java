@@ -87,6 +87,8 @@ public class EventService{
     private EsModifyService esModifyService;
     @Autowired
     private SystemSettingService systemSettingService;
+    @Autowired
+    private UserService userService;
     /**  
      * 创建事件
      * @param opinionEvent 
@@ -158,13 +160,14 @@ public class EventService{
         
         //更新事件关联舆情
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
-        recordVO.setOperator(UserContext.getUser().getUsername());
+        recordVO.setOperator(userService.getNameDepAccount());
         recordVO.setOpTime(new Date());
         recordVO.setOpType(3);
         recordVO.setUuid(opinionEvent.getUuid());
         esModifyService.recordOpinionOp(recordVO);
         Map<String, Object> fieldMap = new HashMap<String, Object>();
         fieldMap.put(EsConstant.opStatusField, 3);
+        fieldMap.put(EsConstant.recordTimeField, new Date());
         esModifyService.updateOpinion(UserContext.getUser(), opinionEvent.getUuid(), fieldMap);
     }
     

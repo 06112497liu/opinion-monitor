@@ -7,6 +7,7 @@ package com.bbd.service;
 import com.bbd.bean.UserListVO;
 import com.bbd.dao.UserDao;
 import com.bbd.dao.UserExtDao;
+import com.bbd.domain.Account;
 import com.bbd.domain.User;
 import com.bbd.domain.UserExample;
 import com.bbd.enums.DistrictExtEnum;
@@ -15,6 +16,7 @@ import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.param.AccountCreateVO;
 import com.bbd.service.param.UserCreateParam;
 import com.bbd.service.param.UserCreateVO;
+import com.bbd.service.utils.BusinessUtils;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Joiner;
@@ -223,6 +225,19 @@ public class UserService {
         int num = userDao.updateByExampleSelective(record, example);
         if(num == 0)
             throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
+    }
+
+    /**
+     * 获取操作者的字符串
+     * @return
+     */
+    public String getNameDepAccount() {
+        UserInfo user = UserContext.getUser();
+        Long userId = user.getId();
+        String username = user.getUsername();
+        Account account = accountService.loadByUserId(userId).get();
+        String targeter = BusinessUtils.getNameDepAccount(account, username);
+        return targeter;
     }
 
 }

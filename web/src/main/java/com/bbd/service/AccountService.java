@@ -17,11 +17,9 @@ import com.google.common.base.Preconditions;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.plugin.com.event.COMEventHandler;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *
