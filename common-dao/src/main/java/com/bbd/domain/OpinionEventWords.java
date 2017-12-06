@@ -10,9 +10,9 @@ public class OpinionEventWords {
     private Long eventId;
 
     private Byte cycle;
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
     private Date gmtCreate;
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
     private Date gmtModified;
 
     private String words;
