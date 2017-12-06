@@ -753,8 +753,11 @@ public class EsQueryServiceImpl implements EsQueryService {
         String uuidField = "uuid";
         TransportClient client = esUtil.getClient();
         TermQueryBuilder query = QueryBuilders.termQuery(uuidField, uuid);
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT).setQuery(query).setFrom(0).setSize(1).execute()
-                .actionGet();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT)
+                .setQuery(query)
+                .setFetchSource(null, EsConstant.keysField)
+                .setFrom(0).setSize(1)
+                .execute().actionGet();
 
         List<OpinionEsVO> list = esUtil.buildResult(resp, OpinionEsVO.class);
         if (list.isEmpty())

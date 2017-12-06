@@ -256,6 +256,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
      */
     @Override
     public OpinionTaskListVO getTransferDetail(String uuid, Integer type) {
+        String username = userService.getNameDepAccount();
         // step-1：查询舆情详情
         OpinionEsVO o = esQueryService.getOpinionByUUID(uuid);
         OpinionTaskListVO result = BeanMapperUtil.map(o, OpinionTaskListVO.class);
@@ -264,14 +265,14 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         Map<String, Object> map = Maps.newHashMap();
         map.put(EsConstant.uuidField, uuid);
         map.put(EsConstant.opTypeField, 1);
-        List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(map, 10000);
+        List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(map, 50);
         OpinionOpRecordVO v = null;
         if (!records.isEmpty()) {
             java.util.Optional<OpinionOpRecordVO> op = null;
             if (type == 1){
                 op = records.stream().findFirst();
             } else if (type == 2) {
-                op = records.stream().filter(p -> p.getOperator().equals(UserContext.getUser().getUsername())).findFirst();
+                op = records.stream().filter(p -> p.getOperator().equals(username)).findFirst();
             }
             if (op != null && op.isPresent()) v = op.get();
         }
