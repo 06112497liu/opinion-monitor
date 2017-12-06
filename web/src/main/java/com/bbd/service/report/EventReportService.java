@@ -11,11 +11,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +24,7 @@ import com.alibaba.fastjson.JSON;
 import com.bbd.dao.UserDao;
 import com.bbd.domain.Account;
 import com.bbd.domain.OpinionEvent;
+import com.bbd.domain.OpinionEventTrendStatistic;
 import com.bbd.report.ReportEngine;
 import com.bbd.report.enums.DataModelEnum;
 import com.bbd.report.enums.ElementEnum;
@@ -37,6 +36,8 @@ import com.bbd.report.model.ReportElementString;
 import com.bbd.report.util.ModelUtil;
 import com.bbd.service.EventService;
 import com.bbd.service.vo.KeyValueVO;
+import com.bbd.service.vo.OpinionVO;
+import com.bbd.util.BigDecimalUtil;
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 
@@ -45,6 +46,7 @@ public class EventReportService {
     private static Logger logger = LoggerFactory.getLogger(EventReportService.class);
     
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd HH");
     @Resource
     EventService eventService;
     @Autowired
@@ -75,7 +77,7 @@ public class EventReportService {
         return 0;
     }
 
-    public Integer generateReport(int cycle, Long id) {
+    public Integer generateReport(int cycle, Long id) throws Exception {
         Date currentTime = new Date();
         opTime = formatter.format(currentTime);
         ArrayList<ReportElementString> list = createReportStruct(cycle, id, opTime);
@@ -175,6 +177,19 @@ public class EventReportService {
     }
     
     public void eventWholeTrend(ArrayList<ReportElementString> list, int cycle, Long id) {
+        if (cycle == 1) {
+            labelTwo = "近24小时监测图表跟踪分析";
+        } else if (cycle == 2) {
+            labelTwo = "近7天监测图表跟踪分析";
+        } else if (cycle == 3) {
+            labelTwo = "近30天监测图表跟踪分析";
+        } else if (cycle == 4) {
+            labelTwo = "历史监测图表跟踪分析";
+        } else if (cycle == 5) {
+            labelTwo = "创建事件至今监测图表跟踪分析";
+        }
+        infoTotal = String.valueOf(eventService.eventInfoTotal(id, cycle, false));
+        warnTotal = String.valueOf(eventService.eventInfoTotal(id, cycle, true));
         Map map = eventService.eventWholeTrend(id, cycle);
         List<KeyValueVO> infoList = (List<KeyValueVO>) map.get("infoList");
         List<KeyValueVO> warnList = (List<KeyValueVO>) map.get("warnList");
@@ -182,12 +197,96 @@ public class EventReportService {
         listAll.add(infoList);
         listAll.add(warnList);
         ReportElementString eventWholeElement = new ReportElementString(StructureEnum.REPORT_HEADER, ElementEnum.REPORT_DEFINITION_TABLE,
-            DataModelEnum.TABLE_DATA, "eventDetail", "eventDetailData");
+            DataModelEnum.TABLE_DATA, "eventWholeTrend", "eventWholeTrendData");
         eventWholeElement.setData(computeTrendDate(listAll));
         list.add(eventWholeElement);
     }
     
+    public void eventSrcDis(ArrayList<ReportElementString> list, int cycle, Long id) throws Exception {
+        List<KeyValueVO> listData = eventService.eventSrcDis(id, cycle);
+        toPercent(listData);
+        ReportElementString eventSrcDisElement = new ReportElementString(StructureEnum.REPORT_HEADER, ElementEnum.REPORT_DEFINITION_TABLE,
+            DataModelEnum.TABLE_DATA, "mediaSpread", "mediaSpreadData");
+        eventSrcDisElement.setData(computeTrend(listData));
+        list.add(eventSrcDisElement);
+    }
+    
+    public void eventInfoTrend(ArrayList<ReportElementString> list, int cycle, Long id) throws Exception {
+        List<List<KeyValueVO>> listData = eventService.eventInfoTrend(id, cycle);
+        ReportElementString eventSrcDisElement = new ReportElementString(StructureEnum.REPORT_HEADER, ElementEnum.REPORT_DEFINITION_TABLE,
+            DataModelEnum.TABLE_DATA, "infoTrend", "infoTrendData");
+        eventSrcDisElement.setData(computeTrendDate(listData));
+        list.add(eventSrcDisElement);
+    }
+    
+    public void eventSrcActive(ArrayList<ReportElementString> list, int cycle, Long id) throws Exception {
+        List<KeyValueVO> listData = eventService.eventSrcActive(id, cycle);
+        ReportElementString eventSrcActiveElement = new ReportElementString(StructureEnum.REPORT_HEADER, ElementEnum.REPORT_DEFINITION_TABLE,
+            DataModelEnum.TABLE_DATA, "websiteSpread", "websiteSpreadData");
+        eventSrcActiveElement.setData(computeTrend(listData));
+        list.add(eventSrcActiveElement);
+        
+        ReportElementString eventSrcActive2Element = new ReportElementString(StructureEnum.REPORT_HEADER, ElementEnum.REPORT_DEFINITION_TABLE,
+            DataModelEnum.TABLE_DATA, "websiteSpread2", "websiteSpread2Data");
+        eventSrcActive2Element.setData(computeTrend(listData));
+        list.add(eventSrcActive2Element);
+    }
+    
+    public void keywords(ArrayList<ReportElementString> list, int cycle, Long id) throws Exception {
+        List<KeyValueVO> listData = eventService.eventKeywords(id, cycle);
+        ReportElementString keywordsElement = new ReportElementString(StructureEnum.REPORT_HEADER, ElementEnum.REPORT_DEFINITION_TABLE,
+            DataModelEnum.TABLE_DATA, "keywords", "keywordsData");
+        keywordsElement.setData(computeTrend(listData));
+        list.add(keywordsElement);
+    }
+    
+    public void eventDataType(ArrayList<ReportElementString> list, int cycle, Long id) throws Exception {
+        List<KeyValueVO> listData = eventService.eventDataType(id, cycle);
+        ReportElementString eventSrcActiveElement = new ReportElementString(StructureEnum.REPORT_HEADER, ElementEnum.REPORT_DEFINITION_TABLE,
+            DataModelEnum.TABLE_DATA, "dataType", "dataTypeData");
+        
+        eventSrcActiveElement.setData(computeTrend(listData));
+        list.add(eventSrcActiveElement);
+    }
+    
+    public void eventTrend(ArrayList<ReportElementString> list, int cycle, Long id) throws Exception {
+        List<OpinionEventTrendStatistic>  opinions = (List<OpinionEventTrendStatistic>) eventService.eventTrend(id, cycle, 1, Integer.MAX_VALUE).get("opinions");
+        ReportElementString eventTrendElement = new ReportElementString(StructureEnum.REPORT_HEADER, ElementEnum.REPORT_DEFINITION_TABLE,
+            DataModelEnum.TABLE_DATA, "dataType", "dataTypeData");
+        String[] title = new String[]{"item"};
+        String[] titleType = new String[]{ParamTypeEnum.STRING.getDesc()};
+        List<Object[]> value = new ArrayList<>();
+        for (OpinionEventTrendStatistic evtStc : opinions) {
+            value.add(new Object[]{"["+formatter2.format(evtStc.getPublishTime())+"]"+evtStc.getTitle()+"["+evtStc.getWebsite()+"] 相同文章数："+evtStc.getSimiliarCount()});
+        }
+        logger.warn(JSON.toJSONString(title) + ModelUtil.TAG + JSON.toJSONString(value));
+        String value2 = JSON.toJSONString(title) + ModelUtil.TAG + JSON.toJSONString(titleType) + ModelUtil.TAG + JSON.toJSONString(value);
+        eventTrendElement.setData(value2);
+        list.add(eventTrendElement);
+    }
+    
+    public void eventOpinion(ArrayList<ReportElementString> list, int cycle, Long id) throws Exception {
+        List<OpinionVO> opinions = (List<OpinionVO>) eventService.getEventInfoList(id, cycle, null, null, 1, Integer.MAX_VALUE).get("opinions");
+        ReportElementString eventTrendElement = new ReportElementString(StructureEnum.REPORT_HEADER, ElementEnum.REPORT_DEFINITION_TABLE,
+            DataModelEnum.TABLE_DATA, "opinionInfo", "opinionInfoData");
+        String[] title = new String[]{"title","summary","similiarCount","emotion","website","publishTime","hot","level","link"};
+        String[] titleType = new String[]{ParamTypeEnum.STRING.getDesc(), ParamTypeEnum.STRING.getDesc(), ParamTypeEnum.STRING.getDesc(), ParamTypeEnum.STRING.getDesc()
+                                          , ParamTypeEnum.STRING.getDesc(), ParamTypeEnum.STRING.getDesc(), ParamTypeEnum.STRING.getDesc(), ParamTypeEnum.STRING.getDesc()
+                                          , ParamTypeEnum.STRING.getDesc()};
+        List<Object[]> value = new ArrayList<>();
+        for (OpinionVO vo : opinions) {
+            value.add(new Object[]{vo.getTitle(), vo.getSummary(), vo.getSimiliarCount(), vo.getEmotion(), vo.getWebsite(), 
+                                   vo.getPublishTime(), vo.getHot(),vo.getLevel(), vo.getLink()});
+        }
+        logger.warn(JSON.toJSONString(title) + ModelUtil.TAG + JSON.toJSONString(value));
+        String value2 = JSON.toJSONString(title) + ModelUtil.TAG + JSON.toJSONString(titleType) + ModelUtil.TAG + JSON.toJSONString(value);
+        eventTrendElement.setData(value2);
+        list.add(eventTrendElement);
+    }
+    
+    
     public String computeTrendDate(List<List<KeyValueVO>> parentList){
+       
         List<Object[]> value = new ArrayList<>();
         String[] title = new String[]{"date","type","num"};
         String[] titleType = new String[]{ParamTypeEnum.STRING.getDesc(), ParamTypeEnum.STRING.getDesc(),ParamTypeEnum.DOUBLE.getDesc()};
@@ -202,7 +301,16 @@ public class EventReportService {
         }
         logger.warn(JSON.toJSONString(title) + ModelUtil.TAG + JSON.toJSONString(value));
         return JSON.toJSONString(title) + ModelUtil.TAG + JSON.toJSONString(titleType) + ModelUtil.TAG + JSON.toJSONString(value);
-   
+    }
+    
+    public void toPercent(List<KeyValueVO> list) {
+        long total = 0;
+        for (KeyValueVO vo : list) {
+            total = total + (long)vo.getValue();
+        }
+        for (KeyValueVO vo : list) {
+            vo.setValue(BigDecimalUtil.div((double)vo.getValue(), (double)total, 2));
+        }
     }
     
     public String computeTrend(List<KeyValueVO> list){
@@ -224,11 +332,19 @@ public class EventReportService {
      * @param year
      * @param quarter
      * @return
+     * @throws Exception 
      */
-    private ArrayList<ReportElementString> createReportStruct(int cycle, Long id, String opTime) {
+    private ArrayList<ReportElementString> createReportStruct(int cycle, Long id, String opTime) throws Exception {
     	ArrayList<ReportElementString> list = new ArrayList<>();
     	eventDetail(list, cycle, id);
     	eventWholeTrend(list, cycle, id);
+    	eventSrcDis(list, cycle, id);
+    	eventInfoTrend(list, cycle, id);
+    	eventSrcActive(list, cycle, id);
+    	keywords(list, cycle, id);
+    	eventDataType(list, cycle, id);
+    	eventTrend(list, cycle, id);
+    	eventOpinion(list, cycle, id);
         return list;
     }
 
