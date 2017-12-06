@@ -855,7 +855,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         UserInfo user = UserContext.getUser();
         if (!UserContext.isAdmin()) {
             query.must(QueryBuilders.matchQuery(EsConstant.operatorsField, user.getId())); // 操作者字段必须包含当前用户
-            query.mustNot(QueryBuilders.termQuery(EsConstant.opOwnerField, user.getId())); // 舆情下一步需要操作的人不是当前用户
+            if(opStatus == 1) query.mustNot(QueryBuilders.termQuery(EsConstant.opOwnerField, user.getId())); // 舆情下一步需要操作的人不是当前用户
         }
         if (opStatus != null) {
             query.must(QueryBuilders.termQuery(EsConstant.opStatusField, opStatus));
