@@ -13,30 +13,26 @@ import com.bbd.domain.OpinionEventExample;
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.IndexStatisticService;
-import com.bbd.service.param.OpinionCountStatQueryParam;
 import com.bbd.service.utils.BusinessUtils;
-import com.bbd.service.utils.PercentUtil;
-import com.bbd.service.vo.*;
-import com.bbd.util.BeanMapperUtil;
+import com.bbd.service.vo.DBStaVO;
+import com.bbd.service.vo.KeyValueVO;
+import com.bbd.service.vo.OpinionCountStatVO;
+import com.bbd.service.vo.SystemStaVO;
 import com.bbd.util.BigDecimalUtil;
+import com.bbd.util.DateUtil;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
-import com.mybatis.util.PageListHelper;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -75,12 +71,77 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
         start = BusinessUtils.getDateTimeWithStartTime(timeSpan);
         DateHistogramInterval interval = BusinessUtils.getDateHistogramInterval(timeSpan);
         Map<String, List<KeyValueVO>> map = esQueryService.getOpinionCountStatisticGroupTime(start, DateTime.now(), interval);
+        buildPresentDateData(map, timeSpan);
         return map;
     }
 
+    // 补全预警舆情数量坐标轴统计
+    private void buildPresentDateData(Map<String, List<KeyValueVO>> map, Integer timeSpan) {
+        Set<String> allKeys = getAllKeys(map);
+        for (Map.Entry<String, List<KeyValueVO>> entry : map.entrySet()) {
+            List<KeyValueVO> value = entry.getValue();
+            Set<String> keys = value.stream().map(KeyValueVO::getName).collect(Collectors.toSet());
+            List<KeyValueVO> noContains = buildAllVos(keys, allKeys);
+            value.addAll(noContains);
+            value.sort(Comparator.comparing(KeyValueVO::getName));
+            formatKeys(value, timeSpan);
+        }
+    }
 
-    private void buildPresentDateData(Map<String, List<KeyValueVO>> map) {
+    private void formatKeys(List<KeyValueVO> list, Integer timeSpan) {
+        String pattern1 = "HH时";
+        String pattern2 = "dd日";
+        String pattern3 = "MM月";
+        String pattern4 = "yyyy年";
+        for (KeyValueVO v : list) {
+            Date keyDate = DateUtil.parseDate(v.getName(), "yyyy-MM-dd HH:mm:ss");
+            String key = null;
+            switch (timeSpan) {
+                case 1:
+                    key = DateUtil.formatDateByPatten(keyDate, pattern1);
+                    break;
+                case 2:
+                case 3:
+                    key = DateUtil.formatDateByPatten(keyDate, pattern2);
+                    break;
+                case 4:
+                    key = DateUtil.formatDateByPatten(keyDate, pattern3);
+                    break;
+                default:
+                    key = DateUtil.formatDateByPatten(keyDate, pattern4);
+                    break;
+            }
+            v.setKey(key);
+            v.setName(key);
+        }
+    }
 
+    // 获取所有的key
+    private Set<String> getAllKeys(Map<String, List<KeyValueVO>> map) {
+        List<KeyValueVO> all = Lists.newLinkedList();
+        for (Map.Entry<String, List<KeyValueVO>> entry : map.entrySet()) {
+            List<KeyValueVO> val = entry.getValue();
+            all.addAll(val);
+        }
+        Set<String> keySet = all.stream().map(KeyValueVO::getName).collect(Collectors.toSet());
+        return keySet;
+    }
+
+    // 根据keys构建KeyValueVO
+    private List<KeyValueVO> buildAllVos(Set<String> keys, Set<String> allKeys) {
+        Set<String> noContain = Sets.newHashSet();
+        for (String str : allKeys) {
+            if (!keys.contains(str)) noContain.add(str);
+        }
+        List<KeyValueVO> rs = Lists.newLinkedList();
+        for (String key : noContain) {
+            KeyValueVO vo = new KeyValueVO();
+            vo.setKey(key);
+            vo.setName(key);
+            vo.setValue(0);
+            rs.add(vo);
+        }
+        return rs;
     }
 
     @Override
