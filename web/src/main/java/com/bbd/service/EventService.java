@@ -634,7 +634,7 @@ public class EventService{
     public HashMap<String, Object> eventTrend(Long id, Integer cycle, Integer pageNo, Integer pageSize) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         OpinionEventTrendStatisticExample example = new OpinionEventTrendStatisticExample();
-        example.setOrderByClause("publish_time ASC");
+        example.setOrderByClause("publish_time ASC");//00//取发布时间还是摘录时间排序？
         example.createCriteria().andEventIdEqualTo(id);
         map.put("opinions", opinionEventTrendStatisticDao.selectByExampleWithPageBounds(example, new PageBounds(pageNo, pageSize)));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -687,7 +687,29 @@ public class EventService{
             rs = getEventStatistic("dataType", id);
         }
         transToChinese(rs, "H");
-        return rs;
+        List<KeyValueVO> rs2 = new ArrayList<KeyValueVO>();
+        long crt = 0;
+        long opp = 0;
+        for (KeyValueVO vo : rs) {
+            if (String.valueOf(vo.getKey()).equals("0") || String.valueOf(vo.getKey()).equals("1")) {
+                crt = crt + (long)vo.getValue();
+            } else {
+                opp = opp + (long)vo.getValue();
+            }
+        }
+        if (opp > 0) {
+            KeyValueVO oppVO = new KeyValueVO();
+            oppVO.setName("敏感");
+            oppVO.setValue(opp);
+            rs2.add(oppVO);
+        } 
+        if (crt > 0) {
+            KeyValueVO crtVO = new KeyValueVO();
+            crtVO.setName("非敏感");
+            crtVO.setValue(crt);
+            rs2.add(crtVO);
+        } 
+        return rs2;
     }  
     
     
