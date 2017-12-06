@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import com.bbd.util.DateUtil;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -167,7 +168,7 @@ public class EventService{
         esModifyService.recordOpinionOp(recordVO);
         Map<String, Object> fieldMap = new HashMap<String, Object>();
         fieldMap.put(EsConstant.opStatusField, 3);
-        fieldMap.put(EsConstant.recordTimeField, new Date());
+        fieldMap.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm:ss"));
         esModifyService.updateOpinion(UserContext.getUser(), opinionEvent.getUuid(), fieldMap);
     }
     

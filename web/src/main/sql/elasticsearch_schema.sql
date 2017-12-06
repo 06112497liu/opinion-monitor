@@ -63,7 +63,7 @@ PUT bbd_opinion
         },
         "recordTime": {
           "type": "date",
-          "format": "yyyy-MM-dd||yyyy-MM-dd HH:mm:ss"
+          "format": "yyyy-MM-dd HH:mm:ss"
         },
         "opOwner":{
           "type": "long"

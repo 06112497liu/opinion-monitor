@@ -78,6 +78,11 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
         return map;
     }
 
+
+    private void buildPresentDateData(Map<String, List<KeyValueVO>> map) {
+
+    }
+
     @Override
     public Map<String, List<KeyValueVO>> getOpinionDBCoordinate() {
         Map<String, List<KeyValueVO>> map = esQueryService.getOpinionStaLine();

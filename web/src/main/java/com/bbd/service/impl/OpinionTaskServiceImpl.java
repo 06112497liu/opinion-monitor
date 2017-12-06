@@ -17,6 +17,7 @@ import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.service.vo.OpinionTaskListVO;
 import com.bbd.util.BeanMapperUtil;
+import com.bbd.util.DateUtil;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Joiner;
@@ -172,7 +173,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.opStatusField, 1);
         map.put(EsConstant.opOwnerField, opOwner.getId());
         map.put(EsConstant.transferTypeField, param.getTransferType());
-        map.put(EsConstant.recordTimeField, new Date());
+        map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm:ss"));
         esModifyService.updateOpinion(operatorUser, param.getUuid(), map);
 
         // step-4：记录转发记录
@@ -233,7 +234,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.removeNoteField, removeNote);
         map.put(EsConstant.opStatusField, 2);
         map.put(EsConstant.opOwnerField, -1); // 解除之后，就没有目标操作者了
-        map.put(EsConstant.recordTimeField, new Date());
+        map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm:ss"));
         esModifyService.updateOpinion(operator, uuid, map);
 
         // step-3：记录解除记录
