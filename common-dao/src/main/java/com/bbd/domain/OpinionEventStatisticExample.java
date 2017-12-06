@@ -614,6 +614,66 @@ public class OpinionEventStatisticExample {
             addCriterion("gmt_modified not between", value1, value2, "gmtModified");
             return (Criteria) this;
         }
+
+        public Criteria andWarnTotalIsNull() {
+            addCriterion("warn_total is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andWarnTotalIsNotNull() {
+            addCriterion("warn_total is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andWarnTotalEqualTo(Integer value) {
+            addCriterion("warn_total =", value, "warnTotal");
+            return (Criteria) this;
+        }
+
+        public Criteria andWarnTotalNotEqualTo(Integer value) {
+            addCriterion("warn_total <>", value, "warnTotal");
+            return (Criteria) this;
+        }
+
+        public Criteria andWarnTotalGreaterThan(Integer value) {
+            addCriterion("warn_total >", value, "warnTotal");
+            return (Criteria) this;
+        }
+
+        public Criteria andWarnTotalGreaterThanOrEqualTo(Integer value) {
+            addCriterion("warn_total >=", value, "warnTotal");
+            return (Criteria) this;
+        }
+
+        public Criteria andWarnTotalLessThan(Integer value) {
+            addCriterion("warn_total <", value, "warnTotal");
+            return (Criteria) this;
+        }
+
+        public Criteria andWarnTotalLessThanOrEqualTo(Integer value) {
+            addCriterion("warn_total <=", value, "warnTotal");
+            return (Criteria) this;
+        }
+
+        public Criteria andWarnTotalIn(List<Integer> values) {
+            addCriterion("warn_total in", values, "warnTotal");
+            return (Criteria) this;
+        }
+
+        public Criteria andWarnTotalNotIn(List<Integer> values) {
+            addCriterion("warn_total not in", values, "warnTotal");
+            return (Criteria) this;
+        }
+
+        public Criteria andWarnTotalBetween(Integer value1, Integer value2) {
+            addCriterion("warn_total between", value1, value2, "warnTotal");
+            return (Criteria) this;
+        }
+
+        public Criteria andWarnTotalNotBetween(Integer value1, Integer value2) {
+            addCriterion("warn_total not between", value1, value2, "warnTotal");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

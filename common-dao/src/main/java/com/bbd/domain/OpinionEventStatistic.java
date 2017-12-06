@@ -21,6 +21,8 @@ public class OpinionEventStatistic {
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm")
     private Date gmtModified;
 
+    private Integer warnTotal;
+
     private String words;
 
     public Long getId() {
@@ -85,6 +87,14 @@ public class OpinionEventStatistic {
 
     public void setGmtModified(Date gmtModified) {
         this.gmtModified = gmtModified;
+    }
+
+    public Integer getWarnTotal() {
+        return warnTotal;
+    }
+
+    public void setWarnTotal(Integer warnTotal) {
+        this.warnTotal = warnTotal;
     }
 
     public String getWords() {

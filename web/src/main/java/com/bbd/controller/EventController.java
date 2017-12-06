@@ -218,7 +218,7 @@ public class EventController extends AbstractController {
     })
     @RequestMapping(value = "eventInfoTotal", method = RequestMethod.GET)
     public RestResult eventInfoTotal(Long id, Integer cycle) {
-        return RestResult.ok(eventService.eventInfoTotal(id, cycle));
+        return RestResult.ok(eventService.eventInfoTotal(id, cycle, false));
     }
     
     @ApiOperation(value = "事件信息列表/预警事件总热度", httpMethod = "GET")

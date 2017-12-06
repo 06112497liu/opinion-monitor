@@ -484,7 +484,7 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     @Override
-    public Long queryEventInfoTotal(Long eventId, DateTime startTime, DateTime endTime) {
+    public Long queryEventInfoTotal(Long eventId, DateTime startTime, DateTime endTime, boolean isWarn) {
         // step-1：构建es查询条件
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
@@ -493,6 +493,12 @@ public class EsQueryServiceImpl implements EsQueryService {
         }
         if (endTime != null) {
             query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        } 
+        if (isWarn == true) {
+            // step-1：获取预警热度分界
+            Map<Integer, Integer> map = settingService.getWarnClass();
+            Integer threeClass = map.get(3);
+            query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
         }
         query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(0).setSize(1).setQuery(query);

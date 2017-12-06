@@ -231,7 +231,8 @@ public class EventService{
             startTime = oneYearBefore;
         }*/
         
-        long infototal = esQueryService.queryEventInfoTotal(opinionEvent.getId(), null, endTime);
+        long infototal = esQueryService.queryEventInfoTotal(opinionEvent.getId(), null, endTime, false);
+        long warntotal = esQueryService.queryEventInfoTotal(opinionEvent.getId(), null, endTime, true);
         
         //归档事件媒体分布、媒体活跃度、媒体来源、数据情感信息
         List<KeyValueVO> mediaSpreadList = esQueryService.getEventOpinionMediaSpread(opinionEvent.getId(), null, endTime);
@@ -252,6 +253,7 @@ public class EventService{
         OpinionEventStatistic opinionEventStatistic = new OpinionEventStatistic();
         opinionEventStatistic.setEventId(opinionEvent.getId());
         opinionEventStatistic.setInfoTotal(Integer.valueOf(String.valueOf(infototal)));
+        opinionEventStatistic.setWarnTotal(Integer.valueOf(String.valueOf(warntotal)));
         opinionEventStatistic.setDataType(StringUtils.removeEnd(emotionSpread.toString(), "#"));
         opinionEventStatistic.setMediaType(StringUtils.removeEnd(mediaSpread.toString(), "#"));
         opinionEventStatistic.setSource(StringUtils.removeEnd(websiteSpread.toString(), "#"));
@@ -399,13 +401,18 @@ public class EventService{
      * @param cycle
      * @return 
      */
-    public  long eventInfoTotal(Long id, Integer cycle){
+    public  long eventInfoTotal(Long id, Integer cycle, boolean isWarn){
         if (cycle != 4) {
-            return esQueryService.queryEventInfoTotal(id, new DateTime(getStartDate(cycle)), null);
+            return esQueryService.queryEventInfoTotal(id, new DateTime(getStartDate(cycle)), null, isWarn);
         } else {
             OpinionEventStatisticExample example = new OpinionEventStatisticExample();
             example.createCriteria().andEventIdEqualTo(id);
-            return opinionEventStatisticDao.selectByExample(example).get(0).getInfoTotal();
+            if (isWarn == false) {
+                return opinionEventStatisticDao.selectByExample(example).get(0).getInfoTotal();
+            } else {
+                return opinionEventStatisticDao.selectByExample(example).get(0).getWarnTotal();
+            }
+            
         }
     }
     

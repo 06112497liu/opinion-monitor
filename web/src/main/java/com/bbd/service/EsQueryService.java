@@ -70,7 +70,7 @@ public interface EsQueryService {
      * @param endTime
      * @return
      */
-    Long queryEventInfoTotal(Long eventId, DateTime startTime, DateTime endTime);
+    Long queryEventInfoTotal(Long eventId, DateTime startTime, DateTime endTime, boolean isWarn);
     
     /**  
      * 查询事件信息总量、预警总量

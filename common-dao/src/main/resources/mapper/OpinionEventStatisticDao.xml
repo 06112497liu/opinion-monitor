@@ -10,6 +10,7 @@
     <result column="data_type" jdbcType="VARCHAR" property="dataType" />
     <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
     <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+    <result column="warn_total" jdbcType="INTEGER" property="warnTotal" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.bbd.domain.OpinionEventStatistic">
     <result column="words" jdbcType="LONGVARCHAR" property="words" />
@@ -73,7 +74,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, event_id, info_total, media_type, source, data_type, gmt_create, gmt_modified
+    id, event_id, info_total, media_type, source, data_type, gmt_create, gmt_modified, 
+    warn_total
   </sql>
   <sql id="Blob_Column_List">
     words
@@ -128,10 +130,12 @@
     </selectKey>
     insert into bbd_opinion_event_statistic (event_id, info_total, media_type, 
       source, data_type, gmt_create, 
-      gmt_modified, words)
+      gmt_modified, warn_total, words
+      )
     values (#{eventId,jdbcType=BIGINT}, #{infoTotal,jdbcType=INTEGER}, #{mediaType,jdbcType=VARCHAR}, 
       #{source,jdbcType=VARCHAR}, #{dataType,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP}, 
-      #{gmtModified,jdbcType=TIMESTAMP}, #{words,jdbcType=LONGVARCHAR})
+      #{gmtModified,jdbcType=TIMESTAMP}, #{warnTotal,jdbcType=INTEGER}, #{words,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.bbd.domain.OpinionEventStatistic">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -160,6 +164,9 @@
       <if test="gmtModified != null">
         gmt_modified,
       </if>
+      <if test="warnTotal != null">
+        warn_total,
+      </if>
       <if test="words != null">
         words,
       </if>
@@ -185,6 +192,9 @@
       </if>
       <if test="gmtModified != null">
         #{gmtModified,jdbcType=TIMESTAMP},
+      </if>
+      <if test="warnTotal != null">
+        #{warnTotal,jdbcType=INTEGER},
       </if>
       <if test="words != null">
         #{words,jdbcType=LONGVARCHAR},
@@ -218,6 +228,9 @@
       <if test="record.gmtModified != null">
         gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.warnTotal != null">
+        warn_total = #{record.warnTotal,jdbcType=INTEGER},
+      </if>
       <if test="record.words != null">
         words = #{record.words,jdbcType=LONGVARCHAR},
       </if>
@@ -236,6 +249,7 @@
       data_type = #{record.dataType,jdbcType=VARCHAR},
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
+      warn_total = #{record.warnTotal,jdbcType=INTEGER},
       words = #{record.words,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -250,7 +264,8 @@
       source = #{record.source,jdbcType=VARCHAR},
       data_type = #{record.dataType,jdbcType=VARCHAR},
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
-      gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP}
+      gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
+      warn_total = #{record.warnTotal,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -279,6 +294,9 @@
       <if test="gmtModified != null">
         gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
       </if>
+      <if test="warnTotal != null">
+        warn_total = #{warnTotal,jdbcType=INTEGER},
+      </if>
       <if test="words != null">
         words = #{words,jdbcType=LONGVARCHAR},
       </if>
@@ -294,6 +312,7 @@
       data_type = #{dataType,jdbcType=VARCHAR},
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
       gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      warn_total = #{warnTotal,jdbcType=INTEGER},
       words = #{words,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -305,7 +324,8 @@
       source = #{source,jdbcType=VARCHAR},
       data_type = #{dataType,jdbcType=VARCHAR},
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
-      gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
+      gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      warn_total = #{warnTotal,jdbcType=INTEGER}
     where id = #{id,jdbcType=BIGINT}
   </update>
   <select id="selectByExampleWithPageBounds" parameterType="com.bbd.domain.OpinionEventStatisticExample" resultMap="BaseResultMap">
