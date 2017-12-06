@@ -61,6 +61,10 @@ PUT bbd_opinion
         "opStatus": {
           "type": "integer"
         },
+        "recordTime": {
+          "type": "date",
+          "format": "yyyy-MM-dd||yyyy-MM-dd HH:mm:ss"
+        },
         "opOwner":{
           "type": "long"
         },

@@ -23,6 +23,11 @@ public class OpinionTaskListVO extends OpinionVO {
     private String content;
 
     /**
+     * 舆情操作时间
+     */
+    private Date recordTime;
+
+    /**
      * 舆情操作记录
      */
     private List<OpinionOpRecordVO> records;
@@ -59,6 +64,14 @@ public class OpinionTaskListVO extends OpinionVO {
 
     public void setRecords(List<OpinionOpRecordVO> records) {
         this.records = records;
+    }
+
+    public Date getRecordTime() {
+        return recordTime;
+    }
+
+    public void setRecordTime(Date recordTime) {
+        this.recordTime = recordTime;
     }
 
     public String getEventName() {

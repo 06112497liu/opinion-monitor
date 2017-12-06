@@ -76,6 +76,11 @@ public class OpinionEsVO implements EsBase {
     private Integer         opStatus;
 
     /**
+     * 操作记录时间
+     */
+    private Date         recordTime;
+
+    /**
      * 待操作者
      */
     private Long            opOwner;
@@ -186,6 +191,14 @@ public class OpinionEsVO implements EsBase {
             result.add(vo);
         }
         return result;
+    }
+
+    public Date getRecordTime() {
+        return recordTime;
+    }
+
+    public void setRecordTime(Date recordTime) {
+        this.recordTime = recordTime;
     }
 
     public void setKeywords(String keywords) {

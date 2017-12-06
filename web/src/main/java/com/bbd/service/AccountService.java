@@ -17,6 +17,7 @@ import com.google.common.base.Preconditions;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.plugin.com.event.COMEventHandler;
 
 import java.util.Date;
 import java.util.List;
@@ -65,18 +66,11 @@ public class AccountService {
      */
     public void createAccount(AccountCreateVO vo) {
         Preconditions.checkNotNull(vo, "创建账户参数不能为空");
-
-        String name = vo.getName();
-        Long userId = vo.getUserId();
-        checkAccountNameExist(name, userId);
-
         vo.validate();
-
         Date now = new Date();
         Account account = new Account();
         account.setGmtCreate(now);
         BeanUtils.copyProperties(vo, account);
-
         accountDao.insertSelective(account);
     }
 
@@ -88,10 +82,6 @@ public class AccountService {
         Preconditions.checkNotNull(vo, "创建账户参数不能为空");
         vo.validate();
 
-        String name = vo.getName();
-        Long userId = vo.getUserId();
-        checkAccountNameExist(name, userId);
-
         Date now = new Date();
         Account account = new Account();
         account.setGmtModified(now);
@@ -102,11 +92,23 @@ public class AccountService {
         accountDao.updateByExampleSelective(account, example);
     }
 
-    private void checkAccountNameExist(String name, Long userId) {
-        Optional<Account> op = loadByUserId(userId);
-        if(op.isPresent()) {
-            boolean flag = Objects.equals(name, op.get().getName());
-            if(flag) throw new ApplicationException(CommonErrorCode.PARAM_ERROR, "姓名重复");
+    // 更新账户时，校验姓名是否重复
+    public void checkUpdateAccountNameExist(String name, Long userId) {
+        AccountExample example = new AccountExample();
+        example.createCriteria().andUserIdNotEqualTo(userId).andNameEqualTo(name);
+        List<Account> list = accountDao.selectByExample(example);
+        if(!list.isEmpty()) {
+            throw new ApplicationException(CommonErrorCode.PARAM_ERROR, "姓名重复");
+        }
+    }
+
+    // 创建账户时，校验姓名是否重复
+    public void checkCreateAccountNameExist(String name) {
+        AccountExample example = new AccountExample();
+        example.createCriteria().andNameEqualTo(name);
+        List<Account> list = accountDao.selectByExample(example);
+        if(!list.isEmpty()) {
+            throw new ApplicationException(CommonErrorCode.PARAM_ERROR, "姓名重复");
         }
     }
 

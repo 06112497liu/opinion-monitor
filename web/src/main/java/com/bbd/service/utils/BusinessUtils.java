@@ -2,9 +2,13 @@ package com.bbd.service.utils;
 
 import com.bbd.domain.Account;
 import com.bbd.domain.User;
+import com.bbd.domain.WarnSetting;
+import com.bbd.service.vo.OpinionVO;
 import com.bbd.util.StringUtils;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
+
+import java.util.List;
 
 /**
  * 业务工具
@@ -80,7 +84,6 @@ public class BusinessUtils {
         String str = StringUtils.generateStr("-", account.getName(), account.getDepNote(), username);
         return str;
     }
-
 
 }
     

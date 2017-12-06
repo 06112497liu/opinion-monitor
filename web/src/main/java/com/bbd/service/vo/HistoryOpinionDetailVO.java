@@ -38,7 +38,7 @@ public class HistoryOpinionDetailVO {
 
     private String          source;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Date publishTime;
 
     private Long            opOwner;

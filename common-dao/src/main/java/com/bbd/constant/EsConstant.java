@@ -39,10 +39,11 @@ public class EsConstant {
     public static final String opStatusField                  = "opStatus";
     public static final String targeterField                  = "targeter";
     public static final String transferTypeField              = "transferType";
-    public static final String operatorsField                 = "operators";
+    public static final String operatorField                 = "operator";
     public static final String removeReasonField              = "removeReason";
     public static final String removeNoteField                = "removeNote";
     public static final String opTypeField                    = "opType";
+    public static final String opTimeField                    = "opTime";
 
     // =========== 舆情详情字段 ==========================
     public static final String uuidField                      = "uuid";
@@ -50,14 +51,15 @@ public class EsConstant {
     public static final String contentField                   = "content";
     public static final String publishTimeField               = "publishTime";
     public static final String hotField                       = "hot";
-    public static final String opTimeField                    = "opTime";
     public static final String eventsField                    = "events";
     public static final String mediaTypeField                 = "mediaType";
     public static final String emotionField                   = "emotion";
     public static final String warnTimeField                  = "warnTime";
     public static final String websiteField                   = "website";
     public static final String keywordField                   = "keywords";
-    public static final String keysField                   = "keys";
+    public static final String keysField                      = "keys";
+    public static final String operatorsField                 = "operators";
+    public static final String recordTimeField                 = "recordTime";
 
     // =========== 舆情热度记录字段 ==========================
     public static final String hotTimeField                   = "hotTime";

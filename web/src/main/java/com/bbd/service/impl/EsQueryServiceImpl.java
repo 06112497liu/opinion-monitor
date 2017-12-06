@@ -29,7 +29,10 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -814,8 +817,11 @@ public class EsQueryServiceImpl implements EsQueryService {
         }
 
         // step-2：查询
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query).addSort(EsConstant.hotField, SortOrder.DESC).execute()
-                .actionGet();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setFrom(pb.getOffset()).setSize(pb.getLimit())
+                .setQuery(query)
+                .addSort(EsConstant.hotField, SortOrder.DESC)
+                .execute().actionGet();
 
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();

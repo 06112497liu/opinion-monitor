@@ -82,12 +82,12 @@ public class UserService {
     }
 
     /**
-     * 通过用户名查询用户
+     * 通过账户名查询用户
      * @param username
      * @return
      */
     public Optional<User> queryUserByUserame(String username) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(username), "用户名不能为空");
+        Preconditions.checkArgument(StringUtils.isNotBlank(username), "账户名不能为空");
 
         UserExample user = new UserExample();
         user.createCriteria().andUsernameEqualTo(username);
@@ -116,14 +116,17 @@ public class UserService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void createUserAndAccount(UserCreateParam param) {
-        Optional<User> op = queryUserByUserame(param.getUsername());
-        if(op.isPresent()) {
-            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "账户名重复");
-        }
+
+        // before：校验账户名和姓名是否重复
+        checkCreateUserNameExsit(param.getUsername());
+        accountService.checkCreateAccountNameExist(param.getName());
+
+        // step-1：创建用户
         UserCreateVO userVo = new UserCreateVO();
         BeanUtils.copyProperties(param, userVo);
         Long userId = createUser(userVo);
 
+        // step-2：创建账户
         AccountCreateVO accountVO = new AccountCreateVO();
         BeanUtils.copyProperties(param, accountVO);
         accountVO.setUserId(userId);
@@ -157,6 +160,10 @@ public class UserService {
     @Transactional(rollbackFor = Exception.class)
     public void updateUserAndAccount(UserCreateParam param) {
 
+        // before：校验用户名和姓名是否重复
+        checkUpdateUserNameExsit(param.getUserId(), param.getUsername());
+        accountService.checkUpdateAccountNameExist(param.getName(), param.getUserId());
+
         // step-1：修改用户信息
         UserCreateVO userVo = new UserCreateVO();
         BeanUtils.copyProperties(param, userVo);
@@ -173,13 +180,8 @@ public class UserService {
     // 更新舆情用户信息
     private void updateUser(Long userId, UserCreateVO userCreateVO) {
         Preconditions.checkNotNull(userCreateVO, "修改用户参数不能为空");
+        Preconditions.checkNotNull(userCreateVO.getUsername(), "账户名不能为空");
 
-        Optional<User> op = queryUserByUserame(userCreateVO.getUsername());
-        if(op.isPresent()) {
-            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "账户名重复");
-        }
-
-        userCreateVO.validate();
         UserExample example = new UserExample();
         example.createCriteria().andIdEqualTo(userId);
 
@@ -188,6 +190,24 @@ public class UserService {
         user.setGmtModified(new Date());
 
         userDao.updateByExampleSelective(user, example);
+    }
+
+    // 创建用户时，判断用户名是否重复
+    private void checkCreateUserNameExsit(String username) {
+        Optional<User> op = queryUserByUserame(username);
+        if(op.isPresent()) {
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "账户名重复");
+        }
+    }
+
+    // 更新用户信息时，判断更新的用户名是否重复
+    private void checkUpdateUserNameExsit(Long userId, String username) {
+        UserExample example = new UserExample();
+        example.createCriteria().andIdNotEqualTo(userId).andUsernameEqualTo(username);
+        List<User> list = userDao.selectByExample(example);
+        if(!list.isEmpty()) {
+            throw new ApplicationException(CommonErrorCode.PARAM_ERROR, "用户名重复");
+        }
     }
 
     /**

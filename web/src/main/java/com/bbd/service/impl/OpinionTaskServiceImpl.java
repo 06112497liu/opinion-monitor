@@ -105,7 +105,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                     Map<String, Object> keyMap = Maps.newHashMap();
                     keyMap.put(EsConstant.uuidField, uuid);
                     if(!UserContext.isAdmin())
-                        keyMap.put(EsConstant.operatorsField, operator);
+                        keyMap.put(EsConstant.operatorField, operator);
                     List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 1);
                     o.setRecords(list);
                 });
@@ -116,7 +116,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                     OpinionEventExample exam = new OpinionEventExample();
                     exam.createCriteria().andUuidEqualTo(uuid);
                     List<OpinionEvent> events = opinionEventDao.selectByExample(exam);
-                    OpinionEvent event = null;
+                    OpinionEvent event;
                     if (!events.isEmpty()) {
                         event = events.get(0);
                         o.setMonitorTime(event.getGmtCreate());
@@ -124,9 +124,14 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                         o.setEventID(event.getId());
                     }
                 });
-
             }
         }
+        List<WarnSetting> warnSetting = systemSettingService.queryWarnSetting(3);
+        result.forEach(o -> {
+            Integer hot = o.getHot();
+            Integer level = systemSettingService.judgeOpinionSettingClass(hot, warnSetting);
+            o.setLevel(level);
+        });
         return result;
     }
 
@@ -154,11 +159,13 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         // step-1：校验当前用户是否有操作权限
         checkPermission(param.getUuid());
 
-        // step-2：如果是普通用户，是不能转发给管理员
+        // step-2：如果是普通用户，是不能转发给管理员（也不能转发给自己）
         String str = param.getUsername();
         Splitter s = Splitter.on("-").omitEmptyStrings().trimResults();
         List<String> list = Lists.newArrayList(s.split(str));
         String username = list.get(list.size()-1);
+        String currentUsername = UserContext.getUser().getUsername();
+        if (Objects.equals(username, currentUsername)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "不能转发给自己");
 
         Optional<User> userOpt = userService.queryUserByUserame(username);
         if (!userOpt.isPresent())
@@ -178,6 +185,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.opStatusField, 1);
         map.put(EsConstant.opOwnerField, opOwner.getId());
         map.put(EsConstant.transferTypeField, param.getTransferType());
+        map.put(EsConstant.recordTimeField, new Date());
         esModifyService.updateOpinion(operatorUser, param.getUuid(), map);
 
         // step-4：记录转发记录
@@ -238,6 +246,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.removeNoteField, removeNote);
         map.put(EsConstant.opStatusField, 2);
         map.put(EsConstant.opOwnerField, -1); // 解除之后，就没有目标操作者了
+        map.put(EsConstant.recordTimeField, new Date());
         esModifyService.updateOpinion(operator, uuid, map);
 
         // step-3：记录解除记录
@@ -281,6 +290,11 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         }
         if(v != null) records.add(0, v);
         result.setRecords(records);
+
+        // step-3：设置级别
+        List<WarnSetting> settings = systemSettingService.queryWarnSetting(3);
+        Integer level = systemSettingService.judgeOpinionSettingClass(result.getHot(), settings);
+        result.setLevel(level);
         return result;
     }
 
