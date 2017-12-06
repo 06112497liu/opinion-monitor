@@ -58,7 +58,6 @@ public class EventListener {
         long start = System.currentTimeMillis();
         List<OpinionEvent> opinionEventList = JSON.parseArray(records.toString(), OpinionEvent.class);
         for (OpinionEvent opinionEvent : opinionEventList) {
-            opinionEvent.setGmtCreate(new Date());
             opinionEventDao.updateByPrimaryKeySelective(opinionEvent);
         }
         long end = System.currentTimeMillis();
