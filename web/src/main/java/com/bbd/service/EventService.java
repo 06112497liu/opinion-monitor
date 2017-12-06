@@ -563,7 +563,7 @@ public class EventService{
          } else if (cycle == 3) {
              startDate = DateUtils.addDays(new Date(), -30);
          } else {
-             startDate = DateUtils.addDays(new Date(), -365);
+             startDate = null;//DateUtils.addDays(new Date(), -365);
          }
          return startDate;
      }
@@ -774,6 +774,9 @@ public class EventService{
                 e.setEventLevel(f.getName());
                 break;
             }
+        }
+        if (e.getFileReason() == null) {
+            return;
         }
         List<OpinionDictionary> fileReasonList = getDictionary("E");
         for (OpinionDictionary f : fileReasonList) {
