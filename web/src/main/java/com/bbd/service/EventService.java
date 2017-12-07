@@ -90,7 +90,7 @@ public class EventService{
         if (evtList.size() == 50) {
             throw new ApplicationException(BizErrorCode.EVENT_UPTO_50);
         }
-        for (OpinionEvent evt : evtList) {
+        for (OpinionEvent evt : eventList(opinionEvent)) {
             if (evt.getEventName().trim().equals(opinionEvent.getEventName().trim())) {
                 throw new ApplicationException(BizErrorCode.EVENT_NAME_EXIST);
             }
@@ -187,9 +187,10 @@ public class EventService{
      * @param opinionEvent 
      */
     public void modifyEvent(OpinionEvent opinionEvent) {
-        List<OpinionEvent> evtList = eventList(new OpinionEvent(), 1, Integer.MAX_VALUE);
+        List<OpinionEvent> evtList = eventList(opinionEvent);
         for (OpinionEvent evt : evtList) {
-            if (evt.getEventName().trim().equals(opinionEvent.getEventName().trim())) {
+            if (evt.getEventName().trim().equals(opinionEvent.getEventName().trim())
+                    && evt.getId() != opinionEvent.getId()) {
                 throw new ApplicationException(BizErrorCode.EVENT_NAME_EXIST);
             }
         }
@@ -293,9 +294,17 @@ public class EventService{
         if (opinionEvent.getEventGroup() != null) {
             criteria.andEventGroupEqualTo(opinionEvent.getEventGroup());
         }
-        criteria.andIsDeleteEqualTo((byte)0)
-                .andFileReasonIsNull();
+        criteria.andIsDeleteEqualTo((byte)0);
+        criteria.andFileReasonIsNull();
         return opinionEventDao.selectByExampleWithPageBounds(example, pageBounds);
+    }
+    
+    public List<OpinionEvent> eventList(OpinionEvent opinionEvent) {
+        OpinionEventExample  example = new OpinionEventExample();
+        Criteria criteria = example.createCriteria();
+        criteria.andEventNameEqualTo(opinionEvent.getEventName().trim());
+        criteria.andIsDeleteEqualTo((byte)0);
+        return opinionEventDao.selectByExample(example);
     }
     
     
