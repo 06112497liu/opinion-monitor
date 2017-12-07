@@ -97,6 +97,7 @@ public class IndexController extends AbstractController {
     @ApiOperation(value = "舆情传播渠道分布", httpMethod = "GET")
     @RequestMapping(value = "/opinion/channel/trend", method = RequestMethod.GET)
     public RestResult getEventChannelTrend() {
-        return RestResult.ok(indexStatisticService.getEventChannelTrend());
+        List<KeyValueVO> rs = indexStatisticService.getEventChannelTrend();
+        return RestResult.ok(rs);
     }
 }

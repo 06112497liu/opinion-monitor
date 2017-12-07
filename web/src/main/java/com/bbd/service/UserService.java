@@ -208,7 +208,7 @@ public class UserService {
         example.createCriteria().andIdNotEqualTo(userId).andUsernameEqualTo(username);
         List<User> list = userDao.selectByExample(example);
         if(!list.isEmpty()) {
-            throw new ApplicationException(CommonErrorCode.PARAM_ERROR, "用户名重复");
+            throw new ApplicationException(CommonErrorCode.PARAM_ERROR, "账户名重复");
         }
     }
 
