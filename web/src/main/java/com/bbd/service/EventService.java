@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import com.bbd.util.DateUtil;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -53,6 +54,7 @@ import com.bbd.service.vo.OpinionEsSearchVO;
 import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.service.vo.OpinionVO;
 import com.bbd.util.BeanMapperUtil;
+import com.bbd.util.BigDecimalUtil;
 import com.bbd.util.UserContext;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
@@ -477,8 +479,19 @@ public class EventService{
             rs = getEventStatistic("mediaType", id);
         }
         transToChinese(rs, "F");
+        toPercent(rs);
         return rs;
        
+    }
+    
+    public void toPercent(List<KeyValueVO> list) {
+        long total = 0;
+        for (KeyValueVO vo : list) {
+            total = total + (long)vo.getValue();
+        }
+        for (KeyValueVO vo : list) {
+            vo.setValue(BigDecimalUtil.div((double)vo.getValue(), (double)total, 2));
+        }
     }
     
     
