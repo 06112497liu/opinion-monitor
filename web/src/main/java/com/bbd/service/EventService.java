@@ -199,6 +199,12 @@ public class EventService{
      * @param opinionEvent 
      */
     public void modifyEvent(OpinionEvent opinionEvent) {
+        List<OpinionEvent> evtList = eventList(new OpinionEvent(), 1, Integer.MAX_VALUE);
+        for (OpinionEvent evt : evtList) {
+            if (evt.getEventName().trim().equals(opinionEvent.getEventName().trim())) {
+                throw new ApplicationException(BizErrorCode.EVENT_NAME_EXIST);
+            }
+        }
         opinionEvent.setGmtModified(new Date());
         opinionEventDao.updateByPrimaryKeySelective(opinionEvent);
     }
