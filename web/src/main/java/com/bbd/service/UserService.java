@@ -5,9 +5,11 @@
 package com.bbd.service;
 
 import com.bbd.bean.UserListVO;
+import com.bbd.dao.AccountDao;
 import com.bbd.dao.UserDao;
 import com.bbd.dao.UserExtDao;
 import com.bbd.domain.Account;
+import com.bbd.domain.AccountExample;
 import com.bbd.domain.User;
 import com.bbd.domain.UserExample;
 import com.bbd.enums.DistrictExtEnum;
@@ -52,6 +54,9 @@ public class UserService {
     @Autowired
     private UserExtDao userExtDao;
 
+    @Autowired
+    private AccountDao accountDao;
+
     /**
      * 查询用户列表
      * @param region
@@ -72,15 +77,15 @@ public class UserService {
      * @return
      */
     public List<String> getTransferUsers(String region) {
-        List<UserListVO> list = userExtDao.queryUserList(region);
-        Joiner joiner = Joiner.on("-").skipNulls();
-        List<String> result = list.stream().map(p -> {
-            String name = p.getName();
-            String dep = p.getDepNote();
-            String username = p.getUsername();
-            return joiner.join(name, dep, username);
-        }).collect(Collectors.toList());
-        return result;
+        Long id = UserContext.getUser().getId();
+        AccountExample example = new AccountExample();
+        AccountExample.Criteria criteria = example.createCriteria();
+        if (region != null && !region.equals("5201"))
+            criteria.andRegionEqualTo(region);
+        criteria.andUserIdNotEqualTo(id);
+        List<Account> list = accountDao.selectByExample(example);
+        List<String> rs = list.stream().map(Account::getName).collect(Collectors.toList());
+        return rs;
     }
 
     /**
