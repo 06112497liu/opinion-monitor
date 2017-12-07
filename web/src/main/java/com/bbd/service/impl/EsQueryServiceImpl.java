@@ -449,13 +449,16 @@ public class EsQueryServiceImpl implements EsQueryService {
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
-        query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
         query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
+        query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(10));
         if (emotion != null)
             query.must(QueryBuilders.termQuery(EsConstant.emotionField, emotion));
 
         RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(EsConstant.hotField).keyed(true).addRange("levelOne", oneClass, Integer.MAX_VALUE)
                 .addRange("levelTwo", twoClss, oneClass - 1).addRange("levelThree", threeClass, twoClss - 1);
+        if (threeClass > 10) {
+            hotLevelAgg.addRange("overThanTen", 10, threeClass - 1);
+        }
         TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(EsConstant.mediaTypeField);
 
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query)
