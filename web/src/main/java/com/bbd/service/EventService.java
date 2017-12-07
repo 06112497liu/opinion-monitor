@@ -650,7 +650,7 @@ public class EventService{
         OpinionEventTrendStatisticExample example = new OpinionEventTrendStatisticExample();
         example.setOrderByClause("publish_time ASC");//00//取发布时间还是摘录时间排序？
         example.createCriteria().andEventIdEqualTo(id);
-        map.put("opinions", opinionEventTrendStatisticDao.selectByExampleWithPageBounds(example, new PageBounds(pageNo, pageSize)));
+        map.put("opinions", opinionEventTrendStatisticDao.selectByExampleWithPageBoundsWithBLOBs(example, new PageBounds(pageNo, pageSize)));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateString = formatter.format(opinionEventDao.selectByPrimaryKey(id).getGmtCreate());
         map.put("eventTime", dateString);

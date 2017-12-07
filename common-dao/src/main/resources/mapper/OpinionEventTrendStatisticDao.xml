@@ -87,7 +87,7 @@
     source, calc_time, publish_time, gmt_create, gmt_modified
   </sql>
   <sql id="Blob_Column_List">
-    summary, content, link, keyword, keys
+    summary, content, link, keyword, `keys`
   </sql>
   <select id="selectByExampleWithBLOBs" parameterType="com.bbd.domain.OpinionEventTrendStatisticExample" resultMap="ResultMapWithBLOBs">
     select
@@ -486,6 +486,24 @@
     </if>
     'true' as QUERYID,
     <include refid="Base_Column_List" />
+    from bbd_opinion_event_trend_statistic
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  
+   <select id="selectByExampleWithPageBoundsWithBLOBs" parameterType="com.bbd.domain.OpinionEventTrendStatisticExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+     ,
+    <include refid="Blob_Column_List" /> 
     from bbd_opinion_event_trend_statistic
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />

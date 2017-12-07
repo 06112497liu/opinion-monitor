@@ -18,6 +18,8 @@ public interface OpinionEventTrendStatisticDao {
     List<OpinionEventTrendStatistic> selectByExampleWithBLOBs(OpinionEventTrendStatisticExample example);
 
     List<OpinionEventTrendStatistic> selectByExampleWithPageBounds(OpinionEventTrendStatisticExample example, PageBounds pageBounds);
+    
+    List<OpinionEventTrendStatistic> selectByExampleWithPageBoundsWithBLOBs(OpinionEventTrendStatisticExample example, PageBounds pageBounds);
 
     List<OpinionEventTrendStatistic> selectByExample(OpinionEventTrendStatisticExample example);
 
