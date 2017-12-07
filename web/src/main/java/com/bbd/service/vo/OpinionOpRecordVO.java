@@ -35,7 +35,7 @@ public class OpinionOpRecordVO {
     /**
      * 操作用户id
      */
-    private Integer operatorId;
+    private Long operatorId;
 
     /**
      * 操作用户
@@ -46,7 +46,7 @@ public class OpinionOpRecordVO {
     /**
      * 目标用户id
      */
-    private Integer targeterId;
+    private Long targeterId;
 
     /**
      * 目标用户
@@ -114,6 +114,14 @@ public class OpinionOpRecordVO {
         this.operator = operator;
     }
 
+    public Long getTargeterId() {
+        return targeterId;
+    }
+
+    public void setTargeterId(Long targeterId) {
+        this.targeterId = targeterId;
+    }
+
     public String getTargeter() {
         return targeter;
     }
@@ -134,20 +142,12 @@ public class OpinionOpRecordVO {
         return removeReason;
     }
 
-    public Integer getOperatorId() {
+    public Long getOperatorId() {
         return operatorId;
     }
 
-    public void setOperatorId(Integer operatorId) {
+    public void setOperatorId(Long operatorId) {
         this.operatorId = operatorId;
-    }
-
-    public Integer getTargeterId() {
-        return targeterId;
-    }
-
-    public void setTargeterId(Integer targeterId) {
-        this.targeterId = targeterId;
     }
 
     public void setRemoveReason(Integer removeReason) {

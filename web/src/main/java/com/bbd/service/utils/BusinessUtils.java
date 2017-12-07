@@ -1,14 +1,18 @@
 package com.bbd.service.utils;
 
 import com.bbd.domain.Account;
+import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.User;
 import com.bbd.domain.WarnSetting;
 import com.bbd.service.vo.OpinionVO;
 import com.bbd.util.StringUtils;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 业务工具
@@ -83,6 +87,23 @@ public class BusinessUtils {
     public static String getNameDepAccount(Account account, String username) {
         String str = StringUtils.generateStr("-", account.getName(), account.getDepNote(), username);
         return str;
+    }
+
+    // 根据keys构建KeyValueVO
+    public static List<KeyValueVO> buildAllVos(Set<String> keys, Set<String> allKeys) {
+        Set<String> noContain = Sets.newHashSet();
+        for (String str : allKeys) {
+            if (!keys.contains(str)) noContain.add(str);
+        }
+        List<KeyValueVO> rs = Lists.newLinkedList();
+        for (String key : noContain) {
+            KeyValueVO vo = new KeyValueVO();
+            vo.setKey(key);
+            vo.setName(key);
+            vo.setValue(0);
+            rs.add(vo);
+        }
+        return rs;
     }
 
 }

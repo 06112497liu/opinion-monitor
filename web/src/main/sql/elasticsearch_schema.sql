@@ -41,7 +41,7 @@ PUT bbd_opinion
           "type": "integer"
         },
         "level": {
-          "type": "keyword"
+          "type": "integer"
         },
         "emotion": {
           "type": "integer"
@@ -147,7 +147,7 @@ PUT bbd_opinion_op_record
               "type": "integer"
            },
            "operatorId": {
-              "type": "integer"
+              "type": "long"
            },
            "removeContent": {
               "type": "text",
@@ -171,7 +171,7 @@ PUT bbd_opinion_op_record
               "type": "integer"
            },
            "targeterId": {
-              "type": "integer"
+              "type": "long"
            },
            "transferContent": {
               "type": "text",

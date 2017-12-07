@@ -149,10 +149,11 @@ public class EventService{
         
         //更新事件关联舆情
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
-        recordVO.setOperator(userService.getNameDepAccount());
+        recordVO.setOperatorId(UserContext.getUser().getId());
         recordVO.setOpTime(new Date());
         recordVO.setOpType(3);
         recordVO.setUuid(opinionEvent.getUuid());
+        recordVO.setTargeterId(-1L);
         esModifyService.recordOpinionOp(recordVO);
         Map<String, Object> fieldMap = new HashMap<String, Object>();
         fieldMap.put(EsConstant.opStatusField, 3);

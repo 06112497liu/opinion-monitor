@@ -522,26 +522,20 @@ public class EsQueryServiceImpl implements EsQueryService {
      */
     @Override
     public OpinionEsSearchVO queryHistoryOpinions(DateTime startTime, DateTime endTime, Integer emotion, Integer mediaType, PageBounds pb) {
-        String hotLevelAggName = "hot_level_agg";
+        String levelAggName = "hot_level_agg";
         String mediaAggName = "media_agg";
         // step-1：获取预警等级分界线
-        Map<Integer, Integer> map = settingService.getWarnClass();
-        Integer threeClass = map.get(3);
-        Integer twoClss = map.get(2);
-        Integer oneClass = map.get(1);
 
         // step-2：构建es查询条件
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
-        query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass)); // 预警等级必须达到3
         query.must(QueryBuilders.termQuery(EsConstant.opStatusField, 2)); // 必须是已经解除的
         if (emotion != null)
             query.must(QueryBuilders.termQuery(EsConstant.emotionField, emotion));
 
         TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(EsConstant.mediaTypeField);
-        RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(EsConstant.hotField).keyed(true).addRange("levelOne", oneClass, Integer.MAX_VALUE)
-                .addRange("levelTwo", twoClss, oneClass - 1).addRange("levelThree", threeClass, twoClss - 1);
+        TermsAggregationBuilder hotLevelAgg = AggregationBuilders.terms(levelAggName).field(EsConstant.levelField);
 
         // step-3：查询es
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query)
@@ -560,7 +554,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         List<KeyValueVO> mediaList = buildTermLists(resp, mediaAggName);
         result.setMediaTypeStats(mediaList);
         // 预警等级水平统计
-        List<KeyValueVO> hotLevleList = buildHotLevelLists(resp, hotLevelAggName);
+        List<KeyValueVO> hotLevleList = buildTermLists(resp, levelAggName);
         result.setHotLevelStats(hotLevleList);
 
         return result;
@@ -833,6 +827,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
                 .setFrom(pb.getOffset()).setSize(pb.getLimit())
                 .setQuery(query)
+                .setFetchSource(null, new String[]{EsConstant.keysField, EsConstant.keywordField, EsConstant.contentField})
                 .addSort(EsConstant.hotField, SortOrder.DESC)
                 .execute().actionGet();
 

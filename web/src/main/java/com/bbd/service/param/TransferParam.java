@@ -16,8 +16,8 @@ public class TransferParam {
     @NotBlank(message = "区域不能为空")
     private String district;
 
-    @NotBlank(message = "转发用户不能为空")
-    private String username;
+    @NotNull(message = "转发用户id不能为空")
+    private Long userId;
 
     @NotNull(message = "转发类型不能为空")
     private Integer transferType;
@@ -40,12 +40,12 @@ public class TransferParam {
         this.district = district;
     }
 
-    public String getUsername() {
-        return username;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Integer getTransferType() {

@@ -61,7 +61,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
     @Autowired
     private SystemSettingService systemSettingService;
-
+    
     /**
      * 当前用户待处理舆情列表
      *
@@ -71,7 +71,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     @Override
     public PageList<OpinionTaskListVO> getUnProcessedList(Integer transferType, PageBounds pb) {
 
-        String targeter = userService.getNameDepAccount();
+        Long targeterId = UserContext.getUser().getId();
 
         PageList<OpinionTaskListVO> result = esQueryService.getUnProcessedList(UserContext.getUser().getId(), transferType, pb);
         List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
@@ -79,13 +79,16 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
             o.setLevel(settingService.judgeOpinionSettingClass(o.getHot(), setting));
             String uuid = o.getUuid();
             Map<String, Object> keyMap = Maps.newHashMap();
-            keyMap.put("uuid", uuid);
-            keyMap.put("targeter", targeter);
+            keyMap.put(EsConstant.uuidField, uuid);
+            keyMap.put(EsConstant.targeterIdField, targeterId);
             List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 1);
+            userService.buildOperatorAndTargeter(list);
             o.setRecords(list);
         });
         return result;
     }
+
+
 
     /**
      * 当前用户转发、解除、监测列表
@@ -96,7 +99,6 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
      */
     @Override
     public PageList<OpinionTaskListVO> getProcessedList(Integer opStatus, PageBounds pb) {
-        String operator = userService.getNameDepAccount();
         PageList<OpinionTaskListVO> result = esQueryService.getProcessedList(opStatus, pb);
         if (Objects.nonNull(opStatus)) {
             if (opStatus == 1) {
@@ -105,8 +107,9 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                     Map<String, Object> keyMap = Maps.newHashMap();
                     keyMap.put(EsConstant.uuidField, uuid);
                     if(!UserContext.isAdmin())
-                        keyMap.put(EsConstant.operatorField, operator);
+                        keyMap.put(EsConstant.operatorIdField, UserContext.getUser().getId());
                     List<OpinionOpRecordVO> list = esQueryService.getOpinionOpRecordByUUID(keyMap, 1);
+                    userService.buildOperatorAndTargeter(list);
                     o.setRecords(list);
                 });
             }
@@ -147,18 +150,10 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         checkPermission(param.getUuid());
 
         // step-2：如果是普通用户，是不能转发给管理员（也不能转发给自己）
-        String str = param.getUsername();
-        Splitter s = Splitter.on("-").omitEmptyStrings().trimResults();
-        List<String> list = Lists.newArrayList(s.split(str));
-        String username = list.get(list.size()-1);
-        String currentUsername = UserContext.getUser().getUsername();
-        if (Objects.equals(username, currentUsername)) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "不能转发给自己");
-
-        Optional<User> userOpt = userService.queryUserByUserame(username);
-        if (!userOpt.isPresent())
-            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "转发用户不存在");
-        User opOwner = userOpt.get();
-        checkOpinionTranferConfine(opOwner);
+        Long targeterId = param.getUserId();
+        Long operatorId = UserContext.getUser().getId();
+        if (targeterId.compareTo(operatorId) == 0) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "不能转发给自己");
+        checkOpinionTranferConfine(operatorId);
 
         // step-3：舆情转发次数不能大于50次
         checkOpinionTranCount(param.getUuid());
@@ -170,7 +165,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
         Map<String, Object> map = Maps.newHashMap();
         map.put(EsConstant.opStatusField, 1);
-        map.put(EsConstant.opOwnerField, opOwner.getId());
+        map.put(EsConstant.opOwnerField, targeterId);
         map.put(EsConstant.transferTypeField, param.getTransferType());
         map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm:ss"));
         esModifyService.updateOpinion(operatorUser, param.getUuid(), map);
@@ -182,8 +177,8 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         recordVO.setOpType(1);
         recordVO.setTransferType(param.getTransferType());
         recordVO.setTransferNote(param.getTransferNote());
-        recordVO.setOperator(userService.getNameDepAccount());
-        recordVO.setTargeter(param.getUsername());
+        recordVO.setOperatorId(UserContext.getUser().getId());
+        recordVO.setTargeterId(targeterId);
         recordVO.setOpTime(new Date());
         recordVO.setTransferContent(TransferEnum.getDescByCode(param.getTransferType().toString()));
 
@@ -203,8 +198,8 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     }
 
     // 普通用户不能转发给管理员
-    private void checkOpinionTranferConfine(User opOwner) {
-        Optional<Account> op = accountService.loadByUserId(opOwner.getId());
+    private void checkOpinionTranferConfine(Long userId) {
+        Optional<Account> op = accountService.loadByUserId(userId);
         if(op.isPresent()) {
             Account a = op.get();
             boolean isAdmin = a.getAdmin();
@@ -240,7 +235,8 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
         recordVO.setOpType(2);
         recordVO.setOpTime(new Date());
-        recordVO.setOperator(userService.getNameDepAccount());
+        recordVO.setOperatorId(UserContext.getUser().getId());
+        recordVO.setTargeterId(-1L);
         recordVO.setUuid(uuid);
         recordVO.setRemoveReason(removeReason);
         recordVO.setRemoveContent(WarnReasonEnum.getDescByCode(removeReason.toString()));
@@ -256,7 +252,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
      */
     @Override
     public OpinionTaskListVO getTransferDetail(String uuid, Integer type) {
-        String username = userService.getNameDepAccount();
+        Long currentUserId = UserContext.getUser().getId();
         // step-1：查询舆情详情
         OpinionEsVO o = esQueryService.getOpinionByUUID(uuid);
         OpinionTaskListVO result = BeanMapperUtil.map(o, OpinionTaskListVO.class);
@@ -266,13 +262,14 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.uuidField, uuid);
         map.put(EsConstant.opTypeField, 1);
         List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(map, 50);
+        userService.buildOperatorAndTargeter(records);
         OpinionOpRecordVO v = null;
         if (!records.isEmpty()) {
             java.util.Optional<OpinionOpRecordVO> op = null;
             if (type == 1){
                 op = records.stream().findFirst();
             } else if (type == 2) {
-                op = records.stream().filter(p -> p.getOperator().equals(username)).findFirst();
+                op = records.stream().filter(p -> p.getOperatorId().equals(currentUserId)).findFirst();
             }
             if (op != null && op.isPresent()) v = op.get();
         }

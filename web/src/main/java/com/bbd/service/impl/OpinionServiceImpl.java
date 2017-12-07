@@ -17,10 +17,7 @@ import com.bbd.job.vo.EmailContent;
 import com.bbd.job.vo.MsgVO;
 import com.bbd.job.vo.OpinionMsgModel;
 import com.bbd.job.vo.SMSContent;
-import com.bbd.service.EsQueryService;
-import com.bbd.service.EventService;
-import com.bbd.service.OpinionService;
-import com.bbd.service.SystemSettingService;
+import com.bbd.service.*;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
@@ -31,6 +28,7 @@ import com.bbd.vo.UserInfo;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
@@ -70,6 +68,9 @@ public class OpinionServiceImpl implements OpinionService {
 
     @Autowired
     private SearchHistoryDao searchHistoryDao;
+
+    @Autowired
+    private UserService userService;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -191,10 +192,6 @@ public class OpinionServiceImpl implements OpinionService {
         // step-1：查询es
         OpinionEsSearchVO esResult = esQueryService.queryHistoryOpinions(start, end, emotion, mediaType, pb);
         List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
-        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
-        opinions.forEach(o -> {
-            o.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot(), setting));
-        });
 
         // step-2：分页并返回结果
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), esResult.getTotal().intValue());
@@ -205,8 +202,30 @@ public class OpinionServiceImpl implements OpinionService {
         List<KeyValueVO> mediaTypeList = esResult.getMediaTypeStats();
         List<KeyValueVO> fullMediaTypeList = eventService.calAllMedia(mediaTypeList);
         map.put("mediaTypeCount", fullMediaTypeList);
-        map.put("levelCount", esResult.getHotLevelStats());
+        List<KeyValueVO> levelSta = esResult.getHotLevelStats();
+        buildLevleSta(levelSta);
+        map.put("levelCount", levelSta);
         return map;
+    }
+
+    // 补全预警等级数据
+    private void buildLevleSta(List<KeyValueVO> list) {
+        Map<String, String> mapping = Maps.newHashMap();
+        mapping.put("levelThree", "3"); mapping.put("levelTwo", "2"); mapping.put("levelOne", "1");
+        for (Map.Entry<String, String> entry : mapping.entrySet()) {
+            String key = entry.getKey();
+            String val = entry.getValue();
+            for (KeyValueVO v : list) {
+                String name = v.getName();
+                if (name.equals(val)) {
+                    v.setKey(key); v.setName(key);
+                }
+            }
+        }
+        Set<String> set = list.stream().map(KeyValueVO::getName).collect(Collectors.toSet());
+        Set<String> allSet = Sets.newHashSet("levelThree", "levelTwo", "levelOne");
+        List<KeyValueVO> rs = BusinessUtils.buildAllVos(set, allSet);
+        list.addAll(rs);
     }
 
     /**
@@ -441,7 +460,8 @@ public class OpinionServiceImpl implements OpinionService {
         // step-2：操作记录
         Map<String, Object> keyMap = Maps.newHashMap();
         keyMap.put(EsConstant.uuidField, uuid);
-        List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(keyMap, 1000);
+        List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(keyMap, 52);
+        userService.buildOperatorAndTargeter(records);
         rs.setRecords(records);
 
         // step-3：舆情等级

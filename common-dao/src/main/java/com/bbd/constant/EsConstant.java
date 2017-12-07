@@ -38,8 +38,10 @@ public class EsConstant {
     public static final String opOwnerField                   = "opOwner";
     public static final String opStatusField                  = "opStatus";
     public static final String targeterField                  = "targeter";
+    public static final String targeterIdField                = "targeterId";
     public static final String transferTypeField              = "transferType";
-    public static final String operatorField                 = "operator";
+    public static final String operatorField                  = "operator";
+    public static final String operatorIdField                = "operatorId";
     public static final String removeReasonField              = "removeReason";
     public static final String removeNoteField                = "removeNote";
     public static final String opTypeField                    = "opType";

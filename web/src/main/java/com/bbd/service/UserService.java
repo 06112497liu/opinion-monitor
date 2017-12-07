@@ -19,6 +19,7 @@ import com.bbd.service.param.AccountCreateVO;
 import com.bbd.service.param.UserCreateParam;
 import com.bbd.service.param.UserCreateVO;
 import com.bbd.service.utils.BusinessUtils;
+import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Joiner;
@@ -229,17 +230,17 @@ public class UserService {
             throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
     }
 
-    /**
-     * 获取操作者的字符串
-     * @return
-     */
-    public String getNameDepAccount() {
-        UserInfo user = UserContext.getUser();
-        Long userId = user.getId();
-        String username = user.getUsername();
-        Account account = accountService.loadByUserId(userId).get();
-        String targeter = BusinessUtils.getNameDepAccount(account, username);
-        return targeter;
-    }
+    // 根据用户id来构建操作者和目标对象
+    public void buildOperatorAndTargeter(List<OpinionOpRecordVO> list) {
+        for (OpinionOpRecordVO v : list) {
+            Long operatorId = v.getOperatorId();
+            Long targeterId = v.getTargeterId();
 
+            Optional<Account> operator = accountService.loadByUserId(operatorId);
+            if (operator.isPresent()) v.setOperator(operator.get().getName());
+
+            Optional<Account> targeter = accountService.loadByUserId(targeterId);
+            if (targeter.isPresent()) v.setTargeter(targeter.get().getName());
+        }
+    }
 }

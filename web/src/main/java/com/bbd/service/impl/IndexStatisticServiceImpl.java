@@ -77,7 +77,7 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
         for (Map.Entry<String, List<KeyValueVO>> entry : map.entrySet()) {
             List<KeyValueVO> value = entry.getValue();
             Set<String> keys = value.stream().map(KeyValueVO::getName).collect(Collectors.toSet());
-            List<KeyValueVO> noContains = buildAllVos(keys, allKeys);
+            List<KeyValueVO> noContains = BusinessUtils.buildAllVos(keys, allKeys);
             value.addAll(noContains);
             value.sort(Comparator.comparing(KeyValueVO::getName));
             formatKeys(value, timeSpan);
@@ -121,23 +121,6 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
         }
         Set<String> keySet = all.stream().map(KeyValueVO::getName).collect(Collectors.toSet());
         return keySet;
-    }
-
-    // 根据keys构建KeyValueVO
-    private List<KeyValueVO> buildAllVos(Set<String> keys, Set<String> allKeys) {
-        Set<String> noContain = Sets.newHashSet();
-        for (String str : allKeys) {
-            if (!keys.contains(str)) noContain.add(str);
-        }
-        List<KeyValueVO> rs = Lists.newLinkedList();
-        for (String key : noContain) {
-            KeyValueVO vo = new KeyValueVO();
-            vo.setKey(key);
-            vo.setName(key);
-            vo.setValue(0);
-            rs.add(vo);
-        }
-        return rs;
     }
 
     @Override
