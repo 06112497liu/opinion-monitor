@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  * @author daijinlong 
- * @version $Id: OpinionVO.java, v 0.1 2017年10月31日 下午3:07:22 daijinlong Exp $ 
+ * @version $Id: OpinionVo.java, v 0.1 2017年10月31日 下午3:07:22 daijinlong Exp $
  */
 public class OpinionVO {
 
