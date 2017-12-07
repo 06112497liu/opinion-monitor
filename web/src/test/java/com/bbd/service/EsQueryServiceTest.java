@@ -4,7 +4,7 @@
  */
 package com.bbd.service;
 
-import com.bbd.service.vo.KeyValueVO;
+import com.bbd.domain.KeyValueVO;
 import com.bbd.service.vo.OpinionEsSearchVO;
 import com.mybatis.domain.PageBounds;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;

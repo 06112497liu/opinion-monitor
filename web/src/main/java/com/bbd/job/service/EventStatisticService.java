@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.bbd.domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
@@ -25,15 +26,8 @@ import com.bbd.bean.OpinionEsVO;
 import com.bbd.dao.OpinionEventDao;
 import com.bbd.dao.OpinionEventMediaStatisticDao;
 import com.bbd.dao.OpinionEventTrendStatisticDao;
-import com.bbd.domain.OpinionDictionary;
-import com.bbd.domain.OpinionEvent;
-import com.bbd.domain.OpinionEventExample;
-import com.bbd.domain.OpinionEventMediaStatistic;
-import com.bbd.domain.OpinionEventTrendStatistic;
-import com.bbd.domain.OpinionEventTrendStatisticExample;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
-import com.bbd.service.vo.KeyValueVO;
 import com.mybatis.domain.PageBounds;
 
 /** 

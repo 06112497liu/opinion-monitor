@@ -14,6 +14,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.bbd.domain.KeyValueVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,6 @@ import com.bbd.report.model.ReportElementModel;
 import com.bbd.report.model.ReportElementString;
 import com.bbd.report.util.ModelUtil;
 import com.bbd.service.EventService;
-import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionVO;
 import com.bbd.util.BigDecimalUtil;
 import com.google.common.base.Optional;
