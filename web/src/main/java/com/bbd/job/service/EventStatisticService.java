@@ -49,21 +49,6 @@ public class EventStatisticService {
     @Autowired  
     private KafkaTemplate<Integer, String> kafkaTemplate;  
     
-    /*@Scheduled(cron="0 * * * * ?")
-    public void eventKafka() {
-        OpinionEsVO vo = new  OpinionEsVO();
-        OpinionEventTrendStatisticExample expl = new OpinionEventTrendStatisticExample();
-        expl.setOrderByClause("gmt_create DESC");
-        expl.createCriteria().andEventIdEqualTo(1l);
-        List<OpinionEventTrendStatistic> eventTrendStaList = opinionEventTrendStatisticDao.selectByExampleWithPageBounds(expl, new PageBounds(1,1));
-        if (eventTrendStaList != null && eventTrendStaList.size() > 0 
-                && eventTrendStaList.get(0).getUuid().equals(vo.getUuid())) {
-            
-        }
-        kafkaTemplate.sendDefault("haha111"); 
-        kafkaTemplate.sendDefault("haha111"); 
-    }*/
-    
     @Scheduled(cron="0 30 * * * ?")
     public void eventTrendStatistic() {
         OpinionEventExample example = new OpinionEventExample();
@@ -100,7 +85,7 @@ public class EventStatisticService {
         }
     }
     
-    @Scheduled(cron="0 * * * * ?")
+    @Scheduled(cron="0 30 * * * ?")
     public void eventMediaStatistic() throws ParseException {
         OpinionEventExample example = new OpinionEventExample();
         example.createCriteria().andIsDeleteEqualTo((byte)0).andFileReasonIsNull();
@@ -134,7 +119,7 @@ public class EventStatisticService {
             total = 0;
         }
         if (records!=null && records.size() > 0) {
-            //opinionEventMediaStatisticDao.insertBatch(records);
+            opinionEventMediaStatisticDao.insertBatch(records);
         }
         
     }
@@ -151,19 +136,5 @@ public class EventStatisticService {
         return vo;
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
 }
 
