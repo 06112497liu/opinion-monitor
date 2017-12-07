@@ -204,7 +204,6 @@ public class EventReportService {
     
     public void eventSrcDis(ArrayList<ReportElementString> list, int cycle, Long id) throws Exception {
         List<KeyValueVO> listData = eventService.eventSrcDis(id, cycle);
-        toPercent(listData);
         ReportElementString eventSrcDisElement = new ReportElementString(StructureEnum.REPORT_HEADER, ElementEnum.REPORT_DEFINITION_TABLE,
             DataModelEnum.TABLE_DATA, "mediaSpread", "mediaSpreadData");
         eventSrcDisElement.setData(computeTrend(listData));
@@ -301,16 +300,6 @@ public class EventReportService {
         }
         logger.warn(JSON.toJSONString(title) + ModelUtil.TAG + JSON.toJSONString(value));
         return JSON.toJSONString(title) + ModelUtil.TAG + JSON.toJSONString(titleType) + ModelUtil.TAG + JSON.toJSONString(value);
-    }
-    
-    public void toPercent(List<KeyValueVO> list) {
-        long total = 0;
-        for (KeyValueVO vo : list) {
-            total = total + (long)vo.getValue();
-        }
-        for (KeyValueVO vo : list) {
-            vo.setValue(BigDecimalUtil.div((double)vo.getValue(), (double)total, 2));
-        }
     }
     
     public String computeTrend(List<KeyValueVO> list){

@@ -471,12 +471,12 @@ public class EventService{
     }
     
     public void toPercent(List<KeyValueVO> list) {
-        long total = 0;
+        double total = 0;
         for (KeyValueVO vo : list) {
-            total = total + (long)vo.getValue();
+            total = total + Double.valueOf(String.valueOf(vo.getValue()));
         }
         for (KeyValueVO vo : list) {
-            vo.setValue(BigDecimalUtil.div((double)vo.getValue(), (double)total, 2));
+            vo.setValue(BigDecimalUtil.div(Double.valueOf(String.valueOf(vo.getValue())) * 100, total, 2));
         }
     }
     
