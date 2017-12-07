@@ -2,10 +2,10 @@ package com.bbd.controller;
 
 import com.bbd.RestResult;
 import com.bbd.controller.param.RemoveWarnParam;
+import com.bbd.domain.KeyValueVO;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionTaskService;
 import com.bbd.service.param.TransferParam;
-import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionTaskListVO;
 import com.bbd.util.ValidateUtil;
 import com.mybatis.domain.PageList;

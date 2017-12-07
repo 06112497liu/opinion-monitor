@@ -1,6 +1,7 @@
 package com.bbd.service.vo;
 
 import com.bbd.bean.OpinionWarnTime;
+import com.bbd.domain.KeyValueVO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
@@ -32,7 +33,7 @@ public class HistoryOpinionDetailVO {
     private Integer         emotion;
 
     // 词云
-    private List<KeyValueVO>        keywords;
+    private List<KeyValueVO> keywords;
 
     private String          website;
 

@@ -7,6 +7,7 @@ package com.bbd.service.vo;
 import java.util.List;
 
 import com.bbd.bean.OpinionEsVO;
+import com.bbd.domain.KeyValueVO;
 
 /**
  * 舆情ES查询结果
@@ -19,7 +20,7 @@ public class OpinionEsSearchVO {
 
     private List<OpinionEsVO> opinions;
 
-    private List<KeyValueVO>  hotLevelStats;
+    private List<KeyValueVO> hotLevelStats;
 
     private List<KeyValueVO>  mediaTypeStats;
 

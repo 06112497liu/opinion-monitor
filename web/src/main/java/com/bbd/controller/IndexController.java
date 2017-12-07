@@ -5,10 +5,10 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
+import com.bbd.domain.KeyValueVO;
 import com.bbd.service.IndexStatisticService;
 import com.bbd.service.OpinionService;
 import com.bbd.service.vo.DBStaVO;
-import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionCountStatVO;
 import com.bbd.service.vo.SystemStaVO;
 import io.swagger.annotations.Api;

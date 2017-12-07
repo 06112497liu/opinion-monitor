@@ -9,6 +9,7 @@ import com.bbd.bean.EventEsVO;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.constant.EsConstant;
+import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
@@ -756,7 +757,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT)
                 .setQuery(query)
                 .setFetchSource(null, EsConstant.keysField)
-                .setFrom(0).setSize(1)
+                .setSize(1)
                 .execute().actionGet();
 
         List<OpinionEsVO> list = esUtil.buildResult(resp, OpinionEsVO.class);

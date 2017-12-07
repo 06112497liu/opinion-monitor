@@ -1,5 +1,7 @@
 package com.bbd.service.vo;
 
+import com.bbd.domain.KeyValueVO;
+
 /**
  * @author Liuweibo
  * @version Id: KeyValuePercentVO.java, v0.1 2017/11/2 Liuweibo Exp $$

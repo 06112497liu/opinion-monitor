@@ -7,6 +7,7 @@ import com.bbd.bean.WarnNotifierVO;
 import com.bbd.constant.EsConstant;
 import com.bbd.dao.SearchHistoryDao;
 import com.bbd.dao.WarnNotifierExtDao;
+import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.SearchHistory;
 import com.bbd.domain.SearchHistoryExample;
 import com.bbd.domain.WarnSetting;
@@ -304,7 +305,7 @@ public class OpinionServiceImpl implements OpinionService {
         set.addAll(result);
         List<OpinionHotEsVO> list = new ArrayList<>();
         list.addAll(set);
-        list.sort((o1, o2) -> -(o1.getHotTime().compareTo(o2.getHotTime())));
+        list.sort(Comparator.comparing(OpinionHotEsVO::getHotTime));
         List<KeyValueVO> keyValueVOList = Lists.newLinkedList();
         for (OpinionHotEsVO v : list) {
             KeyValueVO vo = new KeyValueVO();

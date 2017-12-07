@@ -1,5 +1,7 @@
 package com.bbd.service.vo;
 
+import com.bbd.domain.KeyValueVO;
+
 import java.util.List;
 
 /**

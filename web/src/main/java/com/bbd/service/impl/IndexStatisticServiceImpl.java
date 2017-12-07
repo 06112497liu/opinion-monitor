@@ -6,16 +6,12 @@ package com.bbd.service.impl;
 
 import com.bbd.dao.KeywordStatisticsDao;
 import com.bbd.dao.OpinionEventDao;
-import com.bbd.domain.KeywordStatistics;
-import com.bbd.domain.KeywordStatisticsExample;
-import com.bbd.domain.OpinionEvent;
-import com.bbd.domain.OpinionEventExample;
+import com.bbd.domain.*;
 import com.bbd.enums.WebsiteEnum;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.IndexStatisticService;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.DBStaVO;
-import com.bbd.service.vo.KeyValueVO;
 import com.bbd.service.vo.OpinionCountStatVO;
 import com.bbd.service.vo.SystemStaVO;
 import com.bbd.util.BigDecimalUtil;
