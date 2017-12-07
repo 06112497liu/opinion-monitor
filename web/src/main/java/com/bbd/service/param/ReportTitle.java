@@ -7,10 +7,10 @@ package com.bbd.service.param;
 public class ReportTitle {
 
     public static final Object[] opinionBaseInfoTitle =
-            new String[]{"title", "similiarCount", "website", "hot", "level", "emotion", "commentCount", "link", "summary"};
+            new String[]{"title", "similiarCount", "website", "hot", "levelDesc", "emotionDesc", "commentCount", "link", "summary", "emotion", "level"};
 
     public static final Object[] keyValueTile =
-            new String[]{"key", "value"};
+            new String[]{"key", "name", "value"};
 
 }
     

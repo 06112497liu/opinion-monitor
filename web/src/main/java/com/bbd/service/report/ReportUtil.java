@@ -176,10 +176,13 @@ public class ReportUtil {
 				declaredFields[j].setAccessible(true);
 				try {
 					Object obj = declaredFields[j].get(datas.get(i));
-					if(obj instanceof String)
-						rs[i][j] = replaceBlank((String) obj);
-					else
+					if(obj instanceof String) {
+						String str = replaceBlank((String) obj);
+						if (str.equals("")) rs[i][j] = "无";
+						else rs[i][j] = replaceBlank((String) obj);
+					}else {
 						rs[i][j] = obj;
+					}
 				} catch (IllegalArgumentException e) {
 					logger.error("", e);
 				} catch (IllegalAccessException e) {

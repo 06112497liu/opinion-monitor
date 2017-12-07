@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -190,6 +191,11 @@ public class OpinionEsVO implements EsBase {
             vo.setValue(val);
             result.add(vo);
         }
+        result.sort((v1, v2) -> {
+            Double d1 = Double.parseDouble(v1.getValue().toString());
+            Double d2 = Double.parseDouble(v2.getValue().toString());
+            return -Double.compare(d1, d2);
+        });
         return result;
     }
 

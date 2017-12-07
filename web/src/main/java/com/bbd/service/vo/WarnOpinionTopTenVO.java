@@ -31,13 +31,17 @@ public class WarnOpinionTopTenVO {
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
     private Date    time;
 
-    public WarnOpinionTopTenVO() {
+    /**
+     * 链接
+     */
+    private String link;
+
+    public String getLink() {
+        return link;
     }
 
-    public WarnOpinionTopTenVO(String title, Integer level, Date time) {
-        this.title = title;
-        this.level = level;
-        this.time = time;
+    public void setLink(String link) {
+        this.link = link;
     }
 
     public String getTitle() {

@@ -14,15 +14,19 @@ public class OpinionBaseInfoReport {
 
     private Integer hot;
 
-    private Integer level;
+    private String levelDesc;
 
-    private Integer emotion;
+    private String emotionDesc;
 
     private Integer commentCount;
 
     private String link;
 
     private String summary;
+
+    private Integer emotion;
+
+    private Integer level;
 
     public String getTitle() {
         return title;
@@ -64,12 +68,28 @@ public class OpinionBaseInfoReport {
         this.level = level;
     }
 
+    public String getLevelDesc() {
+        return levelDesc;
+    }
+
+    public void setLevelDesc(String levelDesc) {
+        this.levelDesc = levelDesc;
+    }
+
     public Integer getEmotion() {
         return emotion;
     }
 
     public void setEmotion(Integer emotion) {
         this.emotion = emotion;
+    }
+
+    public String getEmotionDesc() {
+        return emotionDesc;
+    }
+
+    public void setEmotionDesc(String emotionDesc) {
+        this.emotionDesc = emotionDesc;
     }
 
     public Integer getCommentCount() {
