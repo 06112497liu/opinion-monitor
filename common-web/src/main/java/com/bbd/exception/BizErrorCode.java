@@ -10,7 +10,7 @@ public enum  BizErrorCode implements ErrorCode {
     NOTIFIER_SETTINGID_NOT_EXIST(1001, "通知人所属setting_id不存在"),
     OBJECT_NOT_EXIST(1002, "操作对象不存在"),
     KEY_WORD_EXIST(1003, "舆情预警关键词重复"),
-    EVENT_UPTO_50(1004, "事件已经达到50"),
+    EVENT_UPTO_50(1004, "最多可同时添加跟踪监测50个事件，目前系统已添加50个事件，请删除或归档部分事件后再添加新的事件监测"),
     EVENT_NAME_EXIST(1005, "事件名称重复");
     
 
