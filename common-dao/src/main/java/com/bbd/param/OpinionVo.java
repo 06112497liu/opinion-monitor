@@ -6,9 +6,9 @@ import java.util.Date;
 
 /**
  * @author Liuweibo
- * @version Id: OpinionVo.java, v0.1 2017/10/26 Liuweibo Exp $$
+ * @version Id: OpinionVO.java, v0.1 2017/10/26 Liuweibo Exp $$
  */
-public class OpinionVo {
+public class OpinionVO {
 
     private Long id;
 
@@ -73,7 +73,7 @@ public class OpinionVo {
 
     @Override
     public String toString() {
-        return "OpinionVo{" +
+        return "OpinionVO{" +
                 "id=" + id +
                 ", uuid='" + uuid + '\'' +
                 ", title='" + title + '\'' +

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Liuweibo
@@ -50,7 +51,7 @@ public class DictionaryController {
     })
     @RequestMapping(value = "transfer/list", method = RequestMethod.GET)
     public RestResult getTransferUsers(String region) {
-        List<String> rs = userService.getTransferUsers(region);
+        Map<Long, String> rs = userService.getTransferUsers(region);
         return RestResult.ok(rs);
     }
 }

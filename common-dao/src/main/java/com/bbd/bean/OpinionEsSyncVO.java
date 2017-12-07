@@ -40,7 +40,7 @@ public class OpinionEsSyncVO implements EsBase {
     /**
      * 关键词
      */
-    private String    keywords;
+    private String          keywords;
 
     /**
      * 词云

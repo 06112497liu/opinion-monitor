@@ -4,6 +4,7 @@ import com.bbd.bean.OpinionEsVO;
 import com.bbd.constant.EsConstant;
 import com.bbd.service.EsModifyService;
 import com.bbd.service.EsQueryService;
+import com.bbd.service.SystemSettingService;
 import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.util.EsUtil;
 import com.bbd.util.JsonUtil;
@@ -35,6 +36,9 @@ public class EsModifyServiceImpl implements EsModifyService {
     @Autowired
     private EsUtil         esUtil;
 
+    @Autowired
+    private SystemSettingService settingService;
+
     /**
      * 转发舆情
      * @param operator
@@ -43,9 +47,15 @@ public class EsModifyServiceImpl implements EsModifyService {
      */
     @Override
     public void updateOpinion(UserInfo operator, String uuid, Map<String, Object> fieldMap) throws IOException, ExecutionException, InterruptedException {
-        OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
-        Long operatorId = operator.getId();
 
+        OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
+        // 保留解除时的预警等级
+        Integer hot = opinion.getHot();
+        Integer level = settingService.judgeOpinionSettingClass(hot, settingService.queryWarnSetting(3));
+        fieldMap.put(EsConstant.levelField, level);
+
+        // 记录操作人
+        Long operatorId = operator.getId();
         Long[] original = opinion.getOperators();
         boolean flag = ArrayUtils.contains(original, operatorId);
         Long[] newArr = original;

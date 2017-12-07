@@ -13,7 +13,6 @@ import com.google.common.collect.Lists;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +36,8 @@ public class OpinionEsVO implements EsBase {
 
     private Integer         hot;
 
+    private Integer         level;
+
     private String          link;
 
     private Integer         similiarCount;
@@ -45,7 +46,7 @@ public class OpinionEsVO implements EsBase {
 
     private Integer         emotion;
 
-    private String        keywords;
+    private String          keywords;
 
     private String[]        keys;
 
@@ -79,7 +80,7 @@ public class OpinionEsVO implements EsBase {
     /**
      * 操作记录时间
      */
-    private Date         recordTime;
+    private Date            recordTime;
 
     /**
      * 待操作者
@@ -99,7 +100,7 @@ public class OpinionEsVO implements EsBase {
     /**
      * 解除备注
      */
-    private String removeNote;
+    private String          removeNote;
 
     /**
      * 预警时间
@@ -142,6 +143,14 @@ public class OpinionEsVO implements EsBase {
 
     public void setHot(Integer hot) {
         this.hot = hot;
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
     }
 
     public String getContent() {

@@ -31,10 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -76,7 +73,7 @@ public class UserService {
      * 转发用户列表
      * @return
      */
-    public List<String> getTransferUsers(String region) {
+    public Map<Long, String> getTransferUsers(String region) {
         Long id = UserContext.getUser().getId();
         AccountExample example = new AccountExample();
         AccountExample.Criteria criteria = example.createCriteria();
@@ -84,7 +81,7 @@ public class UserService {
             criteria.andRegionEqualTo(region);
         criteria.andUserIdNotEqualTo(id);
         List<Account> list = accountDao.selectByExample(example);
-        List<String> rs = list.stream().map(Account::getName).collect(Collectors.toList());
+        Map<Long, String> rs = list.stream().collect(Collectors.toMap(Account::getUserId, Account::getName));
         return rs;
     }
 

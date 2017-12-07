@@ -33,12 +33,23 @@ public class OpinionOpRecordVO {
     private String  transferNote;
 
     /**
-     * 操作者
+     * 操作用户id
+     */
+    private Integer operatorId;
+
+    /**
+     * 操作用户
      */
     private String  operator;
 
+
     /**
-     * 目标对象
+     * 目标用户id
+     */
+    private Integer targeterId;
+
+    /**
+     * 目标用户
      */
     private String  targeter;
 
@@ -121,6 +132,22 @@ public class OpinionOpRecordVO {
 
     public Integer getRemoveReason() {
         return removeReason;
+    }
+
+    public Integer getOperatorId() {
+        return operatorId;
+    }
+
+    public void setOperatorId(Integer operatorId) {
+        this.operatorId = operatorId;
+    }
+
+    public Integer getTargeterId() {
+        return targeterId;
+    }
+
+    public void setTargeterId(Integer targeterId) {
+        this.targeterId = targeterId;
     }
 
     public void setRemoveReason(Integer removeReason) {

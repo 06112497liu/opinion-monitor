@@ -40,6 +40,9 @@ PUT bbd_opinion
         "hot": {
           "type": "integer"
         },
+        "level": {
+          "type": "keyword"
+        },
         "emotion": {
           "type": "integer"
         },
@@ -143,8 +146,8 @@ PUT bbd_opinion_op_record
            "opType": {
               "type": "integer"
            },
-           "operator": {
-              "type": "keyword"
+           "operatorId": {
+              "type": "integer"
            },
            "removeContent": {
               "type": "text",
@@ -167,8 +170,8 @@ PUT bbd_opinion_op_record
            "removeReason": {
               "type": "integer"
            },
-           "targeter": {
-              "type": "keyword"
+           "targeterId": {
+              "type": "integer"
            },
            "transferContent": {
               "type": "text",
