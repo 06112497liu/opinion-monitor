@@ -138,7 +138,12 @@ public class OpinionReportServiceImpl implements OpinionReportService {
         ReportElementModel channelModel = buildReportElementModel("channelDistribution", "channelDistributionData", channelDistributionInfo, ReportTitle.keyValueTitle);
 
             // 舆情信息概要
-        esQueryService.queryWarningOpinion(firstWarnTime);
+        List<OpinionBaseInfoReport> opinionBaseInfo = esQueryService.queryWarningOpinion(firstWarnTime);
+        ReportElementModel baseModel = buildReportElementModel("opinionInfo", "opinionInfoData", opinionBaseInfo, ReportTitle.opinionBaseInfoTitle);
+
+        ArrayListMultimap<StructureEnum, ReportElementModel> elements = buildArrayListMultimap(StructureEnum.GROUP_FOOTER, baseModel, channelModel, opinionStaModel);
+        ReportEngine reportEngine = new ReportEngine();
+        reportEngine.generateReport(detailSource, elements, params, ExportEnum.PDF, out);
     }
 
     private Integer buildType(String type) {

@@ -10,7 +10,6 @@ import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.service.param.OpinionBaseInfoReport;
-import com.bbd.service.param.OpinionStaReport;
 import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
