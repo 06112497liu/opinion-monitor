@@ -631,6 +631,7 @@ public class EventService{
         }
         for (String e : BeanUtils.getProperty(opinionEventStatistic, column).split("#")) {
             KeyValueVO vo = new KeyValueVO();
+            vo.setKey(e.split(",")[0]);
             vo.setName(e.split(",")[0]);
             vo.setValue(e.split(",")[1]);
             rs.add(vo);
