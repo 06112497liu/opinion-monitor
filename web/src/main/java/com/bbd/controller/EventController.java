@@ -8,12 +8,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bbd.RestResult;
+import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.service.EsQueryService;
@@ -247,7 +247,12 @@ public class EventController extends AbstractController {
         })
     @RequestMapping(value = "eventSrcDis", method = RequestMethod.GET)
     public RestResult eventSrcDis(Long id, Integer cycle) throws Exception {
-       return RestResult.ok(eventService.eventSrcDis(id, cycle));
+        List<KeyValueVO> data = eventService.eventSrcDis(id, cycle);
+        List<KeyValueVO> tmp = new ArrayList<KeyValueVO>();
+        for (int i=data.size()-1;i>=0;i--) {
+            tmp.add(data.get(i));
+        }
+       return RestResult.ok(tmp);
     }
     
     @ApiOperation(value = "图表跟踪分析/信息走势图", httpMethod = "GET")
