@@ -707,10 +707,11 @@ public class EventService{
         long crt = 0;
         long opp = 0;
         for (KeyValueVO vo : rs) {
+            long value = Long.valueOf(String.valueOf(vo.getValue()));
             if (String.valueOf(vo.getKey()).equals("0") || String.valueOf(vo.getKey()).equals("1")) {
-                crt = crt + (long)vo.getValue();
+                crt = crt + value;
             } else {
-                opp = opp + (long)vo.getValue();
+                opp = opp + value;
             }
         }
         if (opp > 0) {
