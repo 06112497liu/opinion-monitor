@@ -12,21 +12,9 @@
 	    http://www.springframework.org/schema/task 
         http://www.springframework.org/schema/task/spring-task.xsd"
         xmlns="http://www.springframework.org/schema/beans">
-        
-    <!-- 启动定时器 --> 
-    <task:annotation-driven/> 
-    
-    <bean id="propertiesConfig"
-          class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-        <property name="locations">
-            <list>
-                <value>classpath:config.properties</value>
-                <value>file:/var/reddata/web/opinion/config.properties</value> 
-            </list>
-        </property>
-        <!-- 设置编码格式 -->
-        <property name="fileEncoding" value="UTF-8"></property>
-    </bean>
+
+    <!-- 启动定时器 -->
+    <task:annotation-driven/>
 
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="properties" ref="propertiesConfig"/>
@@ -41,5 +29,48 @@
     </context:component-scan>
 
     <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <beans profile="dev">
+        <bean id="propertiesConfig"
+              class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+            <property name="locations">
+                <list>
+                    <value>classpath:config.properties</value>
+                    <value>classpath:config-dev.properties</value>
+                </list>
+            </property>
+            <!-- 设置编码格式 -->
+            <property name="fileEncoding" value="UTF-8"></property>
+        </bean>
+    </beans>
+
+    <beans profile="test">
+        <bean id="propertiesConfig"
+              class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+            <property name="locations">
+                <list>
+                    <value>classpath:config.properties</value>
+                    <value>classpath:config-test.properties</value>
+                </list>
+            </property>
+            <!-- 设置编码格式 -->
+            <property name="fileEncoding" value="UTF-8"></property>
+        </bean>
+    </beans>
+
+    <beans profile="prod">
+        <bean id="propertiesConfig"
+              class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+            <property name="locations">
+                <list>
+                    <value>classpath:config.properties</value>
+                    <value>classpath:config-prod.properties</value>
+                </list>
+            </property>
+            <!-- 设置编码格式 -->
+            <property name="fileEncoding" value="UTF-8"></property>
+        </bean>
+    </beans>
+
 
 </beans>
