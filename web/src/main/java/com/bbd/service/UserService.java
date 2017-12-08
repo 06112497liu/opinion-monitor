@@ -8,10 +8,7 @@ import com.bbd.bean.UserListVO;
 import com.bbd.dao.AccountDao;
 import com.bbd.dao.UserDao;
 import com.bbd.dao.UserExtDao;
-import com.bbd.domain.Account;
-import com.bbd.domain.AccountExample;
-import com.bbd.domain.User;
-import com.bbd.domain.UserExample;
+import com.bbd.domain.*;
 import com.bbd.enums.DistrictExtEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
@@ -74,7 +71,7 @@ public class UserService {
      * 转发用户列表
      * @return
      */
-    public Map<Long, String> getTransferUsers(String region) {
+    public List<KeyValueVO> getTransferUsers(String region) {
         Long id = UserContext.getUser().getId();
         AccountExample example = new AccountExample();
         AccountExample.Criteria criteria = example.createCriteria();
@@ -82,7 +79,13 @@ public class UserService {
             criteria.andRegionEqualTo(region);
         criteria.andUserIdNotEqualTo(id);
         List<Account> list = accountDao.selectByExample(example);
-        Map<Long, String> rs = list.stream().collect(Collectors.toMap(Account::getUserId, Account::getName));
+        List<KeyValueVO> rs = list.stream().map(p -> {
+                                    KeyValueVO v = new KeyValueVO();
+                                    v.setKey(p.getUserId());
+                                    v.setName(p.getUserId().toString());
+                                    v.setValue(p.getName());
+                                    return v;
+                                }).collect(Collectors.toList());
         return rs;
     }
 

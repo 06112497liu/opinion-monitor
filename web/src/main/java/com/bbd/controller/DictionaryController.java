@@ -1,6 +1,7 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
+import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.DictionaryService;
@@ -51,7 +52,7 @@ public class DictionaryController {
     })
     @RequestMapping(value = "transfer/list", method = RequestMethod.GET)
     public RestResult getTransferUsers(String region) {
-        Map<Long, String> rs = userService.getTransferUsers(region);
+        List<KeyValueVO> rs = userService.getTransferUsers(region);
         return RestResult.ok(rs);
     }
 }
