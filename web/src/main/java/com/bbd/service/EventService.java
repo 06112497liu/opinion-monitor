@@ -763,6 +763,7 @@ public class EventService{
     
     public List<OpinionEvent> getHisEventList(String eventLevel, String region, Date startTime, Date endTime, Integer pageNo, Integer pageSize){
         OpinionEventExample example = new OpinionEventExample();
+        example.setOrderByClause("gmt_file DESC");
         Criteria criteria = example.createCriteria();
         if (eventLevel != null){
             criteria.andEventLevelEqualTo(eventLevel);
