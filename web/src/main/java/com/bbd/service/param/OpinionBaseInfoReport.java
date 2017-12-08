@@ -28,6 +28,8 @@ public class OpinionBaseInfoReport {
 
     private Integer level;
 
+    private String publishTime;
+
     public String getTitle() {
         return title;
     }
@@ -114,6 +116,14 @@ public class OpinionBaseInfoReport {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getPublishTime() {
+        return publishTime;
+    }
+
+    public void setPublishTime(String publishTime) {
+        this.publishTime = publishTime;
     }
 }
     

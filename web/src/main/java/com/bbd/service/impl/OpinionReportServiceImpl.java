@@ -61,6 +61,8 @@ public class OpinionReportServiceImpl implements OpinionReportService {
     private static final Logger           logger = LoggerFactory.getLogger(OpinionReportServiceImpl.class);
     private static final     Optional<String> detailSource = Optional.of("report/opinionDetail.prpt");
 
+    private static final     Optional<String> opinionStaSource = Optional.of("report/opinionSta.prpt");
+
     // 处理下载文件问题
     private OutputStream buildResponse(String fileName, HttpServletResponse response) throws IOException {
         response.addHeader("Content-disposition","attachment;filename="+ URLEncoder.encode(fileName,"UTF-8")+";filename*=UTF-8''"+URLEncoder.encode(fileName,"UTF-8"));
@@ -74,7 +76,7 @@ public class OpinionReportServiceImpl implements OpinionReportService {
      * @param detail
      */
     @Override
-    public void generateDetailReport(OutputStream out, OpinionEsVO detail) {
+    public void generateDetailReport(OutputStream out, OpinionExtVO detail) {
 
         // step-1：报表参数
         Map<String, Object> params = Maps.newHashMap();
@@ -126,12 +128,12 @@ public class OpinionReportServiceImpl implements OpinionReportService {
             // 舆情情感数量
         List<KeyValueVO> assectionSta = esQueryService.queryAffectionSta(firstWarnTime);
         for (KeyValueVO v : assectionSta) {
-            Integer emotion = Integer.parseInt(v.getKey().toString());
-            if ("0".equals(emotion)) opinionStaInfo.setNeutral((Long) v.getValue());
-            if ("1".equals(emotion)) opinionStaInfo.setPositive((Long) v.getValue());
-            if ("2".equals(emotion)) opinionStaInfo.setNegative((Long) v.getValue());
+            String emotionStr =v.getKey().toString();
+            if ("0".equals(emotionStr)) opinionStaInfo.setNeutral((Long) v.getValue());
+            if ("1".equals(emotionStr)) opinionStaInfo.setPositive((Long) v.getValue());
+            if ("2".equals(emotionStr)) opinionStaInfo.setNegative((Long) v.getValue());
         }
-        ReportElementModel opinionStaModel = buildReportElementModel("opinionSta", "opinionStaData", Arrays.asList(opinionStaInfo), ReportTitle.opinionBaseInfoTitle);
+        ReportElementModel opinionStaModel = buildReportElementModel("opinionBase", "opinionBaseData", Arrays.asList(opinionStaInfo), ReportTitle.opinionStaTitle);
 
             // 舆情传播渠道
         List<KeyValueVO> channelDistributionInfo = statisticService.getOpinionChannelTrend(firstWarnTime);
@@ -139,11 +141,17 @@ public class OpinionReportServiceImpl implements OpinionReportService {
 
             // 舆情信息概要
         List<OpinionBaseInfoReport> opinionBaseInfo = esQueryService.queryWarningOpinion(firstWarnTime);
+        int count = 1;
+        for (OpinionBaseInfoReport info : opinionBaseInfo) {
+            info.setTitle(count++ + "、"+ info.getTitle());
+            info.setEmotionDesc(buildEmotionDesc(info.getEmotion()));
+            info.setLevelDesc(buildLevleDesc(info.getLevel()));
+        }
         ReportElementModel baseModel = buildReportElementModel("opinionInfo", "opinionInfoData", opinionBaseInfo, ReportTitle.opinionBaseInfoTitle);
 
-        ArrayListMultimap<StructureEnum, ReportElementModel> elements = buildArrayListMultimap(StructureEnum.GROUP_FOOTER, baseModel, channelModel, opinionStaModel);
+        ArrayListMultimap<StructureEnum, ReportElementModel> elements = buildArrayListMultimap(StructureEnum.REPORT_HEADER, baseModel, channelModel, opinionStaModel);
         ReportEngine reportEngine = new ReportEngine();
-        reportEngine.generateReport(detailSource, elements, params, ExportEnum.PDF, out);
+        reportEngine.generateReport(opinionStaSource, elements, params, ExportEnum.PDF, out);
     }
 
     private Integer buildType(String type) {

@@ -11,6 +11,7 @@ import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.constant.EsConstant;
 import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.OpinionEvent;
+import com.bbd.domain.WarnSetting;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
 import com.bbd.service.SystemSettingService;
@@ -463,12 +464,19 @@ public class EsQueryServiceImpl implements EsQueryService {
     public List<OpinionBaseInfoReport> queryWarningOpinion(DateTime firstWarnTime) {
         TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
-                .setSize(5000)
+                .setSize(50)
                 .setQuery(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(firstWarnTime.toString("yyyy-MM-dd HH:mm:ss")))
                 .setFetchSource(null, new String[]{EsConstant.contentField, EsConstant.keysField, EsConstant.keywordField})
                 .addSort(EsConstant.hotField, SortOrder.DESC)
                 .execute().actionGet();
         List<OpinionBaseInfoReport> rs = EsUtil.buildResult(resp, OpinionBaseInfoReport.class);
+        List<WarnSetting> setting = settingService.queryWarnSetting(3);
+        for (OpinionBaseInfoReport r : rs) {
+            if (r.getLevel() == null) {
+                Integer level = settingService.judgeOpinionSettingClass(r.getHot(), setting);
+                r.setLevel(level);
+            }
+        }
         return rs;
     }
 

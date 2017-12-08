@@ -8,6 +8,8 @@ import com.bbd.bean.OpinionEsVO;
 import com.bbd.context.SessionContext;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionReportService;
+import com.bbd.service.OpinionService;
+import com.bbd.service.vo.OpinionExtVO;
 import com.bbd.util.DateUtil;
 import com.bbd.util.ValidateUtil;
 import io.swagger.annotations.Api;
@@ -59,7 +61,7 @@ public class ReportController extends AbstractController {
     private OpinionReportService opinionReportService;
 
     @Autowired
-    private EsQueryService esQueryService;
+    private OpinionService opinionService;
     
     @ApiOperation(value = "创建事件", httpMethod = "POST")
     
@@ -77,7 +79,7 @@ public class ReportController extends AbstractController {
     public RestResult opinionDetailReport(String uuid) throws Exception{
         ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
         // 舆情详情
-        OpinionEsVO opinionDetail = esQueryService.getOpinionByUUID(uuid);
+        OpinionExtVO opinionDetail = opinionService.getOpinionDetail(uuid);
         HttpServletResponse resp = SessionContext.getResponse();
         String filename = "《" + opinionDetail.getTitle() + "》舆情详情简报.pdf";
         OutputStream out = buildResponse(filename, resp);
