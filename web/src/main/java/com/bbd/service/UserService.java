@@ -71,7 +71,7 @@ public class UserService {
      * 转发用户列表
      * @return
      */
-    public List<KeyValueVO> getTransferUsers(String region) {
+    public List<OpinionDictionary> getTransferUsers(String region) {
         Long id = UserContext.getUser().getId();
         AccountExample example = new AccountExample();
         AccountExample.Criteria criteria = example.createCriteria();
@@ -79,11 +79,10 @@ public class UserService {
             criteria.andRegionEqualTo(region);
         criteria.andUserIdNotEqualTo(id);
         List<Account> list = accountDao.selectByExample(example);
-        List<KeyValueVO> rs = list.stream().map(p -> {
-                                    KeyValueVO v = new KeyValueVO();
-                                    v.setKey(p.getUserId());
-                                    v.setName(p.getUserId().toString());
-                                    v.setValue(p.getName());
+        List<OpinionDictionary> rs = list.stream().map(p -> {
+                                    OpinionDictionary v = new OpinionDictionary();
+                                    v.setCode(p.getUserId().toString());
+                                    v.setName(p.getName());
                                     return v;
                                 }).collect(Collectors.toList());
         return rs;

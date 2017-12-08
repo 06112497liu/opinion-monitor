@@ -52,7 +52,7 @@ public class DictionaryController {
     })
     @RequestMapping(value = "transfer/list", method = RequestMethod.GET)
     public RestResult getTransferUsers(String region) {
-        List<KeyValueVO> rs = userService.getTransferUsers(region);
+        List<OpinionDictionary> rs = userService.getTransferUsers(region);
         return RestResult.ok(rs);
     }
 }
