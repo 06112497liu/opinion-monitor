@@ -828,7 +828,7 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .setFrom(pb.getOffset()).setSize(pb.getLimit())
                 .setQuery(query)
                 .setFetchSource(null, new String[]{EsConstant.keysField, EsConstant.keywordField, EsConstant.contentField})
-                .addSort(EsConstant.hotField, SortOrder.DESC)
+                .addSort(EsConstant.recordTimeField, SortOrder.DESC)
                 .execute().actionGet();
 
         // step-3：返回查询结果
@@ -868,7 +868,7 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .setFrom(pb.getOffset()).setSize(pb.getLimit())
                 .setQuery(query)
                 .setFetchSource(null, new String[]{EsConstant.contentField, EsConstant.keywordField, EsConstant.keysField})
-                .addSort(EsConstant.hotField, SortOrder.DESC)
+                .addSort(EsConstant.recordTimeField, SortOrder.DESC)
                 .execute().actionGet();
 
         // step-3：返回查询结果

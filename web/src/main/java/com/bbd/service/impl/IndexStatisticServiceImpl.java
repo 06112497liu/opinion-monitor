@@ -191,6 +191,7 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     public List<KeyValueVO> getEventChannelTrend() {
 
         List<KeyValueVO> list = esQueryService.getOpinionMediaSpread();
+        if (list.isEmpty()) return Lists.newArrayList();
 
         long count = list.stream().map(v -> {
             Object num = v.getValue();

@@ -12,11 +12,13 @@ import com.bbd.report.model.ReportElementModel;
 import com.bbd.report.model.TableDataModel;
 import com.bbd.report.model.TextDataModel;
 import com.bbd.service.EsQueryService;
+import com.bbd.service.IndexStatisticService;
 import com.bbd.service.OpinionReportService;
 import com.bbd.service.OpinionService;
 import com.bbd.service.param.OpinionBaseInfoReport;
 import com.bbd.service.param.ReportTitle;
 import com.bbd.service.report.ReportUtil;
+import com.bbd.service.vo.OpinionCountStatVO;
 import com.bbd.service.vo.OpinionExtVO;
 import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.DateUtil;
@@ -49,6 +51,9 @@ public class OpinionReportServiceImpl implements OpinionReportService {
 
     @Autowired
     private OpinionService opinionService;
+
+    @Autowired
+    private IndexStatisticService statisticService;
 
     private static final Logger           logger = LoggerFactory.getLogger(OpinionReportServiceImpl.class);
     private static final     Optional<String> detailSource = Optional.of("report/opinionDetail.prpt");
@@ -100,7 +105,7 @@ public class OpinionReportServiceImpl implements OpinionReportService {
      * @param type
      */
     @Override
-    public void generateStaReport(OutputStream out, String type) {
+    public void generateStaReport(OutputStream out, String type) throws NoSuchFieldException, IllegalAccessException {
         Date now = new Date();
         // step-1：报表全局参数
         Map<String, Object> params = Maps.newHashMap();
@@ -110,6 +115,8 @@ public class OpinionReportServiceImpl implements OpinionReportService {
 
         // step-2：报表元素
         Integer state = buildType(type);
+        OpinionCountStatVO opinionSta = statisticService.getOpinionCountStatistic(state);
+        
     }
 
     private Integer buildType(String type) {
