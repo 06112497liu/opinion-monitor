@@ -631,6 +631,7 @@ public class EventService{
         }
         for (String e : BeanUtils.getProperty(opinionEventStatistic, column).split("#")) {
             KeyValueVO vo = new KeyValueVO();
+            vo.setKey(e.split(",")[0]);
             vo.setName(e.split(",")[0]);
             vo.setValue(e.split(",")[1]);
             rs.add(vo);
@@ -762,6 +763,7 @@ public class EventService{
     
     public List<OpinionEvent> getHisEventList(String eventLevel, String region, Date startTime, Date endTime, Integer pageNo, Integer pageSize){
         OpinionEventExample example = new OpinionEventExample();
+        example.setOrderByClause("gmt_file DESC");
         Criteria criteria = example.createCriteria();
         if (eventLevel != null){
             criteria.andEventLevelEqualTo(eventLevel);
