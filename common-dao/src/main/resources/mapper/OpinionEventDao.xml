@@ -664,9 +664,8 @@
 	GROUP BY b.`name`
   </select>
   <select id="eventRegionDis" resultMap="KeyValueVO">
-    SELECT b.`name` AS `name`,COUNT(1) AS `value`
-	FROM `bbd_opinion_event` a, `bbd_opinion_dictionary` b 
-	WHERE a.`region` = b.`code` AND `parent`='C' AND `is_delete`=0
-	GROUP BY b.`name`
+    SELECT a.`name` AS `name`,SUM(CASE WHEN b.id IS NULL THEN 0 ELSE 1 END) AS `value`
+	FROM (SELECT * FROM bbd_opinion_dictionary WHERE `parent`='C') AS a LEFT JOIN (SELECT * FROM bbd_opinion_event WHERE `is_delete`=0) AS b ON b.`region` = a.`code` 
+	GROUP BY a.name
   </select>
 </mapper>

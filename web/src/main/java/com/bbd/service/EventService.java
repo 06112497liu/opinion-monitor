@@ -732,7 +732,7 @@ public class EventService{
      * 舆情事件类别分布 
      * @return 
      */
-    public List<com.bbd.domain.KeyValueVO> eventTypeDis() {
+    public List<KeyValueVO> eventTypeDis() {
         return opinionEventDao.eventTypeDis();
     }
     /** 
@@ -741,15 +741,16 @@ public class EventService{
      */
     public Map<String, Object> eventRegionDis() {
         Map<String, Object> map = new HashMap<String, Object>();
-        List<com.bbd.domain.KeyValueVO> gs = opinionEventDao.eventRegionDis();
+        List<KeyValueVO> gs = opinionEventDao.eventRegionDis();
         long max = 0;
         long min = 0;
-        for (com.bbd.domain.KeyValueVO e : gs) {
-            if (max < (long)e.getValue()) {
-                max = (long)e.getValue();
+        for (KeyValueVO e : gs) {
+            long value = Long.valueOf(String.valueOf(e.getValue()));
+            if (max < value) {
+                max = value;
             } 
-            if (min > (long)e.getValue()) {
-                min = (long)e.getValue();
+            if (min > value) {
+                min = value;
             } 
         }
         map.put("regioins", gs);
