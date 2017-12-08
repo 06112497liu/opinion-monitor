@@ -9,9 +9,11 @@ public class ReportTitle {
     public static final Object[] opinionBaseInfoTitle =
             new String[]{"title", "similiarCount", "website", "hot", "levelDesc", "emotionDesc", "commentCount", "link", "summary", "emotion", "level"};
 
-    public static final Object[] keyValueTile =
+    public static final Object[] keyValueTitle =
             new String[]{"key", "name", "value"};
 
+    public static final Object[] opinionStaTitle =
+            new String[]{"total", "levelOne", "levelTwo", "levelThree", "positive", "negative", "neutral"};
 }
     
     

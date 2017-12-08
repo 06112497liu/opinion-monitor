@@ -4,22 +4,22 @@
  */
 package com.bbd.service;
 
-import java.util.List;
-import java.util.Map;
-
+import com.bbd.bean.EventEsVO;
+import com.bbd.bean.OpinionEsVO;
+import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.domain.KeyValueVO;
+import com.bbd.domain.OpinionEvent;
+import com.bbd.service.param.OpinionBaseInfoReport;
+import com.bbd.service.param.OpinionStaReport;
 import com.bbd.service.vo.*;
-
+import com.mybatis.domain.PageBounds;
+import com.mybatis.domain.PageList;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
-import com.bbd.bean.EventEsVO;
-import com.bbd.bean.OpinionEsVO;
-import com.bbd.bean.OpinionHotEsVO;
-import com.bbd.domain.OpinionEvent;
-import com.mybatis.domain.PageBounds;
-import com.mybatis.domain.PageList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ES查询服务
@@ -111,6 +111,13 @@ public interface EsQueryService {
     List<KeyValueVO> getOpinionMediaSpread();
 
     /**
+     * 根据预警时间来判断舆情传播渠道分布
+     * @param firstWarnTime
+     * @return
+     */
+    List<KeyValueVO> getOpinionMediaSpread(DateTime firstWarnTime);
+
+    /**
      * 查询预警舆情
      * @param startTime: 开始时间
      * @param emotion: 情感
@@ -119,6 +126,13 @@ public interface EsQueryService {
      * @return
      */
     OpinionEsSearchVO queryWarningOpinion(DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb);
+
+    /**
+     * 查询预警舆情
+     * @param firstWarnTime
+     * @return
+     */
+    List<OpinionBaseInfoReport> queryWarningOpinion(DateTime firstWarnTime);
 
     /**
      * 查询舆情事件
@@ -310,7 +324,6 @@ public interface EsQueryService {
      * @param dateTime
      * @return
      */
-    Map<String, Long> queryAffectionSta(DateTime dateTime);
-
+    List<KeyValueVO> queryAffectionSta(DateTime dateTime);
 
 }

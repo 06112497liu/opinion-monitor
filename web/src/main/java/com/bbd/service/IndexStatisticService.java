@@ -7,6 +7,7 @@ package com.bbd.service;
 import com.bbd.domain.KeyValueVO;
 import com.bbd.service.param.OpinionCountStatQueryParam;
 import com.bbd.service.vo.*;
+import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
@@ -60,18 +61,13 @@ public interface IndexStatisticService {
      * 舆情传播渠道分布
      * @return
      */
-    List<KeyValueVO> getEventChannelTrend();
+    List<KeyValueVO> getOpinionChannelTrend();
 
     /**
-     * 舆情事件类别分布
+     * 舆情传播渠道分布(根据预警时间)
+     * @param firstWarnTime
      * @return
      */
-    List<KeyValueVO> getEventClassTrend();
-
-    /**
-     * 舆情事件地域分布
-     * @return
-     */
-    List<KeyValueVO> getEventAreaTrend();
+    List<KeyValueVO> getOpinionChannelTrend(DateTime firstWarnTime);
 
 }

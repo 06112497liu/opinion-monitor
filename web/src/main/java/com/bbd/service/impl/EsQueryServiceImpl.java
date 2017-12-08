@@ -14,6 +14,8 @@ import com.bbd.domain.OpinionEvent;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
 import com.bbd.service.SystemSettingService;
+import com.bbd.service.param.OpinionBaseInfoReport;
+import com.bbd.service.param.OpinionStaReport;
 import com.bbd.service.param.WarnSettingVo;
 import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.*;
@@ -30,10 +32,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -377,6 +376,25 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     /**
+     * 根据预警时间来判断舆情传播渠道分布
+     * @param firstWarnTime
+     * @return
+     */
+    @Override
+    public List<KeyValueVO> getOpinionMediaSpread(DateTime firstWarnTime) {
+        String aggName = "media_aggs";
+        TransportClient client = esUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setQuery(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(firstWarnTime.toString("yyyy-MM-dd HH:mm:ss")))
+                .addAggregation(
+                        AggregationBuilders.terms(aggName)
+                                .field(EsConstant.mediaTypeField).size(10).order(Terms.Order.count(true))
+                ).setSize(0).execute()
+                .actionGet();
+        return buildTermLists(resp, aggName);
+    }
+
+    /**
      * 查询预警舆情
      * @param startTime: 开始时间
      * @param emotion: 情感
@@ -412,7 +430,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
                 .setFrom(pb.getOffset()).setSize(pb.getLimit())
                 .setQuery(query)
-                .setFetchSource(null, EsConstant.contentField)
+                .setFetchSource(null, new String[]{EsConstant.contentField, EsConstant.keysField, EsConstant.keywordField})
                 .addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC))
                 .addAggregation(hotLevelAgg).addAggregation(mediaAgg);
         if (mediaType != null)
@@ -432,6 +450,24 @@ public class EsQueryServiceImpl implements EsQueryService {
         result.setMediaTypeStats(mediaList);
 
         return result;
+    }
+
+    /**
+     * 查询预警舆情
+     * @param firstWarnTime
+     * @return
+     */
+    @Override
+    public List<OpinionBaseInfoReport> queryWarningOpinion(DateTime firstWarnTime) {
+        TransportClient client = esUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setSize(5000)
+                .setQuery(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(firstWarnTime.toString("yyyy-MM-dd HH:mm:ss")))
+                .setFetchSource(null, new String[]{EsConstant.contentField, EsConstant.keysField, EsConstant.keywordField})
+                .addSort(EsConstant.hotField, SortOrder.DESC)
+                .execute().actionGet();
+        List<OpinionBaseInfoReport> rs = EsUtil.buildResult(resp, OpinionBaseInfoReport.class);
+        return rs;
     }
 
     @Override
@@ -1155,8 +1191,16 @@ public class EsQueryServiceImpl implements EsQueryService {
      * @return
      */
     @Override
-    public Map<String, Long> queryAffectionSta(DateTime dateTime) {
-        return null;
+    public List<KeyValueVO> queryAffectionSta(DateTime dateTime) {
+        String aggs = "affection_aggs";
+        TransportClient client = esUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setQuery(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(dateTime.toString("yyyy-MM-dd HH:mm:ss")))
+                .setSize(0)
+                .addAggregation(AggregationBuilders.terms(aggs).field(EsConstant.emotionField))
+                .execute().actionGet();
+        List<KeyValueVO> rs = buildTermLists(resp, aggs);
+        return rs;
     }
 
     /**

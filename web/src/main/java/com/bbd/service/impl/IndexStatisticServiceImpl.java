@@ -188,11 +188,26 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
      * @return
      */
     @Override
-    public List<KeyValueVO> getEventChannelTrend() {
-
+    public List<KeyValueVO> getOpinionChannelTrend() {
         List<KeyValueVO> list = esQueryService.getOpinionMediaSpread();
         if (list.isEmpty()) return Lists.newArrayList();
+        calPercent(list);
+        return list;
+    }
 
+    /**
+     * 舆情传播渠道分布(根据预警时间)
+     * @param firstWarnTime
+     * @return
+     */
+    @Override
+    public List<KeyValueVO> getOpinionChannelTrend(DateTime firstWarnTime) {
+        List<KeyValueVO> list = esQueryService.getOpinionMediaSpread(firstWarnTime);
+        calPercent(list);
+        return list;
+    }
+
+    private void calPercent(List<KeyValueVO> list) {
         long count = list.stream().map(v -> {
             Object num = v.getValue();
             return Long.parseLong(num.toString());
@@ -204,16 +219,5 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
             double per = BigDecimalUtil.div(num, count, 4);
             k.setValue(BigDecimalUtil.mul(per, 100));
         });
-        return list;
-    }
-
-    @Override
-    public List<KeyValueVO> getEventClassTrend() {
-        return null;
-    }
-
-    @Override
-    public List<KeyValueVO> getEventAreaTrend() {
-        return null;
     }
 }

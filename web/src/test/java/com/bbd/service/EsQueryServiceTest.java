@@ -5,6 +5,7 @@
 package com.bbd.service;
 
 import com.bbd.domain.KeyValueVO;
+import com.bbd.service.param.OpinionStaReport;
 import com.bbd.service.vo.OpinionEsSearchVO;
 import com.mybatis.domain.PageBounds;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
@@ -113,5 +114,12 @@ public class EsQueryServiceTest extends BaseServiceTest {
     public void testGetMaxHot() {
         DateTime lastSendTime = DateTime.now().plusMonths(-1);
         esQueryService.queryMaxHot(lastSendTime, 1);
+    }
+
+    @Test
+    public void testQueryAffectionSta() {
+        DateTime time = DateTime.now().plusMonths(-5);
+        List<KeyValueVO> list = esQueryService.queryAffectionSta(time);
+        System.out.println(list);
     }
 }
