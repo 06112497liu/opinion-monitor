@@ -717,7 +717,8 @@ public class EsQueryServiceImpl implements EsQueryService {
             booleanQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
         }
         booleanQuery.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
-
+        booleanQuery.mustNot(QueryBuilders.termQuery(EsConstant.websiteField, ""));
+        
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(booleanQuery).addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.websiteField).size(8)).setSize(0)
                 .execute().actionGet();
         return buildTermLists(resp, aggName);
