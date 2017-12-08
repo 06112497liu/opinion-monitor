@@ -2,6 +2,8 @@ package com.bbd.service.impl;
 
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.domain.KeyValueVO;
+import com.bbd.exception.ApplicationException;
+import com.bbd.exception.CommonErrorCode;
 import com.bbd.report.ReportEngine;
 import com.bbd.report.enums.ElementEnum;
 import com.bbd.report.enums.ExportEnum;
@@ -99,7 +101,22 @@ public class OpinionReportServiceImpl implements OpinionReportService {
      */
     @Override
     public void generateStaReport(OutputStream out, String type) {
+        Date now = new Date();
+        // step-1：报表全局参数
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("time1", DateUtil.formatDateByPatten(now, "yyyy年MM月dd日 HH:mm"));
+        params.put("time2", DateUtil.formatDateByPatten(now, "yyyy-MM-dd"));
+        params.put("timeSpan", type);
 
+        // step-2：报表元素
+        Integer state = buildType(type);
+    }
+
+    private Integer buildType(String type) {
+        if ("日".equals(type)) return 1;
+        if ("周".equals(type)) return 2;
+        if ("月".equals(type)) return 3;
+        else throw new ApplicationException(CommonErrorCode.PARAM_ERROR);
     }
 
     private String buildEmotionDesc(Integer emotion) {

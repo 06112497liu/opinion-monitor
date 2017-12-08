@@ -89,7 +89,7 @@ public class ReportController extends AbstractController {
     @ApiImplicitParams({
             @ApiImplicitParam(value = "报告类型（日、月、周）", name = "type", dataType = "String", paramType = "query", required = true)
     })
-    @RequestMapping(value = "opinion/detail", method = RequestMethod.GET)
+    @RequestMapping(value = "opinion/sta", method = RequestMethod.GET)
     public RestResult opinionStaReport(String type) throws Exception{
         HttpServletResponse resp = SessionContext.getResponse();
         String filename = "消费舆情监测预警系统预警舆情" + type + "报"+ DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm") +".pdf";
