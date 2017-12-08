@@ -1150,6 +1150,16 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     /**
+     * 舆情情感数量统计
+     * @param dateTime
+     * @return
+     */
+    @Override
+    public Map<String, Long> queryAffectionSta(DateTime dateTime) {
+        return null;
+    }
+
+    /**
      * 添加范围查询
      * @param dateRange
      * @param state 1-累积总量；2-当月数量

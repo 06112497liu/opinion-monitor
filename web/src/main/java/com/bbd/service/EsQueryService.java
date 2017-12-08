@@ -304,4 +304,13 @@ public interface EsQueryService {
      * @param uuid
      */
     OpinionEsVO queryHistoryWarnDetail(String uuid);
+
+    /**
+     * 舆情情感数量统计
+     * @param dateTime
+     * @return
+     */
+    Map<String, Long> queryAffectionSta(DateTime dateTime);
+
+
 }
