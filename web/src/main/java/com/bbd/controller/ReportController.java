@@ -4,9 +4,11 @@
  */
 package com.bbd.controller;
 
+import com.bbd.bean.OpinionEsVO;
 import com.bbd.context.SessionContext;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionReportService;
+import com.bbd.util.DateUtil;
 import com.bbd.util.ValidateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -55,6 +57,9 @@ public class ReportController extends AbstractController {
 
     @Autowired
     private OpinionReportService opinionReportService;
+
+    @Autowired
+    private EsQueryService esQueryService;
     
     @ApiOperation(value = "创建事件", httpMethod = "POST")
     
@@ -71,10 +76,25 @@ public class ReportController extends AbstractController {
     @RequestMapping(value = "opinion/detail", method = RequestMethod.GET)
     public RestResult opinionDetailReport(String uuid) throws Exception{
         ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
+        // 舆情详情
+        OpinionEsVO opinionDetail = esQueryService.getOpinionByUUID(uuid);
         HttpServletResponse resp = SessionContext.getResponse();
-        String filename = "舆情详情简报.pdf";
+        String filename = "《" + opinionDetail.getTitle() + "》舆情详情简报.pdf";
         OutputStream out = buildResponse(filename, resp);
-        opinionReportService.generateDetailReport(uuid, out);
+        opinionReportService.generateDetailReport(out, opinionDetail);
+        return RestResult.ok("下载成功");
+    }
+
+    @ApiOperation(value = "预警舆情（日、周、月）报", httpMethod = "GET")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "报告类型（日、月、周）", name = "type", dataType = "String", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "opinion/detail", method = RequestMethod.GET)
+    public RestResult opinionStaReport(String type) throws Exception{
+        HttpServletResponse resp = SessionContext.getResponse();
+        String filename = "消费舆情监测预警系统预警舆情" + type + "报"+ DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm") +".pdf";
+        OutputStream out = buildResponse(filename, resp);
+        opinionReportService.generateStaReport(out, type);
         return RestResult.ok("下载成功");
     }
 

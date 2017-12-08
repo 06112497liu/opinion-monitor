@@ -1,5 +1,7 @@
 package com.bbd.service;
 
+import com.bbd.bean.OpinionEsVO;
+
 import java.io.OutputStream;
 
 /**
@@ -10,8 +12,17 @@ public interface OpinionReportService {
 
     /**
      * 舆情详情报告
-     * @param uuid
+     * @param out
+     * @param opinionDetail
+     * @return
      */
-    void generateDetailReport(String uuid, OutputStream out);
+    void generateDetailReport(OutputStream out, OpinionEsVO opinionDetail);
+
+    /**
+     * 预警舆情（日、周、月）报
+     * @param out
+     * @param type
+     */
+    void generateStaReport(OutputStream out, String type);
 
 }

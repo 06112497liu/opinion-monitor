@@ -26,7 +26,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -48,14 +51,21 @@ public class OpinionReportServiceImpl implements OpinionReportService {
     private static final Logger           logger = LoggerFactory.getLogger(OpinionReportServiceImpl.class);
     private static final     Optional<String> detailSource = Optional.of("report/opinionDetail.prpt");
 
+    // 处理下载文件问题
+    private OutputStream buildResponse(String fileName, HttpServletResponse response) throws IOException {
+        response.addHeader("Content-disposition","attachment;filename="+ URLEncoder.encode(fileName,"UTF-8")+";filename*=UTF-8''"+URLEncoder.encode(fileName,"UTF-8"));
+        response.setContentType("application/x-msdownload;");
+        return response.getOutputStream();
+    }
+
     /**
      * 舆情详情报告
-     * @param uuid
+     * @param out
+     * @param detail
      */
     @Override
-    public void generateDetailReport(String uuid, OutputStream out) {
+    public void generateDetailReport(OutputStream out, OpinionEsVO detail) {
 
-        OpinionExtVO detail = opinionService.getOpinionDetail(uuid);
         // step-1：报表参数
         Map<String, Object> params = Maps.newHashMap();
         params.put("time", DateUtil.formatDateByPatten(new Date(), "yyyy年MM月dd日 HH:mm"));
@@ -69,7 +79,7 @@ public class OpinionReportServiceImpl implements OpinionReportService {
         ReportElementModel baseModel = buildReportElementModel("baseDetail", "baseDetailData", Arrays.asList(baseInfo), 3, ReportTitle.opinionBaseInfoTitle);
 
             // 舆情热度趋势
-        List<KeyValueVO> hotTrendInfo = opinionService.getOpinionHotTrend(uuid, 3);
+        List<KeyValueVO> hotTrendInfo = opinionService.getOpinionHotTrend(detail.getUuid(), 3);
         ReportElementModel hotTrendModel = buildReportElementModel("hotTrend", "hotTrendData", hotTrendInfo, 2, ReportTitle.keyValueTile);
 
             // 关键词云
@@ -80,6 +90,16 @@ public class OpinionReportServiceImpl implements OpinionReportService {
 
         ReportEngine reportEngine = new ReportEngine();
         reportEngine.generateReport(detailSource, elements, params, ExportEnum.PDF, out);
+    }
+
+    /**
+     * 预警舆情（日、周、月）报
+     * @param out
+     * @param type
+     */
+    @Override
+    public void generateStaReport(OutputStream out, String type) {
+
     }
 
     private String buildEmotionDesc(Integer emotion) {
@@ -116,6 +136,8 @@ public class OpinionReportServiceImpl implements OpinionReportService {
         }
         return list;
     }
+
+
 }
 
 

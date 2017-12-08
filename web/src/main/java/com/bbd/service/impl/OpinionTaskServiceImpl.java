@@ -146,6 +146,8 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     @Override
     public void transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
 
+        Date now = new Date();
+
         // step-1：校验当前用户是否有操作权限
         checkPermission(param.getUuid());
 
@@ -167,7 +169,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.opStatusField, 1);
         map.put(EsConstant.opOwnerField, targeterId);
         map.put(EsConstant.transferTypeField, param.getTransferType());
-        map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(now, "yyyy-MM-dd HH:mm:ss"));
         esModifyService.updateOpinion(operatorUser, param.getUuid(), map);
 
         // step-4：记录转发记录
@@ -179,7 +181,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         recordVO.setTransferNote(param.getTransferNote());
         recordVO.setOperatorId(UserContext.getUser().getId());
         recordVO.setTargeterId(targeterId);
-        recordVO.setOpTime(new Date());
+        recordVO.setOpTime(now);
         recordVO.setTransferContent(TransferEnum.getDescByCode(param.getTransferType().toString()));
 
             // 向es中添加转发记录
@@ -219,6 +221,8 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     @Override
     public void removeWarn(String uuid, Integer removeReason, String removeNote) throws InterruptedException, ExecutionException, IOException {
 
+        Date now = new Date();
+
         // step-1：校验当前用户是否有操作资格
         checkPermission(uuid);
 
@@ -228,13 +232,13 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.removeNoteField, removeNote);
         map.put(EsConstant.opStatusField, 2);
         map.put(EsConstant.opOwnerField, -1); // 解除之后，就没有目标操作者了
-        map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(now, "yyyy-MM-dd HH:mm:ss"));
         esModifyService.updateOpinion(operator, uuid, map);
 
         // step-3：记录解除记录
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
         recordVO.setOpType(2);
-        recordVO.setOpTime(new Date());
+        recordVO.setOpTime(now);
         recordVO.setOperatorId(UserContext.getUser().getId());
         recordVO.setTargeterId(-1L);
         recordVO.setUuid(uuid);
