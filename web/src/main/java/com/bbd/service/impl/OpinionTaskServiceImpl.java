@@ -72,8 +72,8 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     public PageList<OpinionTaskListVO> getUnProcessedList(Integer transferType, PageBounds pb) {
 
         Long targeterId = UserContext.getUser().getId();
-
         PageList<OpinionTaskListVO> result = esQueryService.getUnProcessedList(UserContext.getUser().getId(), transferType, pb);
+
         List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         result.forEach(o -> {
             o.setLevel(settingService.judgeOpinionSettingClass(o.getHot(), setting));

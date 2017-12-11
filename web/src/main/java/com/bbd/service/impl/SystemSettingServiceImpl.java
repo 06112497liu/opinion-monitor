@@ -204,7 +204,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     // 校验阈值是否符合规则
     private boolean checkThresholdValue(Integer type, Integer first, Integer second, Integer third) {
         boolean flag;
-        flag = Range.closed(0, 100).containsAll(Ints.asList(first, second, third));
+        flag = Range.closed(0, Integer.MAX_VALUE).containsAll(Ints.asList(first, second, third));
         if(flag == false) return flag;
         if(type != 1) {
             flag = (first > second && second > third);
