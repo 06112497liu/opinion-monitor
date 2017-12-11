@@ -673,8 +673,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setTypes(EsConstant.OPINION_TYPE).setSearchType(SearchType.DEFAULT)
                 .setFrom(pb.getOffset()).setSize(pb.getLimit())
                 .setQuery(query)
-                .setFetchSource(null, EsConstant.contentField)
-                .addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC));
+                .setFetchSource(null, EsConstant.contentField);
 
         // step-3：查询并返回结果
         OpinionEsSearchVO result = new OpinionEsSearchVO();
