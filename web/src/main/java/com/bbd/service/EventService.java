@@ -104,7 +104,7 @@ public class EventService{
         recordNew.setType(1);
         recordNew.setTargetType(2);
         recordNew.setPopup(1);
-        recordNew.setLevel(1);
+        recordNew.setLevel(0);
         recordNew.setMin(60);
         recordNew.setMax(Integer.MAX_VALUE);
         recordNew.setName("事件新增观点预警");
@@ -331,11 +331,11 @@ public class EventService{
      * @param pageSize
      * @return 
      */
-    public  HashMap<String, Object> getEventInfoList(Long id, Integer cycle, Integer emotion, Integer source, Integer pageNo, Integer pageSize) {
+    public  HashMap<String, Object> getEventInfoList(Long id, Integer cycle, Integer emotion, Integer source, Integer hot, Integer pageNo, Integer pageSize) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         PageBounds pb = new PageBounds(pageNo, pageSize);
         OpinionEsSearchVO esResult = esQueryService.queryEventOpinions(id, new DateTime(getStartDate(cycle)), emotion, 
-            source, pb);
+            source, hot, pb);
        
         List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
         List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
@@ -345,6 +345,10 @@ public class EventService{
         map.put("opinions", opinions);
         map.put("total", esResult.getTotal());
         map.put("mediaTypes",  calAllMedia(esResult.getMediaTypeStats()));
+        List<KeyValueVO> emotionStats = esResult.getEmotionStats();
+        transToChinese(emotionStats, "H");
+        map.put("emotionStats",  emotionStats);
+        map.put("hotLevelStats",  esResult.getHotLevelStats());
         return map;
         
     }
@@ -359,20 +363,6 @@ public class EventService{
         tmp.setValue(total);
         return tmp;
         
-    }
-   
-    
-    /**  
-     * 获取事件舆情列表的媒体标签
-     * @param id
-     * @param cycle
-     * @param emotion
-     * @return 
-     */
-    public  List<KeyValueVO> eventLabelList(Long id, Integer cycle, Integer emotion){
-        PageBounds pb = new PageBounds(1, 1);
-        OpinionEsSearchVO esResult = esQueryService.queryEventOpinions(id, new DateTime(getStartDate(cycle)), emotion, null, pb);
-        return calAllMedia(esResult.getMediaTypeStats());
     }
     
     public List<KeyValueVO> calAllMedia(List<KeyValueVO> mediaTypeSta) {

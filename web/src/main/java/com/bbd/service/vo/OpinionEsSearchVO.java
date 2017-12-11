@@ -21,6 +21,8 @@ public class OpinionEsSearchVO {
     private List<OpinionEsVO> opinions;
 
     private List<KeyValueVO> hotLevelStats;
+    
+    private List<KeyValueVO> emotionStats;
 
     private List<KeyValueVO>  mediaTypeStats;
 
@@ -46,6 +48,14 @@ public class OpinionEsSearchVO {
 
     public void setHotLevelStats(List<KeyValueVO> hotLevelStats) {
         this.hotLevelStats = hotLevelStats;
+    }
+
+    public List<KeyValueVO> getEmotionStats() {
+        return emotionStats;
+    }
+
+    public void setEmotionStats(List<KeyValueVO> emotionStats) {
+        this.emotionStats = emotionStats;
     }
 
     public List<KeyValueVO> getMediaTypeStats() {

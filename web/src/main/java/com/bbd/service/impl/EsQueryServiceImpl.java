@@ -28,6 +28,7 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
+
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -481,9 +482,10 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     @Override
-    public OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb) {
+    public OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, Integer hot, PageBounds pb) {
         String hotLevelAggName = "hot_level_agg";
         String mediaAggName = "media_agg";
+        String emotionAggName = "emotion_agg";
 
         // step-1：获取预警热度分界
         Map<Integer, Integer> map = settingService.getWarnClass();
@@ -496,19 +498,25 @@ public class EsQueryServiceImpl implements EsQueryService {
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
         query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
-        query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(10));
+        if (hot != -1) {
+            query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(hot));
+        } else {
+            query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
+        }
+        
         if (emotion != null)
             query.must(QueryBuilders.termQuery(EsConstant.emotionField, emotion));
 
         RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(EsConstant.hotField).keyed(true).addRange("levelOne", oneClass, Integer.MAX_VALUE)
                 .addRange("levelTwo", twoClss, oneClass - 1).addRange("levelThree", threeClass, twoClss - 1);
-        if (threeClass > 10) {
-            hotLevelAgg.addRange("overThanTen", 10, threeClass - 1);
+        if (hot != -1 && threeClass > 10) {
+            hotLevelAgg.addRange("overThanTen", hot, threeClass - 1);
         }
         TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(EsConstant.mediaTypeField);
+        TermsAggregationBuilder emotionAgg = AggregationBuilders.terms(emotionAggName).field(EsConstant.emotionField);
 
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query)
-                .addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC)).addAggregation(hotLevelAgg).addAggregation(mediaAgg);
+                .addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC)).addAggregation(hotLevelAgg).addAggregation(mediaAgg).addAggregation(emotionAgg);
         if (mediaType != null)
             builder.setPostFilter(QueryBuilders.termQuery(EsConstant.mediaTypeField, mediaType));
 
@@ -519,9 +527,12 @@ public class EsQueryServiceImpl implements EsQueryService {
         List<OpinionEsVO> opList = esUtil.buildResult(resp, OpinionEsVO.class);
         result.setOpinions(opList);
 
+        List<KeyValueVO> hotLevelList = buildHotLevelLists(resp, hotLevelAggName);
+        result.setHotLevelStats(hotLevelList);
         List<KeyValueVO> mediaList = buildTermLists(resp, mediaAggName);
         result.setMediaTypeStats(mediaList);
-
+        List<KeyValueVO> emotionList = buildTermLists(resp, emotionAggName);
+        result.setEmotionStats(emotionList);
         return result;
     }
 

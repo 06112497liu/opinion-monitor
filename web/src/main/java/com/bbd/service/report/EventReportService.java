@@ -265,7 +265,7 @@ public class EventReportService {
     }
     
     public void eventOpinion(ArrayList<ReportElementString> list, int cycle, Long id) throws Exception {
-        List<OpinionVO> opinions = (List<OpinionVO>) eventService.getEventInfoList(id, cycle, null, null, 1, Integer.MAX_VALUE).get("opinions");
+        List<OpinionVO> opinions = (List<OpinionVO>) eventService.getEventInfoList(id, cycle, null, null, -1, 1, 100).get("opinions");
         ReportElementString eventTrendElement = new ReportElementString(StructureEnum.REPORT_HEADER, ElementEnum.REPORT_DEFINITION_TABLE,
             DataModelEnum.TABLE_DATA, "opinionInfo", "opinionInfoData");
         String[] title = new String[]{"title","summary","similiarCount","emotion","website","publishTime","hot","level","link"};

@@ -197,18 +197,7 @@ public class EventController extends AbstractController {
     })
     @RequestMapping(value = "eventInfoList", method = RequestMethod.GET)
     public RestResult eventInfoList(Long id, Integer cycle, Integer emotion, Integer mediaType, Integer pageNo, Integer pageSize) {
-        return RestResult.ok(eventService.getEventInfoList(id, cycle, emotion, mediaType, pageNo, pageSize));
-    }
-    
-    @ApiOperation(value = "事件信息列表/媒体类型标签", httpMethod = "GET")
-    @ApiImplicitParams({ 
-        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
-        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天", name = "cycle", dataType = "Integer", paramType = "query", required = true),
-        @ApiImplicitParam(value = "舆情类型,空表示全部舆情，0表示中性舆情，1表示正面舆情，2表示负面舆情", name = "emotion", dataType = "Integer", paramType = "query", required = false)
-    })
-    @RequestMapping(value = "eventLabelList", method = RequestMethod.GET)
-    public RestResult eventLabelList(Long id, Integer cycle, Integer emotion) {
-        return RestResult.ok(eventService.eventLabelList(id, cycle, emotion));
+        return RestResult.ok(eventService.getEventInfoList(id, cycle, emotion, mediaType, 10, pageNo, pageSize));
     }
     
     @ApiOperation(value = "事件信息列表/图表跟踪分析/信息总量", httpMethod = "GET")

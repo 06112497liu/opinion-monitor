@@ -142,7 +142,7 @@ public interface EsQueryService {
      * @param pb: 分页
      * @return
      */
-    OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, PageBounds pb);
+    OpinionEsSearchVO queryEventOpinions(Long eventId, DateTime startTime, Integer emotion, Integer mediaType, Integer hot, PageBounds pb);
 
     /**
      * 查询历史预警舆情
