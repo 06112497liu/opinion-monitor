@@ -8,30 +8,27 @@ import com.bbd.enums.TransferEnum;
 import com.bbd.enums.WarnReasonEnum;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
-import com.bbd.exception.ErrorCode;
 import com.bbd.exception.UserErrorCode;
 import com.bbd.service.*;
 import com.bbd.service.param.TransferParam;
-import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.service.vo.OpinionTaskListVO;
 import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.DateUtil;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
-import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -125,7 +122,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                         o.setMonitorTime(event.getGmtCreate());
                         o.setEventName(event.getEventName());
                         o.setEventID(event.getId());
-                        o.setFlag(event.getIsDelete());
+                        o.setFlag(event.getIsDelete().intValue());
                     }
                 });
             }

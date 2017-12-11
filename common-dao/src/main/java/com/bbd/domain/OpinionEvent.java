@@ -35,7 +35,7 @@ public class OpinionEvent {
 
     private String fileReason;
 
-    private Integer isDelete;
+    private Byte isDelete;
     
     private Long createBy;
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
@@ -189,11 +189,11 @@ public class OpinionEvent {
         this.fileReason = fileReason;
     }
 
-    public Integer getIsDelete() {
+    public Byte getIsDelete() {
         return isDelete;
     }
 
-    public void setIsDelete(Integer isDelete) {
+    public void setIsDelete(Byte isDelete) {
         this.isDelete = isDelete;
     }
 
