@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @author Liuweibo
  * @version Id: OpinionJobService.java, v0.1 2017/11/17 Liuweibo Exp $$
  */
-//@Service
+@Service
 public class OpinionJobService {
 
     @Autowired
