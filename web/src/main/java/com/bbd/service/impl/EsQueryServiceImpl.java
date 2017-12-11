@@ -321,7 +321,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         List<Date> dates = eventService.getDates(cycle, opinionEvent);
         for (Date date : dates) {
             DateTime dateTime = new DateTime(date);
-            dateRange.addUnboundedTo(dateTime.toString("yyyy-MM-dd HH:mm"), dateTime);
+            dateRange.addUnboundedTo(dateTime.toString("yyyy-MM-dd HH:mm:ss"), dateTime);
         }
         return dateRange;
     }
