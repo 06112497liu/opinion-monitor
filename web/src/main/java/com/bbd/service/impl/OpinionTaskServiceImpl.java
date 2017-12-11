@@ -267,17 +267,6 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.opTypeField, 1);
         List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(map, 50);
         userService.buildOperatorAndTargeter(records);
-        OpinionOpRecordVO v = null;
-        if (!records.isEmpty()) {
-            java.util.Optional<OpinionOpRecordVO> op = null;
-            if (type == 1){
-                op = records.stream().findFirst();
-            } else if (type == 2) {
-                op = records.stream().filter(p -> p.getOperatorId().equals(currentUserId)).findFirst();
-            }
-            if (op != null && op.isPresent()) v = op.get();
-        }
-        if(v != null) records.add(0, v);
         result.setRecords(records);
 
         // step-3：设置级别
