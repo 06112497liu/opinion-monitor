@@ -58,6 +58,11 @@ public class OpinionTaskListVO extends OpinionVO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Date monitorTime;
 
+    /**
+     * 事件是否删除(1-已删除，0-未删除)
+     */
+    private Integer flag;
+
     public List<OpinionOpRecordVO> getRecords() {
         return records;
     }
@@ -120,6 +125,14 @@ public class OpinionTaskListVO extends OpinionVO {
 
     public void setKeys(String[] keys) {
         this.keys = keys;
+    }
+
+    public Integer getFlag() {
+        return flag;
+    }
+
+    public void setFlag(Integer flag) {
+        this.flag = flag;
     }
 }
     

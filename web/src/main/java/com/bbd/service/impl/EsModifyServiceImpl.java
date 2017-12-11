@@ -11,6 +11,7 @@ import com.bbd.util.JsonUtil;
 import com.bbd.vo.UserInfo;
 import org.apache.commons.lang3.ArrayUtils;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -70,6 +71,7 @@ public class EsModifyServiceImpl implements EsModifyService {
         request.type(EsConstant.OPINION_TYPE);
         request.id(uuid);
         request.doc(buildXContentBuilder(fieldMap));
+        request.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL); // 被搜索时可见
 
         client.update(request).get();
     }
@@ -96,7 +98,7 @@ public class EsModifyServiceImpl implements EsModifyService {
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         bulkRequest.add(client.prepareIndex(EsConstant.IDX_OPINION_OP_RECORD, EsConstant.OPINION_OP_RECORD_TYPE).setSource(JsonUtil.fromJson(recordVO), XContentType.JSON));
         // 插入数据
-        bulkRequest.get();
+        bulkRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL).execute().actionGet();
     }
 
 }
