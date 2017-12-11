@@ -131,9 +131,6 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchRequestBuilder builder = esUtil.getClient().prepareSearch(EsConstant.IDX_OPINION);
         final String countAggs = "count_aggs";
 
-        FilterAggregationBuilder warnAggsBuilder = AggregationBuilders.filter(total, QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(start).lte(end));
-        warnAggsBuilder.subAggregation(AggregationBuilders.cardinality(countAggs).field(EsConstant.OPINION_FIRST_WARN_TIME));
-
         FilterAggregationBuilder oneWarnAggsBuilder = AggregationBuilders.filter(levelOne, QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_ONE).gte(start).lte(end));
         oneWarnAggsBuilder.subAggregation(AggregationBuilders.cardinality(countAggs).field(EsConstant.OPINION_FIRST_WARN_TIME_ONE));
 
@@ -143,7 +140,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         FilterAggregationBuilder threeWarnAggsBuilder = AggregationBuilders.filter(levelThree, QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_THREE).gte(start).lte(end));
         threeWarnAggsBuilder.subAggregation(AggregationBuilders.cardinality(countAggs).field(EsConstant.OPINION_FIRST_WARN_TIME_THREE));
 
-        builder.setSize(0).addAggregation(warnAggsBuilder).addAggregation(oneWarnAggsBuilder).addAggregation(twoWarnAggsBuilder).addAggregation(threeWarnAggsBuilder);
+        builder.setSize(0).addAggregation(oneWarnAggsBuilder).addAggregation(twoWarnAggsBuilder).addAggregation(threeWarnAggsBuilder);
 
         SearchResponse resp = builder.get();
 
@@ -176,9 +173,6 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         final String countAggs = "count_aggs";
 
-        FilterAggregationBuilder warnAggsBuilder = AggregationBuilders.filter(total, QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(start).lte(end));
-        warnAggsBuilder.subAggregation(AggregationBuilders.dateHistogram(countAggs).field(EsConstant.OPINION_FIRST_WARN_TIME).dateHistogramInterval(interval));
-
         FilterAggregationBuilder oneWarnAggsBuilder = AggregationBuilders.filter(levelOne, QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_ONE).gte(start).lte(end));
         oneWarnAggsBuilder.subAggregation(AggregationBuilders.dateHistogram(countAggs).field(EsConstant.OPINION_FIRST_WARN_TIME_ONE).dateHistogramInterval(interval));
 
@@ -188,11 +182,10 @@ public class EsQueryServiceImpl implements EsQueryService {
         FilterAggregationBuilder threeWarnAggsBuilder = AggregationBuilders.filter(levelThree, QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME_THREE).gte(start).lte(end));
         threeWarnAggsBuilder.subAggregation(AggregationBuilders.dateHistogram(countAggs).field(EsConstant.OPINION_FIRST_WARN_TIME_THREE).dateHistogramInterval(interval));
 
-        builder.setSize(0).addAggregation(warnAggsBuilder).addAggregation(oneWarnAggsBuilder).addAggregation(twoWarnAggsBuilder).addAggregation(threeWarnAggsBuilder);
+        builder.setSize(0).addAggregation(oneWarnAggsBuilder).addAggregation(twoWarnAggsBuilder).addAggregation(threeWarnAggsBuilder);
 
         SearchResponse resp = builder.get();
 
-        map.put(total, buildWarnAggs(total, resp.getAggregations().getAsMap()));
         map.put(levelOne, buildWarnAggs(levelOne, resp.getAggregations().getAsMap()));
         map.put(levelTwo, buildWarnAggs(levelTwo, resp.getAggregations().getAsMap()));
         map.put(levelThree, buildWarnAggs(levelThree, resp.getAggregations().getAsMap()));

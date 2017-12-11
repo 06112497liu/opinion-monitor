@@ -68,6 +68,23 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
         DateHistogramInterval interval = BusinessUtils.getDateHistogramInterval(timeSpan);
         Map<String, List<KeyValueVO>> map = esQueryService.getOpinionCountStatisticGroupTime(start, DateTime.now(), interval);
         buildPresentDateData(map, timeSpan);
+        // 构建总量
+        List<KeyValueVO> levelOneList = map.get("levelOne");
+        List<KeyValueVO> levelTwoList = map.get("levelTwo");
+        List<KeyValueVO> levelThreeList = map.get("levelThree");
+        List<KeyValueVO> totalList = Lists.newLinkedList();
+        for (int i=0; i<levelOneList.size(); i++) {
+            KeyValueVO one = levelOneList.get(i);
+            KeyValueVO two = levelTwoList.get(i);
+            KeyValueVO three = levelThreeList.get(i);
+            KeyValueVO vo = new KeyValueVO();
+            vo.setKey(one.getKey()); vo.setName(one.getName());
+            vo.setValue(Long.parseLong(one.getValue().toString()) +
+                        Long.parseLong(two.getValue().toString()) +
+                        Long.parseLong(three.getValue().toString()));
+            totalList.add(vo);
+        }
+        map.put("total", totalList);
         return map;
     }
 
@@ -91,7 +108,7 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
         String pattern4 = "yyyy年";
         for (KeyValueVO v : list) {
             Date keyDate = DateUtil.parseDate(v.getName(), "yyyy-MM-dd HH:mm:ss");
-            String key = null;
+            String key;
             switch (timeSpan) {
                 case 1:
                     key = DateUtil.formatDateByPatten(keyDate, pattern1);

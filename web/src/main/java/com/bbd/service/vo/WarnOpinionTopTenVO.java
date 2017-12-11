@@ -11,6 +11,11 @@ import java.util.Date;
 public class WarnOpinionTopTenVO {
 
     /**
+     * 舆情uuid
+     */
+    private String uuid;
+
+    /**
      * 舆情标题
      */
     private String  title;
@@ -31,17 +36,12 @@ public class WarnOpinionTopTenVO {
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
     private Date    time;
 
-    /**
-     * 链接
-     */
-    private String link;
-
-    public String getLink() {
-        return link;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setLink(String link) {
-        this.link = link;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getTitle() {

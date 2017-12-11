@@ -32,7 +32,7 @@ public class OpinionCountStatVO {
     private Long levelThree = 0L;
 
     public Long getTotal() {
-        return total;
+        return levelOne + levelTwo + levelThree;
     }
 
     public void setTotal(Long total) {

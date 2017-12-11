@@ -85,7 +85,6 @@ public class OpinionServiceImpl implements OpinionService {
             v.setHot(o.getHot());
             v.setLevel(systemSettingService.judgeOpinionSettingClass(o.getHot(), setting));
             v.setTitle(o.getTitle());
-            v.setLink(o.getLink());
             result.add(v);
         });
         result.sort((x1, x2) -> ComparisonChain.start().compare(x1.getLevel(), x2.getLevel()).compare(x2.getHot(), x1.getHot()).result());

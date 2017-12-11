@@ -211,6 +211,7 @@ public class UserService {
     private void checkUpdateUserNameExsit(Long userId, String username) {
         UserExample example = new UserExample();
         example.createCriteria().andIdNotEqualTo(userId).andUsernameEqualTo(username);
+
         List<User> list = userDao.selectByExample(example);
         if(!list.isEmpty()) {
             throw new ApplicationException(CommonErrorCode.PARAM_ERROR, "账户名重复");
