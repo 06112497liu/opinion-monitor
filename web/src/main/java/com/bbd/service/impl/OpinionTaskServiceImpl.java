@@ -146,7 +146,8 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         Date now = new Date();
 
         // step-1：校验当前用户是否有操作权限
-        checkPermission(param.getUuid());
+        OpinionEsVO opinion = esQueryService.getOpinionByUUID(param.getUuid());
+        checkPermission(opinion);
 
         // step-2：如果是普通用户，是不能转发给管理员（也不能转发给自己）
         Long targeterId = param.getUserId();
@@ -220,8 +221,10 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
         Date now = new Date();
 
-        // step-1：校验当前用户是否有操作资格
-        checkPermission(uuid);
+        // step-1：校验当前用户是否有操作资格，热点舆情不能解除
+        OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
+        checkPermission(opinion);
+        checkHotLevel(opinion.getHot());
 
         // step-2：修改舆情记录
         UserInfo operator = UserContext.getUser();
@@ -297,11 +300,10 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     }
 
     // 校验当前用户是否有操作该条舆情的资格
-    private void checkPermission(String uuid) {
+    private void checkPermission(OpinionEsVO opinion) {
         UserInfo user = UserContext.getUser();
         // 如果不是超级管理员，判断当前用户是否是该条舆情的待操作者
         if(!UserContext.isAdmin()) {
-            OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
             if(Objects.isNull(opinion)) {
                 throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
             }
@@ -311,6 +313,15 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                     throw new ApplicationException(UserErrorCode.USER_NO_PERMISSION);
                 }
             }
+        }
+    }
+
+    // 校验热度值是否达到预警等级
+    private void checkHotLevel(Integer hot) {
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3);
+        Integer level = systemSettingService.judgeOpinionSettingClass(hot, setting);
+        if(level == -1) {
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "热点舆情不能解除");
         }
     }
 }
