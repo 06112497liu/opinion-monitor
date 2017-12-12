@@ -1,17 +1,19 @@
 package com.bbd.service.utils;
 
-import com.bbd.domain.Account;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.bbd.bean.Reptile;
 import com.bbd.domain.KeyValueVO;
-import com.bbd.domain.User;
-import com.bbd.domain.WarnSetting;
-import com.bbd.service.vo.OpinionVO;
-import com.bbd.util.StringUtils;
+import com.bbd.util.HttpUtil;
+import com.bbd.util.RemoteConfigUtil;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -78,17 +80,6 @@ public class BusinessUtils {
         return d;
     }
 
-    /**
-     * 获取 姓名-部门名称-账号
-     * @param account
-     * @param username
-     * @return
-     */
-    public static String getNameDepAccount(Account account, String username) {
-        String str = StringUtils.generateStr("-", account.getName(), account.getDepNote(), username);
-        return str;
-    }
-
     // 根据keys构建KeyValueVO
     public static List<KeyValueVO> buildAllVos(Set<String> keys, Set<String> allKeys) {
         Set<String> noContain = Sets.newHashSet();
@@ -104,6 +95,50 @@ public class BusinessUtils {
             rs.add(vo);
         }
         return rs;
+    }
+
+
+    // 解析舆情content字段
+    public static String buildContent(List<String> list) {
+        StringBuilder sb = new StringBuilder();
+        for (String str : list) {
+            String trimStr = str.trim();
+            if (trimStr.startsWith("pic_rowkey")) {
+                String pictureCode = trimStr.substring(trimStr.indexOf(":")+1);
+                String imgUrl = getPicParse(pictureCode);
+                if (imgUrl != null) {
+                    sb.append("<img src='" + imgUrl + "'>");
+                }
+            } else {
+                sb.append(trimStr);
+            }
+            sb.append("<br/>");
+        }
+        return sb.toString();
+    }
+
+    // 调用bbd数据平台接口，获取图片地址
+    private static String getPicParse(String picCode) {
+
+        String url = RemoteConfigUtil.get(Reptile.PIC_PARSE_URL);
+        String ak = RemoteConfigUtil.get(Reptile.PIC_PARSE_AK);
+        String path = RemoteConfigUtil.get(Reptile.PIC_PARSE_PATH);
+        String full_url = url + path;
+        Map<String, String> params = Maps.newHashMap();
+        params.put("key", picCode);
+        params.put("appkey", ak);
+        String resp = HttpUtil.getHttp(full_url, params);
+
+        JSONObject obj = JSONObject.parseObject(resp);
+        JSONArray imgResp = obj.getJSONArray("results");
+        String imgUrl = null;
+        for (int i=0; i<imgResp.size(); i++) {
+            JSONObject o = imgResp.getJSONObject(i);
+            if(o.containsKey("img_url")) {
+                imgUrl = o.getString("img_url");
+            }
+        }
+        return imgUrl;
     }
 
 }
