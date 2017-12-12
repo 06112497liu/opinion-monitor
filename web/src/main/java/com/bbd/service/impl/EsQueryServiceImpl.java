@@ -837,21 +837,6 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     /**
-     * 根据舆情uuid查询该条舆情的操作人
-     * @param uuid
-     * @return
-     */
-    @Override
-    public Long[] getOperatorsByUUID(String uuid) {
-        OpinionEsVO opinion = getOpinionByUUID(uuid);
-        Long[] result = opinion.getOperators();
-        if (Objects.isNull(result))
-            return new Long[0];
-        else
-            return result;
-    }
-
-    /**
      * 当前用户待处理舆情列表
      * @param userId
      * @param transferType

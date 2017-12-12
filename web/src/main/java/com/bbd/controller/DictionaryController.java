@@ -1,7 +1,6 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
-import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.DictionaryService;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Liuweibo

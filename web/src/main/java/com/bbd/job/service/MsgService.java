@@ -4,45 +4,27 @@
  * BBD Service Inc
  * All Rights Reserved @2017
  */
- package com.bbd.job.service; 
+ package com.bbd.job.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import com.bbd.bean.EventEsVO;
+import com.bbd.bean.OpinionEsVO;
+import com.bbd.dao.*;
+import com.bbd.domain.*;
+import com.bbd.job.vo.*;
+import com.bbd.service.EsQueryService;
+import com.bbd.service.EventService;
+import com.bbd.service.OpinionService;
+import com.bbd.service.vo.OpinionMsgSend;
+import com.bbd.util.JsonUtil;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.bbd.bean.EventEsVO;
-import com.bbd.bean.OpinionEsVO;
-import com.bbd.dao.MsgSendRecordDao;
-import com.bbd.dao.OpinionEventDao;
-import com.bbd.dao.OpinionEventLevelChangeDao;
-import com.bbd.dao.WarnNotifierDao;
-import com.bbd.dao.WarnSettingDao;
-import com.bbd.domain.MsgSendRecord;
-import com.bbd.domain.MsgSendRecordExample;
-import com.bbd.domain.OpinionEvent;
-import com.bbd.domain.OpinionEventExample;
-import com.bbd.domain.OpinionEventLevelChange;
-import com.bbd.domain.OpinionEventLevelChangeExample;
-import com.bbd.domain.WarnNotifier;
-import com.bbd.domain.WarnNotifierExample;
-import com.bbd.domain.WarnSetting;
-import com.bbd.domain.WarnSettingExample;
-import com.bbd.job.vo.EventIncMsgModel;
-import com.bbd.job.vo.EventMsgModel;
-import com.bbd.job.vo.EmailContent;
-import com.bbd.job.vo.MsgVO;
-import com.bbd.job.vo.SMSContent;
-import com.bbd.service.EsQueryService;
-import com.bbd.service.EventService;
-import com.bbd.service.OpinionService;
-import com.bbd.service.vo.OpinionMsgSend;
-import com.bbd.util.JsonUtil;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /** 
  * @author daijinlong 

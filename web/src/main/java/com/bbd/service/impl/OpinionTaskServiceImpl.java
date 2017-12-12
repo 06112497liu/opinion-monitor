@@ -1,5 +1,6 @@
 package com.bbd.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.constant.EsConstant;
 import com.bbd.dao.OpinionEventDao;
@@ -11,6 +12,7 @@ import com.bbd.exception.CommonErrorCode;
 import com.bbd.exception.UserErrorCode;
 import com.bbd.service.*;
 import com.bbd.service.param.TransferParam;
+import com.bbd.service.utils.BusinessUtils;
 import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.service.vo.OpinionTaskListVO;
 import com.bbd.util.BeanMapperUtil;
@@ -25,10 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -271,6 +270,12 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         List<WarnSetting> settings = systemSettingService.queryWarnSetting(3);
         Integer level = systemSettingService.judgeOpinionSettingClass(result.getHot(), settings);
         result.setLevel(level);
+
+        // step-4：解析舆情正文内容
+        JSONArray arr = JSONArray.parseArray(result.getContent());
+        String contentHtml = BusinessUtils.buildContent(new ArrayList(arr));
+        result.setContent(contentHtml);
+
         return result;
     }
 

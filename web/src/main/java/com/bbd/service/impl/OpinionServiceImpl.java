@@ -1,5 +1,6 @@
 package com.bbd.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
@@ -242,6 +243,10 @@ public class OpinionServiceImpl implements OpinionService {
         List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
         Integer level = systemSettingService.judgeOpinionSettingClass(result.getHot(), setting);
         result.setLevel(level);
+        // 解析正文
+        JSONArray arr = JSONArray.parseArray(result.getContent());
+        String contentHtml = BusinessUtils.buildContent(new ArrayList(arr));
+        result.setContent(contentHtml);
         return result;
     }
 
@@ -464,12 +469,14 @@ public class OpinionServiceImpl implements OpinionService {
         userService.buildOperatorAndTargeter(records);
         rs.setRecords(records);
 
-        // step-3：舆情等级
-        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3);
-        rs.setLevel(systemSettingService.judgeOpinionSettingClass(rs.getHot(), setting));
-
+        // step-3：正文内容解析为html
+        JSONArray arr = JSONArray.parseArray(rs.getContent());
+        List<String> list = new ArrayList(arr);
+        String contentHtml = BusinessUtils.buildContent(list);
+        rs.setContent(contentHtml);
         return rs;
     }
+
 }
 
 

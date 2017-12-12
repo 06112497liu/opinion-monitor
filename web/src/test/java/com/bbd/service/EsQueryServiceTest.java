@@ -4,16 +4,22 @@
  */
 package com.bbd.service;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.bbd.bean.OpinionEsVO;
+import com.bbd.bean.Reptile;
 import com.bbd.domain.KeyValueVO;
-import com.bbd.service.param.OpinionStaReport;
 import com.bbd.service.vo.OpinionEsSearchVO;
+import com.bbd.util.HttpUtil;
+import com.bbd.util.RemoteConfigUtil;
+import com.google.common.collect.Maps;
 import com.mybatis.domain.PageBounds;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -89,9 +95,61 @@ public class EsQueryServiceTest extends BaseServiceTest {
 
     @Test
     public void testGetOpinionByUUID() {
-        esQueryService.getOpinionByUUID("88");
+        OpinionEsVO opinion = esQueryService.getOpinionByUUID("16510889051924266776");
+        String content = opinion.getContent();
+        JSONArray arr = JSONArray.parseArray(content);
+        List<String> list = new ArrayList(arr);
+        StringBuilder sb = buildContent(list);
+        System.out.println(sb);
     }
 
+    private StringBuilder buildContent(List<String> list) {
+        StringBuilder sb = new StringBuilder();
+        for (String str : list) {
+            String trimStr = str.trim();
+            if (trimStr.startsWith("pic_rowkey")) {
+                String pictureCode = trimStr.substring(trimStr.indexOf(":")+1);
+                String picAddress = getPicParse(pictureCode);
+                sb.append(picAddress);
+            } else {
+                sb.append(trimStr);
+            }
+            sb.append("<br/>");
+        }
+        return sb;
+    }
+
+    private String getPicParse(String picCode) {
+
+        String url = RemoteConfigUtil.get(Reptile.PIC_PARSE_URL);
+        String ak = RemoteConfigUtil.get(Reptile.PIC_PARSE_AK);
+        String path = RemoteConfigUtil.get(Reptile.PIC_PARSE_PATH);
+        String full_url = url + path;
+        Map<String, String> params = Maps.newHashMap();
+        params.put("key", picCode);
+        params.put("appkey", ak);
+        String resp = HttpUtil.getHttp(full_url, params);
+
+        JSONObject obj = JSONObject.parseObject(resp);
+        JSONArray imgResp = obj.getJSONArray("results");
+        String imgUrl = null;
+        for (int i=0; i<imgResp.size(); i++) {
+            JSONObject o = imgResp.getJSONObject(i);
+            if(o.containsKey("img_url")) {
+                imgUrl = o.getString("img_url");
+            }
+        }
+        return imgUrl;
+    }
+
+    @Test
+    public void stringTest() {
+        String s = "3::3:";
+        System.out.println(s.length());
+        System.out.println(s.indexOf(":"));
+        String str = s.trim();
+        System.out.println(str.length());
+    }
     @Test
     public void testGetOpinionCountStatisticGroupTime() {
         DateTime dateTime = new DateTime();

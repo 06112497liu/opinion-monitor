@@ -4,16 +4,16 @@
  * BBD Service Inc
  * All Rights Reserved @2017
  */
- package com.bbd.job.service; 
+ package com.bbd.job.service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.bbd.bean.OpinionEsVO;
+import com.bbd.dao.OpinionEventDao;
+import com.bbd.dao.OpinionEventMediaStatisticDao;
+import com.bbd.dao.OpinionEventTrendStatisticDao;
 import com.bbd.domain.*;
+import com.bbd.service.EsQueryService;
+import com.bbd.service.EventService;
+import com.mybatis.domain.PageBounds;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
@@ -22,13 +22,12 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.bbd.bean.OpinionEsVO;
-import com.bbd.dao.OpinionEventDao;
-import com.bbd.dao.OpinionEventMediaStatisticDao;
-import com.bbd.dao.OpinionEventTrendStatisticDao;
-import com.bbd.service.EsQueryService;
-import com.bbd.service.EventService;
-import com.mybatis.domain.PageBounds;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /** 
  * @author daijinlong 
