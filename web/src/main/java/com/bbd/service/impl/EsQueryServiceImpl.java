@@ -504,7 +504,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(EsConstant.hotField).keyed(true).addRange("levelOne", oneClass, Integer.MAX_VALUE)
                 .addRange("levelTwo", twoClss, oneClass ).addRange("levelThree", threeClass, twoClss);
         if (hot != -1 && threeClass > 10) {
-            hotLevelAgg.addRange("overThanTen", hot, threeClass - 1);
+            hotLevelAgg.addRange("overThanTen", hot, threeClass);
         }
         TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(EsConstant.mediaTypeField);
         TermsAggregationBuilder emotionAgg = AggregationBuilders.terms(emotionAggName).field(EsConstant.emotionField);
