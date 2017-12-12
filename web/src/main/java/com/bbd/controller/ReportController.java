@@ -67,7 +67,7 @@ public class ReportController extends AbstractController {
     
     @RequestMapping(value = "eventReport", method = RequestMethod.POST)
     public RestResult eventReport() throws Exception{
-        eventReportService.generateReport(3, 4l);
+        eventReportService.generateReport(3, 5l);
         return RestResult.ok(9368+13419+15949+13299);
     }
 

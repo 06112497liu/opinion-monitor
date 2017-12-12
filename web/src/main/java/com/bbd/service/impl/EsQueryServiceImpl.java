@@ -60,6 +60,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -301,7 +302,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         List<KeyValueVO> ls = Lists.newLinkedList();
         for (InternalDateRange.Bucket d : dateList) {
             KeyValueVO v = new KeyValueVO();
-            v.setName(d.getKey());
+            v.setName(d.getKey().toString().substring(0, 16));
             v.setValue(d.getDocCount());
             ls.add(v);
         }
@@ -501,7 +502,7 @@ public class EsQueryServiceImpl implements EsQueryService {
             query.must(QueryBuilders.termQuery(EsConstant.emotionField, emotion));
 
         RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(EsConstant.hotField).keyed(true).addRange("levelOne", oneClass, Integer.MAX_VALUE)
-                .addRange("levelTwo", twoClss, oneClass - 1).addRange("levelThree", threeClass, twoClss - 1);
+                .addRange("levelTwo", twoClss, oneClass ).addRange("levelThree", threeClass, twoClss);
         if (hot != -1 && threeClass > 10) {
             hotLevelAgg.addRange("overThanTen", hot, threeClass - 1);
         }
