@@ -422,7 +422,7 @@ public class EsQueryServiceImpl implements EsQueryService {
             query.must(QueryBuilders.termQuery(EsConstant.emotionField, emotion));
 
         RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(hotLevelAggName).field(EsConstant.hotField).keyed(true).addRange("levelOne", oneClass, Integer.MAX_VALUE)
-                .addRange("levelTwo", twoClss, oneClass - 1).addRange("levelThree", threeClass, twoClss - 1);
+                .addRange("levelTwo", twoClss, oneClass).addRange("levelThree", threeClass, twoClss);
         TermsAggregationBuilder mediaAgg = AggregationBuilders.terms(mediaAggName).field(EsConstant.mediaTypeField);
 
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION)
@@ -1019,7 +1019,7 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .setSize(0)
                 .setQuery(query)
                 .addAggregation(
-                        AggregationBuilders.range(hotAgg).field(EsConstant.hotField).keyed(true).addRange(levelThree, threeClass, twoClss - 1).addRange(levelTwo, twoClss, oneClass - 1)
+                        AggregationBuilders.range(hotAgg).field(EsConstant.hotField).keyed(true).addRange(levelThree, threeClass, twoClss).addRange(levelTwo, twoClss, oneClass)
                                 .addRange(levelOne, oneClass, Integer.MAX_VALUE)).execute().actionGet();
         List<KeyValueVO> list = buildHotLevelLists(resp, hotAgg);
         return list;
