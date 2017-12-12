@@ -11,6 +11,7 @@ import com.bbd.service.OpinionService;
 import com.bbd.service.vo.DBStaVO;
 import com.bbd.service.vo.OpinionCountStatVO;
 import com.bbd.service.vo.SystemStaVO;
+import com.bbd.service.vo.WarnOpinionTopTenVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -70,7 +71,8 @@ public class IndexController extends AbstractController {
     @ApiOperation(value = "预警舆情top10", httpMethod = "GET")
     @RequestMapping(value = "/warn/opinion/top10", method = RequestMethod.GET)
     public RestResult getWarnOpinionTopTen() {
-        return RestResult.ok(opinionService.getWarnOpinionTopTen());
+        List<WarnOpinionTopTenVO> rs = opinionService.getWarnOpinionTopTen();
+        return RestResult.ok(rs);
     }
 
     @ApiOperation(value = "舆情数据库统计", httpMethod = "GET")
