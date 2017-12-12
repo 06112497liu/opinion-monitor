@@ -60,6 +60,7 @@ public class EventReportService {
     private String infoTotal;
     private String warnTotal;
     private String eventTime;
+    private String fileTime;
     private String allWarn;
     private String firstWarn;
     private String secondWarn;
@@ -81,16 +82,17 @@ public class EventReportService {
         return 0;
     }
 
-    public Integer generateReport(int cycle, Long id) throws Exception {
+    public void generateReport(int cycle, Long id, OutputStream out) throws Exception {
         Date currentTime = new Date();
         opTime = formatter.format(currentTime);
         ArrayList<ReportElementString> list = createReportStruct(cycle, id, opTime);
         HashMap<String,Object> params = new HashMap<>();
-        params.put("opTime", opTime);
+        params.put("opTime", formatter2.format(currentTime));
         params.put("eventName", eventName);
         params.put("infoTotal", infoTotal);
         params.put("warnTotal", warnTotal);
         params.put("eventTime", eventTime);
+        
         params.put("allWarn", allWarn);
         params.put("firstWarn", firstWarn);
         params.put("secondWarn", secondWarn);
@@ -98,23 +100,29 @@ public class EventReportService {
         params.put("crtWarn", crtWarn);
         params.put("midWarn", midWarn);
         params.put("oppWarn", oppWarn);
-        params.put("timeLabel", "");
+        
+        params.put("timeLabel", timeLabel);
         params.put("labelTwo", labelTwo);
         params.put("labelThree", labelThree);
         
         
+        /*ReportEngine reportEngine = new ReportEngine();
+        reportEngine.generateReport(detailSource, elements, params, ExportEnum.PDF, out);
+        */
         ArrayListMultimap<StructureEnum,ReportElementModel> array = ModelUtil.stringToModel(list);
         ReportEngine re = new ReportEngine();
-        File f = new File("E:/"+System.currentTimeMillis()+".pdf");
+       /* File f = new File("E:/"+System.currentTimeMillis()+".pdf");
         OutputStream out= null;
         try {
             out = new FileOutputStream(f);
         } catch (FileNotFoundException e) {
             logger.error(e.getMessage());
+        }*/
+        if (cycle != 4) {
+            re.generateReport(Optional.of("report/opinionEvent.prpt"),array,params,ExportEnum.PDF,out);
+        } else {
+            re.generateReport(Optional.of("report/opinionEventHis.prpt"),array,params,ExportEnum.PDF,out);
         }
-        re.generateReport(Optional.of("report/opinionEvent.prpt"),array,params,ExportEnum.PDF,out);
-
-        return null;
     }
     
     public int daysBetween(Date start, Date end) {
@@ -134,8 +142,7 @@ public class EventReportService {
         String[] title = new String[]{"item"};
         String[] titleType = new String[]{ParamTypeEnum.STRING.getDesc()};
         OpinionEvent opinionEvent = eventService.getEventChinese(id);
-        eventName = opinionEvent.getEventName();
-        eventTime = formatter.format(opinionEvent.getGmtCreate());
+        fileName(cycle, id);
         Map map= eventService.getEventUser(id);
         value.add(new String[]{"事件名称：" + hasData(opinionEvent.getEventName())});
         if (cycle != 4) {
@@ -144,11 +151,12 @@ public class EventReportService {
         Account createUser = (Account)map.get("createUser");
         value.add(new String[]{"监测账号：" + buildUserInfo(createUser)});
         if (cycle != 4) {
-            value.add(new String[]{"监测时间：" + formatter.format(opinionEvent.getGmtCreate()) + " -- " + opTime + "," + 
+            value.add(new String[]{"监测时间：" + formatter.format(opinionEvent.getGmtCreate()) + "——" + opTime + "，" + 
             "已持续监测" + daysBetween(opinionEvent.getGmtCreate(), new Date()) + "天"});
         }
         if (cycle == 4) {//如果已经归档
-            value.add(new String[]{"监测时间：" + formatter.format(opinionEvent.getGmtCreate()) + ",共持续监测" + daysBetween(opinionEvent.getGmtCreate(), opinionEvent.getGmtFile()) + "天"});
+            fileTime = formatter.format(opinionEvent.getGmtFile());
+            value.add(new String[]{"监测时间：" + formatter.format(opinionEvent.getGmtCreate()) + "，共持续监测" + daysBetween(opinionEvent.getGmtCreate(), opinionEvent.getGmtFile()) + "天"});
             Account fileUser = (Account)map.get("fileUser");
             value.add(new String[]{"归档账号：" + buildUserInfo(fileUser)});
             value.add(new String[]{"归档时间：" + formatter.format(opinionEvent.getGmtFile())});
@@ -189,16 +197,39 @@ public class EventReportService {
         }
     }
     
+    public String fileName(int cycle, Long id) {
+        OpinionEvent opinionEvent = eventService.getEventChinese(id);
+        eventName = opinionEvent.getEventName();
+        eventTime = formatter.format(opinionEvent.getGmtCreate());
+        if (cycle == 1) {
+            eventName = "《+"+eventName+"+》舆情事件日报";
+        } else if (cycle == 2) {
+            eventName = "《+"+eventName+"+》舆情事件周报";
+        } else if (cycle == 3) {
+            eventName = "《+"+eventName+"+》舆情事件月报";
+        } else if (cycle == 4) {
+            eventName = "《+"+eventName+"+》历史舆情事件归档报告";
+        } else if (cycle == 5) {
+            eventName = "《+"+eventName+"+》舆情事件专报";
+        }
+        return eventName;
+    }
+    
     public void eventWholeTrend(ArrayList<ReportElementString> list, int cycle, Long id) {
         if (cycle == 1) {
+            timeLabel = "";
             labelTwo = "近24小时监测图表跟踪分析";
         } else if (cycle == 2) {
+            timeLabel = "";
             labelTwo = "近7天监测图表跟踪分析";
         } else if (cycle == 3) {
+            timeLabel = "";
             labelTwo = "近30天监测图表跟踪分析";
         } else if (cycle == 4) {
+            timeLabel = "（从监测开始日期至归档日期"+eventTime+"——"+fileTime+"）";
             labelTwo = "历史监测图表跟踪分析";
         } else if (cycle == 5) {
+            timeLabel = "（从监测开始日期至今"+eventTime+"——"+opTime+"）";
             labelTwo = "创建事件至今监测图表跟踪分析";
         }
         infoTotal = String.valueOf(eventService.eventInfoTotal(id, cycle, false));
@@ -305,7 +336,7 @@ public class EventReportService {
             labelThree = eventTime +"至今预警舆情信息列表";
         }
         
-        HashMap<String, Object> map = eventService.getEventInfoList(id, cycle, null, null, -1, 1, 10);
+        HashMap<String, Object> map = eventService.getEventInfoList(id, cycle, null, null, -1, 1, 100);
         
         allWarn = String.valueOf(map.get("total"));
         List<KeyValueVO> hotLevelStats = (List<KeyValueVO>) map.get("hotLevelStats");
@@ -346,9 +377,17 @@ public class EventReportService {
         List<Object[]> value = new ArrayList<>();
         int i = 1;
         for (OpinionVO vo : opinions) {
-            value.add(new Object[]{i + "、" + vo.getTitle(), vo.getSummary(), vo.getSimiliarCount().toString(), vo.getEmotion().toString(), 
+            String emotion = null;
+            if (vo.getEmotion() == 0) {
+                emotion = "中性";
+            } else if (vo.getEmotion() == 1) {
+                emotion = "正面";
+            } else if (vo.getEmotion() == 2) {
+                emotion = "负面";
+            }
+            value.add(new Object[]{i + "、" + vo.getTitle(), hasData(vo.getSummary()), vo.getSimiliarCount().toString(), emotion,
                                    vo.getWebsite()== null || vo.getWebsite().trim().equals("") ? "未知来源" : vo.getWebsite(), 
-                                   formatter2.format(vo.getPublishTime()), vo.getHot().toString(),vo.getLevel().toString()+"级", vo.getLink()});
+                                   formatter2.format(vo.getPublishTime()), vo.getHot().toString(),vo.getLevel().toString()+"级", hasData(vo.getLink())});
             i++;
         }
         logger.warn(JSON.toJSONString(title) + ModelUtil.TAG + JSON.toJSONString(value));
@@ -408,7 +447,9 @@ public class EventReportService {
     	keywords(list, cycle, id);
     	eventDataType(list, cycle, id);
     	eventTrend(list, cycle, id);
-    	eventOpinion(list, cycle, id);
+    	if (cycle != 4) {
+    	    eventOpinion(list, cycle, id);
+    	}
         return list;
     }
 

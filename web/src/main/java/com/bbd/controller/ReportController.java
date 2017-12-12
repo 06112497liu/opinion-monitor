@@ -12,6 +12,7 @@ import com.bbd.service.OpinionService;
 import com.bbd.service.vo.OpinionExtVO;
 import com.bbd.util.DateUtil;
 import com.bbd.util.ValidateUtil;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -63,12 +64,17 @@ public class ReportController extends AbstractController {
     @Autowired
     private OpinionService opinionService;
     
-    @ApiOperation(value = "创建事件", httpMethod = "POST")
-    
-    @RequestMapping(value = "eventReport", method = RequestMethod.POST)
-    public RestResult eventReport() throws Exception{
-        eventReportService.generateReport(3, 5l);
-        return RestResult.ok(9368+13419+15949+13299);
+    @ApiOperation(value = "事件报告", httpMethod = "POST")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天，4表示历史，5表示专报（创建至今）", name = "cycle", dataType = "Integer", paramType = "query", required = true)
+    })
+    @RequestMapping(value = "eventReport", method = RequestMethod.GET)
+    public RestResult eventReport(Long id, Integer cycle) throws Exception{
+        HttpServletResponse resp = SessionContext.getResponse();
+        OutputStream out = buildResponse(eventReportService.fileName(cycle, id)+".pdf", resp);
+        eventReportService.generateReport(cycle, id, out);
+        return RestResult.ok("下载成功");
     }
 
     @ApiOperation(value = "舆情详情简报", httpMethod = "GET")
