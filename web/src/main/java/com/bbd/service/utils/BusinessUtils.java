@@ -104,8 +104,7 @@ public class BusinessUtils {
         for (String str : list) {
             String trimStr = str.trim();
             if (trimStr.startsWith("pic_rowkey")) {
-                String pictureCode = trimStr.substring(trimStr.indexOf(":")+1);
-                String imgUrl = getPicParse(pictureCode);
+                String imgUrl = getPicParse(trimStr);
                 if (imgUrl != null) {
                     sb.append("<img src='" + imgUrl + "'>");
                 }
