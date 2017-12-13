@@ -143,10 +143,7 @@
     delete from bbd_opinion_event
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.bbd.domain.OpinionEvent">
-    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
-      SELECT LAST_INSERT_ID()
-    </selectKey>
+  <insert id="insert" parameterType="com.bbd.domain.OpinionEvent" useGeneratedKeys="true" keyProperty="id">
     insert into bbd_opinion_event (uuid, event_name, event_group, 
       monitor, region, event_level, 
       merchant, brand, address, 

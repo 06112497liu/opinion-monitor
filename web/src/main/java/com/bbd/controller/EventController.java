@@ -67,8 +67,7 @@ public class EventController extends AbstractController {
     @RequestMapping(value = "createEvent", method = RequestMethod.POST)
     public RestResult createEvent(@RequestBody OpinionEvent opinionEvent) throws IOException, ExecutionException, InterruptedException {
         opinionEvent.setCreateBy(UserContext.getUser().getId());
-        eventService.createEvent(opinionEvent);
-        return RestResult.ok();
+        return RestResult.ok(eventService.createEvent(opinionEvent));
     }
     
     @ApiOperation(value = "修改事件", httpMethod = "POST")

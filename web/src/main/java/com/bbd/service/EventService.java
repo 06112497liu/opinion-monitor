@@ -85,7 +85,7 @@ public class EventService{
      * @throws ExecutionException 
      * @throws IOException 
      */
-    public synchronized void createEvent(OpinionEvent opinionEvent) throws IOException, ExecutionException, InterruptedException {
+    public synchronized Long createEvent(OpinionEvent opinionEvent) throws IOException, ExecutionException, InterruptedException {
         List<OpinionEvent> evtList = eventList(new OpinionEvent(), 1, Integer.MAX_VALUE);
         if (evtList.size() == 50) {
             throw new ApplicationException(BizErrorCode.EVENT_UPTO_50);
@@ -159,6 +159,7 @@ public class EventService{
         fieldMap.put(EsConstant.opStatusField, 3);
         fieldMap.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm:ss"));
         esModifyService.updateOpinion(UserContext.getUser(), opinionEvent.getUuid(), fieldMap);
+        return opinionEvent.getId();
     }
     
     
