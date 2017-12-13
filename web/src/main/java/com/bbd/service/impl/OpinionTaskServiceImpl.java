@@ -17,6 +17,7 @@ import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.service.vo.OpinionTaskListVO;
 import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.DateUtil;
+import com.bbd.util.StringUtils;
 import com.bbd.util.UserContext;
 import com.bbd.vo.UserInfo;
 import com.google.common.base.Optional;
@@ -275,10 +276,12 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         result.setLevel(level);
 
         // step-4：解析舆情正文内容
-        JSONArray arr = JSONArray.parseArray(result.getContent());
-        String contentHtml = BusinessUtils.buildContent(new ArrayList(arr));
-        result.setContent(contentHtml);
-
+        String content = result.getContent();
+        if (StringUtils.isNotEmpty(content) && content.startsWith("[")) {
+            JSONArray arr = JSONArray.parseArray(content);
+            String contentHtml = BusinessUtils.buildContent(new ArrayList(arr));
+            result.setContent(contentHtml);
+        }
         return result;
     }
 

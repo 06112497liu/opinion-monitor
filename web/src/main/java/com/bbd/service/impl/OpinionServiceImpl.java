@@ -244,9 +244,12 @@ public class OpinionServiceImpl implements OpinionService {
         Integer level = systemSettingService.judgeOpinionSettingClass(result.getHot(), setting);
         result.setLevel(level);
         // 解析正文
-        JSONArray arr = JSONArray.parseArray(result.getContent());
-        String contentHtml = BusinessUtils.buildContent(new ArrayList(arr));
-        result.setContent(contentHtml);
+        String content = result.getContent();
+        if (StringUtils.isNotEmpty(content) && content.startsWith("[")) {
+            JSONArray arr = JSONArray.parseArray(content);
+            String contentHtml = BusinessUtils.buildContent(new ArrayList(arr));
+            result.setContent(contentHtml);
+        }
         return result;
     }
 
@@ -474,10 +477,13 @@ public class OpinionServiceImpl implements OpinionService {
         rs.setRecords(records);
 
         // step-3：正文内容解析为html
-        JSONArray arr = JSONArray.parseArray(rs.getContent());
-        List<String> list = new ArrayList(arr);
-        String contentHtml = BusinessUtils.buildContent(list);
-        rs.setContent(contentHtml);
+        // 解析正文
+        String content = rs.getContent();
+        if (StringUtils.isNotEmpty(content) && content.startsWith("[")) {
+            JSONArray arr = JSONArray.parseArray(content);
+            String contentHtml = BusinessUtils.buildContent(new ArrayList(arr));
+            rs.setContent(contentHtml);
+        }
         return rs;
     }
 
