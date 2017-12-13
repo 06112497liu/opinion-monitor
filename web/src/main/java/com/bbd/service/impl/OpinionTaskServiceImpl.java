@@ -277,7 +277,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
         // step-4：解析舆情正文内容
         String content = result.getContent();
-        if (StringUtils.isNotEmpty(content) && content.startsWith("[")) {
+        if (StringUtils.isNotEmpty(content) && content.startsWith("[\"")) {
             JSONArray arr = JSONArray.parseArray(content);
             String contentHtml = BusinessUtils.buildContent(new ArrayList(arr));
             result.setContent(contentHtml);

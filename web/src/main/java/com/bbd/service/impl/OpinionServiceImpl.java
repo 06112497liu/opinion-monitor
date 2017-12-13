@@ -245,7 +245,7 @@ public class OpinionServiceImpl implements OpinionService {
         result.setLevel(level);
         // 解析正文
         String content = result.getContent();
-        if (StringUtils.isNotEmpty(content) && content.startsWith("[")) {
+        if (StringUtils.isNotEmpty(content) && content.startsWith("[\"")) {
             JSONArray arr = JSONArray.parseArray(content);
             String contentHtml = BusinessUtils.buildContent(new ArrayList(arr));
             result.setContent(contentHtml);
@@ -479,7 +479,7 @@ public class OpinionServiceImpl implements OpinionService {
         // step-3：正文内容解析为html
         // 解析正文
         String content = rs.getContent();
-        if (StringUtils.isNotEmpty(content) && content.startsWith("[")) {
+        if (StringUtils.isNotEmpty(content) && content.startsWith("[\"")) {
             JSONArray arr = JSONArray.parseArray(content);
             String contentHtml = BusinessUtils.buildContent(new ArrayList(arr));
             rs.setContent(contentHtml);
