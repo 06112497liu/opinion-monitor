@@ -664,5 +664,6 @@
     SELECT a.`name` AS `name`,SUM(CASE WHEN b.id IS NULL THEN 0 ELSE 1 END) AS `value`
 	FROM (SELECT * FROM bbd_opinion_dictionary WHERE `parent`='C') AS a LEFT JOIN (SELECT * FROM bbd_opinion_event WHERE `is_delete`=0) AS b ON b.`region` = a.`code` 
 	GROUP BY a.name
+	ORDER BY `value` DESC
   </select>
 </mapper>
