@@ -367,7 +367,7 @@ public class OpinionServiceImpl implements OpinionService {
         Map<Integer, Integer> maxMap = Maps.newHashMap();
         maxMap.put(1, oneMax);
         maxMap.put(2, twoMax);
-        maxMap.put(1, threeMax);
+        maxMap.put(3, threeMax);
         Map<Integer, Integer> mapAdd = esQueryService.queryAddWarnCount(lastSendTime);
         List<WarnNotifierVO> notifies = notifierExtDao.queryNotifierList(3);
 
@@ -447,7 +447,11 @@ public class OpinionServiceImpl implements OpinionService {
                 model.setLevelThree(value);
             model.setUsername(p.getNotifier());
         }
-        model.setScore(maxMap.get(max).toString());
+        Integer score = maxMap.get(max);
+        if (score != null)
+            model.setScore(score.toString());
+        else
+            model.setScore("0");
     }
 
     /**

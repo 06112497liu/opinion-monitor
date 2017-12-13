@@ -220,6 +220,7 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     @Override
     public List<KeyValueVO> getOpinionChannelTrend(DateTime firstWarnTime) {
         List<KeyValueVO> list = esQueryService.getOpinionMediaSpread(firstWarnTime);
+        if (list.isEmpty()) return Lists.newArrayList();
         calPercent(list);
         return list;
     }
