@@ -335,7 +335,7 @@ public class EventService{
     public  HashMap<String, Object> getEventInfoList(Long id, Integer cycle, Integer emotion, Integer source, Integer hot, Integer pageNo, Integer pageSize) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         PageBounds pb = new PageBounds(pageNo, pageSize);
-        OpinionEsSearchVO esResult = esQueryService.queryEventOpinions(id, new DateTime(getStartDate(cycle)), emotion, 
+        OpinionEsSearchVO esResult = esQueryService.queryEventOpinions(id, getStartDate(cycle), emotion, 
             source, hot, pb);
        
         List<OpinionVO> opinions = BeanMapperUtil.mapList(esResult.getOpinions(), OpinionVO.class);
@@ -402,7 +402,7 @@ public class EventService{
      */
     public  long eventInfoTotal(Long id, Integer cycle, boolean isWarn){
         if (cycle != 4) {
-            return esQueryService.queryEventInfoTotal(id, new DateTime(getStartDate(cycle)), null, isWarn);
+            return esQueryService.queryEventInfoTotal(id, getStartDate(cycle), null, isWarn);
         } else {
             OpinionEventStatisticExample example = new OpinionEventStatisticExample();
             example.createCriteria().andEventIdEqualTo(id);
@@ -461,7 +461,7 @@ public class EventService{
     public List<KeyValueVO> eventSrcDis(Long id, Integer cycle) throws Exception {
         List<KeyValueVO> rs = null;
         if (cycle.intValue() != 4) {
-            rs = esQueryService.getEventOpinionMediaSpread(id, new DateTime(getStartDate(cycle)), null);
+            rs = esQueryService.getEventOpinionMediaSpread(id, getStartDate(cycle), null);
         } else {
             rs = getEventStatistic("mediaType", id);
         }
@@ -491,7 +491,6 @@ public class EventService{
     public List<List<KeyValueVO>> eventInfoTrend(Long id, Integer cycle) {
         List<OpinionDictionary> opinionDictionaryList = getDictionary("F");
         addAllToDic(opinionDictionaryList);
-        //Date startDate = getStartDate(cycle);
         OpinionEventMediaStatisticExample example = new OpinionEventMediaStatisticExample();
         example.setOrderByClause("pick_time ASC");
         OpinionEvent opinionEvent = opinionEventDao.selectByPrimaryKey(id);
@@ -571,16 +570,16 @@ public class EventService{
          }
      }
     
-     public Date getStartDate(int cycle) {
-         Date startDate = null;
+     public DateTime getStartDate(int cycle) {
+         DateTime startDate = new DateTime();
          if (cycle == 1) {
-             startDate = DateUtils.addDays(new Date(), -1);
+             return startDate.minusDays(1);
          } else if (cycle == 2) {
-             startDate = DateUtils.addDays(new Date(), -7);
+             return startDate.minusDays(7);
          } else if (cycle == 3) {
-             startDate = DateUtils.addDays(new Date(), -30);
+             return startDate.minusDays(30);
          } 
-         return startDate;
+         return null;
      }
     
     /**  
@@ -593,7 +592,7 @@ public class EventService{
     public List<KeyValueVO> eventSrcActive(Long id, Integer cycle) throws Exception {
         List<KeyValueVO> rs = null;
         if (cycle.intValue() != 4) {
-            rs = esQueryService.getEventWebsiteSpread(id, new DateTime(getStartDate(cycle)), null);
+            rs = esQueryService.getEventWebsiteSpread(id, getStartDate(cycle), null);
             for (KeyValueVO vo : rs) {
                 vo.setName((String)vo.getKey());
                 vo.setKey(null);
@@ -687,7 +686,7 @@ public class EventService{
     public List<KeyValueVO> eventDataType(Long id, Integer cycle) throws Exception {
         List<KeyValueVO> rs = null;
         if (cycle.intValue() != 4) {
-            rs = esQueryService.getEventEmotionSpread(id, new DateTime(getStartDate(cycle)), null);
+            rs = esQueryService.getEventEmotionSpread(id, getStartDate(cycle), null);
         } else {
             rs = getEventStatistic("dataType", id);
         }

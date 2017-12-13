@@ -490,7 +490,9 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-2：构建es查询条件
         TransportClient client = esUtil.getClient();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        if (startTime != null) {
+            query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        }
         query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
         if (hot != -1) {
             query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(hot));
