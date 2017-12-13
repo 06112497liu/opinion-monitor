@@ -6,25 +6,45 @@
  */
  package com.bbd.job.service;
 
-import com.bbd.bean.EventEsVO;
-import com.bbd.bean.OpinionEsVO;
-import com.bbd.dao.*;
-import com.bbd.domain.*;
-import com.bbd.job.vo.*;
-import com.bbd.service.EsQueryService;
-import com.bbd.service.EventService;
-import com.bbd.service.OpinionService;
-import com.bbd.service.vo.OpinionMsgSend;
-import com.bbd.util.JsonUtil;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.bbd.bean.EventEsVO;
+import com.bbd.bean.OpinionEsVO;
+import com.bbd.dao.MsgSendRecordDao;
+import com.bbd.dao.OpinionEventDao;
+import com.bbd.dao.OpinionEventLevelChangeDao;
+import com.bbd.dao.WarnNotifierDao;
+import com.bbd.dao.WarnSettingDao;
+import com.bbd.domain.MsgSendRecord;
+import com.bbd.domain.MsgSendRecordExample;
+import com.bbd.domain.OpinionEvent;
+import com.bbd.domain.OpinionEventExample;
+import com.bbd.domain.OpinionEventLevelChange;
+import com.bbd.domain.OpinionEventLevelChangeExample;
+import com.bbd.domain.WarnNotifier;
+import com.bbd.domain.WarnNotifierExample;
+import com.bbd.domain.WarnSetting;
+import com.bbd.domain.WarnSettingExample;
+import com.bbd.job.vo.EmailContent;
+import com.bbd.job.vo.EventIncMsgModel;
+import com.bbd.job.vo.EventMsgModel;
+import com.bbd.job.vo.MsgVO;
+import com.bbd.job.vo.SMSContent;
+import com.bbd.service.EsQueryService;
+import com.bbd.service.EventService;
+import com.bbd.service.OpinionService;
+import com.bbd.service.vo.OpinionMsgSend;
+import com.bbd.util.JsonUtil;
 
 /** 
  * @author daijinlong 
@@ -32,6 +52,8 @@ import java.util.List;
  */
 @Service
 public class MsgService {
+    private static final Logger  logger = LoggerFactory.getLogger(MsgService.class);
+    
     private static final int SEND_TYPE_OPINION = 1;
     private static final int SEND_TYPE_EVENT_NEW = 2;
     private static final int SEND_TYPE_EVENT_HOT = 3;
@@ -300,9 +322,11 @@ public class MsgService {
             List<WarnNotifier> warnNotifierList= getNotifiers(warnSetting);
             for (MsgVO msgVO : buildEventNewMsg(e, evtList.size(), op.getHot(), warnNotifierList, true)) {
                 kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件
+                logger.info("发送邮件事件新增舆情成功: {}", JsonUtil.fromJson(msgVO));
             }
             for (MsgVO msgVO : buildEventNewMsg(e, evtList.size(), op.getHot(), warnNotifierList, false)) {
                 kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送短信
+                logger.info("发送短信事件新增舆情成功: {}", JsonUtil.fromJson(msgVO));
             }
         }
         //由于同一批短信和邮件发送send_time相同，故bbd_msg_send_record区分msg_type没有意义，用同一条记录即可
@@ -328,6 +352,7 @@ public class MsgService {
         OpinionMsgSend opinionMsgSend = opinionService.getWarnRemindJson(msgSendRecord != null ? new DateTime(msgSendRecord.getSendTime()) : null);
         for (MsgVO msgVO : opinionMsgSend.getSendMsg()) {
             kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件和短信
+            logger.info("发送邮件或者短信舆情成功: {}", JsonUtil.fromJson(msgVO));
         }
         updateMsgRecord(SEND_TYPE_OPINION, MSG_TYPE_EMAIL, opinionMsgSend.getClaTime()); 
     }
@@ -355,9 +380,11 @@ public class MsgService {
                 List<WarnNotifier> warnNotifierList= getNotifiers(warnSetting);
                 for (MsgVO msgVO : buildEventWholeMsg(e, level, warnNotifierList, true)) {
                     kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送邮件
+                    logger.info("发送邮件事件总体热度级别变化成功: {}", JsonUtil.fromJson(msgVO));
                 }
                 for (MsgVO msgVO : buildEventWholeMsg(e, level, warnNotifierList, false)) {
                     kafkaTemplate.sendDefault(JsonUtil.fromJson(msgVO));//发送短信
+                    logger.info("发送短信事件总体热度级别变化成功: {}", JsonUtil.fromJson(msgVO));
                 }
             }
         }

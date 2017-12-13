@@ -6,22 +6,6 @@
  */
  package com.bbd.job.service;
 
-import com.bbd.bean.OpinionEsVO;
-import com.bbd.dao.OpinionEventDao;
-import com.bbd.dao.OpinionEventMediaStatisticDao;
-import com.bbd.dao.OpinionEventTrendStatisticDao;
-import com.bbd.domain.*;
-import com.bbd.service.EsQueryService;
-import com.bbd.service.EventService;
-import com.mybatis.domain.PageBounds;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,12 +13,38 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import com.bbd.bean.OpinionEsVO;
+import com.bbd.dao.OpinionEventDao;
+import com.bbd.dao.OpinionEventMediaStatisticDao;
+import com.bbd.dao.OpinionEventTrendStatisticDao;
+import com.bbd.domain.KeyValueVO;
+import com.bbd.domain.OpinionDictionary;
+import com.bbd.domain.OpinionEvent;
+import com.bbd.domain.OpinionEventExample;
+import com.bbd.domain.OpinionEventMediaStatistic;
+import com.bbd.domain.OpinionEventTrendStatistic;
+import com.bbd.domain.OpinionEventTrendStatisticExample;
+import com.bbd.service.EsQueryService;
+import com.bbd.service.EventService;
+import com.mybatis.domain.PageBounds;
+
 /** 
  * @author daijinlong 
  * @version $Id: EventStatisticService.java, v 0.1 2017年11月14日 上午10:23:47 daijinlong Exp $ 
  */
 @Service
 public class EventStatisticService {
+    private static final Logger  logger = LoggerFactory.getLogger(EventStatisticService.class);
     @Autowired
     OpinionEventDao opinionEventDao;
     @Autowired
@@ -81,6 +91,7 @@ public class EventStatisticService {
         }
         if (records!=null && records.size() > 0) {
             opinionEventTrendStatisticDao.insertBatch(records);
+            logger.info("事件走势定时任务入库成功: {}条记录", records.size());
         }
     }
     
@@ -119,6 +130,7 @@ public class EventStatisticService {
         }
         if (records!=null && records.size() > 0) {
             opinionEventMediaStatisticDao.insertBatch(records);
+            logger.info("事件媒体信息量统计定时任务入库成功: {}条记录", records.size());
         }
         
     }
