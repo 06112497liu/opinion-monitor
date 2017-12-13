@@ -5,11 +5,13 @@
 package com.bbd.util;
 
 import com.bbd.exception.ApplicationException;
+import com.bbd.exception.CommonErrorCode;
 import com.bbd.exception.ErrorCode;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -178,6 +180,23 @@ public class ValidateUtil {
     public static void checkNotEquals(String s1, String s2, ErrorCode errorCode) {
         if (StringUtils.equals(s1, s2)) {
             throw new ApplicationException(errorCode);
+        }
+    }
+
+    /**
+     * 校验正整数
+     * @param msg
+     * @param errorCode
+     * @param s
+     */
+    public static void isNum(String msg, ErrorCode errorCode, List<String> s) {
+        String rex = "^[1-9]+[0-9]*$";
+        Pattern p = Pattern.compile(rex);
+        for (String str : s) {
+            Matcher m = p.matcher(str);
+            if (!m.find()) {
+                throw new ApplicationException(errorCode, msg);
+            }
         }
     }
 

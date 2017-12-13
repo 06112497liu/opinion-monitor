@@ -18,10 +18,7 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -63,11 +60,14 @@ public class SystemSettingController {
     @RequestMapping(value = "hot/modify", method = RequestMethod.GET)
     public RestResult modifyHeatValue(Long eventId,
                                       Integer type,
-                                      Integer first,
                                       Integer popup,
+                                      Integer first,
                                       @RequestParam(value = "second", defaultValue = "0") Integer second,
                                       @RequestParam(value = "third", defaultValue = "0") Integer third) {
+
         ValidateUtil.checkNull(type, CommonErrorCode.PARAM_ERROR, "预警类型不能为空");
+        ValidateUtil.isNum("数据必须为正整数", CommonErrorCode.PARAM_ERROR, Arrays.asList(first.toString(), second.toString(), third.toString()));
+
         if(type != 1) ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, first, second, third);
         else ValidateUtil.checkNull(first, CommonErrorCode.PARAM_ERROR);
         if(type != 3) ValidateUtil.checkNull(eventId, CommonErrorCode.BIZ_ERROR, "配置所属事件id不能为空");
