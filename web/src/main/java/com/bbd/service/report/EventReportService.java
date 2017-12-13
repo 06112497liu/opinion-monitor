@@ -1,9 +1,6 @@
 package com.bbd.service.report;
 
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,8 +11,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import com.bbd.domain.KeyValueVO;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.bbd.dao.UserDao;
 import com.bbd.domain.Account;
+import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.domain.OpinionEventTrendStatistic;
 import com.bbd.report.ReportEngine;
@@ -35,12 +31,9 @@ import com.bbd.report.enums.ParamTypeEnum;
 import com.bbd.report.enums.StructureEnum;
 import com.bbd.report.model.ReportElementModel;
 import com.bbd.report.model.ReportElementString;
-import com.bbd.report.model.TableDataModel;
 import com.bbd.report.util.ModelUtil;
 import com.bbd.service.EventService;
-import com.bbd.service.vo.OpinionEsSearchVO;
 import com.bbd.service.vo.OpinionVO;
-import com.bbd.util.BigDecimalUtil;
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 
@@ -72,16 +65,6 @@ public class EventReportService {
     private String labelTwo;
     private String labelThree;
     
-    @Value("#{propertiesConfig['lifeCycle1']}")
-    private String lifeCycle1;//生命周期
-    
-    @Value("#{propertiesConfig['lifeCycle2']}")
-    private String lifeCycle2;//生命周期
-    
-    public Integer test(ExportEnum exportEnum) {
-        return 0;
-    }
-
     public void generateReport(int cycle, Long id, OutputStream out) throws Exception {
         Date currentTime = new Date();
         opTime = formatter.format(currentTime);
@@ -105,10 +88,6 @@ public class EventReportService {
         params.put("labelTwo", labelTwo);
         params.put("labelThree", labelThree);
         
-        
-        /*ReportEngine reportEngine = new ReportEngine();
-        reportEngine.generateReport(detailSource, elements, params, ExportEnum.PDF, out);
-        */
         ArrayListMultimap<StructureEnum,ReportElementModel> array = ModelUtil.stringToModel(list);
         ReportEngine re = new ReportEngine();
        /* File f = new File("E:/"+System.currentTimeMillis()+".pdf");

@@ -545,14 +545,14 @@ public class EventService{
          } else if (cycle == 2) {
              latestTime = DateTime.parse((yearMonDay + (now.getHourOfDay() / 12 == 0 ? 0 : 12) + ":00:00"), format);
              addToDates(dates, createTime, null, latestTime, 14, 12);
-         } else if (cycle == 3) {
+         } else if (cycle == 3 || cycle == 5) {
              latestTime = DateTime.parse(yearMonDay + "00:00:00", format);
-             addToDates(dates, createTime, null, latestTime, 30, 24);
-         } else {
+             addToDates(dates, createTime, null, latestTime, cycle == 3 ? 30 : 365, 24);
+         } else if (cycle == 4) {
              now = new DateTime(opinionEvent.getGmtFile());
              latestTime = DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + " " + "00:00:00", format);
              addToDates(dates, createTime, now, latestTime, 365, 24);
-         }
+         } 
          return dates;
      } 
      
@@ -572,16 +572,14 @@ public class EventService{
      }
     
      public Date getStartDate(int cycle) {
-         Date startDate ;
+         Date startDate = null;
          if (cycle == 1) {
              startDate = DateUtils.addDays(new Date(), -1);
          } else if (cycle == 2) {
              startDate = DateUtils.addDays(new Date(), -7);
          } else if (cycle == 3) {
              startDate = DateUtils.addDays(new Date(), -30);
-         } else {
-             startDate = null;//DateUtils.addDays(new Date(), -365);
-         }
+         } 
          return startDate;
      }
     
@@ -660,7 +658,7 @@ public class EventService{
     public List<KeyValueVO> eventKeywords(Long id, Integer cycle) {
         List<KeyValueVO> words = new ArrayList<KeyValueVO>();
         OpinionEventWordsExample example = new OpinionEventWordsExample();
-        example.createCriteria().andEventIdEqualTo(id).andCycleEqualTo((byte)(int)(cycle == 4 ? 3 : cycle));
+        example.createCriteria().andEventIdEqualTo(id).andCycleEqualTo((byte)(int)(cycle >= 3 ? 3 : cycle));
         List<OpinionEventWords> opinionEventWordsList = opinionEventWordsDao.selectByExampleWithBLOBs(example);
         if (opinionEventWordsList == null || opinionEventWordsList.size() == 0) {
             return words;
