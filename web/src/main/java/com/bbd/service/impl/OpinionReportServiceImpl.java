@@ -1,5 +1,6 @@
 package com.bbd.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.domain.KeyValueVO;
 import com.bbd.exception.ApplicationException;
@@ -24,6 +25,7 @@ import com.bbd.service.vo.OpinionCountStatVO;
 import com.bbd.service.vo.OpinionExtVO;
 import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.DateUtil;
+import com.bbd.util.StringUtils;
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
@@ -37,10 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Liuweibo
@@ -63,13 +62,6 @@ public class OpinionReportServiceImpl implements OpinionReportService {
 
     private static final     Optional<String> opinionStaSource = Optional.of("report/opinionSta.prpt");
 
-    // 处理下载文件问题
-    private OutputStream buildResponse(String fileName, HttpServletResponse response) throws IOException {
-        response.addHeader("Content-disposition","attachment;filename="+ URLEncoder.encode(fileName,"UTF-8")+";filename*=UTF-8''"+URLEncoder.encode(fileName,"UTF-8"));
-        response.setContentType("application/x-msdownload;");
-        return response.getOutputStream();
-    }
-
     /**
      * 舆情详情报告
      * @param out
@@ -81,7 +73,6 @@ public class OpinionReportServiceImpl implements OpinionReportService {
         // step-1：报表参数
         Map<String, Object> params = Maps.newHashMap();
         params.put("time", DateUtil.formatDateByPatten(new Date(), "yyyy年MM月dd日 HH:mm"));
-        params.put("content", detail.getContent());
 
         // step-2：报表元素数据
         // 舆情基本信息
@@ -98,10 +89,30 @@ public class OpinionReportServiceImpl implements OpinionReportService {
         List<KeyValueVO> wordCloudInfo = detail.getKeywords();
         ReportElementModel wordCloudModel = buildReportElementModel("keywords", "keywordsData", wordCloudInfo, 1, ReportTitle.keyValueTitle);
 
-        ArrayListMultimap<StructureEnum, ReportElementModel> elements = buildArrayListMultimap(StructureEnum.GROUP_FOOTER, baseModel, hotTrendModel, wordCloudModel);
+            // 正文
+        Object[][] contentArr = buildContent(detail.getContent());
+        ReportElementModel contentModel = buildReportElementModel("contentInfo", "contentInfoData", contentArr, 0, new String[]{"content"});
+
+        ArrayListMultimap<StructureEnum, ReportElementModel> elements = buildArrayListMultimap(StructureEnum.GROUP_FOOTER, baseModel, hotTrendModel, wordCloudModel, contentModel);
 
         ReportEngine reportEngine = new ReportEngine();
         reportEngine.generateReport(detailSource, elements, params, ExportEnum.PDF, out);
+    }
+
+    // 构建正文二维数组
+    private Object[][] buildContent(String content) {
+        List<String> list;
+        if (StringUtils.isNotEmpty(content) && content.startsWith("[\"")) {
+            list = JSONArray.parseArray(content, String.class);
+        } else {
+            list = Arrays.asList(content);
+        }
+        int size = list.size();
+        Object[][] arr = new Object[size][];
+        for (int i = 0; i< size; i++) {
+            arr[i][0] = list.get(i);
+        }
+        return arr;
     }
 
     /**
@@ -110,10 +121,9 @@ public class OpinionReportServiceImpl implements OpinionReportService {
      * @param type
      */
     @Override
-    public void generateStaReport(OutputStream out, String type) throws NoSuchFieldException, IllegalAccessException {
+    public void generateStaReport(OutputStream out, Integer type) throws NoSuchFieldException, IllegalAccessException {
         Date now = new Date();
-        Integer state = buildType(type);
-        DateTime firstWarnTime = BusinessUtils.getDateTimeWithStartTime(state);
+        DateTime firstWarnTime = BusinessUtils.getDateTimeWithStartTime(type);
 
         // step-1：报表全局参数
         Map<String, Object> params = Maps.newHashMap();
@@ -123,7 +133,7 @@ public class OpinionReportServiceImpl implements OpinionReportService {
 
         // step-2：报表元素
             // 1、2、3 级预警条数
-        OpinionCountStatVO opinionLevelSta = statisticService.getOpinionCountStatistic(state);
+        OpinionCountStatVO opinionLevelSta = statisticService.getOpinionCountStatistic(type);
         OpinionStaReport opinionStaInfo = BeanMapperUtil.map(opinionLevelSta, OpinionStaReport.class);
             // 舆情情感数量
         List<KeyValueVO> assectionSta = esQueryService.queryAffectionSta(firstWarnTime);
@@ -154,13 +164,6 @@ public class OpinionReportServiceImpl implements OpinionReportService {
         reportEngine.generateReport(opinionStaSource, elements, params, ExportEnum.PDF, out);
     }
 
-    private Integer buildType(String type) {
-        if ("日".equals(type)) return 1;
-        if ("周".equals(type)) return 2;
-        if ("月".equals(type)) return 3;
-        else throw new ApplicationException(CommonErrorCode.PARAM_ERROR);
-    }
-
     private String buildEmotionDesc(Integer emotion) {
         if (emotion == 0) return "中性";
         if (emotion == 1) return "正面";
@@ -179,6 +182,17 @@ public class OpinionReportServiceImpl implements OpinionReportService {
     private <T> ReportElementModel buildReportElementModel(String name, String dataName, List<T> lists, int index, Object[] title) {
         ReportElementModel model = new ReportElementModel();
         Object[][] arrays = ReportUtil.buildTwoArray(lists);
+        TableDataModel dataModel = new TableDataModel(arrays, title);
+        model.setName(name);
+        model.setDataName(dataName);
+        model.setIndex(index);
+        model.setElementEnum(ElementEnum.REPORT_DEFINITION_TABLE);
+        model.setDataModel(dataModel);
+        return model;
+    }
+
+    private <T> ReportElementModel buildReportElementModel(String name, String dataName, Object[][] arrays, int index, Object[] title) {
+        ReportElementModel model = new ReportElementModel();
         TableDataModel dataModel = new TableDataModel(arrays, title);
         model.setName(name);
         model.setDataName(dataName);

@@ -6,6 +6,7 @@ package com.bbd.controller;
 
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.context.SessionContext;
+import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionReportService;
 import com.bbd.service.OpinionService;
@@ -95,15 +96,34 @@ public class ReportController extends AbstractController {
 
     @ApiOperation(value = "预警舆情（日、周、月）报", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "报告类型（日、月、周）", name = "type", dataType = "String", paramType = "query", required = true)
+            @ApiImplicitParam(value = "报告类型（1-日、2-周、3-月）", name = "type", dataType = "Integer", paramType = "query", required = true)
     })
     @RequestMapping(value = "opinion/sta", method = RequestMethod.GET)
-    public RestResult opinionStaReport(String type) throws Exception{
+    public RestResult opinionStaReport(Integer type) throws Exception{
+        String typeDesc = getTimeSpanStr(type);
         HttpServletResponse resp = SessionContext.getResponse();
-        String filename = "消费舆情监测预警系统预警舆情" + type + "报"+ DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm") +".pdf";
+        String filename = "消费舆情监测预警系统预警舆情" + typeDesc + "报"+ DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm") +".pdf";
         OutputStream out = buildResponse(filename, resp);
         opinionReportService.generateStaReport(out, type);
         return RestResult.ok("下载成功");
+    }
+
+    private String getTimeSpanStr(Integer type) {
+        String rs;
+        switch (type) {
+            case 1:
+                rs = "日";
+               break;
+            case 2:
+                rs = "周";
+                break;
+            case 3:
+                rs = "月";
+                break;
+            default:
+                throw new ApplicationException(CommonErrorCode.PARAM_ERROR);
+        }
+        return rs;
     }
 
     // 处理下载文件问题

@@ -23,6 +23,6 @@ public interface OpinionReportService {
      * @param out
      * @param type
      */
-    void generateStaReport(OutputStream out, String type) throws NoSuchFieldException, IllegalAccessException;
+    void generateStaReport(OutputStream out, Integer type) throws NoSuchFieldException, IllegalAccessException;
 
 }
