@@ -80,9 +80,9 @@ public class OpinionNewsListener {
 
         BulkRequestBuilder bulk = client.prepareBulk();
         for (OpinionNewsVO vo : vos) {
-            String id = UUID.randomUUID().toString();
-            //String id = vo.getId();
-            System.out.println("id: " + vo.getId());
+            //String id = UUID.randomUUID().toString();
+            String id = vo.getId();
+            //System.out.println("id: " + vo.getId());
             IndexRequest ir = new IndexRequest(index, type, id);
             ir.source(JsonUtil.fromJson(vo), XContentType.JSON);
             UpdateRequest ur = new UpdateRequest(index, type, id).upsert(ir);
