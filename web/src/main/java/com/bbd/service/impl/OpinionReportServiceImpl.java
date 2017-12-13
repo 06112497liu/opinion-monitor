@@ -28,6 +28,7 @@ import com.bbd.util.DateUtil;
 import com.bbd.util.StringUtils;
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -108,9 +109,11 @@ public class OpinionReportServiceImpl implements OpinionReportService {
             list = Arrays.asList(content);
         }
         int size = list.size();
-        Object[][] arr = new Object[size][];
+        Object[][] arr = new Object[size][1];
         for (int i = 0; i< size; i++) {
-            arr[i][0] = list.get(i);
+            String item = list.get(i);
+            if (!item.startsWith("pic_rowkey"))
+                arr[i][0] = list.get(i);
         }
         return arr;
     }

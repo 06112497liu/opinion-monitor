@@ -6,11 +6,12 @@ package com.bbd.controller;
 
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.context.SessionContext;
+import com.bbd.domain.WarnSetting;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
-import com.bbd.service.OpinionReportService;
-import com.bbd.service.OpinionService;
+import com.bbd.service.*;
 import com.bbd.service.vo.OpinionExtVO;
+import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.DateUtil;
 import com.bbd.util.ValidateUtil;
 
@@ -42,8 +43,6 @@ import com.bbd.RestResult;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.domain.OpinionEvent;
 import com.bbd.report.enums.ExportEnum;
-import com.bbd.service.EsQueryService;
-import com.bbd.service.EventService;
 import com.bbd.service.report.EventReportService;
 import com.bbd.util.UserContext;
 
@@ -63,7 +62,13 @@ public class ReportController extends AbstractController {
     private OpinionReportService opinionReportService;
 
     @Autowired
+    private EsQueryService esQueryService;
+
+    @Autowired
     private OpinionService opinionService;
+
+    @Autowired
+    private SystemSettingService systemSettingService;
     
     @ApiOperation(value = "事件报告", httpMethod = "POST")
     @ApiImplicitParams({ 
@@ -85,8 +90,7 @@ public class ReportController extends AbstractController {
     @RequestMapping(value = "opinion/detail", method = RequestMethod.GET)
     public RestResult opinionDetailReport(String uuid) throws Exception{
         ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
-        // 舆情详情
-        OpinionExtVO opinionDetail = opinionService.getOpinionDetail(uuid);
+        OpinionExtVO opinionDetail = getOpinionDetail(uuid);
         HttpServletResponse resp = SessionContext.getResponse();
         String filename = "《" + opinionDetail.getTitle() + "》舆情详情简报.pdf";
         OutputStream out = buildResponse(filename, resp);
@@ -106,6 +110,17 @@ public class ReportController extends AbstractController {
         OutputStream out = buildResponse(filename, resp);
         opinionReportService.generateStaReport(out, type);
         return RestResult.ok("下载成功");
+    }
+
+    private OpinionExtVO getOpinionDetail(String uuid) {
+        // 舆情详情
+        OpinionEsVO o = esQueryService.getOpinionByUUID(uuid);
+        OpinionExtVO result = BeanMapperUtil.map(o, OpinionExtVO.class);
+        // 判断预警级别
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3); // 预警配置
+        Integer level = systemSettingService.judgeOpinionSettingClass(result.getHot(), setting);
+        result.setLevel(level);
+        return result;
     }
 
     private String getTimeSpanStr(Integer type) {
