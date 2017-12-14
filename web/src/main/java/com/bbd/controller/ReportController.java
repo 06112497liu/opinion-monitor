@@ -106,7 +106,7 @@ public class ReportController extends AbstractController {
     public RestResult opinionStaReport(Integer type) throws Exception{
         String typeDesc = getTimeSpanStr(type);
         HttpServletResponse resp = SessionContext.getResponse();
-        String filename = "消费舆情监测预警系统预警舆情" + typeDesc + "报"+ DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm") +".pdf";
+        String filename = "消费舆情监测预警系统预警舆情" + typeDesc + "报"+ DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd-HHmm") +".pdf";
         OutputStream out = buildResponse(filename, resp);
         opinionReportService.generateStaReport(out, type, typeDesc);
         return RestResult.ok("下载成功");

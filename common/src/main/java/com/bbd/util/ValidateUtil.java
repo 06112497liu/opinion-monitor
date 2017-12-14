@@ -190,7 +190,7 @@ public class ValidateUtil {
      * @param s
      */
     public static void isNum(String msg, ErrorCode errorCode, List<String> s) {
-        String rex = "^[1-9]+[0-9]*$";
+        String rex = "^[1-9]?[0-9]*$";
         Pattern p = Pattern.compile(rex);
         for (String str : s) {
             Matcher m = p.matcher(str);
