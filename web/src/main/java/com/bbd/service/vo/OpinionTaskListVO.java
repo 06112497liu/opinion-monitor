@@ -61,7 +61,12 @@ public class OpinionTaskListVO extends OpinionVO {
     /**
      * 事件是否删除(1-已删除，0-未删除)
      */
-    private Integer flag;
+    private Integer isDelete;
+
+    /**
+     * 事件是否归档（1-已归档，0-未归档）
+     */
+    private Integer isFile;
 
     public List<OpinionOpRecordVO> getRecords() {
         return records;
@@ -127,12 +132,20 @@ public class OpinionTaskListVO extends OpinionVO {
         this.keys = keys;
     }
 
-    public Integer getFlag() {
-        return flag;
+    public Integer getIsDelete() {
+        return isDelete;
     }
 
-    public void setFlag(Integer flag) {
-        this.flag = flag;
+    public void setIsDelete(Integer isDelete) {
+        this.isDelete = isDelete;
+    }
+
+    public Integer getIsFile() {
+        return isFile;
+    }
+
+    public void setIsFile(Integer isFile) {
+        this.isFile = isFile;
     }
 }
     

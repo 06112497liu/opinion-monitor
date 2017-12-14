@@ -58,20 +58,19 @@ public class SystemSettingController {
             @ApiImplicitParam(value = "3级预警下限", name = "third", dataType = "Integer", paramType = "query", required = false)
     })
     @RequestMapping(value = "hot/modify", method = RequestMethod.GET)
-    public RestResult modifyHeatValue(Long eventId,
-                                      Integer type,
-                                      Integer popup,
-                                      Integer first,
-                                      @RequestParam(value = "second", defaultValue = "0") Integer second,
-                                      @RequestParam(value = "third", defaultValue = "0") Integer third) {
+    public RestResult modifyHeatValue(Long eventId, Integer type, Integer popup, Number first,
+                                      @RequestParam(value = "second", defaultValue = "0") Number second,
+                                      @RequestParam(value = "third", defaultValue = "0") Number third) {
 
         ValidateUtil.checkNull(type, CommonErrorCode.PARAM_ERROR, "预警类型不能为空");
-        ValidateUtil.isNum("数据必须为正整数", CommonErrorCode.PARAM_ERROR, Arrays.asList(first.toString(), second.toString(), third.toString()));
+        ValidateUtil.isNum("必须为正整数", CommonErrorCode.PARAM_ERROR, Arrays.asList(first.toString(), second.toString(), third.toString()));
 
         if(type != 1) ValidateUtil.checkAllNull(CommonErrorCode.PARAM_ERROR, first, second, third);
         else ValidateUtil.checkNull(first, CommonErrorCode.PARAM_ERROR);
         if(type != 3) ValidateUtil.checkNull(eventId, CommonErrorCode.BIZ_ERROR, "配置所属事件id不能为空");
-        return RestResult.ok(settingService.modifyHeat(eventId, type, popup, first, second, third));
+        Integer rs = settingService.modifyHeat(eventId, type, popup, first.intValue(), second.intValue(), third.intValue());
+
+        return RestResult.ok(rs);
     }
 
     @ApiOperation(value = "创建或修改通知人信息", httpMethod = "POST")
