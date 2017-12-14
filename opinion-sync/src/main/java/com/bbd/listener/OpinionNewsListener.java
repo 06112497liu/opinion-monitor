@@ -10,7 +10,6 @@ import com.bbd.util.JsonUtil;
 import com.bbd.vo.OpinionNewsVO;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -25,10 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-import sun.applet.Main;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 舆情新闻Listener
