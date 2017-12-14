@@ -181,15 +181,15 @@ public class EventReportService {
         eventName = opinionEvent.getEventName();
         eventTime = formatter.format(opinionEvent.getGmtCreate());
         if (cycle == 1) {
-            eventName = "《+"+eventName+"+》舆情事件日报";
+            eventName = "《"+eventName+"》舆情事件日报";
         } else if (cycle == 2) {
-            eventName = "《+"+eventName+"+》舆情事件周报";
+            eventName = "《"+eventName+"》舆情事件周报";
         } else if (cycle == 3) {
-            eventName = "《+"+eventName+"+》舆情事件月报";
+            eventName = "《"+eventName+"》舆情事件月报";
         } else if (cycle == 4) {
-            eventName = "《+"+eventName+"+》历史舆情事件归档报告";
+            eventName = "《"+eventName+"》历史舆情事件归档报告";
         } else if (cycle == 5) {
-            eventName = "《+"+eventName+"+》舆情事件专报";
+            eventName = "《"+eventName+"》舆情事件专报";
         }
         return eventName;
     }
