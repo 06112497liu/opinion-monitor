@@ -177,9 +177,9 @@ public class ReportUtil {
 				try {
 					Object obj = declaredFields[j].get(datas.get(i));
 					if(obj instanceof String) {
-						String str = replaceBlank((String) obj);
+						String str = obj.toString().trim();
 						if (str.equals("")) rs[i][j] = "无";
-						else rs[i][j] = replaceBlank((String) obj);
+						else rs[i][j] = str;
 					}else {
 						rs[i][j] = obj;
 					}
@@ -193,15 +193,4 @@ public class ReportUtil {
 		return rs;
 	}
 
-	public static String replaceBlank(String str) {
-		String dest = "";
-		if (str!=null) {
-			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-			Matcher m = p.matcher(str);
-			dest = m.replaceAll("");
-		}
-		return dest;
-	}
-   
-	
 }

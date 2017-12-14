@@ -326,7 +326,7 @@ public class OpinionServiceImpl implements OpinionService {
         // 根据横坐标去重
         Set<OpinionHotEsVO> set;
         if (timeSpan == 1)
-            set = new TreeSet<>(Comparator.comparing(o -> new DateTime(o.getHotTime()).toString("yyyy-MM-dd HH:00:00")));
+            set = new TreeSet<>(Comparator.comparing(o -> new DateTime(o.getHotTime()).toString("yyyy-MM-dd HH")));
         else
             set = new TreeSet<>(Comparator.comparing(o -> new DateTime(o.getHotTime()).toString("yyyy-MM-dd")));
 
@@ -337,13 +337,25 @@ public class OpinionServiceImpl implements OpinionService {
         List<KeyValueVO> keyValueVOList = Lists.newLinkedList();
         for (OpinionHotEsVO v : list) {
             KeyValueVO vo = new KeyValueVO();
-            String time = DateUtil.formatDateByPatten(v.getHotTime(), "yyyy-MM-dd HH:mm");
+            String time = DateUtil.formatDateByPatten(v.getHotTime(), getPattern(timeSpan));
             vo.setKey(time);
             vo.setName(time);
             vo.setValue(v.getHot());
             keyValueVOList.add(vo);
         }
         return keyValueVOList;
+    }
+
+    private String getPattern(Integer timeSpan) {
+        switch (timeSpan) {
+            case 1:
+                return "HH时";
+            case 2:
+            case 3:
+                return "dd日";
+            default:
+                throw new ApplicationException(CommonErrorCode.PARAM_ERROR);
+        }
     }
 
     /**
@@ -354,7 +366,7 @@ public class OpinionServiceImpl implements OpinionService {
     @Override
     public OpinionMsgSend getWarnRemindJson(DateTime lastSendTime) {
 
-        lastSendTime = (lastSendTime == null) ? DateTime.now().plusHours(-1) : lastSendTime;
+        lastSendTime = (lastSendTime == null) ? DateTime.now().plusHours(-100) : lastSendTime;
         List<MsgVO> result = Lists.newLinkedList();
         Date date = new Date();
         OpinionMsgSend msgSend = new OpinionMsgSend();
