@@ -459,7 +459,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public List<OpinionBaseInfoReport> queryWarningOpinion(DateTime firstWarnTime) {
         TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
-                .setSize(50)
+                .setSize(100)
                 .setQuery(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(firstWarnTime.toString("yyyy-MM-dd HH:mm:ss")))
                 .setFetchSource(null, new String[]{EsConstant.contentField, EsConstant.keysField, EsConstant.keywordField})
                 .addSort(EsConstant.hotField, SortOrder.DESC)

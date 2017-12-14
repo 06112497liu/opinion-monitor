@@ -124,7 +124,7 @@ public class OpinionReportServiceImpl implements OpinionReportService {
      * @param type
      */
     @Override
-    public void generateStaReport(OutputStream out, Integer type) throws NoSuchFieldException, IllegalAccessException {
+    public void generateStaReport(OutputStream out, Integer type, String typeDesc) throws NoSuchFieldException, IllegalAccessException {
         Date now = new Date();
         DateTime firstWarnTime = BusinessUtils.getDateTimeWithStartTime(type);
 
@@ -132,7 +132,7 @@ public class OpinionReportServiceImpl implements OpinionReportService {
         Map<String, Object> params = Maps.newHashMap();
         params.put("time1", DateUtil.formatDateByPatten(now, "yyyy年MM月dd日 HH:mm"));
         params.put("time2", DateUtil.formatDateByPatten(now, "yyyy-MM-dd"));
-        params.put("timeSpan", type);
+        params.put("timeSpan", typeDesc);
 
         // step-2：报表元素
             // 1、2、3 级预警条数
