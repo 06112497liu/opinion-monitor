@@ -1,7 +1,6 @@
 package com.bbd.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
-import com.bbd.bean.OpinionEsVO;
 import com.bbd.domain.KeyValueVO;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
@@ -11,7 +10,6 @@ import com.bbd.report.enums.ExportEnum;
 import com.bbd.report.enums.StructureEnum;
 import com.bbd.report.model.ReportElementModel;
 import com.bbd.report.model.TableDataModel;
-import com.bbd.report.model.TextDataModel;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.IndexStatisticService;
 import com.bbd.service.OpinionReportService;
@@ -21,14 +19,12 @@ import com.bbd.service.param.OpinionStaReport;
 import com.bbd.service.param.ReportTitle;
 import com.bbd.service.report.ReportUtil;
 import com.bbd.service.utils.BusinessUtils;
-import com.bbd.service.vo.OpinionCountStatVO;
 import com.bbd.service.vo.OpinionExtVO;
 import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.DateUtil;
 import com.bbd.util.StringUtils;
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -36,12 +32,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Liuweibo

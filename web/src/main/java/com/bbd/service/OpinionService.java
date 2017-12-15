@@ -1,13 +1,10 @@
 package com.bbd.service;
 
-import com.bbd.bean.OpinionEsVO;
-import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.domain.KeyValueVO;
 import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import org.joda.time.DateTime;
-import org.springframework.data.domain.Page;
 
 import java.util.Date;
 import java.util.List;

@@ -2,11 +2,9 @@ package com.bbd.service;
 
 import com.bbd.domain.KeyValueVO;
 import com.bbd.service.param.TransferParam;
-import com.bbd.service.vo.OpinionOpRecordVO;
 import com.bbd.service.vo.OpinionTaskListVO;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
-import org.elasticsearch.action.support.replication.ReplicationResponse;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,6 +1,5 @@
 package com.bbd.service;
 
-import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.Reptile;
 import com.bbd.dao.MonitorKeywordsDao;
 import com.bbd.domain.MonitorKeywords;
@@ -11,17 +10,13 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import jdk.nashorn.internal.scripts.JO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

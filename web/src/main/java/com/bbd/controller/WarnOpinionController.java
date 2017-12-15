@@ -1,7 +1,6 @@
 package com.bbd.controller;
 
 import com.bbd.RestResult;
-import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.domain.KeyValueVO;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionService;
