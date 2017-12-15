@@ -135,10 +135,10 @@ public class EventReportService {
         }
         if (cycle == 4) {//如果已经归档
             fileTime = formatter.format(opinionEvent.getGmtFile());
-            value.add(new String[]{"监测时间：" + formatter.format(opinionEvent.getGmtCreate()) + "，共持续监测" + daysBetween(opinionEvent.getGmtCreate(), opinionEvent.getGmtFile()) + "天"});
+            value.add(new String[]{"监测时间：" + formatter.format(opinionEvent.getGmtCreate())});
             Account fileUser = (Account)map.get("fileUser");
             value.add(new String[]{"归档账号：" + buildUserInfo(fileUser)});
-            value.add(new String[]{"归档时间：" + formatter.format(opinionEvent.getGmtFile())});
+            value.add(new String[]{"归档时间：" + formatter.format(opinionEvent.getGmtFile()) + "，共持续监测" + daysBetween(opinionEvent.getGmtCreate(), opinionEvent.getGmtFile()) + "天"});
             value.add(new String[]{"归档理由：" + hasData(opinionEvent.getFileReason())});
             value.add(new String[]{"备注：" + hasData(opinionEvent.getRemark())});
         }
