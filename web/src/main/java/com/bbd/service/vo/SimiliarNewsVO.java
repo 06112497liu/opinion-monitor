@@ -1,5 +1,7 @@
 package com.bbd.service.vo;
 
+import com.bbd.util.StringUtils;
+
 /**
  * 相同文章VO
  * @author Liuweibo
@@ -13,9 +15,19 @@ public class SimiliarNewsVO {
     private String  title;
 
     /**
+     * 网站
+     */
+    private String website;
+
+    /**
      * 来源
      */
     private String source;
+
+    /**
+     * 真实来源
+     */
+    private String realSource;
 
     /**
      * 热度
@@ -26,6 +38,7 @@ public class SimiliarNewsVO {
      * 链接
      */
     private String link;
+
 
     public SimiliarNewsVO() {
     }
@@ -44,12 +57,30 @@ public class SimiliarNewsVO {
         this.title = title;
     }
 
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
     public String getSource() {
         return source;
     }
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public String getRealSource() {
+        if (StringUtils.isNotEmpty(source)) return source;
+        if (StringUtils.isNotEmpty(website)) return website;
+        return "";
+    }
+
+    public void setRealSource(String realSource) {
+        this.realSource = realSource;
     }
 
     public Integer getHot() {

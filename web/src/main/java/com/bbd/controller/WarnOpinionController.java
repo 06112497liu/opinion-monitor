@@ -6,6 +6,7 @@ import com.bbd.domain.KeyValueVO;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.service.OpinionService;
 import com.bbd.service.vo.HistoryOpinionDetailVO;
+import com.bbd.service.vo.OpinionExtVO;
 import com.bbd.service.vo.SimiliarNewsVO;
 import com.bbd.util.ValidateUtil;
 import io.swagger.annotations.Api;
@@ -77,7 +78,8 @@ public class WarnOpinionController extends AbstractController {
     @RequestMapping(value = "detail", method = RequestMethod.GET)
     public RestResult getWarnOpinionDetail(String uuid) {
         ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
-        return RestResult.ok(opinionService.getOpinionDetail(uuid));
+        OpinionExtVO rs = opinionService.getOpinionDetail(uuid);
+        return RestResult.ok(rs);
     }
 
     @ApiOperation(value = "预警舆情相同文章信息", httpMethod = "GET")

@@ -128,10 +128,10 @@ public interface EsQueryService {
 
     /**
      * 查询预警舆情
-     * @param firstWarnTime
+     * @param startTime
      * @return
      */
-    List<OpinionBaseInfoReport> queryWarningOpinion(DateTime firstWarnTime);
+    List<OpinionBaseInfoReport> queryWarningOpinion(DateTime startTime);
 
     /**
      * 查询舆情事件
@@ -312,10 +312,17 @@ public interface EsQueryService {
     OpinionEsVO queryHistoryWarnDetail(String uuid);
 
     /**
-     * 舆情情感数量统计
+     * 舆情情感数量统计（报告专用）
      * @param dateTime
      * @return
      */
     List<KeyValueVO> queryAffectionSta(DateTime dateTime);
+
+    /**
+     * 舆情等级统计（报告专用）
+     * @param startTime
+     * @return
+     */
+    List<KeyValueVO> queryHotLevelSta(DateTime startTime);
 
 }

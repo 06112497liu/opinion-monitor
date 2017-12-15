@@ -23,6 +23,8 @@ public class OpinionNewsVO {
 
     private Integer hot;
 
+    private String website;
+
     private String  source;
 
     private String  link;
@@ -73,5 +75,13 @@ public class OpinionNewsVO {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
     }
 }

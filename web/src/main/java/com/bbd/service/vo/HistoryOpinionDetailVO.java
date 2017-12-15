@@ -2,6 +2,7 @@ package com.bbd.service.vo;
 
 import com.bbd.bean.OpinionWarnTime;
 import com.bbd.domain.KeyValueVO;
+import com.bbd.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
@@ -22,7 +23,7 @@ public class HistoryOpinionDetailVO {
 
     private Integer         hot;
 
-    private Integer level;
+    private Integer         level;
 
     private String          link;
 
@@ -39,6 +40,11 @@ public class HistoryOpinionDetailVO {
 
     private String          source;
 
+    /**
+     * 真实来源
+     */
+    private String realSource;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Date publishTime;
 
@@ -48,6 +54,16 @@ public class HistoryOpinionDetailVO {
 
     /** 操作记录 */
     private List<OpinionOpRecordVO> records;
+
+    public String getRealSource() {
+        if (StringUtils.isNotEmpty(source)) return source;
+        if (StringUtils.isNotEmpty(website)) return website;
+        return "";
+    }
+
+    public void setRealSource(String realSource) {
+        this.realSource = realSource;
+    }
 
     public String getUuid() {
         return uuid;

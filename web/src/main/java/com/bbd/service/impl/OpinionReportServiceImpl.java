@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -126,20 +127,27 @@ public class OpinionReportServiceImpl implements OpinionReportService {
     @Override
     public void generateStaReport(OutputStream out, Integer type, String typeDesc) throws NoSuchFieldException, IllegalAccessException {
         Date now = new Date();
-        DateTime firstWarnTime = BusinessUtils.getDateTimeWithStartTime(type);
+        DateTime publishTime = BusinessUtils.getDateByTimeSpan(type);
 
         // step-1：报表全局参数
         Map<String, Object> params = Maps.newHashMap();
         params.put("time1", DateUtil.formatDateByPatten(now, "yyyy年MM月dd日 HH:mm"));
         params.put("time2", DateUtil.formatDateByPatten(now, "yyyy-MM-dd"));
         params.put("timeSpan", typeDesc);
+        params.put("type", buildType(type));
 
         // step-2：报表元素
             // 1、2、3 级预警条数
-        OpinionCountStatVO opinionLevelSta = statisticService.getOpinionCountStatistic(type);
-        OpinionStaReport opinionStaInfo = BeanMapperUtil.map(opinionLevelSta, OpinionStaReport.class);
+        List<KeyValueVO> opinionLevelSta = esQueryService.queryHotLevelSta(publishTime);
+        OpinionStaReport opinionStaInfo = new OpinionStaReport();
+        for (KeyValueVO v : opinionLevelSta) {
+            Field method = OpinionStaReport.class.getDeclaredField(v.getName());
+            method.setAccessible(true);
+            method.set(opinionStaInfo, Long.parseLong( (v.getValue().toString())) );
+        }
+        opinionStaInfo.setTotal(opinionStaInfo.getLevelOne() + opinionStaInfo.getLevelTwo() + opinionStaInfo.getLevelThree());
             // 舆情情感数量
-        List<KeyValueVO> assectionSta = esQueryService.queryAffectionSta(firstWarnTime);
+        List<KeyValueVO> assectionSta = esQueryService.queryAffectionSta(publishTime);
         for (KeyValueVO v : assectionSta) {
             String emotionStr =v.getKey().toString();
             if ("0".equals(emotionStr)) opinionStaInfo.setNeutral((Long) v.getValue());
@@ -149,11 +157,11 @@ public class OpinionReportServiceImpl implements OpinionReportService {
         ReportElementModel opinionStaModel = buildReportElementModel("opinionBase", "opinionBaseData", Arrays.asList(opinionStaInfo), ReportTitle.opinionStaTitle);
 
             // 舆情传播渠道
-        List<KeyValueVO> channelDistributionInfo = statisticService.getOpinionChannelTrend(firstWarnTime);
+        List<KeyValueVO> channelDistributionInfo = statisticService.getOpinionChannelTrend(publishTime);
         ReportElementModel channelModel = buildReportElementModel("channelDistribution", "channelDistributionData", channelDistributionInfo, ReportTitle.keyValueTitle);
 
             // 舆情信息概要
-        List<OpinionBaseInfoReport> opinionBaseInfo = esQueryService.queryWarningOpinion(firstWarnTime);
+        List<OpinionBaseInfoReport> opinionBaseInfo = esQueryService.queryWarningOpinion(publishTime);
         int count = 1;
         for (OpinionBaseInfoReport info : opinionBaseInfo) {
             info.setTitle(count++ + "、"+ info.getTitle());
@@ -165,6 +173,13 @@ public class OpinionReportServiceImpl implements OpinionReportService {
         ArrayListMultimap<StructureEnum, ReportElementModel> elements = buildArrayListMultimap(StructureEnum.REPORT_HEADER, baseModel, channelModel, opinionStaModel);
         ReportEngine reportEngine = new ReportEngine();
         reportEngine.generateReport(opinionStaSource, elements, params, ExportEnum.PDF, out);
+    }
+
+    private String buildType(Integer type) {
+        if (type == 1) return "日";
+        if (type == 2) return "周";
+        if (type == 3) return "月";
+        else throw new ApplicationException(CommonErrorCode.PARAM_ERROR);
     }
 
     private String buildEmotionDesc(Integer emotion) {

@@ -92,7 +92,7 @@ public class ReportController extends AbstractController {
         ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
         OpinionExtVO opinionDetail = getOpinionDetail(uuid);
         HttpServletResponse resp = SessionContext.getResponse();
-        String filename = "《" + opinionDetail.getTitle() + "》舆情详情简报.pdf";
+        String filename = "《" + opinionDetail.getTitle() + "》舆情详情简报"+ DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd-HHmm") + ".pdf";
         OutputStream out = buildResponse(filename, resp);
         opinionReportService.generateDetailReport(out, opinionDetail);
         return RestResult.ok("下载成功");
@@ -127,13 +127,13 @@ public class ReportController extends AbstractController {
         String rs;
         switch (type) {
             case 1:
-                rs = "日";
+                rs = "24小时";
                break;
             case 2:
-                rs = "周";
+                rs = "一周";
                 break;
             case 3:
-                rs = "月";
+                rs = "一月";
                 break;
             default:
                 throw new ApplicationException(CommonErrorCode.PARAM_ERROR);

@@ -65,9 +65,9 @@ public interface IndexStatisticService {
 
     /**
      * 舆情传播渠道分布(根据预警时间)
-     * @param firstWarnTime
+     * @param publicshTime
      * @return
      */
-    List<KeyValueVO> getOpinionChannelTrend(DateTime firstWarnTime);
+    List<KeyValueVO> getOpinionChannelTrend(DateTime publicshTime);
 
 }

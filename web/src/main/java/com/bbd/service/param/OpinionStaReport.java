@@ -38,10 +38,10 @@ public class OpinionStaReport {
     /**
      * 中性舆情数量
      */
-    private Long neutral;
+    private Long neutral = 0L;
 
     public Long getTotal() {
-        return total;
+        return levelOne + levelTwo + levelThree;
     }
 
     public void setTotal(Long total) {

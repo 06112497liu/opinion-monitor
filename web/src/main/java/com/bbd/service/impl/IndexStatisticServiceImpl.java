@@ -55,7 +55,7 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     public OpinionCountStatVO getOpinionCountStatistic(Integer timeSpan) throws NoSuchFieldException, IllegalAccessException {
 
         DateTime now = DateTime.now();
-        DateTime startTime = BusinessUtils.getDateTimeWithStartTime(timeSpan);
+        DateTime startTime = BusinessUtils.getDateByTimeSpan(timeSpan);
 
         OpinionCountStatVO result = esQueryService.getOpinionCountStatistic(startTime, now);
         return result;
@@ -213,15 +213,17 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     }
 
     /**
-     * 舆情传播渠道分布(根据预警时间)
-     * @param firstWarnTime
+     * 舆情传播渠道分布(发布时间)
+     * @param publicshTime
      * @return
      */
     @Override
-    public List<KeyValueVO> getOpinionChannelTrend(DateTime firstWarnTime) {
-        List<KeyValueVO> list = esQueryService.getOpinionMediaSpread(firstWarnTime);
+    public List<KeyValueVO> getOpinionChannelTrend(DateTime publicshTime) {
+        List<KeyValueVO> list = esQueryService.getOpinionMediaSpread(publicshTime);
         if (list.isEmpty()) return Lists.newArrayList();
-        calPercent(list);
+        for (KeyValueVO v : list) {
+            v.setName(WebsiteEnum.getDescByCode(v.getKey().toString()));
+        }
         return list;
     }
 
@@ -233,7 +235,6 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
 
         list.forEach(k -> {
             Long num = Long.parseLong(k.getValue().toString());
-            k.setName(WebsiteEnum.getDescByCode(k.getKey().toString()));
             double per = BigDecimalUtil.div(num, count, 4);
             k.setValue(BigDecimalUtil.mul(per, 100));
         });

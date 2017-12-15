@@ -6,6 +6,7 @@
  */
  package com.bbd.service.vo;
 
+import com.bbd.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
@@ -33,6 +34,11 @@ public class OpinionVO {
     private String website;
 
     private String source;
+
+    /**
+     * 真实来源
+     */
+    private String realSource;
 
     /**
      * 网站链接
@@ -116,6 +122,16 @@ public class OpinionVO {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public String getRealSource() {
+        if (StringUtils.isNotEmpty(source)) return source;
+        if (StringUtils.isNotEmpty(website)) return website;
+        return "";
+    }
+
+    public void setRealSource(String realSource) {
+        this.realSource = realSource;
     }
 
     public Integer getMediaType() {

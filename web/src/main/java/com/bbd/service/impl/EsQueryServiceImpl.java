@@ -33,10 +33,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -374,19 +371,29 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     /**
-     * 根据预警时间来判断舆情传播渠道分布
-     * @param firstWarnTime
+     * 根据发布时间来判断舆情传播渠道分布
+     * @param startTime
      * @return
      */
     @Override
-    public List<KeyValueVO> getOpinionMediaSpread(DateTime firstWarnTime) {
+    public List<KeyValueVO> getOpinionMediaSpread(DateTime startTime) {
+
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3);
         String aggName = "media_aggs";
         TransportClient client = esUtil.getClient();
+
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        boolQuery.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
+        boolQuery.must(QueryBuilders.existsQuery(EsConstant.warnTimeField)); // 必须是已经被预警的
+        boolQuery.mustNot(QueryBuilders.existsQuery(EsConstant.opStatusField)); // 必须是未进入舆情任务中的舆情
+
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
-                .setQuery(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(firstWarnTime.toString("yyyy-MM-dd HH:mm:ss")))
+                .setQuery(boolQuery)
                 .addAggregation(
                         AggregationBuilders.terms(aggName)
-                                .field(EsConstant.mediaTypeField).size(10).order(Terms.Order.count(true))
+                                .field(EsConstant.mediaTypeField).size(10).order(Terms.Order.count(false))
                 ).setSize(0).execute()
                 .actionGet();
         return buildTermLists(resp, aggName);
@@ -418,6 +425,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         query.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
         query.must(QueryBuilders.existsQuery(EsConstant.warnTimeField)); // 必须是已经被预警的
         query.mustNot(QueryBuilders.existsQuery(EsConstant.opStatusField)); // 必须是未进入舆情任务中的舆情
+
         if (emotion != null)
             query.must(QueryBuilders.termQuery(EsConstant.emotionField, emotion));
 
@@ -452,18 +460,30 @@ public class EsQueryServiceImpl implements EsQueryService {
 
     /**
      * 查询预警舆情
-     * @param firstWarnTime
+     * @param startTime
      * @return
      */
     @Override
-    public List<OpinionBaseInfoReport> queryWarningOpinion(DateTime firstWarnTime) {
+    public List<OpinionBaseInfoReport> queryWarningOpinion(DateTime startTime) {
+
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3);
+
         TransportClient client = esUtil.getClient();
+
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        boolQuery.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
+        boolQuery.must(QueryBuilders.existsQuery(EsConstant.warnTimeField)); // 必须是已经被预警的
+        boolQuery.mustNot(QueryBuilders.existsQuery(EsConstant.opStatusField)); // 必须是未进入舆情任务中的舆情
+
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
                 .setSize(100)
-                .setQuery(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(firstWarnTime.toString("yyyy-MM-dd HH:mm:ss")))
+                .setQuery(boolQuery)
                 .setFetchSource(null, new String[]{EsConstant.contentField, EsConstant.keysField, EsConstant.keywordField})
                 .addSort(EsConstant.hotField, SortOrder.DESC)
                 .execute().actionGet();
+
         List<OpinionBaseInfoReport> rs = EsUtil.buildResult(resp, OpinionBaseInfoReport.class);
         List<WarnSetting> setting = settingService.queryWarnSetting(3);
         for (OpinionBaseInfoReport r : rs) {
@@ -1187,21 +1207,68 @@ public class EsQueryServiceImpl implements EsQueryService {
     }
 
     /**
-     * 舆情情感数量统计
-     * @param dateTime
+     * 舆情情感数量统计（报告专用）
+     * @param startTime
      * @return
      */
     @Override
-    public List<KeyValueVO> queryAffectionSta(DateTime dateTime) {
+    public List<KeyValueVO> queryAffectionSta(DateTime startTime) {
+
         String aggs = "affection_aggs";
         TransportClient client = esUtil.getClient();
+
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3);
+
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        boolQuery.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
+        boolQuery.must(QueryBuilders.existsQuery(EsConstant.warnTimeField)); // 必须是已经被预警的
+        boolQuery.mustNot(QueryBuilders.existsQuery(EsConstant.opStatusField)); // 必须是未进入舆情任务中的舆情
+
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
-                .setQuery(QueryBuilders.rangeQuery(EsConstant.OPINION_FIRST_WARN_TIME).gte(dateTime.toString("yyyy-MM-dd HH:mm:ss")))
+                .setQuery(boolQuery)
                 .setSize(0)
                 .addAggregation(AggregationBuilders.terms(aggs).field(EsConstant.emotionField))
                 .execute().actionGet();
         List<KeyValueVO> rs = buildTermLists(resp, aggs);
         return rs;
+    }
+
+    /**
+     * 舆情等级统计（报告专用）
+     * @param startTime
+     * @return
+     */
+    @Override
+    public List<KeyValueVO> queryHotLevelSta(DateTime startTime) {
+
+        String aggs = "affection_aggs";
+        TransportClient client = esUtil.getClient();
+
+        // step-1：获取预警热度分界
+        Map<Integer, Integer> map = settingService.getWarnClass();
+        Integer threeClass = map.get(3);
+        Integer twoClss = map.get(2);
+        Integer oneClass = map.get(1);
+
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).gte(startTime.toString(EsConstant.LONG_TIME_FORMAT)));
+        boolQuery.must(QueryBuilders.rangeQuery(EsConstant.hotField).gte(threeClass));
+        boolQuery.must(QueryBuilders.existsQuery(EsConstant.warnTimeField)); // 必须是已经被预警的
+        boolQuery.mustNot(QueryBuilders.existsQuery(EsConstant.opStatusField)); // 必须是未进入舆情任务中的舆情
+
+        RangeAggregationBuilder hotLevelAgg = AggregationBuilders.range(aggs).field(EsConstant.hotField).keyed(true).addRange("levelOne", oneClass, Integer.MAX_VALUE)
+                .addRange("levelTwo", twoClss, oneClass).addRange("levelThree", threeClass, twoClss);
+
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION)
+                .setSize(0)
+                .setQuery(boolQuery)
+                .addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC))
+                .addAggregation(hotLevelAgg)
+                .execute().actionGet();
+        List<KeyValueVO> hotLevelList = buildHotLevelLists(resp, aggs);
+        return hotLevelList;
     }
 
     /**
