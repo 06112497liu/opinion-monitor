@@ -2,6 +2,7 @@ package com.bbd.service.report;
 
 
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,6 +35,7 @@ import com.bbd.report.model.ReportElementString;
 import com.bbd.report.util.ModelUtil;
 import com.bbd.service.EventService;
 import com.bbd.service.vo.OpinionVO;
+import com.bbd.util.BigDecimalUtil;
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 
@@ -261,9 +263,21 @@ public class EventReportService {
         
         ReportElementString eventSrcActive2Element = new ReportElementString(StructureEnum.GROUP_FOOTER, ElementEnum.REPORT_DEFINITION_TABLE,
             DataModelEnum.TABLE_DATA, "websiteSpread2", "websiteSpread2Data");
-        eventSrcActive2Element.setData(computeTrend(listData));
+        List<KeyValueVO> listData2 = new ArrayList<KeyValueVO>(listData); 
+        reBuildKey(listData2);
+        eventSrcActive2Element.setData(computeTrend(listData2));
         eventSrcActive2Element.setIndex(1);
         list.add(eventSrcActive2Element);
+    }
+    
+    public void reBuildKey(List<KeyValueVO> dataList) {
+        double total = 0;
+        for (KeyValueVO vo : dataList) {
+            total = total + Double.valueOf(String.valueOf(vo.getValue()));
+        }
+        for (KeyValueVO vo : dataList) {
+            vo.setName(vo.getName() +"："+ BigDecimalUtil.div(Double.valueOf(String.valueOf(vo.getValue())) * 100, total, 2) + "%");
+        }
     }
     
     public void keywords(ArrayList<ReportElementString> list, int cycle, Long id) throws Exception {
@@ -279,7 +293,7 @@ public class EventReportService {
         List<KeyValueVO> listData = eventService.eventDataType(id, cycle);
         ReportElementString eventSrcActiveElement = new ReportElementString(StructureEnum.GROUP_FOOTER, ElementEnum.REPORT_DEFINITION_TABLE,
             DataModelEnum.TABLE_DATA, "dataType", "dataTypeData");
-        
+        reBuildKey(listData);
         eventSrcActiveElement.setData(computeTrend(listData));
         eventSrcActiveElement.setIndex(1);
         list.add(eventSrcActiveElement);
