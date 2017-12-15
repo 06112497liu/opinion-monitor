@@ -125,8 +125,8 @@ public class OpinionVO {
     }
 
     public String getRealSource() {
-        if (StringUtils.isNotEmpty(source)) return source;
         if (StringUtils.isNotEmpty(website)) return website;
+        if (StringUtils.isNotEmpty(source)) return source;
         return "";
     }
 
