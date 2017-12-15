@@ -14,6 +14,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -63,7 +64,8 @@ public class MsgService {
     private static final int WARN_EVENT_TYPE_NEW = 1;
     private static final int WARN_EVENT_TYPE_WHOLE = 2;
     private static final int WARN_EVENT_TARGET_TYPE = 2;
-    
+    @Value("#{propertiesConfig[address]}")
+    private String address;
     @Autowired
     OpinionEventDao opinionEventDao;
     @Autowired
@@ -181,7 +183,7 @@ public class MsgService {
             
             eventMsgModel.setUsername(warnNotifier.getNotifier());
             if (isEmail == true && warnNotifier.getEmailNotify() == 1) {
-                eventMsgModel.setLink("XXXXXXXX（系统PC端舆情事件信息列表地址，登录后直接跳转到列表页");
+                eventMsgModel.setLink(address + "/monitor?id=" + e.getId());
                 EmailContent content = new EmailContent();
                 content.setModel(eventMsgModel);
                 content.setRetry(3);
@@ -227,7 +229,7 @@ public class MsgService {
             eventIncMsgModel.setUsername(warnNotifier.getNotifier());
             if (isEmail == true && warnNotifier.getEmailNotify() == 1) {
                 EmailContent content = new EmailContent();
-                eventIncMsgModel.setLink("XXXXXXXX（系统PC端舆情事件信息列表地址，登录后直接跳转到列表页）");
+                eventIncMsgModel.setLink(address + "/monitor?id=" + e.getId());
                 content.setModel(eventIncMsgModel);
                 content.setRetry(3);
                 content.setSubject("事件新增观点预警");
@@ -295,7 +297,6 @@ public class MsgService {
         example.createCriteria().andIsDeleteEqualTo((byte)0).andFileReasonIsNull();
         return opinionEventDao.selectByExample(example);
     }
-    
     
     /**事件新增舆情定时任务   
      */
