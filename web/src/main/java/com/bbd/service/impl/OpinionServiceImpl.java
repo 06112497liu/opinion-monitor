@@ -349,7 +349,7 @@ public class OpinionServiceImpl implements OpinionService {
     private String getPattern(Integer timeSpan) {
         switch (timeSpan) {
             case 1:
-                return "HH时";
+                return "MM日HH时";
             case 2:
             case 3:
                 return "dd日";
