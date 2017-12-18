@@ -256,11 +256,16 @@ public class EventController extends AbstractController {
     @ApiOperation(value = "图表跟踪分析/媒体活跃度和媒体来源占比", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
-        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true)
-        })
+        @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天, 4表示历史", name = "cycle", dataType = "Integer", paramType = "query", required = true),
+        @ApiImplicitParam(value = "返回百分比还是数值，0表示非百分比，1表示百分比", name = "toPercent", dataType = "Integer", paramType = "query", required = true)
+    })
     @RequestMapping(value = "eventSrcActive", method = RequestMethod.GET)
-    public RestResult eventSrcActive(Long id, Integer cycle) throws Exception {
-       return RestResult.ok(eventService.eventSrcActive(id, cycle));
+    public RestResult eventSrcActive(Long id, Integer cycle, Integer toPercent) throws Exception {
+        List<KeyValueVO> list = eventService.eventSrcActive(id, cycle);
+        if (toPercent == 1) {
+            eventService.toPercent(list);
+        }
+       return RestResult.ok(list);
     }
     
     @ApiOperation(value = "图表跟踪分析/事件走势", httpMethod = "GET")

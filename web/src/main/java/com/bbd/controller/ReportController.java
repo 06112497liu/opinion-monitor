@@ -70,7 +70,7 @@ public class ReportController extends AbstractController {
     @Autowired
     private SystemSettingService systemSettingService;
     
-    @ApiOperation(value = "事件报告", httpMethod = "POST")
+    @ApiOperation(value = "事件报告", httpMethod = "GET")
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "事件ID", name = "id", dataType = "Long", paramType = "query", required = true),
         @ApiImplicitParam(value = "时间周期,1表示24小时，2表示7天，3表示30天，4表示历史，5表示专报（创建至今）", name = "cycle", dataType = "Integer", paramType = "query", required = true)

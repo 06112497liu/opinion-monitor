@@ -264,6 +264,7 @@ public class EventReportService {
         ReportElementString eventSrcActive2Element = new ReportElementString(StructureEnum.GROUP_FOOTER, ElementEnum.REPORT_DEFINITION_TABLE,
             DataModelEnum.TABLE_DATA, "websiteSpread2", "websiteSpread2Data");
         List<KeyValueVO> listData2 = new ArrayList<KeyValueVO>(listData); 
+        eventService.toPercent(listData2);
         reBuildKey(listData2);
         eventSrcActive2Element.setData(computeTrend(listData2));
         eventSrcActive2Element.setIndex(1);
@@ -271,12 +272,8 @@ public class EventReportService {
     }
     
     public void reBuildKey(List<KeyValueVO> dataList) {
-        double total = 0;
         for (KeyValueVO vo : dataList) {
-            total = total + Double.valueOf(String.valueOf(vo.getValue()));
-        }
-        for (KeyValueVO vo : dataList) {
-            vo.setName(vo.getName() +"："+ BigDecimalUtil.div(Double.valueOf(String.valueOf(vo.getValue())) * 100, total, 2) + "%");
+            vo.setName(vo.getName() +"："+ vo.getValue() + "%");
         }
     }
     
@@ -293,6 +290,7 @@ public class EventReportService {
         List<KeyValueVO> listData = eventService.eventDataType(id, cycle);
         ReportElementString eventSrcActiveElement = new ReportElementString(StructureEnum.GROUP_FOOTER, ElementEnum.REPORT_DEFINITION_TABLE,
             DataModelEnum.TABLE_DATA, "dataType", "dataTypeData");
+        eventService.toPercent(listData);
         reBuildKey(listData);
         eventSrcActiveElement.setData(computeTrend(listData));
         eventSrcActiveElement.setIndex(1);

@@ -479,6 +479,19 @@ public class EventService{
         for (KeyValueVO vo : list) {
             vo.setValue(BigDecimalUtil.div(Double.valueOf(String.valueOf(vo.getValue())) * 100, total, 2));
         }
+        int i = 0;
+        double sum = 0d;
+        for (KeyValueVO vo : list) {
+            if (i < list.size() - 1) {
+                sum = sum + Double.valueOf(String.valueOf(vo.getValue()));
+            }
+            if (i == list.size() - 1) {
+                vo.setValue(BigDecimalUtil.div(100 - sum, 1, 2));
+                break;
+            }
+            i++;
+        }
+        
     }
     
     
@@ -714,6 +727,7 @@ public class EventService{
             crtVO.setValue(crt);
             rs2.add(crtVO);
         } 
+        toPercent(rs2);
         return rs2;
     }  
     
