@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbd.dao.AccountExtDao">
+  <resultMap id="BaseResultMap" type="com.bbd.domain.Account">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="admin" jdbcType="BIT" property="admin" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="region" jdbcType="VARCHAR" property="region" />
+    <result column="dep_note" jdbcType="VARCHAR" property="depNote" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+  </resultMap>
+
+  <select id="getTransferList" parameterType="long" resultMap="BaseResultMap">
+    SELECT
+        b.*
+    FROM
+        bbd_user a
+    RIGHT JOIN bbd_account b ON a.id = b.user_id
+    WHERE
+        a.flag = 0 AND b.admin != 1 AND a.id != #{id}
+    <if test="region != null and region != '5201'">
+        AND b.region = #{region}
+    </if>
+  </select>
+
+</mapper>
