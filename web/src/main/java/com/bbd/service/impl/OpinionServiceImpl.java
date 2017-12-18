@@ -38,6 +38,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -72,6 +73,9 @@ public class OpinionServiceImpl implements OpinionService {
 
     @Autowired
     private UserService userService;
+
+    @Value("#{propertiesConfig[address]}")
+    private String address;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -417,9 +421,12 @@ public class OpinionServiceImpl implements OpinionService {
             content.setModel(model);
             List<WarnNotifierVO> list = notifies.get(k);
             buildOpinionMsgModel(model, list, mapAdd, maxMap);
+            model.setLink(address + "/warning");
             msgVO.setType("email");
             msgVO.setContent(content);
-            result.add(msgVO);
+
+            if (!model.checkAllZero())
+                result.add(msgVO);
         }
         return result;
     }
@@ -439,7 +446,8 @@ public class OpinionServiceImpl implements OpinionService {
             buildOpinionMsgModel(model, list, mapAdd, maxMap);
             msgVO.setType("sms");
             msgVO.setContent(content);
-            result.add(msgVO);
+            if (!model.checkAllZero())
+                result.add(msgVO);
         }
         return result;
     }

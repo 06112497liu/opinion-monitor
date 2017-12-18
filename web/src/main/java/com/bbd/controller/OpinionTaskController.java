@@ -60,7 +60,6 @@ public class OpinionTaskController extends AbstractController{
     }
 
     @ApiOperation(value = "当前用户任务列表统计", httpMethod = "GET")
-
     @RequestMapping(value = "sta", method = RequestMethod.GET)
     public RestResult getTaskSta() {
         List<KeyValueVO> result = opinionTaskService.getTaskSta();

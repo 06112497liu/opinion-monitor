@@ -157,7 +157,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         if (targeterId.compareTo(operatorId) == 0) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "不能转发给自己");
         checkOpinionTranferConfine(targeterId);
 
-        // step-3：舆情转发次数不能大于50次
+        // step-3：舆情转发次数不能大于49次
         checkOpinionTranCount(param.getUuid());
 
         // step-3：修改舆情的状态

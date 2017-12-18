@@ -22,6 +22,10 @@ public class OpinionMsgModel extends MsgModel {
     @JSONField(name = "levelthree")
     private Integer levelThree = 0;
 
+    public boolean checkAllZero() {
+        return (levelOne == 0 && levelTwo == 0 && levelThree ==0);
+    }
+
     public Integer getLevelOne() {
         return levelOne;
     }
