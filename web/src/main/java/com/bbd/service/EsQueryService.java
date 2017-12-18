@@ -325,4 +325,19 @@ public interface EsQueryService {
      */
     List<KeyValueVO> queryHotLevelSta(DateTime startTime);
 
+    /**
+     * 计算相同文章数
+     * @param uuid
+     * @return
+     */
+    Integer calSimilarCount(String uuid);
+
+    /**
+     * 计算一批舆情的相似文章数
+     * @param uuids
+     * @param size
+     * @return
+     */
+    Map<String, Object> calSimilarCount(List<String> uuids, Integer size);
+
 }

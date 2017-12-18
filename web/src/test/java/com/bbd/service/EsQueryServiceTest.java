@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -180,4 +181,15 @@ public class EsQueryServiceTest extends BaseServiceTest {
         List<KeyValueVO> list = esQueryService.queryAffectionSta(time);
         System.out.println(list);
     }
+
+    @Test
+    public void testCalSimilarCount() {
+        Integer count = esQueryService.calSimilarCount("7158796291244568116");
+        System.out.println(count);
+        List<String> uuids = Arrays.asList("7158796291244568116", "15702127494206401901");
+        Map<String, Object> rs = esQueryService.calSimilarCount(uuids, uuids.size());
+        System.out.println(rs);
+    }
+
+
 }

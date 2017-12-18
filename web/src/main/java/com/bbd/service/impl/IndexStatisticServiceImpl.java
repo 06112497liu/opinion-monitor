@@ -55,7 +55,7 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     public OpinionCountStatVO getOpinionCountStatistic(Integer timeSpan) throws NoSuchFieldException, IllegalAccessException {
 
         DateTime now = DateTime.now();
-        DateTime startTime = BusinessUtils.getDateByTimeSpan(timeSpan);
+        DateTime startTime = BusinessUtils.getDateTimeWithStartTime(timeSpan);
 
         OpinionCountStatVO result = esQueryService.getOpinionCountStatistic(startTime, now);
         return result;

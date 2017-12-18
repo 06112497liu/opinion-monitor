@@ -49,6 +49,7 @@ public class EsConstant {
 
     // =========== 舆情详情字段 ==========================
     public static final String uuidField                      = "uuid";
+    public static final String uuidKeywordField               = "uuid.keyword";
     public static final String titleField                     = "title";
     public static final String contentField                   = "content";
     public static final String publishTimeField               = "publishTime";

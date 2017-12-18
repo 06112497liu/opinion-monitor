@@ -28,14 +28,12 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -244,8 +242,8 @@ public class EsQueryServiceImpl implements EsQueryService {
         query.must(QueryBuilders.termQuery(EsConstant.eventsField, eventId));
         query.must(QueryBuilders.rangeQuery(EsConstant.publishTimeField).lte(endTime.toString(EsConstant.LONG_TIME_FORMAT)));
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query)
-                .addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.mediaTypeField)).setSize(0).execute()
-                .actionGet();
+                .addAggregation(AggregationBuilders.terms(aggName).field(EsConstant.mediaTypeField)).setSize(0)
+                .execute().actionGet();
         return buildTermLists(resp, aggName);
     }
     /**  
@@ -1312,4 +1310,37 @@ public class EsQueryServiceImpl implements EsQueryService {
         return query;
     }
 
+    /**
+     * 计算相同文章数
+     * @param uuid
+     * @return
+     */
+    @Override
+    public Integer calSimilarCount(String uuid) {
+        TransportClient client = esUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_SIMILAR_NEWS)
+                .setQuery(QueryBuilders.termQuery(EsConstant.uuidKeywordField, uuid))
+                .setSize(0).execute().actionGet();
+        Long count = resp.getHits().getTotalHits();
+        return count.intValue();
+    }
+
+    /**
+     * 计算一批舆情的相似文章数
+     * @param uuids
+     * @param size
+     * @return
+     */
+    @Override
+    public Map<String, Object> calSimilarCount(List<String> uuids, Integer size) {
+        String aggs = "uuid_sta";
+        TransportClient client = esUtil.getClient();
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_SIMILAR_NEWS)
+                .setQuery(QueryBuilders.termsQuery(EsConstant.uuidField, uuids))
+                .addAggregation(AggregationBuilders.terms(aggs).field(EsConstant.uuidKeywordField).size(size))
+                .execute().actionGet();
+        List<KeyValueVO> rs = buildTermLists(resp, aggs);
+        Map<String, Object> map = rs.stream().collect(Collectors.toMap(KeyValueVO::getName, KeyValueVO::getValue));
+        return map;
+    }
 }

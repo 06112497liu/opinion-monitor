@@ -73,7 +73,7 @@ public class EsModifyServiceImpl implements EsModifyService {
         request.doc(buildXContentBuilder(fieldMap));
         request.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL); // 被搜索时可见
 
-        client.update(request).get();
+        client.update(request).actionGet();
     }
 
     private XContentBuilder buildXContentBuilder(Map<String, Object> map) throws IOException {
