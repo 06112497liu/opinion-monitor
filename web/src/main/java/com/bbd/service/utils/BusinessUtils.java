@@ -108,10 +108,11 @@ public class BusinessUtils {
                 if (imgUrl != null) {
                     sb.append("<img src='" + imgUrl + "'>");
                 }
+            } else if(trimStr.isEmpty()) {
+                sb.append("<br/>");
             } else {
                 sb.append(trimStr);
             }
-            sb.append("<br/>");
         }
         return sb.toString();
     }
