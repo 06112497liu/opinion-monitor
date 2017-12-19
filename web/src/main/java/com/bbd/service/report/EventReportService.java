@@ -395,7 +395,8 @@ public class EventReportService {
         String[] title = new String[]{"date","type","num"};
         String[] titleType = new String[]{ParamTypeEnum.STRING.getDesc(), ParamTypeEnum.STRING.getDesc(),ParamTypeEnum.DOUBLE.getDesc()};
         if (parentList != null && parentList.size() > 0) {
-            for (int i = 0; i< parentList.get(0).size(); i++) {
+            int size = parentList.get(0).size();
+            for (int i = size > 30 ? size - 30 : 0; i< size; i++) {
                 for (int j = 0; j < parentList.size(); j++) {
                     value.add(new Object[]{parentList.get(j).get(i).getName(),
                                            parentList.get(j).get(i).getKey(),
