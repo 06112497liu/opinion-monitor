@@ -208,6 +208,7 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     public List<KeyValueVO> getOpinionChannelTrend() {
         List<KeyValueVO> list = esQueryService.getOpinionMediaSpread();
         if (list.isEmpty()) return Lists.newArrayList();
+        transferMediaTypeDesc(list);
         calPercent(list);
         return list;
     }
@@ -221,10 +222,15 @@ public class IndexStatisticServiceImpl implements IndexStatisticService {
     public List<KeyValueVO> getOpinionChannelTrend(DateTime publicshTime) {
         List<KeyValueVO> list = esQueryService.getOpinionMediaSpread(publicshTime);
         if (list.isEmpty()) return Lists.newArrayList();
+        transferMediaTypeDesc(list);
+        return list;
+    }
+
+    // mediaType(媒体类型) -> 中文描述
+    private void transferMediaTypeDesc(List<KeyValueVO> list) {
         for (KeyValueVO v : list) {
             v.setName(WebsiteEnum.getDescByCode(v.getKey().toString()));
         }
-        return list;
     }
 
     private void calPercent(List<KeyValueVO> list) {
