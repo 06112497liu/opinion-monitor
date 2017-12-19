@@ -614,7 +614,7 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         // step-3：查询es
         SearchRequestBuilder builder = client.prepareSearch(EsConstant.IDX_OPINION).setFrom(pb.getOffset()).setSize(pb.getLimit()).setQuery(query)
-                .addSort(SortBuilders.fieldSort(EsConstant.hotField).order(SortOrder.DESC)).addAggregation(hotLevelAgg).addAggregation(mediaAgg);
+                .addSort(EsConstant.recordTimeField, SortOrder.DESC).addAggregation(hotLevelAgg).addAggregation(mediaAgg);
         if (mediaType != null)
             builder.setPostFilter(QueryBuilders.termQuery(EsConstant.mediaTypeField, mediaType));
         SearchResponse resp = builder.execute().actionGet();
@@ -952,7 +952,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_OP_RECORD).setTypes(EsConstant.OPINION_OP_RECORD_TYPE).setSearchType(SearchType.DEFAULT)
                 .setQuery(buildSearchRequest(null, keyMap))
-                .addSort(EsConstant.opTimeField, SortOrder.DESC)
+                .addSort(EsConstant.opTimeField, SortOrder.ASC)
                 .setSize(szie).execute().actionGet();
 
         List<OpinionOpRecordVO> list = esUtil.buildResult(resp, OpinionOpRecordVO.class);

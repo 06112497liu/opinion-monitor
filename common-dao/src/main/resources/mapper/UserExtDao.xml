@@ -14,6 +14,9 @@
             <if test="region != 5201 and region != null">
                 AND b.region = #{region}
             </if>
+            <if test="isAdmin == false">
+                AND b.admin != 1
+            </if>
         ORDER BY
         a.gmt_create DESC
     </select>

@@ -492,7 +492,7 @@ public class OpinionServiceImpl implements OpinionService {
         // step-2：操作记录
         Map<String, Object> keyMap = Maps.newHashMap();
         keyMap.put(EsConstant.uuidField, uuid);
-        List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(keyMap, 52);
+        List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(keyMap, 50);
         userService.buildOperatorAndTargeter(records);
         rs.setRecords(records);
 

@@ -63,7 +63,8 @@ public class UserService {
      * @return
      */
     public List<UserListVO> queryUsers(String region, PageBounds pb) {
-        List<UserListVO> list = userExtDao.queryUserListLimt(region, pb);
+        boolean isAdmin = UserContext.isAdmin();
+        List<UserListVO> list = userExtDao.queryUserListLimt(isAdmin, region, pb);
         list.forEach(p -> {
             p.setReginDesc(DistrictExtEnum.getDescByCode(p.getRegion()));
         });
