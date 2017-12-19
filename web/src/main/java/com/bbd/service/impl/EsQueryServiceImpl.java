@@ -968,9 +968,13 @@ public class EsQueryServiceImpl implements EsQueryService {
     @Override
     public List<OpinionHotEsVO> getOpinionHotTrend(String uuid, DateTime startTime) {
         TransportClient client = esUtil.getClient();
-        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_HOT).setTypes(EsConstant.OPINION_HOT_TYPE).setSearchType(SearchType.DEFAULT)
-                .setQuery(QueryBuilders.rangeQuery(EsConstant.hotTimeField).gte(startTime.toString("yyyy-MM-dd HH:mm:ss"))).setQuery(QueryBuilders.termQuery(EsConstant.uuidField, uuid)).setSize(10000)
-                .execute().actionGet();
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.rangeQuery(EsConstant.hotTimeField).gte(startTime.toString("yyyy-MM-dd HH:mm:ss")));
+        boolQuery.must(QueryBuilders.termQuery(EsConstant.uuidField, uuid));
+
+        SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_HOT)
+                .setQuery(boolQuery)
+                .setSize(9999).execute().actionGet();
         List<OpinionHotEsVO> result = esUtil.buildResult(resp, OpinionHotEsVO.class);
         return result;
     }
