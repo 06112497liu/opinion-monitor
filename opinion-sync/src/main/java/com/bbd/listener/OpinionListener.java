@@ -106,9 +106,9 @@ public class OpinionListener {
                 continue;
             }
 
+            addHotRecord(vo, hotVos);
             if (warn) {
                 addOpinionEventRecords(vo, oerWarnVos);
-                addHotRecord(vo, hotVos);
 
                 setWarnTime(nvo, esVo, settings);
 
