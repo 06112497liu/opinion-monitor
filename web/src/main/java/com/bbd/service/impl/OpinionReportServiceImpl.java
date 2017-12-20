@@ -26,6 +26,7 @@ import com.bbd.util.StringUtils;
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
+import org.apache.commons.collections.ListUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,6 +159,10 @@ public class OpinionReportServiceImpl implements OpinionReportService {
 
             // 舆情信息概要
         List<OpinionBaseInfoReport> opinionBaseInfo = esQueryService.queryWarningOpinion(publishTime);
+        if (opinionBaseInfo.isEmpty())
+            params.put("noData", "暂无数据");
+        else
+            params.put("noData", "");
         int count = 1;
         for (OpinionBaseInfoReport info : opinionBaseInfo) {
             info.setTitle(count++ + "、"+ info.getTitle());
