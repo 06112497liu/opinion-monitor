@@ -1332,19 +1332,31 @@ public class EsQueryServiceImpl implements EsQueryService {
     /**
      * 计算一批舆情的相似文章数
      * @param uuids
-     * @param size
      * @return
      */
     @Override
-    public Map<String, Object> calSimilarCount(List<String> uuids, Integer size) {
+    public Map<String, Object> calSimilarCount(List<String> uuids) {
         String aggs = "uuid_sta";
         TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_SIMILAR_NEWS)
                 .setQuery(QueryBuilders.termsQuery(EsConstant.uuidField, uuids))
-                .addAggregation(AggregationBuilders.terms(aggs).field(EsConstant.uuidKeywordField).size(size))
+                .addAggregation(AggregationBuilders.terms(aggs).field(EsConstant.uuidKeywordField).size(uuids.size()))
                 .execute().actionGet();
         List<KeyValueVO> rs = buildTermLists(resp, aggs);
         Map<String, Object> map = rs.stream().collect(Collectors.toMap(KeyValueVO::getName, KeyValueVO::getValue));
         return map;
+    }
+
+    /**
+     * 检查舆情是否处于任务当中
+     * @param uuid
+     * @return
+     */
+    @Override
+    public Boolean checkOpinionTasking(String uuid) {
+        OpinionEsVO opinion = getOpinionByUUID(uuid);
+        Integer statu = opinion.getOpStatus();
+        statu = (statu == null ? 0 : statu);
+        return statu != 0;
     }
 }

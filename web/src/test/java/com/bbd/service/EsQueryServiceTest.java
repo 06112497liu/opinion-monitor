@@ -187,9 +187,14 @@ public class EsQueryServiceTest extends BaseServiceTest {
         Integer count = esQueryService.calSimilarCount("7158796291244568116");
         System.out.println(count);
         List<String> uuids = Arrays.asList("7158796291244568116", "15702127494206401901");
-        Map<String, Object> rs = esQueryService.calSimilarCount(uuids, uuids.size());
+        Map<String, Object> rs = esQueryService.calSimilarCount(uuids);
         System.out.println(rs);
     }
 
+    @Test
+    public void testCheckOpinionTasking() {
+        Boolean flag = esQueryService.checkOpinionTasking("10957094175423247910");
+        System.out.println(flag);
+    }
 
 }

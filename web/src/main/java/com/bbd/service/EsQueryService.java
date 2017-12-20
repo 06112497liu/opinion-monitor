@@ -13,6 +13,7 @@ import com.bbd.service.param.OpinionBaseInfoReport;
 import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -338,6 +339,13 @@ public interface EsQueryService {
      * @param size
      * @return
      */
-    Map<String, Object> calSimilarCount(List<String> uuids, Integer size);
+    Map<String, Object> calSimilarCount(List<String> uuids);
+
+    /**
+     * 检查舆情是否处于任务当中
+     * @param uuid
+     * @return
+     */
+    Boolean checkOpinionTasking(String uuid);
 
 }

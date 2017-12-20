@@ -55,7 +55,7 @@ public class EsModifyServiceImpl implements EsModifyService {
         Integer level = settingService.judgeOpinionSettingClass(hot, settingService.queryWarnSetting(3));
         fieldMap.put(EsConstant.levelField, level);
 
-        // 记录操作人
+        // 记录参与人
         Long operatorId = operator.getId();
         Long[] original = opinion.getOperators();
         boolean flag = ArrayUtils.contains(original, operatorId);
@@ -74,6 +74,16 @@ public class EsModifyServiceImpl implements EsModifyService {
         request.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL); // 被搜索时可见
 
         client.update(request).actionGet();
+    }
+
+    // 记录参与人
+    private Long[] getOperators(Long[] original, Long userid) {
+        boolean flag = ArrayUtils.contains(original, userid);
+        Long[] newArr = original;
+        if (!flag) {
+            newArr = ArrayUtils.add(original, userid);
+        }
+        return newArr;
     }
 
     private XContentBuilder buildXContentBuilder(Map<String, Object> map) throws IOException {

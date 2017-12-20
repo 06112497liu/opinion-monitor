@@ -223,10 +223,13 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
         Date now = new Date();
 
-        // step-1：校验当前用户是否有操作资格，热点舆情不能解除
+        // step-1：校验当前用户是否有操作资格，热点舆情不能解除（处于任务中的热点舆情能解除）
         OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
         checkPermission(opinion);
-        checkHotLevel(opinion.getHot());
+        boolean isTasking = checkOpinionTasking(uuid);
+        if (!isTasking) {
+            checkHotLevel(opinion.getHot());
+        }
 
         // step-2：修改舆情记录
         UserInfo operator = UserContext.getUser();
@@ -325,7 +328,12 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         List<WarnSetting> setting = systemSettingService.queryWarnSetting(3);
         Integer level = systemSettingService.judgeOpinionSettingClass(hot, setting);
         if(level == -1) {
-            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "热点舆情不能解除");
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "非任务中热点舆情不能解除");
         }
+    }
+
+    // 校验舆情是否处于任务当中
+    private boolean checkOpinionTasking(String uuid) {
+        return esQueryService.checkOpinionTasking(uuid);
     }
 }
