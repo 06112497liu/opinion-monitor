@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.bean.OpinionHotEsVO;
+import com.bbd.bean.OpinionWarnTime;
 import com.bbd.bean.WarnNotifierVO;
 import com.bbd.constant.EsConstant;
 import com.bbd.dao.SearchHistoryDao;
@@ -216,7 +217,7 @@ public class OpinionServiceImpl implements OpinionService {
     // 补全预警等级数据
     private void buildLevleSta(List<KeyValueVO> list) {
         Map<String, String> mapping = Maps.newHashMap();
-        mapping.put("levelThree", "3"); mapping.put("levelTwo", "2"); mapping.put("levelOne", "1");
+        mapping.put("levelThree", "3"); mapping.put("levelTwo", "2"); mapping.put("levelOne", "1"); mapping.put("hot", "-1");
         for (Map.Entry<String, String> entry : mapping.entrySet()) {
             String key = entry.getKey();
             String val = entry.getValue();
@@ -228,7 +229,7 @@ public class OpinionServiceImpl implements OpinionService {
             }
         }
         Set<String> set = list.stream().map(KeyValueVO::getName).collect(Collectors.toSet());
-        Set<String> allSet = Sets.newHashSet("levelThree", "levelTwo", "levelOne");
+        Set<String> allSet = Sets.newHashSet("levelThree", "levelTwo", "levelOne", "hot");
         List<KeyValueVO> rs = BusinessUtils.buildAllVos(set, allSet);
         list.addAll(rs);
     }
@@ -487,7 +488,6 @@ public class OpinionServiceImpl implements OpinionService {
         // step-1：舆情详情
         OpinionEsVO esVO = esQueryService.queryHistoryWarnDetail(uuid);
         HistoryOpinionDetailVO rs = BeanMapperUtil.map(esVO, HistoryOpinionDetailVO.class);
-        rs.setFirstWarnTime(esVO.getWarnTime().getFirstWarnTime());
 
         // step-2：操作记录
         Map<String, Object> keyMap = Maps.newHashMap();
@@ -495,6 +495,13 @@ public class OpinionServiceImpl implements OpinionService {
         List<OpinionOpRecordVO> records = esQueryService.getOpinionOpRecordByUUID(keyMap, 50);
         userService.buildOperatorAndTargeter(records);
         rs.setRecords(records);
+
+            // 预警时间处理
+        OpinionWarnTime wartime = esVO.getWarnTime();
+        if (Objects.nonNull(wartime))
+            rs.setFirstWarnTime(wartime.getFirstWarnTime());
+        else
+            rs.setFirstWarnTime(records.get(records.size() - 1).getOpTime());
 
         // step-3：正文内容解析为html
         // 解析正文

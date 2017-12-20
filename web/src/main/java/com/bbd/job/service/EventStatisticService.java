@@ -42,7 +42,7 @@ import com.mybatis.domain.PageBounds;
  * @author daijinlong 
  * @version $Id: EventStatisticService.java, v 0.1 2017年11月14日 上午10:23:47 daijinlong Exp $ 
  */
-@Service
+//@Service
 public class EventStatisticService {
     private static final Logger  logger = LoggerFactory.getLogger(EventStatisticService.class);
     @Autowired

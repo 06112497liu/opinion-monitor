@@ -21,7 +21,7 @@ public interface EsModifyService {
      * @param uuid
      * @param fieldMap
      */
-    void updateOpinion(UserInfo operator, String uuid, Map<String, Object> fieldMap) throws IOException, ExecutionException, InterruptedException;
+    void updateOpinion(UserInfo operator, Long targetId, String uuid, Map<String, Object> fieldMap) throws IOException, ExecutionException, InterruptedException;
 
     /**
      * 添加舆情操作记录

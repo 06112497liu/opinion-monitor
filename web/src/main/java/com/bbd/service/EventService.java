@@ -158,7 +158,7 @@ public class EventService{
         Map<String, Object> fieldMap = new HashMap<String, Object>();
         fieldMap.put(EsConstant.opStatusField, 3);
         fieldMap.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm:ss"));
-        esModifyService.updateOpinion(UserContext.getUser(), opinionEvent.getUuid(), fieldMap);
+        esModifyService.updateOpinion(UserContext.getUser(), -1L, opinionEvent.getUuid(), fieldMap);
         return opinionEvent.getId();
     }
     

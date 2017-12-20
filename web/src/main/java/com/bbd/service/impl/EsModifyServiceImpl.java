@@ -47,7 +47,7 @@ public class EsModifyServiceImpl implements EsModifyService {
      * @param fieldMap
      */
     @Override
-    public void updateOpinion(UserInfo operator, String uuid, Map<String, Object> fieldMap) throws IOException, ExecutionException, InterruptedException {
+    public void updateOpinion(UserInfo operator, Long targetId, String uuid, Map<String, Object> fieldMap) throws IOException, ExecutionException, InterruptedException {
 
         OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
         // 保留解除时的预警等级
@@ -56,13 +56,13 @@ public class EsModifyServiceImpl implements EsModifyService {
         fieldMap.put(EsConstant.levelField, level);
 
         // 记录参与人
+            // 操作人
         Long operatorId = operator.getId();
         Long[] original = opinion.getOperators();
-        boolean flag = ArrayUtils.contains(original, operatorId);
-        Long[] newArr = original;
-        if (!flag) {
-            newArr = ArrayUtils.add(original, operatorId);
-        }
+        Long[] tempArr = getOperators(original, operatorId);
+            // 被操作人
+        Long[] newArr = getOperators(tempArr, targetId);
+
         fieldMap.put(EsConstant.operatorsField, newArr);
 
         TransportClient client = esUtil.getClient();
@@ -80,7 +80,7 @@ public class EsModifyServiceImpl implements EsModifyService {
     private Long[] getOperators(Long[] original, Long userid) {
         boolean flag = ArrayUtils.contains(original, userid);
         Long[] newArr = original;
-        if (!flag) {
+        if (!flag && userid != -1L) {
             newArr = ArrayUtils.add(original, userid);
         }
         return newArr;

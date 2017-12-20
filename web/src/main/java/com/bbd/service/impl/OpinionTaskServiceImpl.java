@@ -170,7 +170,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.opOwnerField, targeterId);
         map.put(EsConstant.transferTypeField, param.getTransferType());
         map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(now, "yyyy-MM-dd HH:mm:ss"));
-        esModifyService.updateOpinion(operatorUser, param.getUuid(), map);
+        esModifyService.updateOpinion(operatorUser, targeterId, param.getUuid(), map);
 
         // step-4：记录转发记录
             // 构建转发记录对象
@@ -238,7 +238,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         map.put(EsConstant.opStatusField, 2);
         map.put(EsConstant.opOwnerField, -1); // 解除之后，就没有目标操作者了
         map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(now, "yyyy-MM-dd HH:mm:ss"));
-        esModifyService.updateOpinion(operator, uuid, map);
+        esModifyService.updateOpinion(operator, -1L, uuid, map);
 
         // step-3：记录解除记录
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
