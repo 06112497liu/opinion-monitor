@@ -278,24 +278,24 @@ PUT /bbd_opinion_news
     "number_of_shards": 1
   },
   "mappings": {
-    "article": {
+    "opinion_news": {
       "properties": {
-        "opinionId": {
-          "type": "keyword"
-        },
         "hot": {
           "type": "integer"
         },
-        "id": {
+        "link": {
+          "type": "keyword"
+        },
+        "md5": {
+          "type": "keyword"
+        },
+        "source": {
           "type": "keyword"
         },
         "title": {
           "type": "text"
         },
-        "source": {
-          "type": "keyword"
-        },
-        "link": {
+        "uuid": {
           "type": "keyword"
         }
       }
