@@ -55,7 +55,7 @@ public class OpinionVO {
 
     private Integer    flag;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date       publishTime;
 
     public String getUuid() {

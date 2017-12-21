@@ -64,9 +64,9 @@ public class OpinionEsSyncVO implements EsBase {
      */
     private List<Long>      events;
 
-    @JSONField(format = "yyyy-MM-dd")
-    private Date            publishTime;
 
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    private Date            publishTime;
     /**
      * 标记是否为消费舆情
      */
