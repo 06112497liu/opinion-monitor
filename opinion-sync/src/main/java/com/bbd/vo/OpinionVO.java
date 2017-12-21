@@ -23,6 +23,8 @@ import java.util.List;
  */
 public class OpinionVO {
 
+    private String     md5;
+
     private String     uuid;
 
     private String     title;
@@ -57,6 +59,14 @@ public class OpinionVO {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date       publishTime;
+
+    public String getMd5() {
+        return md5;
+    }
+
+    public void setMd5(String md5) {
+        this.md5 = md5;
+    }
 
     public String getUuid() {
         return uuid;

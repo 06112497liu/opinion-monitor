@@ -58,11 +58,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -1358,7 +1354,8 @@ public class EsQueryServiceImpl implements EsQueryService {
         TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_SIMILAR_NEWS)
                 .setQuery(QueryBuilders.termsQuery(EsConstant.uuidField, uuids))
-                .addAggregation(AggregationBuilders.terms(aggs).field(EsConstant.uuidKeywordField).size(uuids.size() + 1))
+                .setSize(0)
+                .addAggregation(AggregationBuilders.terms(aggs).field(EsConstant.uuidField).size(uuids.size() + 1))
                 .execute().actionGet();
         List<KeyValueVO> rs = buildTermLists(resp, aggs);
         Map<String, Object> map = rs.stream().collect(Collectors.toMap(KeyValueVO::getName, vo -> Integer.parseInt(vo.getValue().toString()) - 1));
@@ -1370,10 +1367,15 @@ public class EsQueryServiceImpl implements EsQueryService {
             return;
         }
         for (OpinionEsVO e : opinionEsVOList) {
-            e.setSimiliarCount(Integer.valueOf(map.get(e.getUuid()).toString()));
+            Object value = map.get(e.getUuid());
+            if (Objects.nonNull(value))
+                e.setSimiliarCount(Integer.valueOf(value.toString()));
+            else
+                e.setSimiliarCount(0);
         }
     }
-    
+
+
     public List<String> getUuids(List<OpinionEsVO> opinionEsVOList) {
         List<String> uuids = new ArrayList<String>();
         if (opinionEsVOList == null) {
