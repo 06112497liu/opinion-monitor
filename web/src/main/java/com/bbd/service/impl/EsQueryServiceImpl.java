@@ -28,6 +28,7 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
+
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -57,6 +58,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -222,6 +224,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-2：查询并返回结果
         SearchResponse resp = builder.execute().actionGet();
         List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
+        setSimilar(opList, calSimilarCount(getUuids(opList)));
         if (opList != null && opList.size() > 0) {
             return opList.get(0);
         } else {
@@ -543,6 +546,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchResponse resp = builder.execute().actionGet();
         result.setTotal(resp.getHits().getTotalHits());
         List<OpinionEsVO> opList = esUtil.buildResult(resp, OpinionEsVO.class);
+        setSimilar(opList, calSimilarCount(getUuids(opList)));
         result.setOpinions(opList);
 
         List<KeyValueVO> hotLevelList = buildHotLevelLists(resp, hotLevelAggName);
@@ -833,6 +837,7 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .execute().actionGet();
 
         List<OpinionEsVO> list = esUtil.buildResult(resp, OpinionEsVO.class);
+        setSimilar(list, calSimilarCount(getUuids(list)));
         if (list.isEmpty())
             return null;
         return list.get(0);
@@ -854,6 +859,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-2：查询并返回结果
         SearchResponse resp = builder.execute().actionGet();
         List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
+        setSimilar(opList, calSimilarCount(getUuids(opList)));
         if (opList != null && opList.size() > 0) {
             return opList.get(0);
         } else {
@@ -1340,12 +1346,33 @@ public class EsQueryServiceImpl implements EsQueryService {
         TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_SIMILAR_NEWS)
                 .setQuery(QueryBuilders.termsQuery(EsConstant.uuidField, uuids))
-                .addAggregation(AggregationBuilders.terms(aggs).field(EsConstant.uuidKeywordField).size(uuids.size()))
+                .addAggregation(AggregationBuilders.terms(aggs).field(EsConstant.uuidKeywordField).size(uuids.size() + 1))
                 .execute().actionGet();
         List<KeyValueVO> rs = buildTermLists(resp, aggs);
         Map<String, Object> map = rs.stream().collect(Collectors.toMap(KeyValueVO::getName, KeyValueVO::getValue));
         return map;
     }
+    
+    public void setSimilar(List<OpinionEsVO> opinionEsVOList, Map<String, Object> map) {
+        if (opinionEsVOList == null) {
+            return;
+        }
+        for (OpinionEsVO e : opinionEsVOList) {
+            e.setSimiliarCount(Integer.valueOf(map.get(e.getUuid()).toString()));
+        }
+    }
+    
+    public List<String> getUuids(List<OpinionEsVO> opinionEsVOList) {
+        List<String> uuids = new ArrayList<String>();
+        if (opinionEsVOList == null) {
+            return uuids;
+        }
+        for (OpinionEsVO e : opinionEsVOList) {
+            uuids.add(e.getUuid());
+        }
+        return uuids;
+    }
+    
 
     /**
      * 检查舆情是否处于任务当中
