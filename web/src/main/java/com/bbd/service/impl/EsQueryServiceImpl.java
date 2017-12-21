@@ -1156,7 +1156,7 @@ public class EsQueryServiceImpl implements EsQueryService {
                 temp = list.stream().filter(vo -> !vo.getLink().equals(link)).collect(Collectors.toList());
         }
 
-        Long total = resp.getHits().getTotalHits();
+        Long total = resp.getHits().getTotalHits() - 1;
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
         PageList<SimiliarNewsVO> result = PageListHelper.create(temp, paginator);
         return result;
