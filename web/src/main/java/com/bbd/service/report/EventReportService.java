@@ -66,6 +66,8 @@ public class EventReportService {
     private String timeLabel;
     private String labelTwo;
     private String labelThree;
+    private String nodata1 = "";
+    private String nodata2 = "";
     
     public void generateReport(int cycle, Long id, OutputStream out) throws Exception {
         Date currentTime = new Date();
@@ -90,6 +92,10 @@ public class EventReportService {
         params.put("labelTwo", labelTwo);
         params.put("labelThree", labelThree);
         
+        params.put("nodata1", nodata1);
+        if (cycle != 4) {
+            params.put("nodata2", nodata2);
+        }
         ArrayListMultimap<StructureEnum,ReportElementModel> array = ModelUtil.stringToModel(list);
         ReportEngine re = new ReportEngine();
        /* File f = new File("E:/"+System.currentTimeMillis()+".pdf");
@@ -299,6 +305,9 @@ public class EventReportService {
     
     public void eventTrend(ArrayList<ReportElementString> list, int cycle, Long id) throws Exception {
         List<OpinionEventTrendStatistic>  opinions = (List<OpinionEventTrendStatistic>) eventService.eventTrend(id, cycle, 1, Integer.MAX_VALUE).get("opinions");
+        if (opinions == null || opinions.size() == 0) {
+            nodata1 = "暂无数据";
+        }
         ReportElementString eventTrendElement = new ReportElementString(StructureEnum.GROUP_FOOTER, ElementEnum.REPORT_DEFINITION_TABLE,
             DataModelEnum.TABLE_DATA, "eventTrend", "eventTrendData");
         String[] title = new String[]{"item"};
@@ -357,7 +366,9 @@ public class EventReportService {
         crtWarn = crtWarn == null ? "0" : crtWarn;
         oppWarn = oppWarn == null ? "0" : oppWarn;
         List<OpinionVO> opinions = (List<OpinionVO>) map.get("opinions");
-        
+        if (opinions == null || opinions.size() == 0) {
+            nodata2 = "暂无数据";
+        } 
         
         ReportElementString eventTrendElement = new ReportElementString(StructureEnum.GROUP_FOOTER, ElementEnum.REPORT_DEFINITION_TABLE,
             DataModelEnum.TABLE_DATA, "opinionInfo", "opinionInfoData");
