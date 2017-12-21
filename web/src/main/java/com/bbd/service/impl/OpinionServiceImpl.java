@@ -312,17 +312,7 @@ public class OpinionServiceImpl implements OpinionService {
 
     @Override
     public List<SimiliarNewsVO> getOpinionSimiliarNewsList(String uuid, PageBounds pb) {
-        OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
-        String md5 = opinion.getMd5();
-        String link = opinion.getLink();
-        List<SimiliarNewsVO> temp = esQueryService.querySimiliarNews(uuid, pb);
-        List<SimiliarNewsVO> rs = temp;
-        if (Objects.nonNull(md5)) {
-            rs = temp.stream().filter(vo -> !vo.getMd5().equals(md5)).collect(Collectors.toList());
-        } else {
-            if (Objects.nonNull(link))
-                rs = temp.stream().filter(vo -> !vo.getLink().equals(link)).collect(Collectors.toList());
-        }
+        List<SimiliarNewsVO> rs = esQueryService.querySimiliarNews(uuid, pb);
         return rs;
     }
 

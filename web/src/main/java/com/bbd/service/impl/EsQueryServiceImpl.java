@@ -1143,9 +1143,22 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .setSize(6666)
                 .execute().actionGet();
         List<SimiliarNewsVO> list = EsUtil.buildResult(resp, SimiliarNewsVO.class);
+
+        OpinionEsVO opinion = getOpinionByUUID(uuid);
+        String md5 = opinion.getMd5();
+        String link = opinion.getLink();
+
+        List<SimiliarNewsVO> temp = list;
+        if (Objects.nonNull(md5)) {
+            temp = list.stream().filter(vo -> !vo.getMd5().equals(md5)).collect(Collectors.toList());
+        } else {
+            if (Objects.nonNull(link))
+                temp = list.stream().filter(vo -> !vo.getLink().equals(link)).collect(Collectors.toList());
+        }
+
         Long total = resp.getHits().getTotalHits();
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
-        PageList<SimiliarNewsVO> result = PageListHelper.create(list, paginator);
+        PageList<SimiliarNewsVO> result = PageListHelper.create(temp, paginator);
         return result;
     }
 
