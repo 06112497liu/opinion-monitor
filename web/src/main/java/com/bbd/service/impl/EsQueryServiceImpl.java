@@ -310,11 +310,11 @@ public class EsQueryServiceImpl implements EsQueryService {
     public DateRangeAggregationBuilder buildEventDayeRange(int cycle, OpinionEvent opinionEvent) {
         String aggsName = "event_calc_aggs";
 
-        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.matchTimeTrimField).keyed(true);
+        DateRangeAggregationBuilder dateRange = AggregationBuilders.dateRange(aggsName).field(EsConstant.matchTimeField).keyed(true);
         List<Date> dates = eventService.getDates(cycle, opinionEvent);
         for (Date date : dates) {
             DateTime dateTime = new DateTime(date);
-            dateRange.addUnboundedTo(dateTime.toString("yyyy-MM-dd HH:mm:ss"), dateTime);
+            dateRange.addUnboundedTo(dateTime.toString(EsConstant.LONG_TIME_FORMAT), dateTime.toString(EsConstant.LONG_TIME_FORMAT));
         }
         return dateRange;
     }
