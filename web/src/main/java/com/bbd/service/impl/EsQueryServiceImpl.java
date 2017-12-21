@@ -453,6 +453,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         SearchHits hits = resp.getHits();
         result.setTotal(hits.getTotalHits());
         List<OpinionEsVO> opList = EsUtil.buildResult(resp, OpinionEsVO.class);
+        setSimilar(opList, calSimilarCount(getUuids(opList)));
         result.setOpinions(opList);
 
         List<KeyValueVO> hotLevelList = buildHotLevelLists(resp, hotLevelAggName);
@@ -627,6 +628,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         OpinionEsSearchVO result = new OpinionEsSearchVO();
         result.setTotal(resp.getHits().getTotalHits());
         List<OpinionEsVO> opList = esUtil.buildResult(resp, OpinionEsVO.class);
+        setSimilar(opList, calSimilarCount(getUuids(opList)));
         result.setOpinions(opList);
 
         // 舆情来源类型统计
@@ -671,6 +673,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         result.setTotal(resp.getHits().getTotalHits());
         // 列表结果
         List<OpinionEsVO> opList = esUtil.buildResult(resp, OpinionEsVO.class);
+        setSimilar(opList, calSimilarCount(getUuids(opList)));
         result.setOpinions(opList);
 
         return result;
@@ -714,6 +717,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         result.setTotal(resp.getHits().getTotalHits());
         // 列表结果
         List<OpinionEsVO> opList = esUtil.buildResult(resp, OpinionEsVO.class);
+        setSimilar(opList, calSimilarCount(getUuids(opList)));
         result.setOpinions(opList);
         return result;
     }
@@ -840,7 +844,9 @@ public class EsQueryServiceImpl implements EsQueryService {
         setSimilar(list, calSimilarCount(getUuids(list)));
         if (list.isEmpty())
             return null;
-        return list.get(0);
+        OpinionEsVO rs = list.get(0);
+        rs.setSimiliarCount(calSimilarCount(uuid));
+        return rs;
     }
     /**
      * 根据舆情uuids查询热度最高的舆情
@@ -900,6 +906,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();
         List<OpinionEsVO> esList = esUtil.buildResult(resp, OpinionEsVO.class);
+        setSimilar(esList, calSimilarCount(getUuids(esList)));
         List<OpinionTaskListVO> list = BeanMapperUtil.mapList(esList, OpinionTaskListVO.class);
         // 查询转发记录
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
@@ -940,6 +947,7 @@ public class EsQueryServiceImpl implements EsQueryService {
         // step-3：返回查询结果
         Long total = resp.getHits().getTotalHits();
         List<OpinionEsVO> esList = esUtil.buildResult(resp, OpinionEsVO.class);
+        setSimilar(esList, calSimilarCount(getUuids(esList)));
         List<OpinionTaskListVO> list = BeanMapperUtil.mapList(esList, OpinionTaskListVO.class);
         // 查询转发记录
         Paginator paginator = new Paginator(pb.getPage(), pb.getLimit(), total.intValue());
@@ -1214,7 +1222,11 @@ public class EsQueryServiceImpl implements EsQueryService {
 
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION).setQuery(query).execute().actionGet();
         List<OpinionEsVO> list = EsUtil.buildResult(resp, OpinionEsVO.class);
-        if(!list.isEmpty()) return list.get(0);
+        if(!list.isEmpty()) {
+            OpinionEsVO rs = list.get(0);
+            rs.setSimiliarCount(calSimilarCount(uuid));
+            return rs;
+        }
         return null;
     }
 
@@ -1332,7 +1344,7 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .setQuery(QueryBuilders.termQuery(EsConstant.uuidKeywordField, uuid))
                 .setSize(0).execute().actionGet();
         Long count = resp.getHits().getTotalHits();
-        return count.intValue();
+        return count.intValue() - 1;
     }
 
     /**
@@ -1349,7 +1361,7 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .addAggregation(AggregationBuilders.terms(aggs).field(EsConstant.uuidKeywordField).size(uuids.size() + 1))
                 .execute().actionGet();
         List<KeyValueVO> rs = buildTermLists(resp, aggs);
-        Map<String, Object> map = rs.stream().collect(Collectors.toMap(KeyValueVO::getName, KeyValueVO::getValue));
+        Map<String, Object> map = rs.stream().collect(Collectors.toMap(KeyValueVO::getName, vo -> Integer.parseInt(vo.getValue().toString()) - 1));
         return map;
     }
     
