@@ -8,6 +8,7 @@ import com.bbd.service.vo.HistoryOpinionDetailVO;
 import com.bbd.service.vo.OpinionExtVO;
 import com.bbd.service.vo.SimiliarNewsVO;
 import com.bbd.util.ValidateUtil;
+import com.mybatis.domain.PageBounds;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -83,14 +84,13 @@ public class WarnOpinionController extends AbstractController {
 
     @ApiOperation(value = "预警舆情相同文章信息", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String uuid", paramType = "query", required = true),
-            @ApiImplicitParam(value = "起始页号", name = "page", dataType = "Integer", paramType = "query", required = false),
-            @ApiImplicitParam(value = "每页大小", name = "limit", dataType = "Integer", paramType = "query", required = false)
+            @ApiImplicitParam(value = "舆情uuid", name = "uuid", dataType = "String uuid", paramType = "query", required = true)
     })
     @RequestMapping(value = "news/list", method = RequestMethod.GET)
     public RestResult getWarnOpinionSimiliarNewsList(String uuid) {
         ValidateUtil.checkNull(uuid, CommonErrorCode.PARAM_ERROR, "uuid不能为空");
-        List<SimiliarNewsVO> rs = opinionService.getOpinionSimiliarNewsList(uuid, getPageBounds());
+        PageBounds pb = new PageBounds(1, 6666);
+        List<SimiliarNewsVO> rs = opinionService.getOpinionSimiliarNewsList(uuid, pb);
         return RestResult.ok(rs);
     }
 

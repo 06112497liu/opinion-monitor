@@ -9,6 +9,8 @@ import com.bbd.util.StringUtils;
  */
 public class SimiliarNewsVO {
 
+    private String  md5;
+
     /**
      * 标题
      */
@@ -47,6 +49,14 @@ public class SimiliarNewsVO {
         this.title = title;
         this.source = source;
         this.hot = hot;
+    }
+
+    public String getMd5() {
+        return md5;
+    }
+
+    public void setMd5(String md5) {
+        this.md5 = md5;
     }
 
     public String getTitle() {

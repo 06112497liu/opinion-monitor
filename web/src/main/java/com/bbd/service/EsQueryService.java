@@ -336,12 +336,13 @@ public interface EsQueryService {
     /**
      * 计算一批舆情的相似文章数
      * @param uuids
+     * @param size
      * @return
      */
-    Map<String, Object> calSimilarCount(List<String> uuids);
+    Map<String, Object> calSimilarCount(List<String> uuids, Integer size);
 
     /**
-     * 检查舆情是否处于任务当中
+     *
      * @param uuid
      * @return
      */
