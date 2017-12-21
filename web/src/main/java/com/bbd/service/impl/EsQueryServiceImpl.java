@@ -1337,7 +1337,7 @@ public class EsQueryServiceImpl implements EsQueryService {
     public Integer calSimilarCount(String uuid) {
         TransportClient client = esUtil.getClient();
         SearchResponse resp = client.prepareSearch(EsConstant.IDX_OPINION_SIMILAR_NEWS)
-                .setQuery(QueryBuilders.termQuery(EsConstant.uuidKeywordField, uuid))
+                .setQuery(QueryBuilders.termQuery(EsConstant.uuidField, uuid))
                 .setSize(0).execute().actionGet();
         Long count = resp.getHits().getTotalHits();
         return count.intValue() - 1;

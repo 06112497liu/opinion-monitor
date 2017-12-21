@@ -318,10 +318,10 @@ public class OpinionServiceImpl implements OpinionService {
         List<SimiliarNewsVO> temp = esQueryService.querySimiliarNews(uuid, pb);
         List<SimiliarNewsVO> rs = temp;
         if (Objects.nonNull(md5)) {
-            rs = temp.stream().filter(vo -> vo.getMd5().equals(md5)).collect(Collectors.toList());
+            rs = temp.stream().filter(vo -> !vo.getMd5().equals(md5)).collect(Collectors.toList());
         } else {
             if (Objects.nonNull(link))
-                rs = temp.stream().filter(vo -> vo.getLink().equals(link)).collect(Collectors.toList());
+                rs = temp.stream().filter(vo -> !vo.getLink().equals(link)).collect(Collectors.toList());
         }
         return rs;
     }
