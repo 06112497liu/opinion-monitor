@@ -1,5 +1,22 @@
 package com.bbd.service.impl;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSONArray;
 import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.OpinionEsVO;
@@ -19,9 +36,20 @@ import com.bbd.job.vo.EmailContent;
 import com.bbd.job.vo.MsgVO;
 import com.bbd.job.vo.OpinionMsgModel;
 import com.bbd.job.vo.SMSContent;
-import com.bbd.service.*;
+import com.bbd.service.EsQueryService;
+import com.bbd.service.EventService;
+import com.bbd.service.OpinionService;
+import com.bbd.service.SystemSettingService;
+import com.bbd.service.UserService;
 import com.bbd.service.utils.BusinessUtils;
-import com.bbd.service.vo.*;
+import com.bbd.service.vo.HistoryOpinionDetailVO;
+import com.bbd.service.vo.OpinionEsSearchVO;
+import com.bbd.service.vo.OpinionExtVO;
+import com.bbd.service.vo.OpinionMsgSend;
+import com.bbd.service.vo.OpinionOpRecordVO;
+import com.bbd.service.vo.OpinionVO;
+import com.bbd.service.vo.SimiliarNewsVO;
+import com.bbd.service.vo.WarnOpinionTopTenVO;
 import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.DateUtil;
 import com.bbd.util.StringUtils;
@@ -35,17 +63,6 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Liuweibo
@@ -59,9 +76,6 @@ public class OpinionServiceImpl implements OpinionService {
 
     @Autowired
     private SystemSettingService systemSettingService;
-
-    @Resource
-    private RedisTemplate redisTemplate;
 
     @Autowired
     private WarnNotifierExtDao notifierExtDao;
