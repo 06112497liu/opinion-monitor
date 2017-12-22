@@ -16,6 +16,7 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.domain.SortBy;
+
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
@@ -44,6 +45,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -80,10 +82,8 @@ public class EsUtil {
      */
     private TransportClient    client;
 
-    @Value("${es.host}")
-    private String             esHost;
-    @Value("${es.port}")
-    private Integer            esPort;
+    @Value("${es.hosts}")
+    private String             esHosts;
     @Value("${es.cluster}")
     private String             esCluster;
 
@@ -407,12 +407,17 @@ public class EsUtil {
     @PostConstruct
     public void init() {
         try {
-            Settings settings = Settings.builder().put("cluster.name", esCluster).build();
-            client = new PreBuiltTransportClient(settings).addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), esPort));
-//            List<DiscoveryNode> nodes = client.listedNodes();
-//            for (DiscoveryNode node : nodes) {
-//                logger.info("Discovered node: " + node.getHostAddress());
-//            }
+            Settings settings = Settings.builder().put("cluster.name", esCluster).put("client.transport.sniff", true).build();
+            PreBuiltTransportClient pbc = new PreBuiltTransportClient(settings);
+            for (String esHost : esHosts.split(",")) {
+                pbc.addTransportAddress(new InetSocketTransportAddress(
+                    InetAddress.getByName(esHost.split(":")[0]), Integer.valueOf(esHost.split(":")[1])));
+            }
+            client = pbc;
+            List<DiscoveryNode> nodes = client.listedNodes();
+            for (DiscoveryNode node : nodes) {
+                logger.info("Discovered node: " + node.getHostAddress());
+            }
         } catch (UnknownHostException e) {
             logger.error(e.getMessage(), e);
         }

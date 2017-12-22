@@ -47,18 +47,21 @@ public class EsUtil {
      * es链接
      */
     private TransportClient    client;
-    @Value("${es.host}")
-    private String             esHost;
-    @Value("${es.port}")
-    private Integer            esPort;
+    @Value("${es.hosts}")
+    private String             esHosts;
     @Value("${es.cluster}")
     private String             esCluster;
 
     @PostConstruct
     public void init() {
         try {
-            Settings settings = Settings.builder().put("cluster.name", esCluster).build();
-            client = new PreBuiltTransportClient(settings).addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(getEsHost()), getEsPort()));
+            Settings settings = Settings.builder().put("cluster.name", esCluster).put("client.transport.sniff", true).build();
+            PreBuiltTransportClient pbc = new PreBuiltTransportClient(settings);
+            for (String esHost : esHosts.split(",")) {
+                pbc.addTransportAddress(new InetSocketTransportAddress(
+                    InetAddress.getByName(esHost.split(":")[0]), Integer.valueOf(esHost.split(":")[1])));
+            }
+            client = pbc;
             List<DiscoveryNode> nodes = client.listedNodes();
             for (DiscoveryNode node : nodes) {
                 logger.info("Discovered node: " + node.getHostAddress());
@@ -72,11 +75,4 @@ public class EsUtil {
         return client;
     }
 
-    public String getEsHost() {
-        return esHost;
-    }
-
-    public Integer getEsPort() {
-        return esPort;
-    }
 }
