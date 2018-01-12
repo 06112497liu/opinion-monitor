@@ -75,7 +75,7 @@ public class OpinionListener {
 
         List<OpinionVO> vos = Lists.newArrayList();
         for (ConsumerRecord<String, String> record : records) {
-            System.out.printf("offset = %d, key = %s, value = %s\n", record.offset(), record.key(), record.value());
+            //System.out.printf("offset = %d, key = %s, value = %s\n", record.offset(), record.key(), record.value());
             OpinionVO vo = JsonUtil.parseObject(record.value(), OpinionVO.class);
             vos.add(vo);
         }
