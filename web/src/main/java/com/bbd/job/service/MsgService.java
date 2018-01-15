@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.bbd.bean.EventEsVO;
@@ -24,6 +23,8 @@ import com.bbd.bean.OpinionEsVO;
 import com.bbd.dao.MsgSendRecordDao;
 import com.bbd.dao.OpinionEventDao;
 import com.bbd.dao.OpinionEventLevelChangeDao;
+import com.bbd.dao.OpinionEventLevelRecordDao;
+import com.bbd.dao.OpinionPopDao;
 import com.bbd.dao.WarnNotifierDao;
 import com.bbd.dao.WarnSettingDao;
 import com.bbd.domain.MsgSendRecord;
@@ -32,6 +33,11 @@ import com.bbd.domain.OpinionEvent;
 import com.bbd.domain.OpinionEventExample;
 import com.bbd.domain.OpinionEventLevelChange;
 import com.bbd.domain.OpinionEventLevelChangeExample;
+import com.bbd.domain.OpinionEventLevelRecord;
+import com.bbd.domain.OpinionEventLevelRecordExample;
+import com.bbd.domain.OpinionPop;
+import com.bbd.domain.OpinionPopExample;
+import com.bbd.domain.PopMsg;
 import com.bbd.domain.WarnNotifier;
 import com.bbd.domain.WarnNotifierExample;
 import com.bbd.domain.WarnSetting;
@@ -73,9 +79,13 @@ public class MsgService {
     @Autowired
     OpinionEventLevelChangeDao opinionEventLevelChangeDao;
     @Autowired
+    OpinionEventLevelRecordDao opinionEventLevelRecordDao;
+    @Autowired
     MsgSendRecordDao msgSendRecordDao;
     @Autowired
     WarnNotifierDao warnNotifierDao;
+    @Autowired
+    OpinionPopDao opinionPopDao;
     @Autowired
     private EsQueryService esQueryService;
     @Autowired
@@ -145,6 +155,43 @@ public class MsgService {
             opinionEventLevelChange.setGmtLevelChange(now);
             opinionEventLevelChange.setGmtModified(now);
             opinionEventLevelChangeDao.updateByPrimaryKeySelective(opinionEventLevelChange);
+            return true;
+        }
+        return false;
+    }
+    
+    /**判断事件总体热度级别是否改变  
+     * @param e
+     * @param level
+     * @param now
+     * @return 
+     */
+    public boolean changeLevelRecord(OpinionEvent e, int level, Date now) {
+        OpinionEventLevelRecordExample  levelRecordExample = new OpinionEventLevelRecordExample();
+        levelRecordExample.createCriteria().andEventIdEqualTo(e.getId());
+        List<OpinionEventLevelRecord> opinionEventLevelRecordList = opinionEventLevelRecordDao.selectByExample(levelRecordExample);
+        levelRecordExample.clear();
+        
+        OpinionEventLevelRecord opinionEventLevelRecord;
+        if (opinionEventLevelRecordList == null || opinionEventLevelRecordList.size() == 0) {
+            opinionEventLevelRecord = new OpinionEventLevelRecord();
+            opinionEventLevelRecord.setEventId(e.getId());
+            opinionEventLevelRecord.setLevel((byte)level);
+            opinionEventLevelRecord.setHot(e.getHot());
+            opinionEventLevelRecord.setGmtPick(now);
+            opinionEventLevelRecord.setGmtCreate(now);
+            opinionEventLevelRecordDao.insert(opinionEventLevelRecord);
+            return true;
+        } 
+        opinionEventLevelRecord = opinionEventLevelRecordList.get(opinionEventLevelRecordList.size() - 1);
+        if (level != opinionEventLevelRecord.getLevel()) {
+            opinionEventLevelRecord = new OpinionEventLevelRecord();
+            opinionEventLevelRecord.setEventId(e.getId());
+            opinionEventLevelRecord.setLevel((byte)level);
+            opinionEventLevelRecord.setHot(e.getHot());
+            opinionEventLevelRecord.setGmtPick(now);
+            opinionEventLevelRecord.setGmtCreate(now);
+            opinionEventLevelRecordDao.insert(opinionEventLevelRecord);
             return true;
         }
         return false;
@@ -300,7 +347,7 @@ public class MsgService {
     
     /**事件新增舆情定时任务   
      */
-    @Scheduled(cron="0 30 * * * ?")
+    //@Scheduled(cron="0 30 * * * ?")
     public void eventNewOpinionKafka(){
         //事件热点舆情变化发送至kafka
         List<OpinionEvent> opinionEventList = getEventList();
@@ -347,7 +394,7 @@ public class MsgService {
     /**舆情定时任务  
      * @throws NoSuchFieldException 
      */
-    @Scheduled(cron="0 30 * * * ?")
+    //@Scheduled(cron="0 30 * * * ?")
     public void opinionKafka() throws NoSuchFieldException {
         MsgSendRecord msgSendRecord = getMsgSendRecord(SEND_TYPE_OPINION, MSG_TYPE_EMAIL);
         OpinionMsgSend opinionMsgSend = opinionService.getWarnRemindJson(msgSendRecord != null ? new DateTime(msgSendRecord.getSendTime()) : null);
@@ -361,7 +408,7 @@ public class MsgService {
     
     /**事件总体热度级别变化定任务   
      */
-    @Scheduled(cron="0 30 * * * ?")
+    //@Scheduled(cron="0 30 * * * ?")
     public void eventWholeHotKafka() {
         //事件总体热度级别变化发送至kafka
         List<OpinionEvent> opinionEventList = getEventList();
@@ -392,5 +439,92 @@ public class MsgService {
         //由于同一批短信和邮件发送send_time相同，故bbd_msg_send_record区分msg_type没有意义，用同一条记录即可
         updateMsgRecord(SEND_TYPE_EVENT_HOT, MSG_TYPE_EMAIL, now);
     }
+    
+    /**事件总体热度级别变化定任务--弹窗   
+     */
+    //@Scheduled(cron="0 0/10 * * * ?")
+    public void eventLevelRecordPop() {
+        List<OpinionEvent> opinionEventList = getEventList();
+        Integer level;
+        Date now = new Date();
+        for (OpinionEvent e : opinionEventList) {
+            WarnSetting warnSetting = getLevel(e, WARN_EVENT_TYPE_WHOLE);
+            if (warnSetting == null) {
+                continue;
+            }
+            level = warnSetting.getLevel();
+            if (level == null) {
+                continue;
+            }
+            boolean change = changeLevelRecord(e, level, now);
+        }
+    }
+    
+    public List<PopMsg> getPop(Long userId, Integer type){
+        OpinionPopExample popEx = new OpinionPopExample();
+        popEx.createCriteria().andUserIdEqualTo(userId).andTypeEqualTo((byte)type.intValue());
+        List<OpinionPop> opinionPopList = opinionPopDao.selectByExample(popEx);
+        OpinionEventLevelRecordExample recordEx = new  OpinionEventLevelRecordExample();
+        recordEx.setOrderByClause("event_id DESC, gmt_pick ASC");
+        
+        List<PopMsg> popMsgs = null;
+        OpinionPop record = new OpinionPop();
+        Date now = new Date();
+        if (opinionPopList != null && opinionPopList.size() > 0) {
+            List<OpinionEventLevelRecord> opinionEventLevelRecordList = opinionEventLevelRecordDao.selectByExample(recordEx);
+            popMsgs = buildPopMsg(opinionEventLevelRecordList);
+            record.setId(opinionPopList.get(0).getId());
+            record.setGmtPopLatest(now);
+            record.setGmtModified(now);
+            opinionPopDao.updateByPrimaryKeySelective(record);
+        } else {
+            recordEx.createCriteria().andGmtPickGreaterThan(opinionPopList.get(0).getGmtPopLatest());
+            List<OpinionEventLevelRecord> opinionEventLevelRecordList = opinionEventLevelRecordDao.selectByExample(recordEx);
+            popMsgs = buildPopMsg(opinionEventLevelRecordList);
+            record.setUserId(userId);
+            record.setType((byte)type.intValue());
+            record.setGmtPopLatest(now);
+            record.setGmtCreate(now);
+            opinionPopDao.insert(record);
+        }
+        return popMsgs;
+    }
+    
+    public List<PopMsg> buildPopMsg(List<OpinionEventLevelRecord> opinionEventLevelRecordList) {
+        List<Long> ids = new ArrayList<Long>();
+        List<PopMsg> popMsgs = new ArrayList<PopMsg>(); 
+        for (OpinionEventLevelRecord record : opinionEventLevelRecordList) {
+            ids.add(record.getEventId());
+        }
+        List<OpinionEvent> eventList = eventService.getEventList(ids);
+        for (OpinionEventLevelRecord record : opinionEventLevelRecordList) {
+            String msg = "";
+            for (OpinionEvent evt : eventList) {
+                if (record.getEventId() == evt.getId()) {
+                    msg = "通知：事件"+getLevel(record.getLevel())+"级预警：“"+evt.getEventName()+"”"+"事件总热度已达"+record.getHot();
+                    PopMsg popMsg = new PopMsg();
+                    popMsg.setMsg(msg);
+                    popMsg.setUrl(address + "/monitor?id=" + evt.getId());
+                    popMsgs.add(popMsg);
+                    break;
+                }
+            }
+            
+        }
+        return popMsgs;
+    }
+    
+    public String getLevel(byte level) {
+        if (level == 1) {
+            return "一";
+        }else if (level == 2) {
+            return "二";
+        }else if (level == 3) {
+            return "三";
+        }
+        return "";
+    }
+    
+    
 }
 

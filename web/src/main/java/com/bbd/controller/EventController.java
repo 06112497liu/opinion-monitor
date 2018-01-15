@@ -29,6 +29,7 @@ import com.bbd.RestResult;
 import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.domain.OpinionEvent;
+import com.bbd.job.service.MsgService;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
 import com.bbd.util.UserContext;
@@ -43,6 +44,8 @@ public class EventController extends AbstractController {
     EventService eventService;
     @Autowired
     EsQueryService esQueryService;
+    @Autowired
+    MsgService msgService;
     
     @ApiOperation(value = "创建事件", httpMethod = "POST")
     /*@ApiImplicitParams({ 
@@ -326,6 +329,16 @@ public class EventController extends AbstractController {
                                    @DateTimeFormat(pattern="yyyy-MM")Date endTime, Integer pageNo, Integer pageSize) {
         return RestResult.ok(eventService.getHisEventList(eventLevel, region, startTime, 
             endTime != null ? DateUtils.addMonths(endTime, 1) : endTime, pageNo, pageSize));
+    }
+    
+    @ApiOperation(value = "事件弹窗", httpMethod = "GET")
+    @ApiImplicitParams({ 
+        @ApiImplicitParam(value = "类型,1表示事件新增舆情，2表示事件热度级别变化", name = "type", dataType = "Integer", paramType = "query", required = true),
+        })
+    @RequestMapping(value = "eventPop", method = RequestMethod.GET)
+    public RestResult eventPop(Integer type) {
+       Long userId = UserContext.getUser().getId();
+       return RestResult.ok(msgService.getPop(userId, type));
     }
     
 }

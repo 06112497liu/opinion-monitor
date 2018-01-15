@@ -194,6 +194,17 @@ public class EventService{
      * @param id
      * @return 
      */
+    public List<OpinionEvent> getEventList(List<Long> ids) {
+        OpinionEventExample ex = new OpinionEventExample();
+        ex.createCriteria().andIdIn(ids);
+        return opinionEventDao.selectByExample(ex);
+    }
+    
+    /**  
+     * 获取事件
+     * @param id
+     * @return 
+     */
     public OpinionEvent getEventChinese(long id) {
         OpinionEvent evt = opinionEventDao.selectByPrimaryKey(id);
         transToChinese(evt);
