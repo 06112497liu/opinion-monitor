@@ -55,7 +55,7 @@ public class OpinionTaskListVO extends OpinionVO {
     /**
      * 添加监测时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
     private Date monitorTime;
 
     /**

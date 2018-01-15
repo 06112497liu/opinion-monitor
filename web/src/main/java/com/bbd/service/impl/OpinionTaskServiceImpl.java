@@ -88,6 +88,55 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
 
     /**
+     * 转发舆情
+     *
+     * @param param
+     */
+    @Override
+    public void transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
+
+        Date now = new Date();
+        String uuid = param.getUuid();
+        Long targeterId = param.getUserId();
+
+        synchronized (this) {
+            // step-1：校验是否具有操作权限
+            // 不能转发给自己
+            notToOneself(targeterId);
+            // 不能转发给管理员（管理员除外）
+            notToAdmin(targeterId);
+            // 转发次数不能操作49次
+            notOver49(uuid);
+            // 待操作者才能操作该条舆情（管理员除外）
+            targeterCanOp(uuid);
+
+            // step-2：修改舆情的状态
+            UserInfo operatorUser = UserContext.getUser();
+            Map<String, Object> map = Maps.newHashMap();
+            map.put(EsConstant.opStatusField, 1);
+            map.put(EsConstant.opOwnerField, targeterId);
+            map.put(EsConstant.transferTypeField, param.getTransferType());
+            map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(now, "yyyy-MM-dd HH:mm:ss"));
+            esModifyService.updateOpinion(operatorUser, targeterId, uuid, map);
+        }
+
+        // step-3：记录转发记录
+            // 构建转发记录对象
+        OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
+        recordVO.setUuid(param.getUuid());
+        recordVO.setOpType(1);
+        recordVO.setTransferType(param.getTransferType());
+        recordVO.setTransferNote(param.getTransferNote());
+        recordVO.setOperatorId(UserContext.getUser().getId());
+        recordVO.setTargeterId(targeterId);
+        recordVO.setOpTime(now);
+        recordVO.setTransferContent(TransferEnum.getDescByCode(param.getTransferType().toString()));
+
+            // 向es中添加转发记录
+        esModifyService.recordOpinionOp(recordVO);
+    }
+
+    /**
      * 当前用户转发、解除、监测列表
      *
      * @param opStatus 1. 转发（介入）；2. 已解除； 3. 已监控
@@ -135,55 +184,6 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
             o.setLevel(level);
         });
         return result;
-    }
-
-    /**
-     * 转发舆情
-     *
-     * @param param
-     */
-    @Override
-    public void transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
-
-        Date now = new Date();
-        String uuid = param.getUuid();
-        Long targeterId = param.getUserId();
-
-        synchronized (this) {
-            // step-1：校验是否具有操作权限
-            // 不能转发给自己
-            notToOneself(targeterId);
-            // 不能转发给管理员（管理员除外）
-            notToAdmin(targeterId);
-            // 转发次数不能操作49次
-            notOver49(uuid);
-            // 待操作者才能操作该条舆情（管理员除外）
-            targeterCanOp(uuid);
-
-            // step-2：修改舆情的状态
-            UserInfo operatorUser = UserContext.getUser();
-            Map<String, Object> map = Maps.newHashMap();
-            map.put(EsConstant.opStatusField, 1);
-            map.put(EsConstant.opOwnerField, targeterId);
-            map.put(EsConstant.transferTypeField, param.getTransferType());
-            map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(now, "yyyy-MM-dd HH:mm:ss"));
-            esModifyService.updateOpinion(operatorUser, targeterId, uuid, map);
-        }
-
-        // step-3：记录转发记录
-            // 构建转发记录对象
-        OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
-        recordVO.setUuid(param.getUuid());
-        recordVO.setOpType(1);
-        recordVO.setTransferType(param.getTransferType());
-        recordVO.setTransferNote(param.getTransferNote());
-        recordVO.setOperatorId(UserContext.getUser().getId());
-        recordVO.setTargeterId(targeterId);
-        recordVO.setOpTime(now);
-        recordVO.setTransferContent(TransferEnum.getDescByCode(param.getTransferType().toString()));
-
-            // 向es中添加转发记录
-        esModifyService.recordOpinionOp(recordVO);
     }
 
     // 舆情转发次数上限为49
