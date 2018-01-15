@@ -1,22 +1,5 @@
 package com.bbd.service.impl;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import com.alibaba.fastjson.JSONArray;
 import com.bbd.annotation.TimeUsed;
 import com.bbd.bean.OpinionEsVO;
@@ -24,32 +7,20 @@ import com.bbd.bean.OpinionHotEsVO;
 import com.bbd.bean.OpinionWarnTime;
 import com.bbd.bean.WarnNotifierVO;
 import com.bbd.constant.EsConstant;
+import com.bbd.dao.OpinionPopDao;
 import com.bbd.dao.SearchHistoryDao;
 import com.bbd.dao.WarnNotifierExtDao;
-import com.bbd.domain.KeyValueVO;
-import com.bbd.domain.SearchHistory;
-import com.bbd.domain.SearchHistoryExample;
-import com.bbd.domain.WarnSetting;
+import com.bbd.domain.*;
 import com.bbd.exception.ApplicationException;
 import com.bbd.exception.CommonErrorCode;
 import com.bbd.job.vo.EmailContent;
 import com.bbd.job.vo.MsgVO;
 import com.bbd.job.vo.OpinionMsgModel;
 import com.bbd.job.vo.SMSContent;
-import com.bbd.service.EsQueryService;
-import com.bbd.service.EventService;
-import com.bbd.service.OpinionService;
-import com.bbd.service.SystemSettingService;
-import com.bbd.service.UserService;
+import com.bbd.report.util.TextUtil;
+import com.bbd.service.*;
 import com.bbd.service.utils.BusinessUtils;
-import com.bbd.service.vo.HistoryOpinionDetailVO;
-import com.bbd.service.vo.OpinionEsSearchVO;
-import com.bbd.service.vo.OpinionExtVO;
-import com.bbd.service.vo.OpinionMsgSend;
-import com.bbd.service.vo.OpinionOpRecordVO;
-import com.bbd.service.vo.OpinionVO;
-import com.bbd.service.vo.SimiliarNewsVO;
-import com.bbd.service.vo.WarnOpinionTopTenVO;
+import com.bbd.service.vo.*;
 import com.bbd.util.BeanMapperUtil;
 import com.bbd.util.DateUtil;
 import com.bbd.util.StringUtils;
@@ -63,6 +34,17 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
+import org.apache.commons.lang3.time.DateUtils;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Liuweibo
@@ -89,8 +71,14 @@ public class OpinionServiceImpl implements OpinionService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private OpinionPopDao popDao;
+
     @Value("#{propertiesConfig[address]}")
     private String address;
+
+    @Value("#{propertiesConfig[pop.opinion]}")
+    private String opinionPopMsg;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -377,6 +365,8 @@ public class OpinionServiceImpl implements OpinionService {
         }
     }
 
+
+
     /**
      * 获取短信或邮件提醒的json字符串
      *
@@ -419,6 +409,84 @@ public class OpinionServiceImpl implements OpinionService {
         result.addAll(smsMsg);
         msgSend.setSendMsg(result);
         return msgSend;
+    }
+
+    /**
+     * 舆情系统弹窗字符串
+     * @param userId
+     * @param type
+     */
+    @Override
+    public PopMsg opinionPopupWindowsMsg(Long userId, Integer type) {
+        DateTime dateTime = DateTime.now();
+        Date now = dateTime.toDate();
+        // 记录弹窗时间
+        OpinionPop opinionPop = recordPopupTime(userId, type, now);
+        Date popupTime = opinionPop.getGmtPopLatest();
+        // 查询预警预警统计信息
+        DateTime queryTime = null;
+        if (DateUtils.isSameDay(now, popupTime)) queryTime = dateTime.plusMinutes(-10);
+        else queryTime = dateTime;
+        buildPopMsg(queryTime);
+        return null;
+    }
+
+    private PopMsg buildPopMsg(DateTime queryTime) {
+        Map<Integer, Integer> sta;
+        Integer maxHot;
+        PopMsg popMsg = new PopMsg();
+        sta = esQueryService.queryAddWarnCount(queryTime);
+        maxHot = esQueryService.queryMaxHot(queryTime, 1);
+        if (maxHot == null) maxHot = esQueryService.queryMaxHot(queryTime, 2);
+        if (maxHot == null) maxHot = esQueryService.queryMaxHot(queryTime, 3);
+        if (maxHot == null) return null;
+        // 用户信息
+        List<Object> params = Lists.newArrayList();
+        UserInfo user = UserContext.getUser();
+        String name = user.getAccountName();
+        String username = user.getUsername();
+        String str1 = name + "-" + username;
+        params.add(str1);
+
+        // 预警统计信息
+        params.add(sta.get(1));
+        params.add(sta.get(2));
+        params.add(sta.get(3));
+        params.add(maxHot);
+
+        String msg = TextUtil.replaceParams(opinionPopMsg, params);
+        popMsg.setMsg(msg);
+        popMsg.setUrl(address + "/warning");
+        return popMsg;
+    }
+
+    /**
+     * 记录弹窗时间
+     * @param userId
+     * @param type
+     * @param now
+     */
+    private OpinionPop recordPopupTime(Long userId, Integer type, Date now) {
+        OpinionPopExample example = new OpinionPopExample();
+        example.createCriteria().andUserIdEqualTo(userId).andTypeEqualTo((byte) type.intValue());
+        List<OpinionPop> list = popDao.selectByExample(example);
+
+        OpinionPop record = new OpinionPop();
+        record.setUserId(userId);
+        record.setType((byte) type.intValue());
+        record.setGmtModified(now);
+        record.setGmtPopLatest(now);
+        if (CollectionUtils.isEmpty(list)) {
+            record.setGmtCreate(now);
+            popDao.insert(record);
+        } else {
+            OpinionPop opinionPop = list.get(0);
+            Date lastTime = opinionPop.getGmtPopLatest();
+            record.setId(opinionPop.getId());
+            popDao.updateByPrimaryKeySelective(record);
+            record.setGmtPopLatest(lastTime);
+        }
+        return record;
     }
 
     List<MsgVO> buidEmailMsgVO(Map<Integer, Integer> maxMap,
