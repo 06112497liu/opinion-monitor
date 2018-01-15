@@ -101,6 +101,7 @@ public class BusinessUtils {
     // 解析舆情content字段
     public static String buildContent(List<String> list) {
         StringBuilder sb = new StringBuilder();
+        int i = 0;
         for (String str : list) {
             String trimStr = str.trim();
             if (trimStr.startsWith("pic_rowkey")) {
@@ -111,8 +112,10 @@ public class BusinessUtils {
             } else if(trimStr.isEmpty()) {
                 sb.append("<br/>");
             } else {
-                sb.append(trimStr);
+                if (i == 0) sb.append(trimStr);
+                else sb.append("&nbsp;&nbsp;&nbsp;&nbsp;<br/>" + trimStr);
             }
+            i++;
         }
         return sb.toString();
     }
