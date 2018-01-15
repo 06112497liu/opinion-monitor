@@ -13,6 +13,7 @@ import com.bbd.service.param.OpinionBaseInfoReport;
 import com.bbd.service.vo.*;
 import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.joda.time.DateTime;
@@ -347,4 +348,11 @@ public interface EsQueryService {
      */
     Boolean checkOpinionTasking(String uuid);
 
+    /**
+     * 获取某个文档的version
+     * @param index
+     * @param id
+     * @return
+     */
+    Long queryVersion(String index, String id);
 }

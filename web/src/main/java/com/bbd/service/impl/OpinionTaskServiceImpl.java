@@ -146,33 +146,31 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     public void transferOpinion(TransferParam param) throws IOException, ExecutionException, InterruptedException {
 
         Date now = new Date();
-
-        // step-1：校验当前用户是否有操作权限
-        OpinionEsVO opinion = esQueryService.getOpinionByUUID(param.getUuid());
-        checkPermission(opinion);
-
-        // step-2：如果是普通用户，是不能转发给管理员（也不能转发给自己）
+        String uuid = param.getUuid();
         Long targeterId = param.getUserId();
-        Long operatorId = UserContext.getUser().getId();
-        if (targeterId.compareTo(operatorId) == 0) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "不能转发给自己");
-        checkOpinionTranferConfine(targeterId);
 
-        // step-3：舆情转发次数不能大于49次
-        checkOpinionTranCount(param.getUuid());
+        synchronized (this) {
+            // step-1：校验是否具有操作权限
+            // 不能转发给自己
+            notToOneself(targeterId);
+            // 不能转发给管理员（管理员除外）
+            notToAdmin(targeterId);
+            // 转发次数不能操作49次
+            notOver49(uuid);
+            // 待操作者才能操作该条舆情（管理员除外）
+            targeterCanOp(uuid);
 
-        // step-3：修改舆情的状态
-        UserInfo operatorUser = UserContext.getUser();
-        if (Objects.isNull(operatorUser))
-            throw new ApplicationException(UserErrorCode.USER_NO_LOGIN);
+            // step-2：修改舆情的状态
+            UserInfo operatorUser = UserContext.getUser();
+            Map<String, Object> map = Maps.newHashMap();
+            map.put(EsConstant.opStatusField, 1);
+            map.put(EsConstant.opOwnerField, targeterId);
+            map.put(EsConstant.transferTypeField, param.getTransferType());
+            map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(now, "yyyy-MM-dd HH:mm:ss"));
+            esModifyService.updateOpinion(operatorUser, targeterId, uuid, map);
+        }
 
-        Map<String, Object> map = Maps.newHashMap();
-        map.put(EsConstant.opStatusField, 1);
-        map.put(EsConstant.opOwnerField, targeterId);
-        map.put(EsConstant.transferTypeField, param.getTransferType());
-        map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(now, "yyyy-MM-dd HH:mm:ss"));
-        esModifyService.updateOpinion(operatorUser, targeterId, param.getUuid(), map);
-
-        // step-4：记录转发记录
+        // step-3：记录转发记录
             // 构建转发记录对象
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
         recordVO.setUuid(param.getUuid());
@@ -188,8 +186,8 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         esModifyService.recordOpinionOp(recordVO);
     }
 
-    // 舆情转发次数上限为50
-    private void checkOpinionTranCount(String uuid) {
+    // 舆情转发次数上限为49
+    private void notOver49(String uuid) {
         Map<String, Object> keyMap = Maps.newHashMap();
         keyMap.put(EsConstant.uuidField, uuid);
         keyMap.put(EsConstant.opTypeField, 1);
@@ -200,7 +198,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
     }
 
     // 普通用户不能转发给管理员
-    private void checkOpinionTranferConfine(Long userId) {
+    private void notToAdmin(Long userId) {
         Optional<Account> op = accountService.loadByUserId(userId);
         if(op.isPresent()) {
             Account a = op.get();
@@ -209,6 +207,45 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                 throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "普通用户不能转发给管理员");
             }
         }
+    }
+
+    // 不能转发给自己
+    private void notToOneself(Long targeterId) {
+        Long operatorId = UserContext.getUser().getId();
+        if (targeterId.compareTo(operatorId) == 0) throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "不能转发给自己");
+    }
+
+    // 待操作者才能操作本条舆情(管理员除外)
+    private void targeterCanOp(String uuid) {
+        OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
+        UserInfo user = UserContext.getUser();
+        // 如果不是超级管理员，判断当前用户是否是该条舆情的待操作者
+        if(!UserContext.isAdmin()) {
+            if(Objects.isNull(opinion)) {
+                throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
+            }
+            Long ownerId = opinion.getOpOwner();
+            if(Objects.nonNull(ownerId)) {
+                if(!Objects.equals(user.getId(), ownerId)) {
+                    throw new ApplicationException(UserErrorCode.USER_NO_PERMISSION);
+                }
+            }
+        }
+    }
+
+    // 非任务中的舆情不能做解除操作
+    private void checkHotLevel(Integer hot) {
+        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3);
+        Integer level = systemSettingService.judgeOpinionSettingClass(hot, setting);
+        if(level == -1) {
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "非任务中热点舆情不能解除");
+        }
+    }
+
+    // 校验舆情是否处于任务当中
+    private boolean checkOpinionTasking(String uuid) {
+        Boolean result = esQueryService.checkOpinionTasking(uuid);
+        return result;
     }
 
     /**
@@ -223,22 +260,26 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
 
         Date now = new Date();
 
-        // step-1：校验当前用户是否有操作资格，热点舆情不能解除（处于任务中的热点舆情能解除）
-        OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
-        checkPermission(opinion);
-        boolean isTasking = checkOpinionTasking(uuid);
-        if (!isTasking) {
-            checkHotLevel(opinion.getHot());
-        }
+        synchronized (this) {
+            // step-1：校验权限
+            OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
+            // 待操作者才能操作该条舆情（管理员除外）
+            targeterCanOp(uuid);
+            // 没有处于任务中的热点舆情不能被解除
+            boolean isTasking = checkOpinionTasking(uuid);
+            if (!isTasking) {
+                checkHotLevel(opinion.getHot());
+            }
 
-        // step-2：修改舆情记录
-        UserInfo operator = UserContext.getUser();
-        Map<String, Object> map = Maps.newHashMap();
-        map.put(EsConstant.removeNoteField, removeNote);
-        map.put(EsConstant.opStatusField, 2);
-        map.put(EsConstant.opOwnerField, -1); // 解除之后，就没有目标操作者了
-        map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(now, "yyyy-MM-dd HH:mm:ss"));
-        esModifyService.updateOpinion(operator, -1L, uuid, map);
+            // step-2：修改舆情记录
+            UserInfo operator = UserContext.getUser();
+            Map<String, Object> map = Maps.newHashMap();
+            map.put(EsConstant.removeNoteField, removeNote);
+            map.put(EsConstant.opStatusField, 2);
+            map.put(EsConstant.opOwnerField, -1); // 解除之后，就没有目标操作者了
+            map.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(now, "yyyy-MM-dd HH:mm:ss"));
+            esModifyService.updateOpinion(operator, -1L, uuid, map);
+        }
 
         // step-3：记录解除记录
         OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
@@ -306,34 +347,4 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
         return result;
     }
 
-    // 校验当前用户是否有操作该条舆情的资格
-    private void checkPermission(OpinionEsVO opinion) {
-        UserInfo user = UserContext.getUser();
-        // 如果不是超级管理员，判断当前用户是否是该条舆情的待操作者
-        if(!UserContext.isAdmin()) {
-            if(Objects.isNull(opinion)) {
-                throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "操作对象不存在");
-            }
-            Long ownerId = opinion.getOpOwner();
-            if(Objects.nonNull(ownerId)) {
-                if(!Objects.equals(user.getId(), ownerId)) {
-                    throw new ApplicationException(UserErrorCode.USER_NO_PERMISSION);
-                }
-            }
-        }
-    }
-
-    // 校验热度值是否达到预警等级
-    private void checkHotLevel(Integer hot) {
-        List<WarnSetting> setting = systemSettingService.queryWarnSetting(3);
-        Integer level = systemSettingService.judgeOpinionSettingClass(hot, setting);
-        if(level == -1) {
-            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "非任务中热点舆情不能解除");
-        }
-    }
-
-    // 校验舆情是否处于任务当中
-    private boolean checkOpinionTasking(String uuid) {
-        return esQueryService.checkOpinionTasking(uuid);
-    }
 }

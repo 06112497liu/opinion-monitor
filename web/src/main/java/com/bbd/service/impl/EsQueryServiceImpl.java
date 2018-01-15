@@ -30,6 +30,7 @@ import com.mybatis.domain.Paginator;
 import com.mybatis.util.PageListHelper;
 
 import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -1412,5 +1413,24 @@ public class EsQueryServiceImpl implements EsQueryService {
         Integer statu = opinion.getOpStatus();
         statu = (statu == null ? 0 : statu);
         return statu != 0;
+    }
+
+    /**
+     * 获取某个文档的version
+     * @param index
+     * @param id
+     * @return
+     */
+    @Override
+    public Long queryVersion(String index, String id) {
+        GetResponse resp = queryGetResp(index, id);
+        long version = resp.getVersion();
+        return version;
+    }
+
+    private GetResponse queryGetResp(String index, String id) {
+        TransportClient client = esUtil.getClient();
+        GetResponse resp = client.prepareGet().setIndex(index).setId(id).execute().actionGet();
+        return resp;
     }
 }

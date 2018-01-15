@@ -2,6 +2,9 @@ package com.bbd.service.impl;
 
 import com.bbd.bean.OpinionEsVO;
 import com.bbd.constant.EsConstant;
+import com.bbd.exception.ApplicationException;
+import com.bbd.exception.CommonErrorCode;
+import com.bbd.exception.ErrorCode;
 import com.bbd.service.EsModifyService;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.SystemSettingService;
@@ -10,18 +13,23 @@ import com.bbd.util.EsUtil;
 import com.bbd.util.JsonUtil;
 import com.bbd.vo.UserInfo;
 import org.apache.commons.lang3.ArrayUtils;
+import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.engine.VersionConflictEngineException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -71,9 +79,15 @@ public class EsModifyServiceImpl implements EsModifyService {
         request.type(EsConstant.OPINION_TYPE);
         request.id(uuid);
         request.doc(buildXContentBuilder(fieldMap));
-        request.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL); // 被搜索时可见
+        request.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE); // 被搜索时可见
+        request.detectNoop(false); // 即时修改和上次相同，也增加版本号
 
-        client.update(request).actionGet();
+        // 设置版本号，是这个版本号，才更新字段，否则报错
+        try {
+            client.update(request).get();
+        } catch (VersionConflictEngineException e) {
+            throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "修改冲突");
+        }
     }
 
     // 记录参与人

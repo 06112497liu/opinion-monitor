@@ -38,7 +38,7 @@ public class OpinionJobService {
      * 定时推送舆情关键词到爬虫种子接口
      * 每天凌晨1点向爬虫推送关键词（全量）
      */
-    @Scheduled(cron = "0 0 1 * * ?")
+    //@Scheduled(cron = "0 0 1 * * ?")
     public void pushKeyWords() throws UnsupportedEncodingException {
         String url = RemoteConfigUtil.get(Reptile.NEWQA_ADD_URL);
         String path = RemoteConfigUtil.get(Reptile.NEWQA_ADD_PATH);
