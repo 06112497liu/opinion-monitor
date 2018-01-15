@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import com.bbd.bean.OpinionEsVO;
 import com.bbd.domain.*;
+import com.bbd.exception.CommonErrorCode;
 import com.bbd.util.DateUtil;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -86,6 +84,26 @@ public class EventService{
      * @throws IOException 
      */
     public synchronized Long createEvent(OpinionEvent opinionEvent) throws IOException, ExecutionException, InterruptedException {
+
+        // 舆情操作权限
+            // 舆情是否已被监测
+        synchronized (this) {
+            havedMonitored(opinionEvent.getUuid());
+            OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
+            recordVO.setOperatorId(UserContext.getUser().getId());
+            recordVO.setOpTime(new Date());
+            recordVO.setOpType(3);
+            recordVO.setUuid(opinionEvent.getUuid());
+            recordVO.setTargeterId(-1L);
+            esModifyService.recordOpinionOp(recordVO);
+        }
+
+        Map<String, Object> fieldMap;
+        fieldMap = new HashMap<>();
+        fieldMap.put(EsConstant.opStatusField, 3);
+        fieldMap.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        esModifyService.updateOpinion(UserContext.getUser(), -1L, opinionEvent.getUuid(), fieldMap);
+
         List<OpinionEvent> evtList = eventList(new OpinionEvent(), 1, Integer.MAX_VALUE);
         if (evtList.size() == 50) {
             throw new ApplicationException(BizErrorCode.EVENT_UPTO_50);
@@ -146,20 +164,19 @@ public class EventService{
         recordWhole3.setName("事件总体热度预警");
         recordWhole3.setCreateBy(opinionEvent.getCreateBy());
         warnSettingDao.insert(recordWhole3);
-        
-        //更新事件关联舆情
-        OpinionOpRecordVO recordVO = new OpinionOpRecordVO();
-        recordVO.setOperatorId(UserContext.getUser().getId());
-        recordVO.setOpTime(new Date());
-        recordVO.setOpType(3);
-        recordVO.setUuid(opinionEvent.getUuid());
-        recordVO.setTargeterId(-1L);
-        esModifyService.recordOpinionOp(recordVO);
-        Map<String, Object> fieldMap = new HashMap<String, Object>();
-        fieldMap.put(EsConstant.opStatusField, 3);
-        fieldMap.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm:ss"));
-        esModifyService.updateOpinion(UserContext.getUser(), -1L, opinionEvent.getUuid(), fieldMap);
+
         return opinionEvent.getId();
+    }
+
+    // 舆情是否已被监测
+    private void havedMonitored(String uuid) {
+        OpinionEsVO opinion = esQueryService.getOpinionByUUID(uuid);
+        Integer status = opinion.getOpStatus();
+        if (Objects.nonNull(status)) {
+            if (status == 3) {
+                throw new ApplicationException(CommonErrorCode.BIZ_ERROR, "舆情已被监测");
+            }
+        }
     }
     
     
