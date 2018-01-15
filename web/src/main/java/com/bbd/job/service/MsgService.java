@@ -440,10 +440,41 @@ public class MsgService {
         updateMsgRecord(SEND_TYPE_EVENT_HOT, MSG_TYPE_EMAIL, now);
     }
     
+    /**事件新增舆情   --弹窗   
+     */
+    public List<PopMsg> eventNewOpinionPop(){
+        //事件热点舆情变化
+        List<OpinionEvent> opinionEventList = getEventList();
+        MsgSendRecord msgSendRecord = getMsgSendRecord(SEND_TYPE_EVENT_NEW, MSG_TYPE_EMAIL);
+        DateTime startTime = null;
+        if (msgSendRecord != null) {
+            startTime = new DateTime(msgSendRecord.getSendTime());
+        }
+        DateTime endTime = new DateTime();
+        List<PopMsg> popMsgs = new ArrayList<PopMsg>();
+        for (OpinionEvent e : opinionEventList) {
+            List<EventEsVO> evtList = esQueryService.queryEventNewInfoTotal(e, startTime, endTime);
+            if (evtList ==null || evtList.size() == 0 ) {
+                continue;
+            }
+            OpinionEsVO op = esQueryService.getMaxOpinionByUUIDs(buildUids(evtList));
+            WarnSetting warnSetting = getLevel(e, WARN_EVENT_TYPE_NEW);
+            if (warnSetting == null) {
+                continue;
+            }
+            PopMsg popMsg = new PopMsg();
+            String msg = "通知：“"+e.getEventName()+"”事件新增"+evtList.size()+"条热点舆情，"+"热度最高达"+op.getHot();
+            popMsg.setMsg(msg);
+            popMsg.setUrl(address + "/monitor?id=" + e.getId());
+            popMsgs.add(popMsg);
+        }
+        return popMsgs;
+    }
+    
     /**事件总体热度级别变化定任务--弹窗   
      */
     //@Scheduled(cron="0 0/10 * * * ?")
-    public void eventLevelRecordPop() {
+    public void eventLevelRecordPopTask() {
         List<OpinionEvent> opinionEventList = getEventList();
         Integer level;
         Date now = new Date();
@@ -456,11 +487,11 @@ public class MsgService {
             if (level == null) {
                 continue;
             }
-            boolean change = changeLevelRecord(e, level, now);
+            changeLevelRecord(e, level, now);
         }
     }
     
-    public List<PopMsg> getPop(Long userId, Integer type){
+    public List<PopMsg> eventLevelRecordPop(Long userId, Integer type){
         OpinionPopExample popEx = new OpinionPopExample();
         popEx.createCriteria().andUserIdEqualTo(userId).andTypeEqualTo((byte)type.intValue());
         List<OpinionPop> opinionPopList = opinionPopDao.selectByExample(popEx);
@@ -488,6 +519,15 @@ public class MsgService {
             opinionPopDao.insert(record);
         }
         return popMsgs;
+    }
+    
+    public List<PopMsg> getPop(Long userId, Integer type){
+       if (type==2) {//事件新增舆情
+          return eventNewOpinionPop();
+       } else if (type==3) {//事件总体热度级别变化
+          return eventLevelRecordPop(userId, type);
+       }
+       return new ArrayList<PopMsg>();
     }
     
     public List<PopMsg> buildPopMsg(List<OpinionEventLevelRecord> opinionEventLevelRecordList) {

@@ -331,14 +331,4 @@ public class EventController extends AbstractController {
             endTime != null ? DateUtils.addMonths(endTime, 1) : endTime, pageNo, pageSize));
     }
     
-    @ApiOperation(value = "事件弹窗", httpMethod = "GET")
-    @ApiImplicitParams({ 
-        @ApiImplicitParam(value = "类型,1表示事件新增舆情，2表示事件热度级别变化", name = "type", dataType = "Integer", paramType = "query", required = true),
-        })
-    @RequestMapping(value = "eventPop", method = RequestMethod.GET)
-    public RestResult eventPop(Integer type) {
-       Long userId = UserContext.getUser().getId();
-       return RestResult.ok(msgService.getPop(userId, type));
-    }
-    
 }
