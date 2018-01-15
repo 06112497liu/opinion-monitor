@@ -460,7 +460,7 @@ public class MsgService {
             }
             OpinionEsVO op = esQueryService.getMaxOpinionByUUIDs(buildUids(evtList));
             WarnSetting warnSetting = getLevel(e, WARN_EVENT_TYPE_NEW);
-            if (warnSetting == null) {
+            if (warnSetting == null || warnSetting.getPopup() == 0) {
                 continue;
             }
             PopMsg popMsg = new PopMsg();
@@ -503,10 +503,34 @@ public class MsgService {
             recordEx.createCriteria().andGmtPickGreaterThan(opinionPop.getGmtPopLatest());
         }
         List<OpinionEventLevelRecord> opinionEventLevelRecordList = opinionEventLevelRecordDao.selectByExample(recordEx);
-        List<PopMsg> popMsgs = buildPopMsg(opinionEventLevelRecordList);
+        List<PopMsg> popMsgs = buildPopMsg(filterNoPop(opinionEventLevelRecordList));
         updatePop(opinionPop, userId, type); 
         return popMsgs;
     }
+    
+    public List<OpinionEventLevelRecord> filterNoPop(List<OpinionEventLevelRecord> opinionEventLevelRecordList) {
+        List<OpinionEventLevelRecord>  copyList = new ArrayList<OpinionEventLevelRecord>();
+        Long lastEventId = 0l;
+        List<WarnSetting> eventWarnList = null;
+        for (OpinionEventLevelRecord rd : opinionEventLevelRecordList) {
+            if (rd.getEventId() != lastEventId) {
+                WarnSettingExample warnSettingExample = new WarnSettingExample();
+                warnSettingExample.createCriteria().andEventIdEqualTo(rd.getEventId())
+                .andTypeEqualTo(WARN_EVENT_TYPE_WHOLE).andTargetTypeEqualTo(WARN_EVENT_TARGET_TYPE);
+                eventWarnList = warnSettingDao.selectByExample(warnSettingExample);
+                warnSettingExample.clear();
+            }
+            lastEventId = rd.getEventId();
+            for (WarnSetting ws : eventWarnList) {
+                if (ws.getPopup() == 1 
+                         && (int)rd.getLevel() == ws.getLevel()) {
+                    copyList.add(rd);
+                    break;
+                }
+            }
+        }
+        return copyList;
+    } 
     
     public void updatePop(OpinionPop opinionPop, Long userId, Integer type) {
         
