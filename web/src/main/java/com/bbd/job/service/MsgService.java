@@ -348,7 +348,7 @@ public class MsgService {
     
     /**事件新增舆情定时任务   
      */
-    //@Scheduled(cron="0 30 9 * * ?")
+    @Scheduled(cron="0 30 9 * * ?")
     public void eventNewOpinionKafka(){
         //事件热点舆情变化发送至kafka
         List<OpinionEvent> opinionEventList = getEventList();
