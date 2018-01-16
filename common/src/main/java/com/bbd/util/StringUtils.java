@@ -438,6 +438,18 @@ public class StringUtils {
     }
 
     /**
+     * 拼凑字符串
+     * @param list string集合
+     * @param separator 分隔符
+     * @return
+     */
+    public static String generateStr(String separator, List<String> list) {
+        Joiner joiner = Joiner.on(separator).skipNulls();
+        String rs = joiner.join(list);
+        return rs;
+    }
+
+    /**
      * 将字符串分割成集合
      * @param text
      * @param separator

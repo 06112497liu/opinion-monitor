@@ -1214,7 +1214,7 @@ public class EsQueryServiceImpl implements EsQueryService {
                 .addSort(EsConstant.hotField, SortOrder.DESC)
                 .setSize(1).execute().actionGet();
         List<OpinionVO> opinion = EsUtil.buildResult(resp, OpinionVO.class);
-        if(opinion.isEmpty()) return null;
+        if(opinion.isEmpty()) return -1;
         Integer hot = opinion.get(0).getHot();
         return hot;
     }

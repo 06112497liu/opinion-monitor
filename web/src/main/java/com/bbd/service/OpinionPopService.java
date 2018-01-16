@@ -1,6 +1,6 @@
 package com.bbd.service;
 
-import com.bbd.domain.PopMsg;
+import com.bbd.domain.PopOpinionMsg;
 
 /**
  * @author Liuweibo
@@ -13,5 +13,5 @@ public interface OpinionPopService {
      * @param userId
      * @param type
      */
-    PopMsg opinionPopupWindowsMsg(Long userId, Integer type);
+    PopOpinionMsg opinionPopupWindowsMsg(Long userId, Integer type);
 }

@@ -384,7 +384,7 @@ public class OpinionServiceImpl implements OpinionService {
         Integer oneMax = esQueryService.queryMaxHot(lastSendTime, 1);
         Integer twoMax = esQueryService.queryMaxHot(lastSendTime, 2);
         Integer threeMax = esQueryService.queryMaxHot(lastSendTime, 3);
-        if (oneMax == null && twoMax == null && threeMax == null) return msgSend;
+        if (oneMax == -1 && twoMax == -1 && threeMax == -1) return msgSend;
 
         Map<Integer, Integer> maxMap = Maps.newHashMap();
         maxMap.put(1, oneMax);
