@@ -594,6 +594,7 @@ public class MsgService {
                     popMsg.setLink("/monitor?id=" + evt.getId());
                     popMsgs.add(popMsg);
                     break;
+                    
                 }
             }
             

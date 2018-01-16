@@ -36,7 +36,6 @@ public class PopController extends AbstractController {
     public RestResult pop() {
         Long userId = UserContext.getUser().getId();
         HashMap map = new HashMap();
-        Long userId = UserContext.getUser().getId();
         map.put("eventNewOpinion", msgService.getPop(userId, 2));
         map.put("eventLevelChange", msgService.getPop(userId, 3));
         return RestResult.ok(map);
