@@ -71,16 +71,14 @@ public class OpinionServiceImpl implements OpinionService {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private OpinionPopDao popDao;
-
     @Value("#{propertiesConfig[address]}")
     private String address;
 
-    @Value("#{propertiesConfig[pop.opinion]}")
-    private String opinionPopMsg;
-
     private Logger logger = LoggerFactory.getLogger(getClass());
+
+    public String getAddress() {
+        return address;
+    }
 
     @Override
     public List<WarnOpinionTopTenVO> getWarnOpinionTopTen() {
@@ -409,84 +407,6 @@ public class OpinionServiceImpl implements OpinionService {
         result.addAll(smsMsg);
         msgSend.setSendMsg(result);
         return msgSend;
-    }
-
-    /**
-     * 舆情系统弹窗字符串
-     * @param userId
-     * @param type
-     */
-    @Override
-    public PopMsg opinionPopupWindowsMsg(Long userId, Integer type) {
-        DateTime dateTime = DateTime.now();
-        Date now = dateTime.toDate();
-        // 记录弹窗时间
-        OpinionPop opinionPop = recordPopupTime(userId, type, now);
-        Date popupTime = opinionPop.getGmtPopLatest();
-        // 查询预警预警统计信息
-        DateTime queryTime = null;
-        if (DateUtils.isSameDay(now, popupTime)) queryTime = dateTime.plusMinutes(-10);
-        else queryTime = dateTime;
-        buildPopMsg(queryTime);
-        return null;
-    }
-
-    private PopMsg buildPopMsg(DateTime queryTime) {
-        Map<Integer, Integer> sta;
-        Integer maxHot;
-        PopMsg popMsg = new PopMsg();
-        sta = esQueryService.queryAddWarnCount(queryTime);
-        maxHot = esQueryService.queryMaxHot(queryTime, 1);
-        if (maxHot == null) maxHot = esQueryService.queryMaxHot(queryTime, 2);
-        if (maxHot == null) maxHot = esQueryService.queryMaxHot(queryTime, 3);
-        if (maxHot == null) return null;
-        // 用户信息
-        List<Object> params = Lists.newArrayList();
-        UserInfo user = UserContext.getUser();
-        String name = user.getAccountName();
-        String username = user.getUsername();
-        String str1 = name + "-" + username;
-        params.add(str1);
-
-        // 预警统计信息
-        params.add(sta.get(1));
-        params.add(sta.get(2));
-        params.add(sta.get(3));
-        params.add(maxHot);
-
-        String msg = TextUtil.replaceParams(opinionPopMsg, params);
-        popMsg.setMsg(msg);
-        popMsg.setUrl(address + "/warning");
-        return popMsg;
-    }
-
-    /**
-     * 记录弹窗时间
-     * @param userId
-     * @param type
-     * @param now
-     */
-    private OpinionPop recordPopupTime(Long userId, Integer type, Date now) {
-        OpinionPopExample example = new OpinionPopExample();
-        example.createCriteria().andUserIdEqualTo(userId).andTypeEqualTo((byte) type.intValue());
-        List<OpinionPop> list = popDao.selectByExample(example);
-
-        OpinionPop record = new OpinionPop();
-        record.setUserId(userId);
-        record.setType((byte) type.intValue());
-        record.setGmtModified(now);
-        record.setGmtPopLatest(now);
-        if (CollectionUtils.isEmpty(list)) {
-            record.setGmtCreate(now);
-            popDao.insert(record);
-        } else {
-            OpinionPop opinionPop = list.get(0);
-            Date lastTime = opinionPop.getGmtPopLatest();
-            record.setId(opinionPop.getId());
-            popDao.updateByPrimaryKeySelective(record);
-            record.setGmtPopLatest(lastTime);
-        }
-        return record;
     }
 
     List<MsgVO> buidEmailMsgVO(Map<Integer, Integer> maxMap,

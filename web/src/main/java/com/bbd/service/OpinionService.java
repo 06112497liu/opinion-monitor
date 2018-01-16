@@ -95,13 +95,6 @@ public interface OpinionService {
     OpinionMsgSend getWarnRemindJson(DateTime lastSendTime) throws NoSuchFieldException;
 
     /**
-     * 舆情系统弹窗字符串
-     * @param userId
-     * @param type
-     */
-    PopMsg opinionPopupWindowsMsg(Long userId, Integer type);
-
-    /**
      * 历史预警舆情详情
      * @param uuid
      */
