@@ -69,9 +69,9 @@ public class OpinionPopServiceImpl implements OpinionPopService {
         OpinionPop opinionPop = recordPopupTime(userId, type, now);
         Date popupTime = opinionPop.getGmtPopLatest();
         // 查询预警预警统计信息
-        DateTime queryTime = null;
+        DateTime queryTime;
         if (DateUtils.isSameInstant(now, popupTime)) queryTime = dateTime.plusYears(-90);
-        else queryTime = dateTime;
+        else queryTime = dateTime.plusYears(-90);
         PopOpinionMsg result = buildPopMsg(queryTime);
         return result;
     }
