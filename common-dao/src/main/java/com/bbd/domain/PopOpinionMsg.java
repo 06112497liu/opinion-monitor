@@ -1,6 +1,7 @@
 package com.bbd.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Map;
  * @author Liuweibo
  * @version Id: PopOpinionMsg.java, v0.1 2018/1/16 Liuweibo Exp $$
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PopOpinionMsg {
 
     private String username;
