@@ -471,7 +471,7 @@ public class MsgService {
             popMsg.setLink("/monitor?id=" + e.getId());
             popMsgs.add(popMsg);
         }
-        updatePop(opinionPop, userId, type); 
+        //updatePop(opinionPop, userId, type); 
         return popMsgs;
     }
     
@@ -506,7 +506,7 @@ public class MsgService {
         }
         List<OpinionEventLevelRecord> opinionEventLevelRecordList = opinionEventLevelRecordDao.selectByExample(recordEx);
         List<PopEventMsg> popMsgs = buildPopMsg(filterNoPop(opinionEventLevelRecordList));
-        updatePop(opinionPop, userId, type); 
+        //updatePop(opinionPop, userId, type); 
         return popMsgs;
     }
     
