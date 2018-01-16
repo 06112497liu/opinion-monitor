@@ -104,7 +104,7 @@ public class EventService{
         fieldMap.put(EsConstant.recordTimeField, DateUtil.formatDateByPatten(new Date(), "yyyy-MM-dd HH:mm:ss"));
         esModifyService.updateOpinion(UserContext.getUser(), -1L, opinionEvent.getUuid(), fieldMap);
 
-        List<OpinionEvent> evtList = eventList(new OpinionEvent(), 1, Integer.MAX_VALUE);
+        List<OpinionEvent> evtList = eventList(new OpinionEvent(), 0, 0, 1, Integer.MAX_VALUE);
         if (evtList.size() == 50) {
             throw new ApplicationException(BizErrorCode.EVENT_UPTO_50);
         }
@@ -313,10 +313,9 @@ public class EventService{
      * @param pageSize
      * @return 
      */
-    public List<OpinionEvent> eventList(OpinionEvent opinionEvent, Integer pageNo, Integer pageSize) {
+    public List<OpinionEvent> eventList(OpinionEvent opinionEvent,Integer myEvent,Integer sortByUser, Integer pageNo, Integer pageSize) {
         PageBounds pageBounds = new PageBounds(pageNo, pageSize);
         OpinionEventExample  example = new OpinionEventExample();
-        example.setOrderByClause("gmt_create DESC");
         Criteria criteria = example.createCriteria();
         if (opinionEvent.getRegion() != null) {
             criteria.andRegionEqualTo(opinionEvent.getRegion());
@@ -324,9 +323,24 @@ public class EventService{
         if (opinionEvent.getEventGroup() != null) {
             criteria.andEventGroupEqualTo(opinionEvent.getEventGroup());
         }
+        if (myEvent != null && myEvent == 1) {
+            criteria.andCreateByEqualTo(opinionEvent.getCreateBy());
+        }
+        if (sortByUser != null && sortByUser == 1) {
+            example.setOrderByClause("create_by ASC,gmt_create DESC");
+        } else {
+            example.setOrderByClause("gmt_create DESC");
+        }
         criteria.andIsDeleteEqualTo((byte)0);
         criteria.andFileReasonIsNull();
+        
         return opinionEventDao.selectByExampleWithPageBounds(example, pageBounds);
+    }
+    
+    public List<Account> getAcounts(List<Long> userIds) {
+        AccountExample example = new AccountExample();
+        example.createCriteria().andUserIdIn(userIds);
+        return accountDao.selectByExample(example);
     }
     
     public List<OpinionEvent> eventList(OpinionEvent opinionEvent) {

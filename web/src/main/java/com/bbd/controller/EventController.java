@@ -10,13 +10,16 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,9 +29,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bbd.RestResult;
+import com.bbd.domain.Account;
+import com.bbd.domain.AccountExample;
 import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.domain.OpinionEvent;
+import com.bbd.domain.OpinionEventChinese;
 import com.bbd.job.service.MsgService;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
@@ -152,18 +158,44 @@ public class EventController extends AbstractController {
     @ApiImplicitParams({ 
         @ApiImplicitParam(value = "区域代码", name = "region", dataType = "String", paramType = "query", required = false),
         @ApiImplicitParam(value = "事件分组", name = "eventGroup", dataType = "String", paramType = "query", required = false),
+        @ApiImplicitParam(value = "我的监测，1表示是，0表示否", name = "myEvent", dataType = "Integer", paramType = "query", required = false),
+        @ApiImplicitParam(value = "按归属账号排序，1表示是，0表示否", name = "sortByUser", dataType = "Integer", paramType = "query", required = false),
         @ApiImplicitParam(value = "第几页", name = "pageNo", dataType = "Integer", paramType = "query", required = true),
         @ApiImplicitParam(value = "每页大小", name = "pageSize", dataType = "Integer", paramType = "query", required = true)
     })
     @RequestMapping(value = "eventList", method = RequestMethod.GET)
-    public RestResult eventList(OpinionEvent opinionEvent, Integer pageNo, Integer pageSize) {
-        return RestResult.ok(eventService.eventList(opinionEvent, pageNo, pageSize));
+    public RestResult eventList(OpinionEvent opinionEvent,Integer myEvent,Integer sortByUser, Integer pageNo, Integer pageSize) throws IllegalAccessException, InvocationTargetException {
+        opinionEvent.setCreateBy(UserContext.getUser().getId());
+        List<OpinionEvent> list = eventService.eventList(opinionEvent,myEvent,sortByUser, pageNo, pageSize);
+        List<Long> userIds = new ArrayList<Long>();
+        for(OpinionEvent e : list) {
+            userIds.add(e.getCreateBy());
+        }
+        List<Account> acts = new ArrayList<Account>();
+        if (userIds.size() > 0) {
+            acts = eventService.getAcounts(userIds);
+        }
+        
+        List<OpinionEventChinese> opinionEventChineseList = new ArrayList<OpinionEventChinese>(); 
+        for(OpinionEvent e : list) {
+            for (Account act : acts) {
+                if (act.getUserId() == e.getCreateBy()) {
+                    OpinionEventChinese opEvtCh = new OpinionEventChinese();
+                    BeanUtils.copyProperties(opEvtCh, e);
+                    opEvtCh.setCreateUserName(act.getName());
+                    opinionEventChineseList.add(opEvtCh);
+                    break;
+                }
+            }
+        }
+        return RestResult.ok(opinionEventChineseList);
     }
+    
     
     @ApiOperation(value = "最新事件", httpMethod = "GET")
     @RequestMapping(value = "eventIdLatest", method = RequestMethod.GET)
     public RestResult eventIdLatest() {
-        List<OpinionEvent> eventList = eventService.eventList(new OpinionEvent(), 1, 1);
+        List<OpinionEvent> eventList = eventService.eventList(new OpinionEvent(),0,0,1, 1);
         if (eventList != null && eventList.size() > 0) {
             return RestResult.ok(eventList.get(0).getId());
         } else {
