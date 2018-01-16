@@ -58,7 +58,7 @@ public class EventStatisticService {
     @Autowired  
     private KafkaTemplate<Integer, String> kafkaTemplate;  
     
-    //@Scheduled(cron="0 30 * * * ?")
+    @Scheduled(cron="0 30 * * * ?")
     public void eventTrendStatistic() {
         OpinionEventExample example = new OpinionEventExample();
         example.createCriteria().andIsDeleteEqualTo((byte)0).andFileReasonIsNull();
@@ -95,7 +95,7 @@ public class EventStatisticService {
         }
     }
     
-    //@Scheduled(cron="0 30 * * * ?")
+    @Scheduled(cron="0 30 * * * ?")
     public void eventMediaStatistic() throws ParseException {
         OpinionEventExample example = new OpinionEventExample();
         example.createCriteria().andIsDeleteEqualTo((byte)0).andFileReasonIsNull();

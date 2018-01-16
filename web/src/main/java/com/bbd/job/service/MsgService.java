@@ -395,7 +395,7 @@ public class MsgService {
     /**舆情定时任务  
      * @throws NoSuchFieldException 
      */
-    //@Scheduled(cron="0 30 9 * * ?")
+    @Scheduled(cron="0 30 9 * * ?")
     public void opinionKafka() throws NoSuchFieldException {
         MsgSendRecord msgSendRecord = getMsgSendRecord(SEND_TYPE_OPINION, MSG_TYPE_EMAIL);
         OpinionMsgSend opinionMsgSend = opinionService.getWarnRemindJson(msgSendRecord != null ? new DateTime(msgSendRecord.getSendTime()) : null);
@@ -409,7 +409,7 @@ public class MsgService {
     
     /**事件总体热度级别变化定任务   
      */
-    //@Scheduled(cron="0 30 9 * * ?")
+    @Scheduled(cron="0 30 9 * * ?")
     public void eventWholeHotKafka() {
         //事件总体热度级别变化发送至kafka
         List<OpinionEvent> opinionEventList = getEventList();
@@ -477,7 +477,7 @@ public class MsgService {
     
     /**事件总体热度级别变化定任务--弹窗   
      */
-    //@Scheduled(cron="0 30 * * * ?")
+    @Scheduled(cron="0 30 * * * ?")
     public void eventLevelRecordPopTask() {
         logger.info("弹窗事件总体热度级别变化计算开始... ");
         List<OpinionEvent> opinionEventList = getEventList();
@@ -586,7 +586,6 @@ public class MsgService {
         for (OpinionEventLevelRecord record : opinionEventLevelRecordList) {
             for (OpinionEvent evt : eventList) {
                 if (record.getEventId() == evt.getId()) {
-                    //msg = "通知：事件"+getLevel(record.getLevel())+"级预警：“"+evt.getEventName()+"”"+"事件总热度已达"+record.getHot();
                     PopEventMsg popMsg = new PopEventMsg();
                     popMsg.setEventName(evt.getEventName());
                     popMsg.setLevel((int)record.getLevel());
@@ -594,7 +593,6 @@ public class MsgService {
                     popMsg.setLink("/monitor?id=" + evt.getId());
                     popMsgs.add(popMsg);
                     break;
-                    
                 }
             }
             

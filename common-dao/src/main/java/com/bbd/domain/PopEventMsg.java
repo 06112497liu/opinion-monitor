@@ -16,7 +16,6 @@ public class PopEventMsg {
     
     private String link;
 
-    
     public String getEventName() {
         return eventName;
     }
