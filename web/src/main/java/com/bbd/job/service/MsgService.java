@@ -38,7 +38,7 @@ import com.bbd.domain.OpinionEventLevelRecord;
 import com.bbd.domain.OpinionEventLevelRecordExample;
 import com.bbd.domain.OpinionPop;
 import com.bbd.domain.OpinionPopExample;
-import com.bbd.domain.PopMsg;
+import com.bbd.domain.PopEventMsg;
 import com.bbd.domain.WarnNotifier;
 import com.bbd.domain.WarnNotifierExample;
 import com.bbd.domain.WarnSetting;
@@ -348,7 +348,7 @@ public class MsgService {
     
     /**事件新增舆情定时任务   
      */
-    @Scheduled(cron="0 30 9 * * ?")
+    //@Scheduled(cron="0 30 9 * * ?")
     public void eventNewOpinionKafka(){
         //事件热点舆情变化发送至kafka
         List<OpinionEvent> opinionEventList = getEventList();
@@ -395,7 +395,7 @@ public class MsgService {
     /**舆情定时任务  
      * @throws NoSuchFieldException 
      */
-    @Scheduled(cron="0 30 9 * * ?")
+    //@Scheduled(cron="0 30 9 * * ?")
     public void opinionKafka() throws NoSuchFieldException {
         MsgSendRecord msgSendRecord = getMsgSendRecord(SEND_TYPE_OPINION, MSG_TYPE_EMAIL);
         OpinionMsgSend opinionMsgSend = opinionService.getWarnRemindJson(msgSendRecord != null ? new DateTime(msgSendRecord.getSendTime()) : null);
@@ -409,7 +409,7 @@ public class MsgService {
     
     /**事件总体热度级别变化定任务   
      */
-    @Scheduled(cron="0 30 9 * * ?")
+    //@Scheduled(cron="0 30 9 * * ?")
     public void eventWholeHotKafka() {
         //事件总体热度级别变化发送至kafka
         List<OpinionEvent> opinionEventList = getEventList();
@@ -443,7 +443,7 @@ public class MsgService {
     
     /**事件新增舆情   --弹窗   
      */
-    public List<PopMsg> eventNewOpinionPop(Long userId, Integer type){
+    public List<PopEventMsg> eventNewOpinionPop(Long userId, Integer type){
         //事件热点舆情变化
         List<OpinionEvent> opinionEventList = getEventList();
         DateTime startTime = null;
@@ -452,7 +452,7 @@ public class MsgService {
         if (opinionPop != null) {
             startTime = new DateTime(opinionPop.getGmtPopLatest());
         }
-        List<PopMsg> popMsgs = new ArrayList<PopMsg>();
+        List<PopEventMsg> popMsgs = new ArrayList<PopEventMsg>();
         for (OpinionEvent e : opinionEventList) {
             List<EventEsVO> evtList = esQueryService.queryEventNewInfoTotal(e, startTime, endTime);
             if (evtList ==null || evtList.size() == 0 ) {
@@ -463,10 +463,12 @@ public class MsgService {
             if (warnSetting == null || warnSetting.getPopup() == 0) {
                 continue;
             }
-            PopMsg popMsg = new PopMsg();
-            String msg = "通知：“"+e.getEventName()+"”事件新增"+evtList.size()+"条热点舆情，"+"热度最高达"+op.getHot();
-            popMsg.setMsg(msg);
-            popMsg.setUrl(address + "/monitor?id=" + e.getId());
+            PopEventMsg popMsg = new PopEventMsg();
+            //String msg = "通知：“"+e.getEventName()+"”事件新增"+evtList.size()+"条热点舆情，"+"热度最高达"+op.getHot();
+            popMsg.setEventName(e.getEventName());
+            popMsg.setCount(evtList.size());
+            popMsg.setHot(op.getHot());
+            popMsg.setLink("/monitor?id=" + e.getId());
             popMsgs.add(popMsg);
         }
         updatePop(opinionPop, userId, type); 
@@ -475,7 +477,7 @@ public class MsgService {
     
     /**事件总体热度级别变化定任务--弹窗   
      */
-    @Scheduled(cron="0 30 * * * ?")
+    //@Scheduled(cron="0 30 * * * ?")
     public void eventLevelRecordPopTask() {
         logger.info("弹窗事件总体热度级别变化计算开始... ");
         List<OpinionEvent> opinionEventList = getEventList();
@@ -495,7 +497,7 @@ public class MsgService {
         logger.info("弹窗事件总体热度级别变化计算结束... ");
     }
     
-    public List<PopMsg> eventLevelRecordPop(Long userId, Integer type){
+    public List<PopEventMsg> eventLevelRecordPop(Long userId, Integer type){
         OpinionEventLevelRecordExample recordEx = new  OpinionEventLevelRecordExample();
         recordEx.setOrderByClause("event_id DESC, gmt_pick ASC");
         OpinionPop opinionPop = getOpinionPop(userId, type);
@@ -503,7 +505,7 @@ public class MsgService {
             recordEx.createCriteria().andGmtPickGreaterThan(opinionPop.getGmtPopLatest());
         }
         List<OpinionEventLevelRecord> opinionEventLevelRecordList = opinionEventLevelRecordDao.selectByExample(recordEx);
-        List<PopMsg> popMsgs = buildPopMsg(filterNoPop(opinionEventLevelRecordList));
+        List<PopEventMsg> popMsgs = buildPopMsg(filterNoPop(opinionEventLevelRecordList));
         updatePop(opinionPop, userId, type); 
         return popMsgs;
     }
@@ -561,18 +563,18 @@ public class MsgService {
         }
     }
     
-    public List<PopMsg> getPop(Long userId, Integer type){
+    public List<PopEventMsg> getPop(Long userId, Integer type){
        if (type==2) {//事件新增舆情
           return eventNewOpinionPop(userId, type);
        } else if (type==3) {//事件总体热度级别变化
           return eventLevelRecordPop(userId, type);
        }
-       return new ArrayList<PopMsg>();
+       return new ArrayList<PopEventMsg>();
     }
     
-    public List<PopMsg> buildPopMsg(List<OpinionEventLevelRecord> opinionEventLevelRecordList) {
+    public List<PopEventMsg> buildPopMsg(List<OpinionEventLevelRecord> opinionEventLevelRecordList) {
         List<Long> ids = new ArrayList<Long>();
-        List<PopMsg> popMsgs = new ArrayList<PopMsg>(); 
+        List<PopEventMsg> popMsgs = new ArrayList<PopEventMsg>(); 
         if (opinionEventLevelRecordList == null || opinionEventLevelRecordList.size() == 0) {
             return popMsgs;
         }
@@ -582,13 +584,14 @@ public class MsgService {
         
         List<OpinionEvent> eventList = eventService.getEventList(ids);
         for (OpinionEventLevelRecord record : opinionEventLevelRecordList) {
-            String msg = "";
             for (OpinionEvent evt : eventList) {
                 if (record.getEventId() == evt.getId()) {
-                    msg = "通知：事件"+getLevel(record.getLevel())+"级预警：“"+evt.getEventName()+"”"+"事件总热度已达"+record.getHot();
-                    PopMsg popMsg = new PopMsg();
-                    popMsg.setMsg(msg);
-                    popMsg.setUrl(address + "/monitor?id=" + evt.getId());
+                    //msg = "通知：事件"+getLevel(record.getLevel())+"级预警：“"+evt.getEventName()+"”"+"事件总热度已达"+record.getHot();
+                    PopEventMsg popMsg = new PopEventMsg();
+                    popMsg.setEventName(evt.getEventName());
+                    popMsg.setLevel((int)record.getLevel());
+                    popMsg.setHot(record.getHot());
+                    popMsg.setLink("/monitor?id=" + evt.getId());
                     popMsgs.add(popMsg);
                     break;
                 }
