@@ -191,7 +191,7 @@ public class OpinionListener {
     }
 
     /**
-     * 获取时间预警设置
+     * 获取事件预警设置
      * @return
      */
     private Map<Long, WarnSetting> getEventsWarnSettings() {

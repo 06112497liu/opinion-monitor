@@ -1,8 +1,15 @@
 package com.bbd.service;
 
+import com.bbd.dao.WarnSettingDao;
 import com.bbd.domain.WarnNotifier;
+import com.bbd.domain.WarnSetting;
+import com.bbd.domain.WarnSettingExample;
+import com.google.common.collect.Maps;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Liuweibo
@@ -12,6 +19,9 @@ public class SystemSettingServiceTest extends BaseServiceTest{
 
     @Autowired
     private SystemSettingService settingService;
+
+    @Autowired
+    private WarnSettingDao warnSettingDao;
 
     @Test
     public void testModifyHeat() {
@@ -53,6 +63,15 @@ public class SystemSettingServiceTest extends BaseServiceTest{
     @Test
     public void testGetWarnSettingList() {
         settingService.getWarnSettingList(3, 8L);
+    }
+
+    @Test
+    public void testWarnSetting() {
+        WarnSettingExample exam = new WarnSettingExample();
+        exam.createCriteria().andTypeEqualTo(1);
+        List<WarnSetting> ss = warnSettingDao.selectByExample(exam);
+        ss.stream().collect(Collectors.toMap(WarnSetting::getEventId, s -> s));
+        System.out.println(ss);
     }
 }
     

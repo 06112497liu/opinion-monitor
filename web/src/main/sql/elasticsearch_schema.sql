@@ -13,13 +13,19 @@ PUT bbd_opinion
           "type": "keyword"
         },
         "titile": {
-          "type": "text"
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "search_analyzer": "ik_max_word"
         },
         "summary": {
-          "type": "text"
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "search_analyzer": "ik_max_word"
         },
         "content": {
-          "type": "text"
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "search_analyzer": "ik_max_word"
         },
         "source": {
           "type": "keyword"
