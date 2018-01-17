@@ -14,12 +14,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -30,11 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bbd.RestResult;
 import com.bbd.domain.Account;
-import com.bbd.domain.AccountExample;
 import com.bbd.domain.KeyValueVO;
 import com.bbd.domain.OpinionDictionary;
 import com.bbd.domain.OpinionEvent;
-import com.bbd.domain.OpinionEventChinese;
 import com.bbd.job.service.MsgService;
 import com.bbd.service.EsQueryService;
 import com.bbd.service.EventService;
@@ -176,19 +172,15 @@ public class EventController extends AbstractController {
             acts = eventService.getAcounts(userIds);
         }
         
-        List<OpinionEventChinese> opinionEventChineseList = new ArrayList<OpinionEventChinese>(); 
         for(OpinionEvent e : list) {
             for (Account act : acts) {
                 if (act.getUserId() == e.getCreateBy()) {
-                    OpinionEventChinese opEvtCh = new OpinionEventChinese();
-                    BeanUtils.copyProperties(opEvtCh, e);
-                    opEvtCh.setCreateUserName(act.getName());
-                    opinionEventChineseList.add(opEvtCh);
+                    e.setCreateUserName(act.getName());
                     break;
                 }
             }
         }
-        return RestResult.ok(opinionEventChineseList);
+        return RestResult.ok(list);
     }
     
     
