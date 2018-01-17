@@ -112,7 +112,7 @@ public class BusinessUtils {
             } else if(trimStr.isEmpty()) {
                 sb.append("<br/>");
             } else {
-                if (i == 0) sb.append("<br/>" + trimStr);
+                if (i == 0) sb.append(trimStr);
                 else sb.append("<br/>" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + trimStr);
             }
             i++;
