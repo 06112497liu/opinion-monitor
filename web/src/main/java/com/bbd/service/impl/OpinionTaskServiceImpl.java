@@ -26,10 +26,12 @@ import com.mybatis.domain.PageBounds;
 import com.mybatis.domain.PageList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * @author Liuweibo
@@ -160,22 +162,39 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                 });
             }
             if (opStatus == 3) { // 如果是已监控页面，查询事件的一些信息
-                //result.parallelStream().map()
-                result.forEach(o -> {
+                Map<String, OpinionEvent> eventMap =
+                    result.parallelStream().map(x -> {
+                        String uuid = x.getUuid();
+                        OpinionEventExample exam = new OpinionEventExample();
+                        exam.createCriteria().andUuidEqualTo(uuid);
+                        List<OpinionEvent> event = opinionEventDao.selectByExample(exam);
+                        if (!CollectionUtils.isEmpty(event)) return event.get(0);
+                        else return null;
+                    }).collect(Collectors.toMap(OpinionEvent::getUuid, x -> x));
+                for (OpinionTaskListVO o : result) {
                     String uuid = o.getUuid();
-                    OpinionEventExample exam = new OpinionEventExample();
-                    exam.createCriteria().andUuidEqualTo(uuid);
-                    List<OpinionEvent> events = opinionEventDao.selectByExample(exam);
-                    OpinionEvent event;
-                    if (!events.isEmpty()) {
-                        event = events.get(0);
-                        o.setMonitorTime(event.getGmtCreate());
-                        o.setEventName(event.getEventName());
-                        o.setEventID(event.getId());
-                        o.setIsDelete(event.getIsDelete().intValue());
-                        o.setIsFile(event.getFileReason() == null ? 0 : 1);
-                    }
-                });
+                    OpinionEvent event = eventMap.get(uuid);
+                    o.setMonitorTime(event.getGmtCreate());
+                    o.setEventName(event.getEventName());
+                    o.setEventID(event.getId());
+                    o.setIsDelete(event.getIsDelete().intValue());
+                    o.setIsFile(event.getFileReason() == null ? 0 : 1);
+                }
+//                result.forEach(o -> {
+//                    String uuid = o.getUuid();
+//                    OpinionEventExample exam = new OpinionEventExample();
+//                    exam.createCriteria().andUuidEqualTo(uuid);
+//                    List<OpinionEvent> events = opinionEventDao.selectByExample(exam);
+//                    OpinionEvent event;
+//                    if (!events.isEmpty()) {
+//                        event = events.get(0);
+//                        o.setMonitorTime(event.getGmtCreate());
+//                        o.setEventName(event.getEventName());
+//                        o.setEventID(event.getId());
+//                        o.setIsDelete(event.getIsDelete().intValue());
+//                        o.setIsFile(event.getFileReason() == null ? 0 : 1);
+//                    }
+//                });
             }
         }
         List<WarnSetting> warnSetting = systemSettingService.queryWarnSetting(3);
