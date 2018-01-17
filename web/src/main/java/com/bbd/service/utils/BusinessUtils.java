@@ -107,13 +107,13 @@ public class BusinessUtils {
             if (trimStr.startsWith("pic_rowkey")) {
                 String imgUrl = getPicParse(trimStr);
                 if (imgUrl != null) {
-                    sb.append("<img src='" + imgUrl + "'>");
+                    sb.append("<img src='" + imgUrl + "'>" + "<br/>");
                 }
             } else if(trimStr.isEmpty()) {
                 sb.append("<br/>");
             } else {
-                if (i == 0) sb.append(trimStr);
-                else sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + trimStr);
+                if (i == 0) sb.append("<br/>" + trimStr);
+                else sb.append("<br/>" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + trimStr);
             }
             i++;
         }

@@ -384,6 +384,12 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>com.bbd.reddata-sso</groupId>
+                <artifactId>bdsso-client</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

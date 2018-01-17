@@ -160,6 +160,7 @@ public class OpinionTaskServiceImpl implements OpinionTaskService {
                 });
             }
             if (opStatus == 3) { // 如果是已监控页面，查询事件的一些信息
+                //result.parallelStream().map()
                 result.forEach(o -> {
                     String uuid = o.getUuid();
                     OpinionEventExample exam = new OpinionEventExample();

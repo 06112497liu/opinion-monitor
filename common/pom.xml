@@ -140,6 +140,18 @@
             <artifactId>transport</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.bbd.reddata-sso</groupId>
+            <artifactId>bdsso-client</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>aspectjweaver</artifactId>
+                    <groupId>aspectj</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+
     </dependencies>
 
     <build>
